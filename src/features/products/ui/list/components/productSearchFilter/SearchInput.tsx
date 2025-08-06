@@ -1,7 +1,9 @@
+"use client"
+
 import { Label } from '@/components/ui/label';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useAtom } from 'jotai/react/useAtom';
+import { useAtom } from 'jotai';
 import { searchValueAtom } from '@/features/products/store/productSearch.store';
 import { ChangeEventHandler } from 'react';
 

@@ -1,7 +1,9 @@
+"use client"
+
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PRODUCT_SALE_TYPE } from '@/constant/Product';
-import { useAtom } from 'jotai/react/useAtom';
+import { useAtom } from 'jotai';
 import { saleTypeAtom } from '@/features/products/store/productSearch.store';
 
 export const ProductSearchSaleState = () => {

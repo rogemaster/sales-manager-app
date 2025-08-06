@@ -1,7 +1,9 @@
+"use client"
+
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CategoryInterface } from '@/types/ProductInterface';
-import { useAtom } from 'jotai/react/useAtom';
+import { useAtom } from 'jotai';
 import { categoryAtom } from '@/features/products/store/productSearch.store';
 import { useMemo } from 'react';
 

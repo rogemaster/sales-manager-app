@@ -1,8 +1,10 @@
+"use client"
+
 import { ChangeEventHandler } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { useAtom } from 'jotai/react/useAtom';
+import { useAtom } from 'jotai';
 import { DateTypeAtom, registDateAtom, updateDateAtom } from '@/features/products/store/productSearch.store';
 import dayjs from 'dayjs';
 import { PRODUCT_DATE_TYPE } from '@/constant/Product';

@@ -6,3 +6,8 @@ export interface ProductSearch {
   categoryId: string;
   searchValue: string;
 }
+
+export interface ProductTableHead {
+  id: string;
+  title: string;
+}

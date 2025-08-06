@@ -13,12 +13,12 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
     icon: PackageIcon,
     items: [
       {
-        title: '삼품목록',
-        url: '/products/list',
+        title: '상품목록',
+        url: '/products',
       },
       {
         title: '상품등록',
-        url: '/products/insert',
+        url: '/products/create',
       }
     ]
   },
@@ -32,8 +32,23 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
         url: '/shopping/settings',
       },
       {
-        title: '쇼핑몰',
-        url: '/shopping/products',
+        title: '쇼핑몰상품등록',
+        url: '/shopping/register'
+      },
+      {
+        title: '쇼핑몰상품목록',
+        url: '/shopping/list',
+      }
+    ]
+  },
+  {
+    title: '주문관리',
+    url: '/order',
+    icon: PackageIcon,
+    items: [
+      {
+        title: '주문목록',
+        url: '/order/list',
       }
     ]
   }
