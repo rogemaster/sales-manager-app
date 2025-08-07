@@ -7,10 +7,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function FindCategoryName(code: string) {
+export function getCategoryName(code: string) {
   return mockCategorys.find((value) => code.includes(value.code))?.name;
 }
 
-export function FindProductStatusName(id: string) {
+export function getProductStatusName(id: string) {
   return PRODUCT_STATUS.find((value) => id.includes(value.id))?.name;
 }
