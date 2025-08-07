@@ -8,22 +8,24 @@ export interface CategoryInterface {
   name: string;
 }
 
-// 배송 타입 값 import
-import { DeliveryTypeValue } from '@/constant/Product';
-
 export interface Product {
   productCode: string;
-  productName: string;
+  name: string;
   categoryCode: string;
-  productNetPrice: number;
-  productPrice: number;
-  productStatus: string;
-  productCreateDate: Date;
-  productUpdateDate: Date;
-  deliveryType: DeliveryTypeValue;
+  netPrice: number;
+  price: number;
+  status: string;
+  deliveryType: string;
+  deliveryPrice: number;
+  mainImage: string;
+  detailPage: string;
+  option: string;
+  keyWord: string | null;
+  createDate: Date;
+  updateDate: Date;
 }
 
-export interface DeliveryType {
-  type: DeliveryTypeValue;
+export interface Category {
+  code: string;
   name: string;
 }

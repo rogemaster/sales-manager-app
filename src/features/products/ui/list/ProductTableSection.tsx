@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { TableBody } from '@/components/ui/table';
-import { ProductListHeader } from '@/features/products/ui/list/components/productTable/TableHeader';
+import { ProductListHeader } from '@/features/products/ui/list/components/productTable/ProductListHeader';
+import { ProductTableBody } from './components/productTable/ProductTableBody';
 
 export const ProductTableSection = () => {
   return (
@@ -9,8 +9,8 @@ export const ProductTableSection = () => {
         <ProductListHeader />
       </CardHeader>
       <CardContent>
-        <TableBody />
+        <ProductTableBody />
       </CardContent>
     </Card>
-  )
-} 
+  );
+};

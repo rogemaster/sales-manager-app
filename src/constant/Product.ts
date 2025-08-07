@@ -1,24 +1,26 @@
 import { ProductSaleState } from '@/types/ProductInterface';
 
-export const PRODUCT_SALE_TYPE: ProductSaleState[] = [
+// 상품 상태
+export const PRODUCT_STATUS: ProductSaleState[] = [
   {
-    id: 'on-sale',
+    id: 'ON_SALE',
     name: '판매중',
   },
   {
-    id: 'wait-sale',
+    id: 'WAIT_SALE',
     name: '판매대기',
   },
   {
-    id: 'sold-out',
+    id: 'SOLD_OUT',
     name: '품절',
   },
   {
-    id: 'sale-dis',
+    id: 'SALE_DIS',
     name: '판매중지',
   },
 ];
 
+// 일자 필터
 export const PRODUCT_DATE_TYPE = [
   {
     id: 'register',
@@ -30,25 +32,8 @@ export const PRODUCT_DATE_TYPE = [
   },
 ] as const;
 
-// 배송 타입 상수 (타입 안전성 확보)
-export const DELIVERY_TYPES = {
-  FREE: 'FREE',
-  NOT_FREE: 'NOT_FREE',
-  CHARGE_RECEIVED: 'CHARGE_RECEIVED',
-  CONDITIONAL_FREE: 'CONDITIONAL_FREE',
-} as const;
-
-// 배송 타입 값들의 유니온 타입
-export type DeliveryTypeValue = (typeof DELIVERY_TYPES)[keyof typeof DELIVERY_TYPES];
-
-// 배송 타입 객체 인터페이스
-export interface DeliveryTypeOption {
-  type: DeliveryTypeValue;
-  name: string;
-}
-
-// 배송 타입 배열 (타입 안전성 확보)
-export const DELIVERY_TYPE: readonly DeliveryTypeOption[] = [
+// 배송 타입 옵션
+export const DELIVERY_TYPE_OPTION = [
   {
     type: 'FREE',
     name: '무료배송',
