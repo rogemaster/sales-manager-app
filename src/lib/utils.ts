@@ -12,5 +12,5 @@ export function getCategoryName(code: string) {
 }
 
 export function getProductStatusName(id: string) {
-  return PRODUCT_STATUS.find((value) => id.includes(value.id))?.name;
+  return PRODUCT_STATUS.find((value) => id.includes(value.id))!;
 }
