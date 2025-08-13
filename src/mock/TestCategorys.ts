@@ -1,6 +1,12 @@
-import { Category } from '@/types/ProductInterface';
+import { Category } from '@/types/CommonInterface';
 
-export const mockCategorys: Category[] = [
+// 전체 카테고리 옵션 상수
+export const ALL_CATEGORY_OPTION = {
+  code: 'ALL',
+  name: '전체',
+} as const;
+
+export const MOCK_CATEGORY_DATA: Category[] = [
   {
     code: 'c00001',
     name: '의류',

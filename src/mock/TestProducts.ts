@@ -1,13 +1,13 @@
 import { Product } from '@/types/ProductInterface';
 
-export const mockProducts: Product[] = [
+export const MOCK_PRODUCT_DATA: Product[] = [
   {
     productCode: 'smp000001',
     name: 'A프린팅 반팔 티셔츠',
     categoryCode: 'c00001',
     netPrice: 5000,
     price: 15000,
-    status: 'WAIT_SALE',
+    status: 'SALE_DIS',
     deliveryType: 'FREE',
     deliveryPrice: 0,
     mainImage: '',

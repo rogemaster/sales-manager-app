@@ -14,7 +14,11 @@ const badgeVariants = cva(
         destructive:
           'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         outline: 'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
-        waiting: 'bg-green-600 px-2 py-1 text-xs font-medium text-white inset-ring inset-ring-green-600',
+        waitSale: 'bg-green-600 px-2 py-1 text-xs font-medium text-white inset-ring inset-ring-green-600',
+        onSale: 'border-transparent bg-blue-600 text-primary-foreground [a&]:hover:bg-primary/90',
+        soldOut:
+          'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        saleDisc: 'border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
       },
     },
     defaultVariants: {

@@ -1,6 +1,6 @@
-import { ProductTableHead } from '../type/Product';
+import { TableTitleValue } from '@/types/CommonInterface';
 
-export const LIST_TABLE_HEAD: ProductTableHead[] = [
+export const LIST_TABLE_HEAD: TableTitleValue[] = [
   {
     id: 'productCode',
     title: '상품코드',

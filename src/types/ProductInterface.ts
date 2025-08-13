@@ -3,18 +3,13 @@ export interface ProductSaleState {
   name: string;
 }
 
-export interface CategoryInterface {
-  id: string;
-  name: string;
-}
-
 export interface Product {
   productCode: string;
   name: string;
   categoryCode: string;
   netPrice: number;
   price: number;
-  status: string;
+  status: ProductStatusType;
   deliveryType: string;
   deliveryPrice: number;
   mainImage: string;
@@ -25,7 +20,4 @@ export interface Product {
   updateDate: Date;
 }
 
-export interface Category {
-  code: string;
-  name: string;
-}
+export type ProductStatusType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS';

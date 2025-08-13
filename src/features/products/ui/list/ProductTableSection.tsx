@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ProductTableHeader } from '@/features/products/ui/list/components/productTable/ProductTableHeader';
 import { ProductTableBody } from './components/productTable/ProductTableBody';
 import { ProductTablePagination } from './components/productTable/ProductTablePagination';
-import { mockProducts } from '@/mock/TestProducts';
+import { MOCK_PRODUCT_DATA } from '@/mock/TestProducts';
 import { useState } from 'react';
 
 export const ProductTableSection = () => {
@@ -12,13 +12,13 @@ export const ProductTableSection = () => {
   return (
     <Card>
       <CardHeader>
-        <ProductTableHeader total={mockProducts.length} />
+        <ProductTableHeader total={MOCK_PRODUCT_DATA.length} />
       </CardHeader>
       <CardContent>
         <ProductTableBody />
         <ProductTablePagination
           currentPage={currentPage}
-          totalPages={mockProducts.length}
+          totalPages={MOCK_PRODUCT_DATA.length}
           onChangePage={(page) => setCurrentPage(page)}
         />
       </CardContent>
