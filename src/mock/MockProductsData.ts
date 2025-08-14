@@ -1,10 +1,10 @@
-import { Product } from '@/types/ProductInterface';
+import { Product } from '@/features/products/types/ProductTypes';
 
 export const MOCK_PRODUCT_DATA: Product[] = [
   {
-    productCode: 'smp000001',
+    productId: 'smp000001',
     name: 'A프린팅 반팔 티셔츠',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 5000,
     price: 15000,
     status: 'SALE_DIS',
@@ -18,9 +18,9 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     updateDate: new Date(),
   },
   {
-    productCode: 'smp000001',
+    productId: 'smp000002',
     name: 'B프린팅 반팔 티셔츠',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 5000,
     price: 15000,
     status: 'ON_SALE',
@@ -34,9 +34,9 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     updateDate: new Date(),
   },
   {
-    productCode: 'smp000001',
+    productId: 'smp000003',
     name: 'C프린팅 반팔 티셔츠',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 5000,
     price: 15000,
     status: 'WAIT_SALE',
@@ -50,9 +50,9 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     updateDate: new Date(),
   },
   {
-    productCode: 'smp000001',
+    productId: 'smp000004',
     name: 'A형 반바지',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 5000,
     price: 25000,
     status: 'ON_SALE',
@@ -66,9 +66,9 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     updateDate: new Date(),
   },
   {
-    productCode: 'smp000001',
+    productId: 'smp000005',
     name: 'B형 반바지',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 5000,
     price: 25000,
     status: 'ON_SALE',
@@ -82,9 +82,9 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     updateDate: new Date(),
   },
   {
-    productCode: 'smp000001',
+    productId: 'smp000006',
     name: 'A형 청바지',
-    categoryCode: 'c00001',
+    categoryId: 'c00001',
     netPrice: 6000,
     price: 35000,
     status: 'SOLD_OUT',

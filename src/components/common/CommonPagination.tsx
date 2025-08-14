@@ -1,5 +1,7 @@
 'use client';
 
+import { MouseEventHandler } from 'react';
+import { getPage } from '@/lib/utils';
 import {
   Pagination,
   PaginationContent,
@@ -8,20 +10,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { MouseEventHandler } from 'react';
 
 type Props = {
-  totalPages: number;
+  range?: number;
   currentPage: number;
+  totalPages: number;
   onChangePage: (page: number) => void;
 };
 
-export const ProductTablePagination = ({ totalPages, currentPage, onChangePage }: Props) => {
-  const maxRange = 10;
-  const currentBlock = Math.floor((currentPage - 1) / maxRange);
-  const startPage = currentBlock * maxRange + 1;
-  const endPage = Math.min(startPage + maxRange - 1, totalPages);
-  const pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+export const CommonPagination = ({ range = 10, currentPage, totalPages, onChangePage }: Props) => {
+  const pages = getPage(range, currentPage, totalPages);
 
   const handleFirstPage: MouseEventHandler = (e) => {
     e.preventDefault();
@@ -53,7 +51,7 @@ export const ProductTablePagination = ({ totalPages, currentPage, onChangePage }
   };
 
   return (
-    <Pagination>
+    <Pagination className="mt-14">
       <PaginationContent>
         {/* 처음 */}
         <PaginationItem>
@@ -92,7 +90,7 @@ export const ProductTablePagination = ({ totalPages, currentPage, onChangePage }
             href="#"
             aria-label="다음"
             onClick={(e) => handleNextPage(e)}
-            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+            className={currentPage === totalPages || pages.length === 1 ? 'pointer-events-none opacity-50' : ''}
           />
         </PaginationItem>
 
@@ -102,7 +100,7 @@ export const ProductTablePagination = ({ totalPages, currentPage, onChangePage }
             href="#"
             aria-label="마지막"
             onClick={(e) => handleLastPage(e)}
-            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+            className={currentPage === totalPages || pages.length === 1 ? 'pointer-events-none opacity-50' : ''}
           >
             마지막
           </PaginationLink>

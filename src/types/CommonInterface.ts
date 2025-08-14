@@ -4,6 +4,6 @@ export interface TableTitleValue {
 }
 
 export interface Category {
-  code: string;
+  id: string;
   name: string;
 }

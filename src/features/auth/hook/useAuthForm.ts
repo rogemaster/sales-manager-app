@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Errors, LoginInfo } from '@/features/auth/types/Auth';
 import { ERROR_MESSAGE } from '@/features/auth/constant/errorMessage';
-import { testUsers } from '@/mock/testUser';
+import { testUsers } from '@/mock/MockUsersData';
 import { validateAuthForm } from '../util/Validators';
 import { useSetAtom } from 'jotai';
 import { setUserInfoAtom } from '../store/auth.store';
@@ -29,12 +29,12 @@ export const useAuthForm = () => {
   const handleInputChange = (field: keyof LoginInfo, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // if (errors[field]) {
     //   setErrors((prev) => ({ ...prev, [field]: undefined }));
     // }
-  }
+  };
 
   // const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -57,26 +57,25 @@ export const useAuthForm = () => {
       if (user) {
         // 로그인 성공
         console.log('user', user);
-        setFormData({ email: "", password: "" });
+        setFormData({ email: '', password: '' });
         setUserDataAtom(user);
         router.push('/home');
       } else {
-        setErrors({general: ERROR_MESSAGE.NOT_FOUND_USER});
+        setErrors({ general: ERROR_MESSAGE.NOT_FOUND_USER });
       }
-
     } catch (error) {
       console.error('로그인 에러: ', error);
-      setErrors({general: ERROR_MESSAGE.LOGIN_FIELD});
+      setErrors({ general: ERROR_MESSAGE.LOGIN_FIELD });
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return {
     formData,
     errors,
     isLoading,
     handleInputChange,
-    handleLogin
-  }
-}
+    handleLogin,
+  };
+};

@@ -10,19 +10,20 @@ import dayjs from 'dayjs';
 
 type Props = {
   label?: string;
-  name: string;
-  onChangeDate: (date: Date, name: string) => void;
+  name?: string;
+  date?: Date;
+  onChangeDate: (date: Date, name?: string) => void;
 };
 
-export const CommonDatePicker = ({ label, onChangeDate, name }: Props) => {
+export const CommonDatePicker = ({ label, onChangeDate, name, date }: Props) => {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date>(new Date());
+  const [selectDate, setSelectDate] = useState<Date>(date || new Date());
 
-  const onSelectDate = (selectDate: Date | undefined) => {
-    if (selectDate) {
-      setDate(selectDate);
+  const onSelectDate = (value: Date | undefined) => {
+    if (value) {
+      setSelectDate(value);
     }
-    onChangeDate(date, name);
+    onChangeDate(selectDate, name);
     setOpen(false);
   };
 
@@ -41,7 +42,12 @@ export const CommonDatePicker = ({ label, onChangeDate, name }: Props) => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-          <Calendar mode="single" selected={date} captionLayout="dropdown" onSelect={(date) => onSelectDate(date)} />
+          <Calendar
+            mode="single"
+            selected={selectDate}
+            captionLayout="dropdown"
+            onSelect={(date) => onSelectDate(date)}
+          />
         </PopoverContent>
       </Popover>
     </div>

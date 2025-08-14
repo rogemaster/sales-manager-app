@@ -1,10 +1,10 @@
-import { ProductSaleState } from '@/types/ProductInterface';
+import { ProductSaleState } from '@/features/products/types/ProductTypes';
 
 // 전체 상품상태 옵션 상수
 export const ALL_PRODUCT_STATUS_OPTION = {
   id: 'ALL',
   name: '전체',
-};
+} as const;
 
 // 상품 상태
 export const PRODUCT_STATUS: ProductSaleState[] = [

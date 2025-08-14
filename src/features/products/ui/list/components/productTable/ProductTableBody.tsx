@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { MOCK_PRODUCT_DATA } from '@/mock/TestProducts';
+import { MOCK_PRODUCT_DATA } from '@/mock/MockProductsData';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Table } from '@/components/ui/table';
 import { getCategoryName } from '@/lib/utils';
-import { LIST_TABLE_HEAD } from '@/features/products/constant/Table';
+import { LIST_TABLE_HEAD } from '@/features/products/constant/TableTitle';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 
 export const ProductTableBody = () => {
@@ -21,7 +21,7 @@ export const ProductTableBody = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedProducts(MOCK_PRODUCT_DATA.map((item) => item.categoryCode));
+      setSelectedProducts(MOCK_PRODUCT_DATA.map((item) => item.categoryId));
     } else {
       setSelectedProducts([]);
     }
@@ -46,16 +46,16 @@ export const ProductTableBody = () => {
       </TableHeader>
       <TableBody>
         {MOCK_PRODUCT_DATA.map((product) => (
-          <TableRow key={product.productCode} className="h-14">
+          <TableRow key={product.productId} className="h-14">
             <TableCell>
               <Checkbox
-                checked={selectedProducts.includes(product.productCode)}
-                onCheckedChange={(checked: boolean) => handleSelectProduct(product.productCode, checked)}
+                checked={selectedProducts.includes(product.productId)}
+                onCheckedChange={(checked: boolean) => handleSelectProduct(product.productId, checked)}
               />
             </TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">{product.productCode}</TableCell>
+            <TableCell className="font-mono text-sm text-muted-foreground">{product.productId}</TableCell>
             <TableCell className="font-medium">{product.name}</TableCell>
-            <TableCell>{getCategoryName(product.categoryCode)}</TableCell>
+            <TableCell>{getCategoryName(product.categoryId)}</TableCell>
             <TableCell>{product.price.toLocaleString()}원</TableCell>
             <TableCell>{<ProductStatusBadge status={product.status} />}</TableCell>
             <TableCell>{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>

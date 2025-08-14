@@ -1,7 +1,7 @@
 // import { getProductStatusName } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { PRODUCT_STATUS } from '@/constant/Product';
-import { ProductStatusType } from '@/types/ProductInterface';
+import { ProductStatusType } from '@/features/products/types/ProductTypes';
 
 type Props = {
   status: ProductStatusType;

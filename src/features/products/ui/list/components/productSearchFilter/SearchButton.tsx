@@ -1,10 +1,16 @@
-"use client"
+'use client';
 
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAtomValue } from 'jotai';
+import { getSearchFilterAtom } from '@/features/products/store/productSearch.store';
 
 export const ProductSearchButton = () => {
-  const handleSearch = () => {}
+  const data = useAtomValue(getSearchFilterAtom);
+
+  const handleSearch = () => {
+    console.log('검색결과', data);
+  };
 
   return (
     <div className="flex items-center">

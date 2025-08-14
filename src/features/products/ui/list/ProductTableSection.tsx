@@ -1,11 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { MOCK_PRODUCT_DATA } from '@/mock/MockProductsData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ProductTableHeader } from '@/features/products/ui/list/components/productTable/ProductTableHeader';
 import { ProductTableBody } from './components/productTable/ProductTableBody';
-import { ProductTablePagination } from './components/productTable/ProductTablePagination';
-import { MOCK_PRODUCT_DATA } from '@/mock/TestProducts';
-import { useState } from 'react';
+import { CommonPagination } from '@/components/common/CommonPagination';
 
 export const ProductTableSection = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -16,7 +16,7 @@ export const ProductTableSection = () => {
       </CardHeader>
       <CardContent>
         <ProductTableBody />
-        <ProductTablePagination
+        <CommonPagination
           currentPage={currentPage}
           totalPages={MOCK_PRODUCT_DATA.length}
           onChangePage={(page) => setCurrentPage(page)}
