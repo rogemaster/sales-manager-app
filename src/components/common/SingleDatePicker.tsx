@@ -7,15 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '../ui/calendar';
 import dayjs from 'dayjs';
+import { SingleDatePickerProps } from '@/types/CommonInterface';
 
-type Props = {
-  label?: string;
-  name?: string;
-  date?: Date;
-  onChangeDate: (date: Date, name?: string) => void;
-};
-
-export const CommonDatePicker = ({ label, onChangeDate, name, date }: Props) => {
+export const SingleDatePicker = ({ label, onChangeDate, name, date }: SingleDatePickerProps) => {
   const [open, setOpen] = useState(false);
   const [selectDate, setSelectDate] = useState<Date>(date || new Date());
 
@@ -23,8 +17,7 @@ export const CommonDatePicker = ({ label, onChangeDate, name, date }: Props) => 
     if (value) {
       setSelectDate(value);
     }
-    onChangeDate(selectDate, name);
-    setOpen(false);
+    onChangeDate!(selectDate, name);
   };
 
   return (

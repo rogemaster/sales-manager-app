@@ -19,8 +19,12 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       {
         title: '상품등록',
         url: '/products/create',
-      }
-    ]
+      },
+      {
+        title: '상품대량등록',
+        url: '/products/bulk',
+      },
+    ],
   },
   {
     title: '쇼핑몰관리',
@@ -33,13 +37,13 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       },
       {
         title: '쇼핑몰상품등록',
-        url: '/shopping/register'
+        url: '/shopping/register',
       },
       {
         title: '쇼핑몰상품목록',
         url: '/shopping/list',
-      }
-    ]
+      },
+    ],
   },
   {
     title: '주문관리',
@@ -49,7 +53,7 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       {
         title: '주문목록',
         url: '/order/list',
-      }
-    ]
-  }
-]
+      },
+    ],
+  },
+];

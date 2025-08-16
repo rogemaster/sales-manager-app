@@ -33,7 +33,6 @@ export const FilterSelect = ({
   // 현재 선택된 옵션 정보를 메모이제이션
   const selectedOptionInfo = useMemo(() => {
     if (value === 'ALL') {
-      console.log('c', allOption.name);
       return allOption;
     }
     return options.find((option) => (option.id && option.id === value) || allOption);

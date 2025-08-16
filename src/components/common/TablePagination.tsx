@@ -18,7 +18,7 @@ type Props = {
   onChangePage: (page: number) => void;
 };
 
-export const CommonPagination = ({ range = 10, currentPage, totalPages, onChangePage }: Props) => {
+export const TablePagination = ({ range = 10, currentPage, totalPages, onChangePage }: Props) => {
   const pages = getPage(range, currentPage, totalPages);
 
   const handleFirstPage: MouseEventHandler = (e) => {

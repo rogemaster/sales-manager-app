@@ -1,24 +1,26 @@
 'use client';
 
+import { useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { calculatorRangeDate } from '@/lib/utils';
+import { DateTypeAtom, searchDateAtom } from '@/features/products/store/productSearch.store';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAtom } from 'jotai';
-import { DateTypeAtom, searchDateAtom } from '@/features/products/store/productSearch.store';
 import { PRODUCT_DATE_TYPE } from '@/constant/Product';
-import { CommonDatePicker } from '@/components/common/CommonDatePicker';
+import { RangeDatePicker } from '@/components/common/RangeDatePicker';
+import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton';
+import { RangeTypeProps } from '@/types/CommonInterface';
 
 export const ProductSearchDate = () => {
-  const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
-  const [getDateAtom, setDateAtom] = useAtom(searchDateAtom);
+  const [rangeValue, setRangeValue] = useState<RangeTypeProps>({ range: 7, uniq: 'day' });
 
-  const handleChangeDate = (date: Date, name?: string) => {
-    if (date) {
-      if (name === 'startDate') {
-        setDateAtom([date, getDateAtom[1]]);
-      } else {
-        setDateAtom([getDateAtom[0], date]);
-      }
-    }
+  const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
+  const setSearchDateAtom = useSetAtom(searchDateAtom);
+
+  const dates = calculatorRangeDate(rangeValue);
+
+  const handleChangeDate = (date: Date[]) => {
+    setSearchDateAtom(date);
   };
 
   return (
@@ -36,9 +38,8 @@ export const ProductSearchDate = () => {
           ))}
         </SelectContent>
       </Select>
-      <CommonDatePicker name="startDate" date={getDateAtom[0]} onChangeDate={handleChangeDate} />
-      <span className="text-muted-foreground">~</span>
-      <CommonDatePicker name="endDate" date={getDateAtom[1]} onChangeDate={handleChangeDate} />
+      <RangeDatePicker date={dates} onChangeDate={handleChangeDate} />
+      <DatePickerRangeButton onChangeDateRange={(value) => setRangeValue(value)} />
     </div>
   );
 };

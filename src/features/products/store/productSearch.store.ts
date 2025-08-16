@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 const DEFAULT_DATE_TYPE: string = 'register';
 const DEFAULT_DATE: Date[] = [dayjs().subtract(7, 'day').toDate(), new Date()];
 const DEFAULT_PRODUCT_STATUS: string = 'ALL';
-const DEFAULT_CATEGORY_CODE: string = 'all';
+const DEFAULT_CATEGORY_CODE: string = 'ALL';
 
 /**
  * 상품 검색 필터 Atom
