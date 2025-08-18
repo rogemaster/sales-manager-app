@@ -11,7 +11,7 @@ export interface Product {
   categoryId: string;
   netPrice: number;
   price: number;
-  status: ProductStatusType;
+  state: ProductStateType;
   deliveryType: string;
   deliveryPrice: number;
   mainImage: string;
@@ -22,7 +22,7 @@ export interface Product {
   updateDate: Date;
 }
 
-export type ProductStatusType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS';
+export type ProductStateType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS';
 
 // 필터 관련 타입들
 export interface FilterOption {

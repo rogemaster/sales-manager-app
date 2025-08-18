@@ -1,14 +1,14 @@
 // import { getProductStatusName } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { PRODUCT_STATUS } from '@/constant/Product';
-import { ProductStatusType } from '@/features/products/types/ProductTypes';
+import { ProductStateType } from '@/features/products/types/ProductTypes';
 
 type Props = {
-  status: ProductStatusType;
+  status: ProductStateType;
   className?: string;
 };
 
-const STATUS_VARIANT_MAP: Record<ProductStatusType, 'waitSale' | 'onSale' | 'soldOut' | 'saleDisc'> = {
+const STATUS_VARIANT_MAP: Record<ProductStateType, 'waitSale' | 'onSale' | 'soldOut' | 'saleDisc'> = {
   WAIT_SALE: 'waitSale',
   ON_SALE: 'onSale',
   SOLD_OUT: 'soldOut',

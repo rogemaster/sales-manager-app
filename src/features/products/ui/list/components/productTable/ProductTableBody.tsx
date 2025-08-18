@@ -57,7 +57,7 @@ export const ProductTableBody = () => {
             <TableCell className="font-medium">{product.name}</TableCell>
             <TableCell>{getCategoryName(product.categoryId)}</TableCell>
             <TableCell>{product.price.toLocaleString()}원</TableCell>
-            <TableCell>{<ProductStatusBadge status={product.status} />}</TableCell>
+            <TableCell>{<ProductStatusBadge status={product.state} />}</TableCell>
             <TableCell>{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>
             <TableCell>{dayjs(product.updateDate).format('YYYY-MM-DD')}</TableCell>
           </TableRow>
