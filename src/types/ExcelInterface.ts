@@ -12,7 +12,7 @@ export interface ExcelTemplateInfo {
 
 // 엑셀 section header
 export interface ExcelHeaderProps {
-  excelType: 'DOWNLOAD' | 'UPLOAD';
+  excelType?: 'DOWNLOAD' | 'UPLOAD';
   headerTitle: string;
   headerDescription: string;
 }
@@ -28,4 +28,21 @@ export interface ExcelDownloaderProps {
   excelHeader: ExcelHeaderProps;
   isTemplateInfo?: boolean;
   templateInfo?: ExcelTemplate;
+}
+
+// 엑셀 데이터 미리보기
+export interface ExcelPreviewProps {
+  excelHeader: ExcelHeaderProps;
+}
+
+// 엑셀 미리보기 테이블 헤더
+export interface ExcelPreviewTableHeader {
+  key: string;
+  headerTitle: string;
+}
+
+// 엑셀 미리보기 테이블 타입
+export interface ExcelPreviewDataTableProps {
+  tableHeaders: ExcelPreviewTableHeader[];
+  uploadedData: [];
 }

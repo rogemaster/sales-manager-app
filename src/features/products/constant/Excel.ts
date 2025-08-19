@@ -1,10 +1,17 @@
-import { ExcelDownloaderProps, ExcelTemplate, ExcelUploaderProps } from '@/types/ExcelInterface';
+import {
+  ExcelPreviewProps,
+  ExcelDownloaderProps,
+  ExcelTemplate,
+  ExcelUploaderProps,
+  ExcelPreviewTableHeader,
+} from '@/types/ExcelInterface';
 
+// 엑셀 양식 템플릿
 export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
   templateTitle: '양식 포함 항목:',
   template: [
     {
-      name: '상품코드',
+      name: '고객상품코드',
       req: false,
     },
     {
@@ -54,8 +61,7 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
   ],
 };
 
-export const EXCEL_UPLOADER_DESCRIPTION: string = '엑셀 파일을 드래그하거나 클릭하여 업로드하세요';
-
+// 엑셀 양식 다운로드
 export const PRODUCT_EXCEL_TEMPLATE_DOWNLOADER: ExcelDownloaderProps = {
   excelHeader: {
     excelType: 'DOWNLOAD',
@@ -66,11 +72,56 @@ export const PRODUCT_EXCEL_TEMPLATE_DOWNLOADER: ExcelDownloaderProps = {
   templateInfo: PRODUCT_BULK_EXCEL_TEMPLATE,
 };
 
+// 엑셀 업로드
 export const PRODUCT_EXCEL_TEMPLATE_UPLOADER: ExcelUploaderProps = {
   excelHeader: {
     excelType: 'UPLOAD',
     headerTitle: '2단계: 파일 업로드',
     headerDescription: '작성한 엑셀 파일을 업로드하여 상품 데이터를 불러오세요.',
   },
-  contentDescription: EXCEL_UPLOADER_DESCRIPTION,
+  contentDescription: '엑셀 파일을 드래그하거나 클릭하여 업로드하세요',
 };
+
+// 엑셀 데이터 미리보기
+export const PRODUCT_EXCEL_PREVIEW: ExcelPreviewProps = {
+  excelHeader: {
+    headerTitle: '3단계: 데이터 확인 및 저장',
+    headerDescription: '업로드된 데이터를 확인하고 오류를 수정한 후 저장하세요.',
+  },
+};
+
+// 엑셀 미리보기 테이블 헤더
+export const PRODUCT_EXCEL_PREVIEW_TABLE_HEADERS: ExcelPreviewTableHeader[] = [
+  {
+    key: 'row',
+    headerTitle: '행',
+  },
+  {
+    key: 'state',
+    headerTitle: '상태',
+  },
+  {
+    key: 'customerCode',
+    headerTitle: '고객상품코드',
+  },
+  {
+    key: 'name',
+    headerTitle: '상품명',
+  },
+  {
+    key: 'categoty',
+    headerTitle: '카테고리',
+  },
+  {
+    key: 'price',
+    headerTitle: '가격',
+  },
+  {
+    key: 'quantity',
+    headerTitle: '수량',
+  },
+  {
+    key: 'error',
+    headerTitle: '오류 내용',
+  },
+];
