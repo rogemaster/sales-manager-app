@@ -1,5 +1,10 @@
 import { ManipulateType } from 'dayjs';
 
+// 다이나믹 타입
+export interface dynamicType {
+  [key: string]: string | number | boolean | object | [] | null | undefined;
+}
+
 export interface TableTitleValue {
   id: string;
   title: string;

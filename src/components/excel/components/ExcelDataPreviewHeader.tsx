@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { ExcelHeaderProps } from '@/types/ExcelInterface';
 import { Button } from '@/components/ui/button';

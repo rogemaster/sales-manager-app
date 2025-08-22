@@ -1,5 +1,5 @@
 type Props = {
-  uploadedData: [];
+  uploadedData: unknown[];
   validCount: number;
   errorCount: number;
 };

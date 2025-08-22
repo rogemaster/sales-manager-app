@@ -18,7 +18,6 @@ export const ExcelDownloader = ({ excelHeader, isTemplateInfo, templateInfo }: E
         {isTemplateInfo && templateInfo && (
           <ExcelTemplateInfo templateTitle={templateInfo?.templateTitle} template={templateInfo?.template} />
         )}
-        <ExcelTemplateButton />
       </CardContent>
     </Card>
   );

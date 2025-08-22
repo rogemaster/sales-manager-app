@@ -1,3 +1,5 @@
+import { ProductBulkUploadLayout } from '@/features/products/ui/bulk/ProductBulkUploadLayout';
+
 export default function ProductBulkUpload() {
-  return <div>상품대량등록 화면</div>;
+  return <ProductBulkUploadLayout />;
 }

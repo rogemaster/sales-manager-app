@@ -7,6 +7,7 @@ export interface ProductSaleState {
 
 export interface Product {
   productId: string;
+  customerCode?: string;
   name: string;
   categoryId: string;
   netPrice: number;
@@ -16,7 +17,10 @@ export interface Product {
   deliveryPrice: number;
   mainImage: string;
   detailPage: string;
-  option: string;
+  option1?: string;
+  option2?: string;
+  totalQuantity: number;
+  subOption?: string;
   keyWord: string | null;
   createDate: Date;
   updateDate: Date;
@@ -45,4 +49,15 @@ export interface ProductSearch {
   saleType: string;
   categoryId: string;
   searchValue: string;
+}
+
+export interface ProductExcelPreviewRow extends Record<string, unknown> {
+  row: number;
+  state: 'valid' | 'error';
+  customerCode: string;
+  name: string;
+  category: string;
+  price: number;
+  totalQuantity: number;
+  error: string[];
 }
