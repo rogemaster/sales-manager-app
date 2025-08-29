@@ -8,6 +8,7 @@ export interface ExcelTemplate {
 
 // 엑셀 양식 정보
 export interface ExcelTemplateInfo {
+  key: string;
   name: string;
   req: boolean;
 }
@@ -30,6 +31,8 @@ export interface ExcelDownloaderProps {
   excelHeader: ExcelHeaderProps;
   isTemplateInfo?: boolean;
   templateInfo?: ExcelTemplate;
+  templateHeaders: string[];
+  templateName?: string;
 }
 
 // 엑셀 미리보기 테이블 컬럼 타입

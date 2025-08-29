@@ -3,6 +3,7 @@ import {
   PRODUCT_EXCEL_TABLE_COLUMNS,
   PRODUCT_EXCEL_TEMPLATE_DOWNLOADER,
   PRODUCT_EXCEL_TEMPLATE_UPLOADER,
+  PRODUCT_BULK_EXCEL_TEMPLATE,
 } from '../../constant/Excel';
 import { ExcelDataPreview, ExcelDownloader, ExcelUploader } from '@/components/excel';
 import { ProductExcelPreviewRow } from '../../types/ProductTypes';
@@ -12,6 +13,9 @@ type Props = {
 };
 
 export const ProductBulkUploadLayout = ({ uploadedData }: Props) => {
+  // 템플릿에서 헤더 이름만 추출
+  const templateHeaders = PRODUCT_BULK_EXCEL_TEMPLATE.template.map((item) => item.name);
+
   return (
     <div className="max-w-[90%] mx-auto space-y-6">
       {/* 헤더 */}
@@ -27,6 +31,8 @@ export const ProductBulkUploadLayout = ({ uploadedData }: Props) => {
           excelHeader={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.excelHeader}
           isTemplateInfo={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.isTemplateInfo}
           templateInfo={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.templateInfo}
+          templateHeaders={templateHeaders}
+          templateName="상품등록"
         />
 
         {/* 파일 업로드 - 완 */}

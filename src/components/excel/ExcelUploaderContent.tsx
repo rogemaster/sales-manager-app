@@ -1,18 +1,23 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
+import { useExcelUploader as excelUploader } from '@/hooks/useExcelUploader';
+import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 
-type Props = { contentDescription: string };
+type Props = { contentDescription: string; fileDataInfo: ExcelTemplateInfo[] };
 
-export const ExcelUploaderContent = ({ contentDescription }: Props) => {
+export const ExcelUploaderContent = ({ contentDescription, fileDataInfo }: Props) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = () => {};
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const result = excelUploader(event, fileDataInfo);
+    console.log(result);
+  };
 
   return (
     <div className="space-y-4">

@@ -1,13 +1,16 @@
 'use client';
 
+// import XLSX from 'xlsx';
 import { FileSpreadsheet } from 'lucide-react';
 import { Button } from '../ui/button';
 
-export const ExcelTemplateButton = () => {
-  const handleDownloadTemplate = () => {};
+type Props = {
+  onClick: () => void;
+};
 
+export const ExcelTemplateButton = ({ onClick }: Props) => {
   return (
-    <Button onClick={handleDownloadTemplate} className="w-full cursor-pointer">
+    <Button onClick={onClick} className="w-full cursor-pointer">
       <FileSpreadsheet className="h-4 w-4 mr-2" />
       엑셀 양식 다운로드
     </Button>

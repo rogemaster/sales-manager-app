@@ -1,4 +1,4 @@
-// Product 관련 타입 정의
+// 상품 관련 타입 정의
 
 export interface ProductSaleState {
   id: string;
@@ -10,7 +10,7 @@ export interface Product {
   customerCode?: string;
   name: string;
   categoryId: string;
-  netPrice: number;
+  netPrice?: number;
   price: number;
   state: ProductStateType;
   deliveryType: string;
