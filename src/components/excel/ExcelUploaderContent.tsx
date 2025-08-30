@@ -4,19 +4,62 @@ import { ChangeEvent, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
-import { useExcelUploader as excelUploader } from '@/hooks/useExcelUploader';
+import { processExcelUpload, UploadResult } from '@/hooks/processExcelUpload';
 import { ExcelTemplateInfo } from '@/types/ExcelInterface';
+import { useAlert } from '@/hooks/useAlert';
 
-type Props = { contentDescription: string; fileDataInfo: ExcelTemplateInfo[] };
+type Props = { contentDescription: string; fileTemplateInfo: ExcelTemplateInfo[] };
 
-export const ExcelUploaderContent = ({ contentDescription, fileDataInfo }: Props) => {
+export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: Props) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showAlert } = useAlert();
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const result = excelUploader(event, fileDataInfo);
-    console.log(result);
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // 진행률 시뮬레이션
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 100);
+
+      const result: UploadResult = await processExcelUpload(event, fileTemplateInfo);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      // 결과에 따른 alert 표시
+      showAlert({
+        type: result.success ? 'success' : 'error',
+        message: result.message,
+      });
+
+      if (result.success) {
+        // 성공 시 추가 처리 (예: 데이터 저장, 상태 업데이트 등)
+        console.log('업로드된 데이터:', result.data);
+      }
+    } catch {
+      showAlert({
+        type: 'error',
+        message: '파일 처리 중 오류가 발생했습니다.',
+      });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      // 파일 입력 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   return (

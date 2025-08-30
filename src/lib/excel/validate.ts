@@ -16,7 +16,7 @@ export function validateSheet(rowsData: Cell[][], requiredHeaders: string[]) {
     requiredHeaders.forEach((header) => {
       const colIndex = headers.indexOf(header);
       const cell = row[colIndex];
-      if (cell === null || (typeof cell === 'string' && cell.trim() === '')) {
+      if (cell === undefined || cell === null || (typeof cell === 'string' && cell.trim() === '')) {
         errors.push(`Row ${rowIndex + 2}, ${header} 값이 없습니다.`);
       }
     });

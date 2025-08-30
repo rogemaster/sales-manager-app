@@ -34,3 +34,22 @@ export type RangeTypeProps = {
   range: number;
   uniq: ManipulateType;
 };
+
+// 공통 alert
+export interface CommonAlertDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  options: AlertOptions | null;
+}
+
+// 공통 alert 옵션
+export interface AlertOptions {
+  title?: string;
+  message: string;
+  type?: 'info' | 'warning' | 'error' | 'success';
+  showCancel?: boolean;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void;
+}

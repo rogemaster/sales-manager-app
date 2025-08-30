@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/card';
 import { ExcelHeader } from './components/ExcelHeader';
 import { ExcelUploaderContent } from './ExcelUploaderContent';
 
-export const ExcelUploader = ({ excelHeader, contentDescription }: ExcelUploaderProps) => {
+export const ExcelUploader = ({ excelHeader, contentDescription, fileTemplateInfo }: ExcelUploaderProps) => {
   return (
     <Card>
       <ExcelHeader
@@ -12,7 +12,7 @@ export const ExcelUploader = ({ excelHeader, contentDescription }: ExcelUploader
         headerDescription={excelHeader.headerDescription}
       />
       <CardContent>
-        <ExcelUploaderContent contentDescription={contentDescription} />
+        <ExcelUploaderContent contentDescription={contentDescription} fileTemplateInfo={fileTemplateInfo} />
       </CardContent>
     </Card>
   );
