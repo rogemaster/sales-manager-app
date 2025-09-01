@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export const SignInSideSection = () => {
+export const LoginSideBanner = () => {
   return (
     <div className="relative hidden bg-muted md:block">
       <Image
@@ -11,5 +11,5 @@ export const SignInSideSection = () => {
         height={32}
       />
     </div>
-  )
-}
+  );
+};

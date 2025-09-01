@@ -3,27 +3,17 @@
 import { useState } from 'react';
 import { Errors, LoginInfo } from '@/features/auth/types/Auth';
 import { ERROR_MESSAGE } from '@/features/auth/constant/errorMessage';
-import { testUsers } from '@/mock/MockUsersData';
 import { validateAuthForm } from '../util/Validators';
-import { useSetAtom } from 'jotai';
-import { setUserInfoAtom } from '../store/auth.store';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export const useAuthForm = () => {
   const [formData, setFormData] = useState<LoginInfo>({ email: '', password: '' });
   const [errors, setErrors] = useState<Errors>();
   const [isLoading, setIsLoading] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
-
-  const setUserDataAtom = useSetAtom(setUserInfoAtom);
-
-  // react-query 로 로그인 처리
-  // const { mutate, isLoading, error } = useMutation({
-  //   mutationFn: () => loginApi({ email, password }),
-  //   onSuccess: (data) => setAuth(data),
-  // });
+  const { data: session } = useSession();
 
   // 입력값 state 관리
   const handleInputChange = (field: keyof LoginInfo, value: string) => {
@@ -31,14 +21,14 @@ export const useAuthForm = () => {
       ...prev,
       [field]: value,
     }));
-    // if (errors[field]) {
-    //   setErrors((prev) => ({ ...prev, [field]: undefined }));
-    // }
+
+    // 에러 메시지 초기화
+    if (errors?.[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
-  // const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-
-  // 로그인 처리
+  // NextAuth를 사용한 로그인 처리
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -49,19 +39,21 @@ export const useAuthForm = () => {
     }
 
     setIsLoading(true);
+    setErrors(undefined);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
-      const user = testUsers.find((u) => u.email === formData.email && u.password === formData.password);
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
 
-      if (user) {
-        // 로그인 성공
-        console.log('user', user);
-        setFormData({ email: '', password: '' });
-        setUserDataAtom(user);
-        router.push('/home');
-      } else {
+      if (result?.error) {
         setErrors({ general: ERROR_MESSAGE.NOT_FOUND_USER });
+      } else if (result?.ok) {
+        // 로그인 성공
+        setFormData({ email: '', password: '' });
+        router.push('/home');
       }
     } catch (error) {
       console.error('로그인 에러: ', error);
