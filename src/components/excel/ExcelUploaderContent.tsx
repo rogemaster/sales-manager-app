@@ -7,14 +7,23 @@ import { Progress } from '../ui/progress';
 import { processExcelUpload, UploadResult } from '@/hooks/processExcelUpload';
 import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 import { useAlert } from '@/hooks/useAlert';
+import { useSetAtom } from 'jotai';
 
-type Props = { contentDescription: string; fileTemplateInfo: ExcelTemplateInfo[] };
+type Props = {
+  contentDescription: string;
+  fileTemplateInfo: ExcelTemplateInfo[];
+};
 
-export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: Props) => {
+export const ExcelUploaderContent = <T extends Record<string, unknown>>({
+  contentDescription,
+  fileTemplateInfo,
+}: Props) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showAlert } = useAlert();
+
+  const setExcelData = useSetAtom(setExcelDataAtom);
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     setIsUploading(true);
@@ -43,9 +52,14 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
         message: result.message,
       });
 
-      if (result.success) {
-        // 성공 시 추가 처리 (예: 데이터 저장, 상태 업데이트 등)
+      if (result.success && result.data) {
         console.log('업로드된 데이터:', result.data);
+        setExcelData(result.data as T[]);
+
+        // if (onDataUpload) {
+        //   onDataUpload(result.data as T[]);
+        // }
+        // 업로드 성공으로 Jotai store에 데이터 저장
       }
     } catch {
       showAlert({

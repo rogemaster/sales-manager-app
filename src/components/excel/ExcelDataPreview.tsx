@@ -14,6 +14,7 @@ export const ExcelDataPreview = <T extends Record<string, unknown>>({
   getValidCount,
   getErrorCount,
 }: ExcelPreviewProps<T>) => {
+  const totalCount = uploadedData ? uploadedData.length : 0;
   const validCount = getValidCount?.(uploadedData) ?? 0;
   const errorCount = getErrorCount?.(uploadedData) ?? 0;
 
@@ -23,19 +24,15 @@ export const ExcelDataPreview = <T extends Record<string, unknown>>({
 
       <CardContent>
         {/* 요약 정보 */}
-        <ExcelDataSummaryInfo
-          uploadedData={uploadedData as unknown[]}
-          validCount={validCount}
-          errorCount={errorCount}
-        />
+        <ExcelDataSummaryInfo totalCount={totalCount} validCount={validCount} errorCount={errorCount} />
 
         {/* 오류 알림 */}
         {errorCount > 0 && <ExcelDataErrorAlert errorCount={errorCount} />}
 
         {/* 데이터 테이블 */}
         <ExcelDataTable
-          tableColumns={tableColumns}
           uploadedData={uploadedData}
+          tableColumns={tableColumns}
           getRowClassName={getRowClassName}
           getRowKey={getRowKey}
         />

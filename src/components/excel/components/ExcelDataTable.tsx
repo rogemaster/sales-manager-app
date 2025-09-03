@@ -27,16 +27,6 @@ export const ExcelDataTable = <T extends Record<string, unknown>>({
               ))}
             </TableRow>
           ))}
-
-          {uploadedData.map((row, i) => (
-            <TableRow key={getRowKey?.(row, i) ?? i} className={getRowClassName?.(row)}>
-              {tableColumns.map((column) => (
-                <TableCell key={column.key} className={column.cellClassName}>
-                  {column.accessor(row)}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
         </TableBody>
       </Table>
     </div>

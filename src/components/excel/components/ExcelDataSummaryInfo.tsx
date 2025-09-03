@@ -1,14 +1,14 @@
 type Props = {
-  uploadedData: unknown[];
+  totalCount: number;
   validCount: number;
   errorCount: number;
 };
 
-export const ExcelDataSummaryInfo = ({ uploadedData, validCount, errorCount }: Props) => {
+export const ExcelDataSummaryInfo = ({ totalCount, validCount, errorCount }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
       <div className="text-center p-4 bg-muted rounded-lg">
-        <div className="text-2xl font-bold">{uploadedData.length}</div>
+        <div className="text-2xl font-bold">{totalCount}</div>
         <div className="text-sm text-muted-foreground">총 데이터</div>
       </div>
       <div className="text-center p-4 bg-green-50 rounded-lg">

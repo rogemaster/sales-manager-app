@@ -24,7 +24,7 @@ export interface ExcelHeaderProps {
 export interface ExcelUploaderProps {
   excelHeader: ExcelHeaderProps;
   contentDescription: string;
-  fileTemplateInfo?: ExcelTemplateInfo[];
+  fileTemplateInfo: ExcelTemplateInfo[];
 }
 
 // 엑셀 다운로드
