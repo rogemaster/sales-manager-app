@@ -1,4 +1,3 @@
-import { useAtomValue } from 'jotai';
 import {
   PRODUCT_EXCEL_PREVIEW_HEADER,
   PRODUCT_EXCEL_TABLE_COLUMNS,
@@ -8,12 +7,8 @@ import {
 } from '../../constant/Excel';
 import { ExcelDataPreview, ExcelDownloader, ExcelUploader } from '@/components/excel';
 import { ProductExcelPreviewRow } from '../../types/ProductTypes';
-import { createExcelDataAtom } from '@/store/excelDataStore';
 
 export const ProductBulkUploadLayout = () => {
-  const { baseAtom } = createExcelDataAtom<ProductExcelPreviewRow>();
-  const { data: uploadedData } = useAtomValue(baseAtom);
-
   // 템플릿에서 헤더 이름만 추출
   const templateHeaders = PRODUCT_BULK_EXCEL_TEMPLATE.template.map((item) => item.name);
 
@@ -48,7 +43,6 @@ export const ProductBulkUploadLayout = () => {
       <ExcelDataPreview<ProductExcelPreviewRow>
         excelHeader={PRODUCT_EXCEL_PREVIEW_HEADER}
         tableColumns={PRODUCT_EXCEL_TABLE_COLUMNS}
-        uploadedData={uploadedData}
         getRowClassName={(r) => (r.state === 'error' ? 'bg-red-50' : undefined)}
         getRowKey={(r, i) => r.row ?? i}
         getErrorCount={(rows) => rows.filter((r) => r.state === 'error').length}

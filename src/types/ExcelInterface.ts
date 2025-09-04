@@ -47,7 +47,6 @@ export interface ExcelTableColumnsType<T> {
 // 엑셀 미리보기 데이터 테이블 타입
 export interface ExcelPreviewDataTableProps<T> {
   tableColumns: ExcelTableColumnsType<T>[];
-  uploadedData: T[];
   getRowKey?: (row: T, index: number) => React.Key;
   getRowClassName?: (row: T) => string | undefined;
 }

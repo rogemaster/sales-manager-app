@@ -4,16 +4,18 @@ import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 import { ExcelDataTable } from './components/ExcelDataTable';
+import { useExcelData } from '@/store/excelDataStore';
 
 export const ExcelDataPreview = <T extends Record<string, unknown>>({
   excelHeader,
   tableColumns,
-  uploadedData,
   getRowKey,
   getRowClassName,
   getValidCount,
   getErrorCount,
 }: ExcelPreviewProps<T>) => {
+  const uploadedData = useExcelData<T>();
+
   const totalCount = uploadedData ? uploadedData.length : 0;
   const validCount = getValidCount?.(uploadedData) ?? 0;
   const errorCount = getErrorCount?.(uploadedData) ?? 0;

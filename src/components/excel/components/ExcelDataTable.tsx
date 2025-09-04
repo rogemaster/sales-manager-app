@@ -1,12 +1,15 @@
 import { ExcelPreviewDataTableProps } from '@/types/ExcelInterface';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from 'react';
 
-export const ExcelDataTable = <T extends Record<string, unknown>>({
+type Props<T = Record<string, unknown>> = { uploadedData: T[] };
+
+const ExcelDataTableInner = <T extends Record<string, unknown>>({
   tableColumns,
   uploadedData,
   getRowKey,
   getRowClassName,
-}: ExcelPreviewDataTableProps<T>) => {
+}: ExcelPreviewDataTableProps<T> & Props<T>) => {
   return (
     <div className="border rounded-lg">
       <Table>
@@ -32,3 +35,5 @@ export const ExcelDataTable = <T extends Record<string, unknown>>({
     </div>
   );
 };
+
+export const ExcelDataTable = React.memo(ExcelDataTableInner) as typeof ExcelDataTableInner;

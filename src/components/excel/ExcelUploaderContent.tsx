@@ -4,10 +4,11 @@ import { ChangeEvent, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
-import { processExcelUpload, UploadResult } from '@/hooks/processExcelUpload';
+import { processExcelUpload } from '@/hooks/processExcelUpload';
 import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
+import { setExcelDataAtom } from '@/store/excelDataStore';
 
 type Props = {
   contentDescription: string;
@@ -41,7 +42,7 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
         });
       }, 100);
 
-      const result: UploadResult = await processExcelUpload(event, fileTemplateInfo);
+      const result = await processExcelUpload(event, fileTemplateInfo);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -55,11 +56,6 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
       if (result.success && result.data) {
         console.log('업로드된 데이터:', result.data);
         setExcelData(result.data as T[]);
-
-        // if (onDataUpload) {
-        //   onDataUpload(result.data as T[]);
-        // }
-        // 업로드 성공으로 Jotai store에 데이터 저장
       }
     } catch {
       showAlert({

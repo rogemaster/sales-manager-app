@@ -1,4 +1,5 @@
-import { atom } from 'jotai';
+import { Atom, atom, useAtomValue } from 'jotai';
+import { atomWithReset, selectAtom } from 'jotai/utils';
 
 export interface ExcelDataState<T = Record<string, unknown>> {
   data: T[];
@@ -6,40 +7,24 @@ export interface ExcelDataState<T = Record<string, unknown>> {
   uploadTime: Date | null;
 }
 
-// 제네릭 타입을 받는 atom 생성 함수
-export function createExcelDataAtom<T = Record<string, unknown>>() {
-  const baseAtom = atom<ExcelDataState<T>>({
-    data: [],
-    isUploaded: false,
-    uploadTime: null,
-  });
-
-  const setExcelDataAtom = atom(null, (_, set, data: T[]) => {
-    set(baseAtom, {
-      data,
-      isUploaded: true,
-      uploadTime: new Date(),
-    });
-  });
-
-  const clearExcelDataAtom = atom(null, (_, set) => {
-    set(baseAtom, {
-      data: [],
-      isUploaded: false,
-      uploadTime: null,
-    });
-  });
-
-  return {
-    baseAtom,
-    setExcelDataAtom,
-    clearExcelDataAtom,
-  };
-}
-
-// 기본 타입용 atom
-export const excelDataAtom = atom<ExcelDataState>({
+// 초기값으로 되돌릴 수 있는 atom
+export const excelDataAtom = atomWithReset<ExcelDataState>({
   data: [],
   isUploaded: false,
   uploadTime: null,
 });
+
+// data의 타입을 ExcelDataState['data'] 타입을 지정해 상태 정의와 동기화 처리
+export const setExcelDataAtom = atom(null, (_, set, data: ExcelDataState['data']) => {
+  set(excelDataAtom, {
+    data,
+    isUploaded: true,
+    uploadTime: new Date(),
+  });
+});
+
+// selectAtom에 제네릭 선언으로 타입 보장 처리
+export function useExcelData<T>() {
+  const dataAtom = selectAtom(excelDataAtom as Atom<ExcelDataState<T>>, (state) => state.data);
+  return useAtomValue(dataAtom);
+}
