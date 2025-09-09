@@ -11,9 +11,11 @@ interface FilterSelectProps {
   value: string;
   onValueChange: (value: string) => void;
   options: FilterOption[];
-  allOption: FilterOption;
+  allOption?: FilterOption;
   placeholder?: string;
-  className?: string;
+  divClassName?: string;
+  labelClassName?: string;
+  triggerClassName?: string;
 }
 
 export const FilterSelect = ({
@@ -23,11 +25,17 @@ export const FilterSelect = ({
   options,
   allOption,
   placeholder,
-  className = 'w-48',
+  divClassName,
+  labelClassName,
+  triggerClassName,
 }: FilterSelectProps) => {
   // 필터 옵션을 메모이제이션
   const filterOptions = useMemo(() => {
-    return [allOption, ...options];
+    if (allOption) {
+      return [allOption, ...options];
+    } else {
+      return options;
+    }
   }, [allOption, options]);
 
   // 현재 선택된 옵션 정보를 메모이제이션
@@ -39,10 +47,10 @@ export const FilterSelect = ({
   }, [value, options, allOption]);
 
   return (
-    <div className="flex items-center gap-4">
-      <Label className="w-20 text-right">{label}</Label>
+    <div className={divClassName}>
+      <Label className={labelClassName}>{label}</Label>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={className}>
+        <SelectTrigger className={triggerClassName}>
           <SelectValue placeholder={placeholder || selectedOptionInfo?.name} />
         </SelectTrigger>
         <SelectContent>

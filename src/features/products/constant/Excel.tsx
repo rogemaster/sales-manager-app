@@ -108,6 +108,7 @@ export const PRODUCT_EXCEL_TEMPLATE_UPLOADER: ExcelUploaderProps = {
     headerDescription: '작성한 엑셀 파일을 업로드하여 상품 데이터를 불러오세요.',
   },
   contentDescription: '엑셀 파일을 드래그하거나 클릭하여 업로드하세요',
+  fileTemplateInfo: PRODUCT_BULK_EXCEL_TEMPLATE.template,
 };
 
 // 엑셀 데이터 미리보기

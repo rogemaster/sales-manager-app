@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState } from 'react';
 
 export const ProductPriceAndQuantityInfo = () => {
-  const [supplyPrice, setSupplyPrice] = useState<number>(0);
-  const [salePrice, setSalePrice] = useState<number>(0);
+  const [netPrice, setNetPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number>(0);
   const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [deliveryType, setDeliveryType] = useState<string>('');
   const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
@@ -23,10 +23,10 @@ export const ProductPriceAndQuantityInfo = () => {
           <div className="space-y-2">
             <Label htmlFor="supplyPrice">공급가 *</Label>
             <Input
-              id="supplyPrice"
+              id="netPrice"
               type="number"
-              value={supplyPrice}
-              onChange={(e) => setSupplyPrice(Number(e.target.value))}
+              value={netPrice}
+              onChange={(e) => setNetPrice(Number(e.target.value))}
               placeholder="0"
               required
             />
@@ -34,10 +34,10 @@ export const ProductPriceAndQuantityInfo = () => {
           <div className="space-y-2">
             <Label htmlFor="salePrice">판매가 *</Label>
             <Input
-              id="salePrice"
+              id="price"
               type="number"
-              value={salePrice}
-              onChange={(e) => setSalePrice(Number(e.target.value))}
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
               placeholder="0"
               required
             />
@@ -60,7 +60,7 @@ export const ProductPriceAndQuantityInfo = () => {
         <div className="space-y-4 pt-4 border-t">
           <h4 className="font-medium">배송 정보</h4>
           <div className="space-y-2">
-            <Label htmlFor="shippingPolicy">배송정책 *</Label>
+            <Label htmlFor="deliveryType">배송정책 *</Label>
             <Select value={deliveryType} onValueChange={(value) => setDeliveryType(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="배송정책을 선택하세요" />
@@ -75,9 +75,9 @@ export const ProductPriceAndQuantityInfo = () => {
 
           {deliveryType === 'prepaid' && (
             <div className="space-y-2">
-              <Label htmlFor="shippingFee">배송비 *</Label>
+              <Label htmlFor="deliveryPrice">배송비 *</Label>
               <Input
-                id="shippingFee"
+                id="deliveryPrice"
                 type="number"
                 value={deliveryPrice}
                 onChange={(e) => setDeliveryPrice(Number(e.target.value))}

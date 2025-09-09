@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { saleTypeAtom } from '@/features/products/store/productSearch.store';
-import { ALL_PRODUCT_STATUS_OPTION, PRODUCT_STATUS } from '@/constant/Product';
+import { ALL_PRODUCT_STATUS_OPTION, PRODUCT_STATUS } from '@/features/products/constant/ProductInfo';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const ProductSearchSaleState = () => {

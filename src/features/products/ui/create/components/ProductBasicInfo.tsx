@@ -4,15 +4,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
+import { FilterSelect } from '@/components/common/FilterSelect';
+import { MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
+import { useFormContext } from 'react-hook-form';
+import { Product } from '@/features/products/types/ProductTypes';
 
 export const ProductCreateBasicinfo = () => {
-  const [customerProductCode, setCustomerProductCode] = useState<string>('');
-  const [productName, setProductName] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>('');
   const [category, setCategory] = useState<string>('');
+
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<Product>();
+
+  // const handleInputChange = (field: string, value: string) => {
+  //   setFormData((prev) => ({ ...prev, [field]: value }));
+  // };
 
   // 키워드 삭제
   const handleRemoveKeyword = (keyword: string) => {
@@ -44,38 +54,22 @@ export const ProductCreateBasicinfo = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="customerProductCode">고객사 상품코드 *</Label>
-          <Input
-            id="customerProductCode"
-            value={customerProductCode}
-            onChange={(e) => setCustomerProductCode(e.target.value)}
-            placeholder="고객사 상품코드를 입력하세요"
-            required
-          />
+          <Label htmlFor="customerProductCode">고객사 상품코드</Label>
+          <Input {...register('customerCode')} />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="productName">상품명 *</Label>
-          <Input
-            id="productName"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            placeholder="상품명을 입력하세요"
-            required
-          />
+          <Input {...register('name', { required: '상품명을 입력해 주세요.' })} required />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="keywords">상품 키워드</Label>
           <div className="space-y-2">
             <div className="flex gap-2">
-              <Input
-                id="keywords"
-                value={keywordInput}
-                onChange={(e) => setKeywordInput(e.target.value)}
-                onKeyDown={handleKeywordKeyDown}
-                placeholder="키워드를 입력하고 Enter를 누르세요"
-              />
+              <Input {...register('name')} placeholder="키워드를 입력하고 Enter를 누르세요" />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               <Button type="button" onClick={handleAddKeyword} size="sm">
                 추가
               </Button>
@@ -93,7 +87,14 @@ export const ProductCreateBasicinfo = () => {
           </div>
         </div>
 
-        <div className="space-y-2">
+        <FilterSelect
+          label="카테고리"
+          divClassName="space-y-2"
+          value={category}
+          onValueChange={(value) => setCategory(value)}
+          options={MOCK_CATEGORY_DATA}
+        />
+        {/* <div className="space-y-2">
           <Label htmlFor="category">카테고리 *</Label>
           <Select value={category} onValueChange={(value) => setCategory(value)}>
             <SelectTrigger>
@@ -101,16 +102,9 @@ export const ProductCreateBasicinfo = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="전자제품">전자제품</SelectItem>
-              <SelectItem value="의류">의류</SelectItem>
-              <SelectItem value="액세서리">액세서리</SelectItem>
-              <SelectItem value="가구">가구</SelectItem>
-              <SelectItem value="도서">도서</SelectItem>
-              <SelectItem value="식품">식품</SelectItem>
-              <SelectItem value="화장품">화장품</SelectItem>
-              <SelectItem value="스포츠">스포츠</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

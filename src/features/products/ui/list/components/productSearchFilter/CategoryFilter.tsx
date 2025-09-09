@@ -15,6 +15,9 @@ export const ProductSearchCategory = () => {
   return (
     <FilterSelect
       label="카테고리"
+      divClassName="flex items-center gap-4"
+      labelClassName="w-20 text-right"
+      triggerClassName="w-48"
       value={getCategoryAtom}
       onValueChange={handleCategoryChange}
       options={MOCK_CATEGORY_DATA}

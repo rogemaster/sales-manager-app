@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Table } from '@/components/ui/table';
 import { getCategoryName } from '@/lib/utils';
-import { LIST_TABLE_HEAD } from '@/features/products/constant/TableTitle';
+import { LIST_TABLE_HEAD } from '@/features/products/constant/ProductTableInfo';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 
 export const ProductTableBody = () => {
