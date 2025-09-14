@@ -1,32 +1,31 @@
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { X } from 'lucide-react';
-import { FilterSelect } from '@/components/common/FilterSelect';
-import { MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
 import { useFormContext } from 'react-hook-form';
 import { Product } from '@/features/products/types/ProductTypes';
+import { X } from 'lucide-react';
+import { MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
+import { FilterSelect } from '@/components/common/FilterSelect';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const ProductCreateBasicinfo = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
 
   const {
     register,
     formState: { errors },
+    setValue,
+    getValues,
   } = useFormContext<Product>();
-
-  // const handleInputChange = (field: string, value: string) => {
-  //   setFormData((prev) => ({ ...prev, [field]: value }));
-  // };
 
   // 키워드 삭제
   const handleRemoveKeyword = (keyword: string) => {
-    setKeywords((prev) => prev.filter((k) => k !== keyword));
+    const updatedKeywords = keywords.filter((k) => k !== keyword);
+    setKeywords(updatedKeywords);
+    setValue('keyWords', updatedKeywords);
   };
 
   // 키워드 Enter 키 처리
@@ -40,7 +39,9 @@ export const ProductCreateBasicinfo = () => {
   // 키워드 추가
   const handleAddKeyword = () => {
     if (keywordInput.trim() && !keywords.includes(keywordInput.trim())) {
-      setKeywords((prev) => [...prev, keywordInput.trim()]);
+      const newKeywords = [...keywords, keywordInput.trim()];
+      setKeywords(newKeywords);
+      setValue('keyWords', keywords);
       setKeywordInput('');
     }
   };
@@ -60,7 +61,7 @@ export const ProductCreateBasicinfo = () => {
 
         <div className="space-y-2">
           <Label htmlFor="productName">상품명 *</Label>
-          <Input {...register('name', { required: '상품명을 입력해 주세요.' })} required />
+          <Input {...register('name', { required: '상품명을 입력해 주세요.' })} />
           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </div>
 
@@ -68,7 +69,12 @@ export const ProductCreateBasicinfo = () => {
           <Label htmlFor="keywords">상품 키워드</Label>
           <div className="space-y-2">
             <div className="flex gap-2">
-              <Input {...register('name')} placeholder="키워드를 입력하고 Enter를 누르세요" />
+              <Input
+                value={keywordInput}
+                onKeyDown={handleKeywordKeyDown}
+                onChange={(e) => setKeywordInput(e.target.value)}
+                placeholder="키워드를 입력하고 Enter를 누르세요"
+              />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               <Button type="button" onClick={handleAddKeyword} size="sm">
                 추가
@@ -88,11 +94,12 @@ export const ProductCreateBasicinfo = () => {
         </div>
 
         <FilterSelect
-          label="카테고리"
+          label="카테고리 *"
           divClassName="space-y-2"
-          value={category}
-          onValueChange={(value) => setCategory(value)}
+          value={getValues('categoryId')}
+          onValueChange={(id) => setValue('categoryId', id)}
           options={MOCK_CATEGORY_DATA}
+          placeholder="카테고리를 선택하세요."
         />
         {/* <div className="space-y-2">
           <Label htmlFor="category">카테고리 *</Label>

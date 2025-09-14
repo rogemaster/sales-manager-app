@@ -1,4 +1,4 @@
-import { ProductSaleState } from '@/features/products/types/ProductTypes';
+import { FilterOption, ProductSaleState } from '@/features/products/types/ProductTypes';
 
 // 전체 상품상태 옵션 상수
 export const ALL_PRODUCT_STATUS_OPTION = {
@@ -27,7 +27,7 @@ export const PRODUCT_STATUS: ProductSaleState[] = [
 ];
 
 // 일자 필터
-export const PRODUCT_DATE_TYPE = [
+export const PRODUCT_DATE_TYPE: FilterOption[] = [
   {
     id: 'register',
     name: '등록일',
@@ -39,21 +39,21 @@ export const PRODUCT_DATE_TYPE = [
 ] as const;
 
 // 배송 타입 옵션
-export const DELIVERY_TYPE_OPTION = [
+export const DELIVERY_TYPE_OPTION: FilterOption[] = [
   {
-    type: 'FREE',
+    id: 'FREE',
     name: '무료배송',
   },
   {
-    type: 'NOT_FREE',
+    id: 'NOT_FREE',
     name: '유료배송',
   },
   {
-    type: 'CHARGE_RECEIVED',
+    id: 'CHARGE_RECEIVED',
     name: '착불',
   },
   {
-    type: 'CONDITIONAL_FREE',
+    id: 'CONDITIONAL_FREE',
     name: '조건부 무료배송',
   },
 ] as const;

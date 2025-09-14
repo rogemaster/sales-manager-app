@@ -21,14 +21,15 @@ export const ProductSubmitButton = ({ submitTitle, cancelTitle, submitClassName,
     }
   };
 
-  // <div className="flex justify-end gap-4">
-  <div className={submitClassName ?? ''}>
-    <Button type="button" variant="outline" onClick={onBack}>
-      {cancelTitle ?? '취소'}
-    </Button>
-    <Button type="submit" onSubmit={onSubmit}>
-      <Save className="h-4 w-4 mr-2" />
-      {submitTitle ?? '저장'}
-    </Button>
-  </div>;
+  return (
+    <div className={submitClassName ?? ''}>
+      <Button type="button" variant="outline" onClick={onBack}>
+        {cancelTitle ?? '취소'}
+      </Button>
+      <Button type="submit" onSubmit={onSubmit}>
+        <Save className="h-4 w-4 mr-2" />
+        {submitTitle ?? '저장'}
+      </Button>
+    </div>
+  );
 };

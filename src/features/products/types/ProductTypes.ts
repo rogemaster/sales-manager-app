@@ -21,7 +21,7 @@ export interface Product {
   option2?: string;
   totalQuantity: number;
   subOption?: string;
-  keyWord: string | null;
+  keyWords?: string[];
   createDate: Date;
   updateDate: Date;
 }
@@ -60,4 +60,10 @@ export interface ProductExcelPreviewRow extends Record<string, unknown> {
   price: number;
   totalQuantity: number;
   error: string[];
+}
+
+export interface ProductOption {
+  id: string;
+  name: string;
+  values: string[];
 }

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FilterOption } from '@/features/products/types/ProductTypes';
 
 interface FilterSelectProps {
+  htmlFor?: string;
   label: string;
   value: string;
   onValueChange: (value: string) => void;
@@ -19,6 +20,7 @@ interface FilterSelectProps {
 }
 
 export const FilterSelect = ({
+  htmlFor,
   label,
   value,
   onValueChange,
@@ -43,12 +45,14 @@ export const FilterSelect = ({
     if (value === 'ALL') {
       return allOption;
     }
-    return options.find((option) => (option.id && option.id === value) || allOption);
+    return options.find((option) => option.id && option.id === value);
   }, [value, options, allOption]);
 
   return (
     <div className={divClassName}>
-      <Label className={labelClassName}>{label}</Label>
+      <Label htmlFor={htmlFor} className={labelClassName}>
+        {label}
+      </Label>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className={triggerClassName}>
           <SelectValue placeholder={placeholder || selectedOptionInfo?.name} />

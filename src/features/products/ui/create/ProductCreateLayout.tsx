@@ -2,12 +2,16 @@
 
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Product } from '../../types/ProductTypes';
-
+import { ProductCreateBasicinfo } from './components/ProductBasicInfo';
+import { ProductPriceAndQuantityInfo } from './components/ProductPriceAndQuantityInfo';
+import { ProductOptionSection } from './options/ProductOptionSection';
+import { ProductMainImageInfo } from './components/ProductMainImageInfo';
+import { ProductDetailInfo } from './components/ProductDetailInfo';
 export const ProductCreateLayout = () => {
   const formData = useForm<Product>();
 
-  const onSubmit: SubmitHandler<Product> = (data) => {
-    console.log('상품등록 데이터:: ', data);
+  const onSubmit: SubmitHandler<Product> = () => {
+    console.log('상품등록 데이터:: ');
   };
 
   return (
@@ -24,24 +28,23 @@ export const ProductCreateLayout = () => {
         <form onSubmit={formData.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* 기본 정보 */}
-
+            <ProductCreateBasicinfo />
             {/* 가격 및 수량 정보 */}
+            <ProductPriceAndQuantityInfo />
           </div>
 
           {/* 옵션 정보 */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* 기본 옵션 */}
-
-            {/* 추가 옵션 */}
-          </div>
+          <ProductOptionSection />
 
           {/* 옵션 조합 관리 */}
 
           {/* 이미지 및 상세 정보 */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* 메인 이미지 */}
+            <ProductMainImageInfo />
 
             {/* 상품 상세 설명 */}
+            <ProductDetailInfo />
           </div>
 
           {/* 저장 버튼 */}

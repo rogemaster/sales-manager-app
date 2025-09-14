@@ -1,9 +1,13 @@
+import { useFormContext } from 'react-hook-form';
+import { Product } from '@/features/products/types/ProductTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
 
 export const ProductDetailInfo = () => {
-  const [productDescription, setProductDescription] = useState<string>('');
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<Product>();
 
   return (
     <Card>
@@ -13,8 +17,7 @@ export const ProductDetailInfo = () => {
       </CardHeader>
       <CardContent>
         <Textarea
-          value={productDescription}
-          onChange={(e) => setProductDescription(e.target.value)}
+          {...register('detailPage', { required: '상품상세설명을 입력하세요.' })}
           placeholder="상세설명 입력"
           rows={10}
           className="resize-none"

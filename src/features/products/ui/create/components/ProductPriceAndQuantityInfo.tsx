@@ -1,15 +1,34 @@
+'use client';
+
+import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { DELIVERY_TYPE_OPTION } from '@/features/products/constant/ProductInfo';
+import { Product } from '@/features/products/types/ProductTypes';
+import { FilterSelect } from '@/components/common/FilterSelect';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
 
 export const ProductPriceAndQuantityInfo = () => {
-  const [netPrice, setNetPrice] = useState<number>(0);
-  const [price, setPrice] = useState<number>(0);
-  const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [deliveryType, setDeliveryType] = useState<string>('');
-  const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
+  const {
+    register,
+    formState: { errors },
+    setValue,
+  } = useFormContext<Product>();
+
+  const isDeliveryPrice = () => {
+    if (deliveryType === 'NOT_FREE' || deliveryType === 'CONDITIONAL_FREE') {
+      return true;
+    }
+    return false;
+  };
+
+  const handelDeliveryType = (type: string) => {
+    console.log('배송타입', type);
+    setValue('deliveryType', type);
+    setDeliveryType(type);
+  };
 
   return (
     // 가격 및 수량 정보
@@ -21,45 +40,37 @@ export const ProductPriceAndQuantityInfo = () => {
       <CardContent className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="supplyPrice">공급가 *</Label>
-            <Input
-              id="netPrice"
-              type="number"
-              value={netPrice}
-              onChange={(e) => setNetPrice(Number(e.target.value))}
-              placeholder="0"
-              required
-            />
+            <Label htmlFor="supplyPrice">공급가</Label>
+            <Input {...register('netPrice')} placeholder="0" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="salePrice">판매가 *</Label>
-            <Input
-              id="price"
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              placeholder="0"
-              required
-            />
+            <Input {...register('price', { required: '판매가를 입력해 주세요.' })} placeholder="0" />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="totalQuantity">총수량 *</Label>
-          <Input
-            id="totalQuantity"
-            type="number"
-            value={totalQuantity}
-            onChange={(e) => setTotalQuantity(Number(e.target.value))}
-            placeholder="0"
-            required
-          />
+          <Input {...register('totalQuantity', { required: '총 수량을 입력해 주세요.' })} placeholder="0" />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </div>
 
         {/* 배송 정보 */}
         <div className="space-y-4 pt-4 border-t">
           <h4 className="font-medium">배송 정보</h4>
-          <div className="space-y-2">
+          <FilterSelect
+            htmlFor="deliveryType"
+            divClassName="space-y-2"
+            label="배송정책 *"
+            triggerClassName="w-full"
+            placeholder="배송정책을 선택하세요."
+            value={deliveryType}
+            onValueChange={handelDeliveryType}
+            options={DELIVERY_TYPE_OPTION}
+          />
+
+          {/* <div className="space-y-2">
             <Label htmlFor="deliveryType">배송정책 *</Label>
             <Select value={deliveryType} onValueChange={(value) => setDeliveryType(value)}>
               <SelectTrigger>
@@ -71,18 +82,13 @@ export const ProductPriceAndQuantityInfo = () => {
                 <SelectItem value="prepaid">선결제</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
-          {deliveryType === 'prepaid' && (
+          {isDeliveryPrice() && (
             <div className="space-y-2">
               <Label htmlFor="deliveryPrice">배송비 *</Label>
-              <Input
-                id="deliveryPrice"
-                type="number"
-                value={deliveryPrice}
-                onChange={(e) => setDeliveryPrice(Number(e.target.value))}
-                placeholder="0"
-              />
+              <Input {...register('deliveryPrice', { required: '배송비를 입력해주세요.' })} placeholder="0" />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
           )}
         </div>

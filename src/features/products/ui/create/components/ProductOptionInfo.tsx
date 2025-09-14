@@ -6,12 +6,6 @@ import { Plus, X } from 'lucide-react';
 import { useAlert } from '@/hooks/useAlert';
 import { Label } from '@/components/ui/label';
 
-interface ProductOption {
-  id: string;
-  name: string;
-  values: string[];
-}
-
 interface OptionCombination {
   id: string;
   combination: string;
@@ -106,7 +100,7 @@ export const ProductOptionInfo = () => {
       return;
     }
 
-    const combinations = generateOptionCombinations();
+    const combinations = generate();
     setOptionCombinations(combinations);
     setIsOptionsConfirmed(true);
 
@@ -197,97 +191,7 @@ export const ProductOptionInfo = () => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            옵션
-            <div className="flex gap-2">
-              {!isOptionsConfirmed ? (
-                <>
-                  <Button type="button" size="sm" onClick={() => handleAddOption('options')}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    옵션 추가
-                  </Button>
-                  <Button type="button" size="sm" onClick={handleConfirmOptions} variant="default">
-                    확정
-                  </Button>
-                </>
-              ) : (
-                <Button type="button" size="sm" onClick={handleResetOptions} variant="outline">
-                  재설정
-                </Button>
-              )}
-            </div>
-          </CardTitle>
-          <CardDescription>상품의 기본 옵션을 설정하세요.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {!isOptionsConfirmed ? (
-            <>
-              {options.map((option) => (
-                <div key={option.id} className="p-4 border rounded-lg space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Input
-                      placeholder="옵션명 (예: 색상, 사이즈)"
-                      value={option.name}
-                      onChange={(e) => handleOptionNameChange(option.id, e.target.value, 'options')}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveOption(option.id, 'options')}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {option.values.map((value, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          placeholder="옵션값"
-                          value={value}
-                          onChange={(e) => handleOptionValueChange(option.id, index, e.target.value, 'options')}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleAddOptionValue(option.id, 'options')}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                        {option.values.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveOptionValue(option.id, index, 'options')}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {options.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  옵션을 추가하여 상품의 다양한 선택사항을 제공하세요.
-                </p>
-              )}
-            </>
-          ) : (
-            <div className="space-y-4">
-              <div className="text-sm text-muted-foreground">
-                설정된 옵션:{' '}
-                {options.map((opt) => `${opt.name}(${opt.values.filter((v) => v.trim()).length}개)`).join(', ')}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <Card></Card>
 
       {/* 옵션 조합 관리 */}
       {isOptionsConfirmed && optionCombinations.length > 0 && (
