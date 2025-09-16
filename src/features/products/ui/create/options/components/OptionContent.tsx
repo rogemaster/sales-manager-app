@@ -9,8 +9,7 @@ type Props = {
   isOptionsConfirmed: boolean;
   options: ProductOption[];
   onOptionNameChange: (optionId: string, optionName: string) => void;
-  onOptionValueChange: (optionId: string, valueIndex: number, value: string) => void;
-  onRemoveOptionValue: (optionId: string, valueIndex: number) => void;
+  onOptionValueChange: (optionId: string, value: string) => void;
   onRemoveOption: (optionId: string) => void;
 };
 
@@ -20,7 +19,6 @@ export const OptionContent = ({
   options,
   onOptionNameChange,
   onOptionValueChange,
-  onRemoveOptionValue,
   onRemoveOption,
 }: Props) => {
   return (
@@ -32,7 +30,7 @@ export const OptionContent = ({
               {/* 옵션명 설정 Input */}
               <div className="flex items-center justify-between">
                 <Input
-                  placeholder={type === 'basic' ? '옵션 (예: 색상)' : '추가옵션 (예: 색상)'}
+                  placeholder={type === 'basic' ? '옵션 (예: 색상)' : '추가옵션 (예: 추가제품)'}
                   value={option.name}
                   onChange={(e) => onOptionNameChange(option.id, e.target.value)}
                   className="flex-1 mr-2"
@@ -44,25 +42,13 @@ export const OptionContent = ({
 
               {/* 옵션값 설정 Input */}
               <div className="space-y-2">
-                {option.values.map((value, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      placeholder={type === 'basic' ? '옵션 (예: 90, 100, 110)' : '추가옵션 (예: 90, 100, 110)'}
-                      value={value}
-                      onChange={(e) => onOptionValueChange(option.id, index, e.target.value)}
-                    />
-                    {option.values.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRemoveOptionValue(option.id, index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={type === 'basic' ? '옵션 (예: 90, 100, 110)' : '추가옵션 (예: 90, 100, 110)'}
+                    value={option.values}
+                    onChange={(e) => onOptionValueChange(option.id, e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           ))}
@@ -76,7 +62,7 @@ export const OptionContent = ({
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
             설정된 {type === 'basic' ? '옵션' : '추가옵션'}:{' '}
-            {options.map((opt) => `${opt.name}(${opt.values.filter((v) => v.trim()).length}개)`).join(', ')}
+            {/* {options.map((opt) => `${opt.name}(${opt.values.filter((v) => v.trim()).length}개)`).join(', ')} */}
           </div>
         </div>
       )}

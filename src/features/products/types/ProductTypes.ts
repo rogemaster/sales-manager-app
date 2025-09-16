@@ -67,3 +67,9 @@ export interface ProductOption {
   name: string;
   values: string[];
 }
+
+export interface ProductOptionDraft {
+  id: string;
+  name: string;
+  values: string;
+}

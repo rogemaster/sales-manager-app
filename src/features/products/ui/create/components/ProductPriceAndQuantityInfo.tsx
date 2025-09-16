@@ -55,7 +55,6 @@ export const ProductPriceAndQuantityInfo = () => {
           <Input {...register('totalQuantity', { required: '총 수량을 입력해 주세요.' })} placeholder="0" />
           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </div>
-
         {/* 배송 정보 */}
         <div className="space-y-4 pt-4 border-t">
           <h4 className="font-medium">배송 정보</h4>
@@ -69,21 +68,6 @@ export const ProductPriceAndQuantityInfo = () => {
             onValueChange={handelDeliveryType}
             options={DELIVERY_TYPE_OPTION}
           />
-
-          {/* <div className="space-y-2">
-            <Label htmlFor="deliveryType">배송정책 *</Label>
-            <Select value={deliveryType} onValueChange={(value) => setDeliveryType(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="배송정책을 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="free">무료배송</SelectItem>
-                <SelectItem value="cod">착불</SelectItem>
-                <SelectItem value="prepaid">선결제</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
-
           {isDeliveryPrice() && (
             <div className="space-y-2">
               <Label htmlFor="deliveryPrice">배송비 *</Label>

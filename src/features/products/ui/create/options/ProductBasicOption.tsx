@@ -1,21 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { ProductOption } from '@/features/products/types/ProductTypes';
+import { ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
 import { Card } from '@/components/ui/card';
 import { OptionHeader } from './components/OptionHeader';
 import { OptionContent } from './components/OptionContent';
 
 export const ProductBasicOption = () => {
   const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
-  const [options, setOptions] = useState<ProductOption[]>([]);
+  const [options, setOptions] = useState<ProductOptionDraft[]>([]);
 
   // 옵션 추가
   const handleAddOption = () => {
-    const newOption: ProductOption = {
+    const newOption: ProductOptionDraft = {
       id: `option-${Date.now()}`,
       name: '',
-      values: [''],
+      values: '',
     };
     setOptions((prev) => [...prev, newOption]);
   };
@@ -26,29 +26,15 @@ export const ProductBasicOption = () => {
   };
 
   // 옵션값 변경
-  const handleOptionValueChange = (optionId: string, valueIndex: number, value: string) => {
+  const handleOptionValueChange = (optionId: string, value: string) => {
     setOptions((prev) =>
-      prev.map((option) =>
-        option.id === optionId
+      prev.map((opt) =>
+        opt.id === optionId
           ? {
-              ...option,
-              values: option.values.map((v, index) => (index === valueIndex ? value : v)),
+              ...opt,
+              values: value || opt.values,
             }
-          : option,
-      ),
-    );
-  };
-
-  // 옵션값 삭제
-  const handleRemoveOptionValue = (optionId: string, valueIndex: number) => {
-    setOptions((prev) =>
-      prev.map((option) =>
-        option.id === optionId
-          ? {
-              ...option,
-              values: option.values.filter((_, index) => index !== valueIndex),
-            }
-          : option,
+          : opt,
       ),
     );
   };
@@ -60,15 +46,17 @@ export const ProductBasicOption = () => {
 
   // 옵션 확정
   const handleConfirmOptions = () => {
-    // 빈 옵션명이나 값이 있는지 검증
-    const hasEmptyOptions = options.some(
-      (option) => !option.name.trim() || option.values.some((value) => !value.trim()),
-    );
+    console.log('옵션확정', options);
 
-    if (hasEmptyOptions) {
-      alert('모든 옵션명과 옵션값을 입력해주세요.');
-      return;
-    }
+    // 빈 옵션명이나 값이 있는지 검증
+    // const hasEmptyOptions = options.some(
+    //   (option) => !option.name.trim() || option.values.some((value) => !value.trim()),
+    // );
+
+    // if (hasEmptyOptions) {
+    //   alert('모든 옵션명과 옵션값을 입력해주세요.');
+    //   return;
+    // }
 
     setIsOptionsConfirmed(true);
   };
@@ -94,7 +82,6 @@ export const ProductBasicOption = () => {
         options={options}
         onOptionNameChange={handleOptionNameChange}
         onOptionValueChange={handleOptionValueChange}
-        onRemoveOptionValue={handleRemoveOptionValue}
         onRemoveOption={handleRemoveOption}
       />
     </Card>
