@@ -73,3 +73,11 @@ export interface ProductOptionDraft {
   name: string;
   values: string;
 }
+
+export interface OptionCombination {
+  id: string;
+  combination: string;
+  values: { [key: string]: string };
+  quantity: string;
+  skuCode: string;
+}

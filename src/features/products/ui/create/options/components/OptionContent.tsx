@@ -2,12 +2,12 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ProductOption } from '@/features/products/types/ProductTypes';
+import { ProductOptionDraft } from '@/features/products/types/ProductTypes';
 
 type Props = {
   type: 'basic' | 'sub';
   isOptionsConfirmed: boolean;
-  options: ProductOption[];
+  options: ProductOptionDraft[];
   onOptionNameChange: (optionId: string, optionName: string) => void;
   onOptionValueChange: (optionId: string, value: string) => void;
   onRemoveOption: (optionId: string) => void;

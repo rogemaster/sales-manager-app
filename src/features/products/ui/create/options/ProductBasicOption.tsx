@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
+import { OptionCombination, ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
 import { Card } from '@/components/ui/card';
 import { OptionHeader } from './components/OptionHeader';
 import { OptionContent } from './components/OptionContent';
+import { optionCombinations } from '@/features/products/util/Options';
 
 export const ProductBasicOption = () => {
   const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
   const [options, setOptions] = useState<ProductOptionDraft[]>([]);
+  const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>([]);
 
   // 옵션 추가
   const handleAddOption = () => {
@@ -48,6 +50,16 @@ export const ProductBasicOption = () => {
   const handleConfirmOptions = () => {
     console.log('옵션확정', options);
 
+    const optionData: ProductOption[] = options.map((option) => ({
+      id: option.id,
+      name: option.name,
+      values: option.values.split(','),
+    }));
+
+    const optionCombinationsData = optionCombinations(optionData);
+    setOptionCombinationsData(optionCombinationsData);
+    setIsOptionsConfirmed(true);
+
     // 빈 옵션명이나 값이 있는지 검증
     // const hasEmptyOptions = options.some(
     //   (option) => !option.name.trim() || option.values.some((value) => !value.trim()),
@@ -60,6 +72,11 @@ export const ProductBasicOption = () => {
 
     setIsOptionsConfirmed(true);
   };
+
+  // 디버깅용
+  if (optionCombinationsData.length > 0) {
+    console.log(optionCombinationsData);
+  }
 
   // 옵션 재설정
   const handleResetOptions = () => {
