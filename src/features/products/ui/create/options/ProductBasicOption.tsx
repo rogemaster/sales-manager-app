@@ -5,12 +5,15 @@ import { OptionCombination, ProductOption, ProductOptionDraft } from '@/features
 import { Card } from '@/components/ui/card';
 import { OptionHeader } from './components/OptionHeader';
 import { OptionContent } from './components/OptionContent';
-import { optionCombinations } from '@/features/products/util/Options';
+import { optionCombinations, validateOptions } from '@/features/products/util/Options';
+import { useAlert } from '@/hooks/useAlert';
 
 export const ProductBasicOption = () => {
   const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
   const [options, setOptions] = useState<ProductOptionDraft[]>([]);
   const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>([]);
+
+  const { showAlert } = useAlert();
 
   // 옵션 추가
   const handleAddOption = () => {
@@ -56,27 +59,20 @@ export const ProductBasicOption = () => {
       values: option.values.split(','),
     }));
 
+    const validOptions = validateOptions(optionData);
+
+    if (validOptions.length === 0) {
+      return showAlert({
+        type: 'error',
+        message: '유효한 옵션이 없습니다. 옵션명과 옵션값을 확인해 주세요.',
+      });
+    }
+
     const optionCombinationsData = optionCombinations(optionData);
+    console.log(optionCombinationsData);
     setOptionCombinationsData(optionCombinationsData);
     setIsOptionsConfirmed(true);
-
-    // 빈 옵션명이나 값이 있는지 검증
-    // const hasEmptyOptions = options.some(
-    //   (option) => !option.name.trim() || option.values.some((value) => !value.trim()),
-    // );
-
-    // if (hasEmptyOptions) {
-    //   alert('모든 옵션명과 옵션값을 입력해주세요.');
-    //   return;
-    // }
-
-    setIsOptionsConfirmed(true);
   };
-
-  // 디버깅용
-  if (optionCombinationsData.length > 0) {
-    console.log(optionCombinationsData);
-  }
 
   // 옵션 재설정
   const handleResetOptions = () => {
