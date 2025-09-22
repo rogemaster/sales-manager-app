@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/router';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Product } from '../../types/ProductTypes';
 import { ProductCreateBasicinfo } from './components/ProductBasicInfo';
@@ -7,8 +8,16 @@ import { ProductPriceAndQuantityInfo } from './components/ProductPriceAndQuantit
 import { ProductOptionSection } from './options/ProductOptionSection';
 import { ProductMainImageInfo } from './components/ProductMainImageInfo';
 import { ProductDetailInfo } from './components/ProductDetailInfo';
+import { Button } from '@/components/ui/button';
+import { Save } from 'lucide-react';
+
 export const ProductCreateLayout = () => {
   const formData = useForm<Product>();
+  const router = useRouter();
+
+  const onBack = () => {
+    router.back();
+  };
 
   const onSubmit: SubmitHandler<Product> = () => {
     console.log('상품등록 데이터:: ');
@@ -47,7 +56,18 @@ export const ProductCreateLayout = () => {
             <ProductDetailInfo />
           </div>
 
+          {/* 상품정보고시 */}
+
           {/* 저장 버튼 */}
+          <div className="flex justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onBack}>
+              취소
+            </Button>
+            <Button type="submit">
+              <Save className="h-4 w-4 mr-2" />
+              상품 등록
+            </Button>
+          </div>
         </form>
       </FormProvider>
     </div>

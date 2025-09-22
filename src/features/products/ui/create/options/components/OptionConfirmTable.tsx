@@ -1,12 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { OptionCombination } from '@/features/products/types/ProductTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAlert } from '@/hooks/useAlert';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 
 type Props = {
   optionCombinations: OptionCombination[];
@@ -15,42 +15,43 @@ type Props = {
 
 export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: Props) => {
   const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>(optionCombinations);
+  const [bulkQuantity, setBulkQuantity] = useState<number>(0);
   const { showAlert } = useAlert();
 
   // 옵션 조합 수정
   const handleOptionCombinationChange = (id: string, field: 'quantity' | 'skuCode' | 'optionPrice', value: string) => {
-    setOptionCombinationsData((prev) => prev.map((combo) => (combo.id === id ? { ...combo, [field]: value } : combo)));
+    setOptionCombinationsData((prev) =>
+      prev.map((combo) =>
+        combo.id === id ? { ...combo, [field]: field === 'quantity' ? Number(value) || 0 : value } : combo,
+      ),
+    );
   };
 
   const handleOptionBatchQuantity = () => {
-    const quantity = prompt('모든 조합에 적용할 수량을 입력하세요:');
-    if (quantity && !isNaN(Number(quantity)) && Number(quantity) >= 0) {
-      setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity })));
+    if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity >= 0) {
+      setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity: bulkQuantity })));
       showAlert({
         type: 'success',
-        message: `모든 조합의 수량이 ${quantity}개로 설정되었습니다.`,
+        message: `모든 조합의 수량이 ${bulkQuantity}개로 설정되었습니다.`,
       });
     }
   };
 
   const handleOptionBatchSKUCode = () => {
-    const prefix = prompt('SKU 코드 접두사를 입력하세요 (예: PRD-):');
-    if (prefix) {
-      setOptionCombinationsData((prev) =>
-        prev.map((combo, index) => ({
-          ...combo,
-          skuCode: `${prefix}${String(index + 1).padStart(3, '0')}`,
-        })),
-      );
-      showAlert({
-        type: 'success',
-        message: `모든 조합의 SKU 코드가 생성되었습니다.`,
-      });
-    }
+    setOptionCombinationsData((prev) =>
+      prev.map((combo, index) => ({
+        ...combo,
+        skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
+      })),
+    );
+    showAlert({
+      type: 'success',
+      message: `모든 조합의 SKU 코드가 생성되었습니다.`,
+    });
   };
 
   const handleOptionReset = () => {
-    setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity: '', skuCode: '' })));
+    setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity: 0, skuCode: '' })));
     showAlert({
       type: 'info',
       message: '모든 조합의 수량과 SKU 코드가 초기화되었습니다.',
@@ -123,15 +124,26 @@ export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: P
 
               {/* 일괄 설정 버튼들 */}
               <div className="flex gap-2 pt-4 border-t">
-                <Button type="button" size="sm" variant="outline" onClick={handleOptionBatchQuantity}>
-                  수량 일괄설정
-                </Button>
-                <Button type="button" size="sm" variant="outline" onClick={handleOptionBatchSKUCode}>
-                  SKU 일괄생성
-                </Button>
-                <Button type="button" size="sm" variant="outline" onClick={handleOptionReset}>
-                  전체 초기화
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium">일괄 수량: </Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={bulkQuantity}
+                    onChange={(e) => setBulkQuantity(Number(e.target.value))}
+                    className="w-20 h-8"
+                    min="0"
+                  />
+                  <Button type="button" size="sm" variant="outline" onClick={handleOptionBatchQuantity}>
+                    수량 일괄설정
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={handleOptionBatchSKUCode}>
+                    SKU 일괄생성
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={handleOptionReset}>
+                    전체 초기화
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
