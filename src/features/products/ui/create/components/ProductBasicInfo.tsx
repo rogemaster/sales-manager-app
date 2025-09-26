@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Product } from '@/features/products/types/ProductTypes';
 import { X } from 'lucide-react';
-import { MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
+import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,8 @@
-export const PRODUCT_INFO_TYPES = {
+import { ProductInfomationDisclosureType } from '@/features/products/types/ProductTypes';
+
+export const PRODUCT_INFO_DISC_TYPES: Record<string, ProductInfomationDisclosureType> = {
   electronics: {
+    id: 'disc-001',
     name: '전자제품',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -14,6 +17,7 @@ export const PRODUCT_INFO_TYPES = {
     ],
   },
   clothing: {
+    id: 'disc-002',
     name: '의류',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -28,6 +32,7 @@ export const PRODUCT_INFO_TYPES = {
     ],
   },
   food: {
+    id: 'disc-003',
     name: '식품',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -41,12 +46,13 @@ export const PRODUCT_INFO_TYPES = {
         key: 'geneticModification',
         label: '유전자변형식품 여부',
         type: 'select',
-        options: ['해당없음', '유전자변형식품', '유전자변형식품 포함'],
+        values: ['해당없음', '유전자변형식품', '유전자변형식품 포함'],
         required: false,
       },
     ],
   },
   cosmetics: {
+    id: 'disc-004',
     name: '화장품',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -60,12 +66,13 @@ export const PRODUCT_INFO_TYPES = {
         key: 'functionalCosmetic',
         label: '기능성화장품 여부',
         type: 'select',
-        options: ['해당없음', '기능성화장품'],
+        values: ['해당없음', '기능성화장품'],
         required: false,
       },
     ],
   },
   books: {
+    id: 'disc-005',
     name: '도서',
     fields: [
       { key: 'publisher', label: '출판사', type: 'text', required: true },
@@ -79,6 +86,7 @@ export const PRODUCT_INFO_TYPES = {
     ],
   },
   furniture: {
+    id: 'disc-006',
     name: '가구',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -94,6 +102,7 @@ export const PRODUCT_INFO_TYPES = {
     ],
   },
   sports: {
+    id: 'disc-007',
     name: '스포츠용품',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },
@@ -108,6 +117,7 @@ export const PRODUCT_INFO_TYPES = {
     ],
   },
   general: {
+    id: 'disc-008',
     name: '일반상품',
     fields: [
       { key: 'manufacturer', label: '제조업체/수입업체', type: 'text', required: true },

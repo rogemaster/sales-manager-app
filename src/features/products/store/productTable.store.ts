@@ -1,4 +1,4 @@
-import { MOCK_PRODUCT_DATA } from '@/mock/MockProductsData';
+import { MOCK_PRODUCT_DATA } from '@/mocks/data/MockProductsData';
 import { atom } from 'jotai';
 
 export const itemsPageAtom = atom<number>(10);

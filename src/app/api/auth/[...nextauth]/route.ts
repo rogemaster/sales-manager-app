@@ -24,24 +24,10 @@ const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // 사용자 인증 로직
-        // const user = users.find((u) => u.email === credentials.email && u.password === credentials.password);
-
-        // if (!user) {
-        //   return null;
-        // }
-
-        // return {
-        //   id: user.id,
-        //   email: user.email,
-        //   name: user.name,
-        //   image: user.image,
-        // };
-
         try {
           // 실제 api 호출로 사용자 조회
           const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-          const authResponse = await fetch(`${baseUrl}/api/signIn`, {
+          const authResponse = await fetch(`${baseUrl}/api/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

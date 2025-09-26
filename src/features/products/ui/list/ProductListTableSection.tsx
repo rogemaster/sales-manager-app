@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_PRODUCT_DATA } from '@/mock/MockProductsData';
+import { MOCK_PRODUCT_DATA } from '@/mocks/data/MockProductsData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ProductTableHeader } from '@/features/products/ui/list/components/productTable/ProductTableHeader';
 import { ProductTableBody } from './components/productTable/ProductTableBody';

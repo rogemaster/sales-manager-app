@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { categoryAtom } from '@/features/products/store/productSearch.store';
-import { ALL_CATEGORY_OPTION, MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
+import { ALL_CATEGORY_OPTION, MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const ProductSearchCategory = () => {

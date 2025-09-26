@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 
 import './globals.css';
+import { worker } from '@/mocks/browser';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,6 +17,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  if (process.env.NODE_ENV === 'development') {
+    worker.start();
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>

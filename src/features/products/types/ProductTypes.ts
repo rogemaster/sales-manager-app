@@ -81,3 +81,26 @@ export interface OptionCombination {
   quantity: number;
   skuCode: string;
 }
+
+type DisclosureFieldType = 'text' | 'number' | 'date' | 'month' | 'textarea' | 'select';
+
+export interface InfoDisclosureBaseField {
+  key: string;
+  label: string;
+  type: Exclude<DisclosureFieldType, 'select'>;
+  required: boolean;
+}
+
+export interface InfoDisclosureSelectField {
+  key: string;
+  label: string;
+  type: 'select';
+  values: string[];
+  required: boolean;
+}
+
+export interface ProductInfomationDisclosureType {
+  id: string;
+  name: string;
+  fields: (InfoDisclosureBaseField | InfoDisclosureSelectField)[];
+}

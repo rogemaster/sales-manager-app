@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { MOCK_PRODUCT_DATA } from '@/mock/MockProductsData';
+import { MOCK_PRODUCT_DATA } from '@/mocks/data/MockProductsData';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Table } from '@/components/ui/table';

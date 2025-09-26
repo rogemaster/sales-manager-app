@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
-import { MOCK_CATEGORY_DATA } from '@/mock/MockCategoryData';
+import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import dayjs from 'dayjs';
 import { RangeTypeProps } from '@/types/CommonInterface';
 
