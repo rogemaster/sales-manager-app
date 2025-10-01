@@ -59,8 +59,8 @@ src/
 │   └── ui/                # UI 컴포넌트
 ├── features/              # 기능별 모듈
 │   ├── auth/              # 인증 기능
-│   ├── products/          # 상품 관리 기능
-│   └── order/             # 주문 관리 기능
+│   ├── products/          # 상품 관리 기능(작업중)
+│   └── order/             # 주문 관리 기능(상품 작업 후 구현)
 ├── hooks/                 # 커스텀 훅
 ├── lib/                   # 유틸리티 및 라이브러리
 ├── store/                 # 전역 상태 관리
@@ -69,7 +69,7 @@ src/
 
 ## 🚀 시작하기
 
-### 1. 의존성 설치
+### 의존성 설치
 
 ```bash
 npm install
@@ -79,7 +79,7 @@ yarn install
 pnpm install
 ```
 
-### 2. 환경 변수 설정
+<!-- ### 환경 변수 설정
 
 프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가하세요:
 
@@ -87,9 +87,9 @@ pnpm install
 # NextAuth.js 설정
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key-here
-```
+``` -->
 
-### 3. 개발 서버 실행
+### 개발 서버 실행
 
 ```bash
 npm run dev
@@ -99,7 +99,7 @@ yarn dev
 pnpm dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
+<!-- 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
 
 ## 🔑 테스트 계정
 
@@ -119,7 +119,8 @@ pnpm dev
 npm run dev      # 개발 서버 실행
 npm run build    # 프로덕션 빌드
 npm run start    # 프로덕션 서버 실행
-npm run lint     # ESLint 실행
+npm run lint     # ESLint 실행 -->
+
 ```
 
 ## 🔧 주요 기능 상세
@@ -144,3 +145,4 @@ npm run lint     # ESLint 실행
 - JWT 기반 세션 관리
 - 보호된 라우트
 - 사용자 권한 관리
+```

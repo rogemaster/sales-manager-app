@@ -3,7 +3,9 @@ import { Inter } from 'next/font/google';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 
 import './globals.css';
-import { worker } from '@/mocks/browser';
+import { handlers } from '@/mocks/handlers';
+import { setupServer } from 'msw/node';
+import { setupWorker } from 'msw/browser';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,7 +19,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  if (process.env.NODE_ENV === 'development') {
+  // if (process.env.NODE_ENV === 'development') {
+  //   worker.start();
+  // }
+
+  if (typeof window === 'undefined') {
+    const server = setupServer(...handlers);
+    server.listen();
+  } else {
+    const worker = setupWorker(...handlers);
     worker.start();
   }
 
