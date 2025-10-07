@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { NextAuthOptions } from 'next-auth';
 import { cookies } from 'next/headers';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -40,7 +40,6 @@ const authOptions: NextAuthOptions = {
             signal: AbortSignal.timeout(10000),
           });
 
-          // 쿠키 처리 (오타 수정: conect.sid → connect.sid)
           const setCookie = authResponse.headers.get('Set-Cookie');
           if (setCookie) {
             const parsed = cookie.parse(setCookie);

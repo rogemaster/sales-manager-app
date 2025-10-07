@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Product } from '../../types/ProductTypes';
 import { ProductCreateBasicinfo } from './components/ProductBasicInfo';
@@ -10,6 +10,7 @@ import { ProductMainImageInfo } from './components/ProductMainImageInfo';
 import { ProductDetailInfo } from './components/ProductDetailInfo';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
+import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
 
 export const ProductCreateLayout = () => {
   const formData = useForm<Product>();
@@ -42,21 +43,19 @@ export const ProductCreateLayout = () => {
             <ProductPriceAndQuantityInfo />
           </div>
 
-          {/* 옵션 정보 */}
+          {/* 옵션 정보 및 옵션 조합 관리 (섹션 내부 포함) */}
           <ProductOptionSection />
-
-          {/* 옵션 조합 관리 */}
 
           {/* 이미지 및 상세 정보 */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* 메인 이미지 */}
             <ProductMainImageInfo />
-
             {/* 상품 상세 설명 */}
             <ProductDetailInfo />
           </div>
 
           {/* 상품정보고시 */}
+          <ProductInformationDisclosureSection />
 
           {/* 저장 버튼 */}
           <div className="flex justify-end gap-4">

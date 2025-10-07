@@ -1,49 +1,34 @@
 import { v4 as uuidv4 } from 'uuid';
 import { OptionCombination, ProductOption } from '../types/ProductTypes';
 
-// 옵션 데이터 예시
-// 옵션명: 색상
-// 옵션값: 빨강, 노랑, 파랑
-
-// [
-//   {
-//     id: a1,
-//     name: '색상',
-//     values: ['빨강', '노랑', '파랑']
-//   },
-//   {
-//     id: a2,
-//     name: '사이즈',
-//     values: [90, 100, 110]
-//   },
-// ]
-
 /**
  * 옵션 유효성 검사
  * @param options 옵션데이터
- * @returns
+ * @returns validOptions 검증완료 옵션데이터
  */
 export const validateOptions = (options: ProductOption[]) => {
   if (options.length === 0) return [];
 
-  const validOptions = options.filter((opt) => opt.name.trim() && opt.values.some((val) => val.trim()));
+  // 1) 옵션명 공백 제거 및 비어있지 않은지 확인
+  // 2) 값 배열 내부도 공백 제거 및 비어있는 값 제거
+  const normalizedOptions = options.map((opt) => ({
+    ...opt,
+    name: opt.name.trim(),
+    values: opt.values.map((val) => val.trim()).filter((val) => val.length > 0),
+  }));
+
+  const validOptions = normalizedOptions.filter((opt) => opt.name && opt.values.length > 0);
   if (validOptions.length === 0) return [];
 
   return validOptions;
-
-  // 각 옵션의 유효한 값들만 추출 <-- 필요가 있을까?
-  // const optionData = validOptions.map((opt) => ({
-  //   name: opt.name.trim(),
-  //   values: opt.values.filter((val) => val.trim()).map((val) => val.trim()),
-  // }));
 };
 
 /**
  * 옵션 조합생성
- * @param optionData 검증완료된 옵션데이터
- * @returns 조합완료된 옵션데이터
+ * @param validOptions 검증완료된 옵션데이터
+ * @returns combinations 조합완료된 옵션데이터
  */
-export const optionCombinations = (optionData: ProductOption[]) => {
+export const optionCombinations = (validOptions: ProductOption[]) => {
   // 조합 생성 (카르테시안 곱)
   const combinations: OptionCombination[] = [];
 
@@ -52,7 +37,7 @@ export const optionCombinations = (optionData: ProductOption[]) => {
     currentCombination: { [key: string]: string },
     currentString: string,
   ) => {
-    if (index === optionData.length) {
+    if (index === validOptions.length) {
       combinations.push({
         id: `option_${index}_${uuidv4().split('-')[0]}`,
         combination: currentString,
@@ -63,7 +48,7 @@ export const optionCombinations = (optionData: ProductOption[]) => {
       return;
     }
 
-    const currentOption = optionData[index];
+    const currentOption = validOptions[index];
     for (const value of currentOption.values) {
       const newString =
         currentString.length > 0
@@ -76,6 +61,5 @@ export const optionCombinations = (optionData: ProductOption[]) => {
 
   generateCombinations(0, {}, '');
 
-  console.log('생성된 조합:', combinations); // 디버깅용
   return combinations;
 };

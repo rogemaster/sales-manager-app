@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OptionCombination } from '@/features/products/types/ProductTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAlert } from '@/hooks/useAlert';
@@ -13,10 +13,15 @@ type Props = {
   isOptionsConfirmed: boolean;
 };
 
-export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: Props) => {
+export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: Props) => {
   const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>(optionCombinations);
   const [bulkQuantity, setBulkQuantity] = useState<number>(0);
   const { showAlert } = useAlert();
+
+  // 부모에서 전달된 옵션 조합 변경 시 동기화
+  useEffect(() => {
+    setOptionCombinationsData(optionCombinations);
+  }, [optionCombinations]);
 
   // 옵션 조합 수정
   const handleOptionCombinationChange = (id: string, field: 'quantity' | 'skuCode' | 'optionPrice', value: string) => {
@@ -60,7 +65,7 @@ export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: P
 
   return (
     <>
-      {isOptionsConfirmed && optionCombinationsData.length > 0 && (
+      {isOptionsConfirmed && optionCombinations.length > 0 && (
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>옵션 조합 관리</CardTitle>
@@ -73,10 +78,10 @@ export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: P
               {/* 조합 목록을 테이블 형태로 표시 */}
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/50 px-4 py-2 font-medium text-sm border-b">옵션 조합 목록</div>
-                <div className="divide-y">
+                <div className="divide-y max-h-[25rem] overflow-y-auto">
                   {optionCombinationsData.map((combo, index) => (
                     <div key={combo.id} className="p-4 hover:bg-muted/30">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                         {/* 조합 정보 */}
                         <div className="md:col-span-1">
                           <div className="font-medium text-sm mb-1">조합 {index + 1}</div>
@@ -108,9 +113,10 @@ export const OptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: P
 
                         {/* 옵션별 추가가격 */}
                         <div className="space-y-1">
-                          <Label className="text-xs font-medium">추가 옵션가</Label>
+                          <Label className="text-xs font-medium">추가 가격</Label>
                           <Input
-                            placeholder="SKU-001"
+                            type="number"
+                            placeholder="0"
                             value={combo.skuCode}
                             onChange={(e) => handleOptionCombinationChange(combo.id, 'optionPrice', e.target.value)}
                             className="h-8"

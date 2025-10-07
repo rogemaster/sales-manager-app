@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ProductOptionDraft } from '@/features/products/types/ProductTypes';
+import { ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
 
 type Props = {
   type: 'basic' | 'sub';
@@ -11,6 +11,7 @@ type Props = {
   onOptionNameChange: (optionId: string, optionName: string) => void;
   onOptionValueChange: (optionId: string, value: string) => void;
   onRemoveOption: (optionId: string) => void;
+  confirmedOptions?: ProductOption[];
 };
 
 export const OptionContent = ({
@@ -20,6 +21,7 @@ export const OptionContent = ({
   onOptionNameChange,
   onOptionValueChange,
   onRemoveOption,
+  confirmedOptions,
 }: Props) => {
   return (
     <CardContent className="space-y-4">
@@ -61,8 +63,8 @@ export const OptionContent = ({
       ) : (
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            설정된 {type === 'basic' ? '옵션' : '추가옵션'}:{' '}
-            {/* {options.map((opt) => `${opt.name}(${opt.values.filter((v) => v.trim()).length}개)`).join(', ')} */}
+            설정된 {type === 'basic' ? '옵션' : '추가옵션'}: {/* 예) 색상(2개), 사이즈(2개) */}
+            {confirmedOptions && confirmedOptions.map((opt) => `${opt.name}(${opt.values.length}개)`).join(', ')}
           </div>
         </div>
       )}

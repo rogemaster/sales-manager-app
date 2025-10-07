@@ -86,6 +86,7 @@ export interface InfoDisclosureBaseField {
   key: string;
   label: string;
   placeholder?: string;
+  type?: 'textarea';
   required: boolean;
 }
 

@@ -1,16 +1,13 @@
 'use client';
 
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { PRODUCT_INFO_DISC_TYPES } from '../../../constant/productInfomationDisclosure';
-import { ProductInfomationDisclosureType } from '@/features/products/types/ProductTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { useFormContext } from 'react-hook-form';
-import { SingleDatePicker } from '@/components/common/SingleDatePicker';
-import dayjs from 'dayjs';
 
 type ProductInfoType = typeof PRODUCT_INFO_DISC_TYPES;
 type ProductInfoKey = keyof ProductInfoType;
@@ -27,20 +24,11 @@ export const ProductInformationDisclosureSection = () => {
   const {
     register,
     formState: { errors },
-    setValue,
   } = useFormContext<SelectedProductInfomation>();
 
   const handleProductInfoTypeChange = (value: string | undefined) => {
     if (value) {
       setSelectedKey(value);
-    }
-  };
-
-  const handleProductInfoChange = (key: string, value: string | Date) => {
-    if (typeof value === Date()) {
-      setValue(key, dayjs(value).format('YYYY-MM-DD'));
-    } else {
-      setValue(key, value as string);
     }
   };
 
@@ -56,7 +44,7 @@ export const ProductInformationDisclosureSection = () => {
           <div className="space-y-2">
             <Label htmlFor="productInfoType">상품정보고시 종류 *</Label>
             <Select value={selectedKey} onValueChange={handleProductInfoTypeChange}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="상품정보고시 종류를 선택하세요" />
               </SelectTrigger>
               <SelectContent>
@@ -80,46 +68,26 @@ export const ProductInformationDisclosureSection = () => {
                         {field.label}
                         {field.required && <span className="text-red-500 ml-1">*</span>}
                       </Label>
-
-                      {field.type === 'textarea' && (
+                      {field.type && field.type === 'textarea' ? (
                         <>
                           <Textarea
                             id={field.key}
-                            placeholder={`${field.label}을(를) 입력하세요`}
+                            placeholder={`${field.placeholder ?? field.label}`}
                             rows={3}
                             {...register(field.key, { required: field.required })}
                           />
                           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                         </>
-                      )}
-                      {field.type === 'select' && (
-                        <Select onValueChange={(value) => handleProductInfoChange(field.key, value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder={`${field.label}을(를) 선택하세요`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {field.values?.map((value) => (
-                              <SelectItem key={value} value={value}>
-                                {value}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      {field.type === 'text' ||
-                        (field.type === 'number' && (
-                          <>
-                            <Input
-                              id={field.key}
-                              type={field.type}
-                              placeholder={`${field.label}을(를) 입력하세요`}
-                              {...register(field.key, { required: field.required })}
-                            />
-                            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-                          </>
-                        ))}
-                      {field.type === 'month' && (
-                        <SingleDatePicker date={} onChangeDate={(date) => handleProductInfoChange(field.key, date)} />
+                      ) : (
+                        <>
+                          <Input
+                            id={field.key}
+                            type={field.type}
+                            placeholder={`${field.placeholder ?? field.label}`}
+                            {...register(field.key, { required: field.required })}
+                          />
+                          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                        </>
                       )}
                     </div>
                   </div>

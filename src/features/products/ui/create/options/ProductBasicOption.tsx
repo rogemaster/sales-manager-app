@@ -8,10 +8,15 @@ import { OptionContent } from './components/OptionContent';
 import { optionCombinations, validateOptions } from '@/features/products/util/Options';
 import { useAlert } from '@/hooks/useAlert';
 
-export const ProductBasicOption = () => {
+type Props = {
+  onConfirm: (combinations: OptionCombination[]) => void;
+  onReset: () => void;
+};
+
+export const ProductBasicOption = ({ onConfirm, onReset }: Props) => {
   const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
   const [options, setOptions] = useState<ProductOptionDraft[]>([]);
-  const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>([]);
+  const [confirmedOptions, setConfirmedOptions] = useState<ProductOption[]>();
 
   const { showAlert } = useAlert();
 
@@ -37,7 +42,7 @@ export const ProductBasicOption = () => {
         opt.id === optionId
           ? {
               ...opt,
-              values: value || opt.values,
+              values: value,
             }
           : opt,
       ),
@@ -51,8 +56,6 @@ export const ProductBasicOption = () => {
 
   // 옵션 확정
   const handleConfirmOptions = () => {
-    console.log('옵션확정', options);
-
     const optionData: ProductOption[] = options.map((option) => ({
       id: option.id,
       name: option.name,
@@ -68,16 +71,19 @@ export const ProductBasicOption = () => {
       });
     }
 
-    const optionCombinationsData = optionCombinations(optionData);
-    console.log(optionCombinationsData);
-    setOptionCombinationsData(optionCombinationsData);
-    setIsOptionsConfirmed(true);
+    setConfirmedOptions(validOptions);
+
+    const optionCombinationsData = optionCombinations(validOptions);
+    if (optionCombinationsData.length > 0) {
+      setIsOptionsConfirmed(true);
+      onConfirm(optionCombinationsData);
+    }
   };
 
   // 옵션 재설정
   const handleResetOptions = () => {
-    setOptions([]);
     setIsOptionsConfirmed(false);
+    onReset();
   };
 
   return (
@@ -96,6 +102,7 @@ export const ProductBasicOption = () => {
         onOptionNameChange={handleOptionNameChange}
         onOptionValueChange={handleOptionValueChange}
         onRemoveOption={handleRemoveOption}
+        confirmedOptions={confirmedOptions}
       />
     </Card>
   );
