@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useResetExcelData } from '@/store/excelDataStore';
+import { ProductExcelPreviewRow } from '../../types/ProductTypes';
 import {
   PRODUCT_EXCEL_PREVIEW_HEADER,
   PRODUCT_EXCEL_TABLE_COLUMNS,
@@ -6,9 +9,17 @@ import {
   PRODUCT_BULK_EXCEL_TEMPLATE,
 } from '../../constant/Excel';
 import { ExcelDataPreview, ExcelDownloader, ExcelUploader } from '@/components/excel';
-import { ProductExcelPreviewRow } from '../../types/ProductTypes';
 
 export const ProductBulkUploadLayout = () => {
+  const resetExcelData = useResetExcelData();
+
+  // 페이지 언마운트될 때 초기화
+  useEffect(() => {
+    return () => {
+      resetExcelData();
+    };
+  }, []);
+
   // 템플릿에서 헤더 이름만 추출
   const templateHeaders = PRODUCT_BULK_EXCEL_TEMPLATE.template.map((item) => item.name);
 

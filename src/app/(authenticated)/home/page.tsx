@@ -18,9 +18,6 @@ export default function Home() {
           {session?.user && (
             <div className="space-y-2">
               <p>
-                <strong>사용자 ID:</strong> {session.user.id}
-              </p>
-              <p>
                 <strong>이메일:</strong> {session.user.email}
               </p>
               <p>

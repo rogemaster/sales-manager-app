@@ -19,10 +19,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // if (process.env.NODE_ENV === 'development') {
-  //   worker.start();
-  // }
-
   if (typeof window === 'undefined') {
     const server = setupServer(...handlers);
     server.listen();

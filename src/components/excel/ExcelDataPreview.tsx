@@ -1,3 +1,5 @@
+'use client';
+
 import { ExcelPreviewProps } from '@/types/ExcelInterface';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
@@ -14,7 +16,7 @@ export const ExcelDataPreview = <T extends Record<string, unknown>>({
   getValidCount,
   getErrorCount,
 }: ExcelPreviewProps<T>) => {
-  const uploadedData = useExcelData<T>();
+  const uploadedData = useExcelData() as T[];
 
   const totalCount = uploadedData ? uploadedData.length : 0;
   const validCount = getValidCount?.(uploadedData) ?? 0;
