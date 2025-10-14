@@ -6,7 +6,7 @@ import { ProductBulkUploadLayout } from '@/features/products/ui/bulk/ProductBulk
 export default function ProductBulkUpload() {
   return (
     <ExcelProvider>
-      <ProductBulkUploadLayout />;
+      <ProductBulkUploadLayout />
     </ExcelProvider>
   );
 }

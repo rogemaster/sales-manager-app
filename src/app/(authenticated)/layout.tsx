@@ -1,3 +1,4 @@
+'use client';
 import { AlertProvider } from '@/components/common/alert/AlertProvider';
 import { GlobalHeader } from '@/components/layout';
 import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';

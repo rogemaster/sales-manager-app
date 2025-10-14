@@ -158,13 +158,15 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType<ProductExcelPrev
   {
     key: 'error',
     headerTitle: '오류 내용',
-    accessor: (r) =>
-      r.error.length > 0 && (
-        <div className="text-sm text-red-600">
-          {r.error!.map((e, i) => (
-            <div key={i}>• {e}</div>
-          ))}
-        </div>
-      ),
+    accessor: (r) => (
+      // r.error.length > 0 && (
+      //   <div className="text-sm text-red-600">
+      //     {r.error!.map((e, i) => (
+      //       <div key={i}>• {e}</div>
+      //     ))}
+      //   </div>
+      // ),
+      <div className="text-sm text-red-600">{r.error}</div>
+    ),
   },
 ];
