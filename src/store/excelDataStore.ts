@@ -39,8 +39,3 @@ export function useExcelData() {
 export function useResetExcelData() {
   return useResetAtom(excelDataAtom);
 }
-
-// export function useExcelData<T>() {
-//   const dataAtom = selectAtom(excelDataAtom as Atom<ExcelDataState<T>>, (state) => state.data);
-//   return useAtomValue(dataAtom);
-// }

@@ -1,14 +1,15 @@
 'use client';
 
-import { Cell, validateSheet } from '@/lib/excel/validate';
+import * as XLSX from 'xlsx';
+import { ExcelRowType, validateExcelData, ValidationResult } from '@/lib/excel/validate';
 import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 import { ChangeEvent } from 'react';
-import * as XLSX from 'xlsx';
 
 export type UploadResult = {
-  success: boolean;
-  message: string;
+  ok: boolean;
+  validation: ValidationResult;
   data?: unknown;
+  message?: string;
 };
 
 export async function processExcelUpload(
@@ -17,7 +18,8 @@ export async function processExcelUpload(
 ): Promise<UploadResult> {
   if (!event.target.files) {
     return {
-      success: false,
+      ok: false,
+      validation: { result: 'error', errors: [] },
       message: '파일을 선택해 주세요.',
     };
   }
@@ -35,7 +37,8 @@ export async function processExcelUpload(
   const isValidFile = (ext && allowedExts.has(ext)) || (file.type && allowedTypes.has(file.type));
   if (!isValidFile) {
     return {
-      success: false,
+      ok: false,
+      validation: { result: 'error', errors: [] },
       message: '엑셀 파일(.xlsx, .xls) 또는 CSV 파일만 업로드 가능합니다.',
     };
   }
@@ -46,32 +49,45 @@ export async function processExcelUpload(
     const workbook = XLSX.read(data, { type: 'array' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+
+    // 엑셀을 이중배열이 아닌 배열 안의 객체 형태(Array of Objects) 로 변형
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    console.log('엑셀 jsonData', jsonData);
 
     // 필수값 헤더 추출
     const requiredHeaders = fileTemplateInfo.filter((data) => data.req).map((data) => data.name);
+    console.log('필수값 추출', requiredHeaders);
 
-    // validateSheet 함수 호출
-    const invalidRows = validateSheet(jsonData as Cell[][], requiredHeaders);
-    console.log('검증', invalidRows);
+    // validateSheet 함수 호출 - 필수값 검증
+    const validation = validateExcelData(jsonData as ExcelRowType[], requiredHeaders);
+    console.log('검증', validation);
 
-    if (!invalidRows.result) {
-      return {
-        success: false,
-        message: `필수값 누락: ${invalidRows.errorHeaders?.join(', ')}`,
-      };
-    }
-
+    const ok = validation.result === 'success';
     return {
-      success: true,
-      message: '업로드가 완료되었습니다.',
-      data: jsonData,
+      ok,
+      validation,
+      data: ok ? jsonData : undefined,
+      message: ok ? '업로드가 완료되었습니다.' : undefined,
     };
+
+    // if (!invalidRows.result) {
+    //   return {
+    //     success: false,
+    //     message: `필수값 누락: ${invalidRows.errorHeaders?.join(', ')}`,
+    //   };
+    // }
+
+    // return {
+    //   success: true,
+    //   message: '업로드가 완료되었습니다.',
+    //   data: jsonData,
+    // };
   } catch (error) {
     console.error(error);
     return {
-      success: false,
-      message: '파일을 선택해주세요.',
+      ok: false,
+      validation: { result: 'error', errors: [] },
+      message: '파일 처리 중 오류가 발생했습니다.',
     };
   }
 }

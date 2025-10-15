@@ -17,6 +17,7 @@ export const ExcelDataPreview = <T extends Record<string, unknown>>({
   getErrorCount,
 }: ExcelPreviewProps<T>) => {
   const uploadedData = useExcelData() as T[];
+  console.log('uploadedData', uploadedData);
 
   const totalCount = uploadedData ? uploadedData.length : 0;
   const validCount = getValidCount?.(uploadedData) ?? 0;

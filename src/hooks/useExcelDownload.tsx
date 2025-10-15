@@ -7,7 +7,7 @@ export const useExcelDownload = (templateHeaders: string[], templateName: string
     const workbook = new Exceljs.Workbook();
     const worksheet = workbook.addWorksheet(templateName);
 
-    // 헤더를 올바르게 추가 (각 헤더를 개별 행으로 추가)
+    // 헤더를 추가 (각 헤더를 개별 행으로 추가)
     worksheet.addRow(templateHeaders);
 
     // 헤더 행 스타일링

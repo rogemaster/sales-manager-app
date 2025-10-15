@@ -26,6 +26,7 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
 
   const setExcelData = useSetAtom(setExcelDataAtom);
 
+  // 파일 업로드 핸들러
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     setIsUploading(true);
     setUploadProgress(0);
@@ -47,13 +48,17 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      // 결과에 따른 alert 표시
+      // 결과에 따른 alert 표시 및 상태 업데이트
       showAlert({
-        type: result.success ? 'success' : 'error',
-        message: result.message,
+        type: result.ok ? 'success' : 'error',
+        message: result.message || (result.ok ? '업로드가 완료되었습니다.' : '유효성 검사에 실패했습니다.'),
       });
+      // 유효성 검사 실패 시, 에러 상세를 콘솔로 출력 (필요시 UI에 노출 가능)
+      if (!result.ok) {
+        console.warn('유효성 검사 실패:', result.validation.errors);
+      }
 
-      if (result.success && result.data) {
+      if (result.ok && result.data) {
         console.log('업로드된 데이터:', result.data);
         setExcelData(result.data as T[]);
       }

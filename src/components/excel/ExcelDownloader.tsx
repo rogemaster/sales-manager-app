@@ -14,7 +14,7 @@ export const ExcelDownloader = ({
   templateHeaders,
   templateName = '상품등록',
 }: ExcelDownloaderProps) => {
-  const { downloadTemplate } = useExcelDownload(templateHeaders, templateName);
+  const { downloadTemplate } = useExcelDownload(templateHeaders || [], templateName);
 
   const handleDownload = () => {
     if (templateInfo) {
