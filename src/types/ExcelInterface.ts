@@ -57,3 +57,30 @@ export interface ExcelPreviewProps<T> extends ExcelPreviewDataTableProps<T> {
   getValidCount?: (rows: T[]) => number;
   getErrorCount?: (rows: T[]) => number;
 }
+
+export type ExcelRowType = { [key: string]: string | number | boolean | null | undefined };
+
+export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'PROCESSING_ERROR';
+
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE';
+
+export type ErrorTypeCode = 'UPLOAD_ERROR' | 'VALIDATE_ERROR';
+
+export type ValidationError = {
+  row: number;
+  header: string;
+  code: ValidationErrorCode;
+};
+
+export type UploadResult = {
+  success: boolean;
+  errorType?: ErrorTypeCode;
+  validationResult?: ValidationResult;
+  uploadError?: UploadErrorCode;
+  data?: unknown;
+};
+
+export type ValidationResult = {
+  result: 'success' | 'error';
+  errors: ValidationError[] | [];
+};

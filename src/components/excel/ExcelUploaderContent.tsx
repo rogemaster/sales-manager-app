@@ -9,6 +9,7 @@ import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
 import { setExcelDataAtom } from '@/store/excelDataStore';
+import { excelUploadErrorCodeToMessage, excelValidErrorsCodeToMessages } from './message';
 
 type Props = {
   contentDescription: string;
@@ -49,18 +50,30 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
       setUploadProgress(100);
 
       // 결과에 따른 alert 표시 및 상태 업데이트
-      showAlert({
-        type: result.ok ? 'success' : 'error',
-        message: result.message || (result.ok ? '업로드가 완료되었습니다.' : '유효성 검사에 실패했습니다.'),
-      });
-      // 유효성 검사 실패 시, 에러 상세를 콘솔로 출력 (필요시 UI에 노출 가능)
-      if (!result.ok) {
-        console.warn('유효성 검사 실패:', result.validation.errors);
+      if (result.success && result.data) {
+        showAlert({
+          type: 'success',
+          message: '업로드가 완료되었습니다.',
+        });
+
+        console.log('최종 업로드 데이터', result.data);
+        setExcelData(result.data as T[]);
       }
 
-      if (result.ok && result.data) {
-        console.log('업로드된 데이터:', result.data);
-        setExcelData(result.data as T[]);
+      if (!result.success && result.errorType === 'UPLOAD_ERROR') {
+        const message = excelUploadErrorCodeToMessage(result.uploadError!);
+        showAlert({
+          type: 'error',
+          message,
+        });
+      }
+
+      if (!result.success && result.errorType === 'VALIDATE_ERROR') {
+        const message = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
+        showAlert({
+          type: 'error',
+          message: message[0],
+        });
       }
     } catch {
       showAlert({
