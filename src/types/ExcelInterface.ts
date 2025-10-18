@@ -37,28 +37,16 @@ export interface ExcelDownloaderProps {
 }
 
 // 엑셀 미리보기 테이블 컬럼 타입
-export interface ExcelTableColumnsType<T> {
+export interface ExcelTableColumnsType {
   key: string;
   headerTitle: string;
-  accessor: (row: T) => React.ReactNode;
+  accessor: (row: ExcelRowWithErrors, index?: number) => React.ReactNode;
   cellClassName?: string;
 }
 
-// 엑셀 미리보기 데이터 테이블 타입
-export interface ExcelPreviewDataTableProps<T> {
-  tableColumns: ExcelTableColumnsType<T>[];
-  getRowKey?: (row: T, index: number) => React.Key;
-  getRowClassName?: (row: T) => string | undefined;
-}
-
-// 엑셀 미리보기 전체 타입
-export interface ExcelPreviewProps<T> extends ExcelPreviewDataTableProps<T> {
-  excelHeader: ExcelHeaderProps;
-  getValidCount?: (rows: T[]) => number;
-  getErrorCount?: (rows: T[]) => number;
-}
-
 export type ExcelRowType = { [key: string]: string | number | boolean | null | undefined };
+
+export type ExcelRowWithErrors = { [key: string]: string | number | boolean | null | undefined | ValidationError[] };
 
 export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'PROCESSING_ERROR';
 
@@ -70,6 +58,7 @@ export type ValidationError = {
   row: number;
   header: string;
   code: ValidationErrorCode;
+  message?: string;
 };
 
 export type UploadResult = {
@@ -77,7 +66,7 @@ export type UploadResult = {
   errorType?: ErrorTypeCode;
   validationResult?: ValidationResult;
   uploadError?: UploadErrorCode;
-  data?: unknown;
+  data?: ExcelRowWithErrors[];
 };
 
 export type ValidationResult = {

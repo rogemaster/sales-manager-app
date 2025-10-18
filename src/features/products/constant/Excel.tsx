@@ -5,7 +5,6 @@ import {
   ExcelHeaderProps,
   ExcelTableColumnsType,
 } from '@/types/ExcelInterface';
-import { ProductExcelPreviewRow } from '../types/ProductTypes';
 
 // 엑셀 양식 템플릿
 export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
@@ -118,55 +117,52 @@ export const PRODUCT_EXCEL_PREVIEW_HEADER: ExcelHeaderProps = {
 };
 
 // 엑셀 미리보기 테이블 헤더
-export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType<ProductExcelPreviewRow>[] = [
+export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   {
     key: 'row',
     headerTitle: '행',
-    accessor: (r) => r.row,
+    accessor: (_, index) => index && index + 1,
   },
   {
     key: 'state',
     headerTitle: '상태',
-    accessor: (r) => (r.state === 'valid' ? '정상' : '오류'),
+    accessor: (r) => (Array.isArray(r.error) && r.error.length === 0 ? '정상' : '오류'),
   },
   {
     key: 'customerCode',
     headerTitle: '고객상품코드',
-    accessor: (r) => r.customerCode ?? '-',
+    accessor: (r) => !Array.isArray(r['고객상품코드']) && r['고객상품코드'],
     cellClassName: 'font-mono text-sm',
   },
   {
     key: 'name',
     headerTitle: '상품명',
-    accessor: (r) => r.name ?? '-',
+    accessor: (r) => !Array.isArray(r['상품명']) && r['상품명'],
   },
   {
     key: 'category',
     headerTitle: '카테고리',
-    accessor: (r) => r.category ?? '-',
+    accessor: (r) => !Array.isArray(r['카테고리']) && r['카테고리'],
   },
   {
     key: 'price',
-    headerTitle: '가격',
-    accessor: (r) => r.price ?? '-',
+    headerTitle: '판매가',
+    accessor: (r) => !Array.isArray(r['판매가']) && r['판매가'],
   },
   {
     key: 'totalQuantity',
-    headerTitle: '수량',
-    accessor: (r) => r.totalQuantity ?? '-',
+    headerTitle: '총수량',
+    accessor: (r) => !Array.isArray(r['총수량']) && r['총수량'],
   },
   {
     key: 'error',
     headerTitle: '오류 내용',
-    accessor: (r) => (
-      // r.error.length > 0 && (
-      //   <div className="text-sm text-red-600">
-      //     {r.error!.map((e, i) => (
-      //       <div key={i}>• {e}</div>
-      //     ))}
-      //   </div>
-      // ),
-      <div className="text-sm text-red-600">{r.error}</div>
-    ),
+    accessor: (r) =>
+      Array.isArray(r.error) &&
+      r.error.map((e, i) => (
+        <div className="text-sm text-red-600" key={i}>
+          • {e.message}
+        </div>
+      )),
   },
 ];

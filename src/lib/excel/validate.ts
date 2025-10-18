@@ -42,7 +42,7 @@ export function validateExcelData(rowsData: ExcelRowType[], requiredHeaders: str
 
   // 필수 값이 없는 경우(필드는 존재)
   if (emptyValueErrors.length > 0) {
-    return { result: 'error', errors: emptyValueErrors };
+    return { result: 'success', errors: emptyValueErrors };
   }
 
   return { result: 'success', errors: [] };

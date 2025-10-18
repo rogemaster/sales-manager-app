@@ -51,17 +51,6 @@ export interface ProductSearch {
   searchValue: string;
 }
 
-export interface ProductExcelPreviewRow extends Record<string, unknown> {
-  row: number;
-  state: 'valid' | 'error';
-  customerCode: string;
-  name: string;
-  category: string;
-  price: number;
-  totalQuantity: number;
-  error: string[];
-}
-
 export interface ProductOption {
   id: string;
   name: string;

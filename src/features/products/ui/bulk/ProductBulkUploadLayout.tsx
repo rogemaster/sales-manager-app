@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useResetExcelData } from '@/store/excelDataStore';
-import { ProductExcelPreviewRow } from '../../types/ProductTypes';
 import {
   PRODUCT_EXCEL_PREVIEW_HEADER,
   PRODUCT_EXCEL_TABLE_COLUMNS,
@@ -51,14 +50,7 @@ export const ProductBulkUploadLayout = () => {
       </div>
 
       {/* 업로드된 데이터 미리보기 */}
-      <ExcelDataPreview<ProductExcelPreviewRow>
-        excelHeader={PRODUCT_EXCEL_PREVIEW_HEADER}
-        tableColumns={PRODUCT_EXCEL_TABLE_COLUMNS}
-        getRowClassName={(r) => (r.state === 'error' ? 'bg-red-50' : undefined)}
-        getRowKey={(r, i) => r.row ?? i}
-        getErrorCount={(rows) => rows.filter((r) => r.state === 'error').length}
-        getValidCount={(rows) => rows.filter((r) => r.state === 'valid').length}
-      />
+      <ExcelDataPreview excelHeader={PRODUCT_EXCEL_PREVIEW_HEADER} tableColumns={PRODUCT_EXCEL_TABLE_COLUMNS} />
     </div>
   );
 };

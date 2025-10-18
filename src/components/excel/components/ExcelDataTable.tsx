@@ -1,15 +1,10 @@
-import { ExcelPreviewDataTableProps } from '@/types/ExcelInterface';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import React from 'react';
+import { ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/ExcelInterface';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-type Props<T = Record<string, unknown>> = { uploadedData: T[] };
+type Props = { uploadedData: ExcelRowWithErrors[]; tableColumns: ExcelTableColumnsType[] };
 
-const ExcelDataTableInner = <T extends Record<string, unknown>>({
-  tableColumns,
-  uploadedData,
-  getRowKey,
-  getRowClassName,
-}: ExcelPreviewDataTableProps<T> & Props<T>) => {
+const ExcelDataTableInner = ({ tableColumns, uploadedData }: Props) => {
   return (
     <div className="border rounded-lg">
       <Table>
@@ -21,11 +16,11 @@ const ExcelDataTableInner = <T extends Record<string, unknown>>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {uploadedData.map((row, index) => (
-            <TableRow key={getRowKey?.(row, index) ?? index} className={getRowClassName?.(row)}>
-              {tableColumns.map((column) => (
+          {uploadedData.map((row, rowIndex) => (
+            <TableRow key={rowIndex} className={Array.isArray(row.error) && row.error.length > 0 ? 'bg-red-50' : ''}>
+              {tableColumns.map((column, colIndex) => (
                 <TableCell key={column.key} className={column.cellClassName}>
-                  {column.accessor(row)}
+                  {column.accessor(row, colIndex)}
                 </TableCell>
               ))}
             </TableRow>

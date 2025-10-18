@@ -1,16 +1,36 @@
-'use client';
-
-import { useState } from 'react';
 import { ExcelHeaderProps } from '@/types/ExcelInterface';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, FileSpreadsheet, X } from 'lucide-react';
+import { useResetExcelData } from '@/store/excelDataStore';
+import { useAlert } from '@/hooks/useAlert';
 
-export const ExcelDataPreviewHeader = ({ headerTitle, headerDescription }: ExcelHeaderProps) => {
-  const [validCount, setVaildCount] = useState(0);
+type Props = { validCount: number };
 
-  const handleClearData = () => {};
-  const handleSaveData = () => {};
+export const ExcelDataPreviewHeader = ({ headerTitle, headerDescription, validCount }: ExcelHeaderProps & Props) => {
+  const { showAlert } = useAlert();
+  const resetExcel = useResetExcelData();
+
+  const handleClearData = () => {
+    showAlert({
+      type: 'info',
+      message: '업로드된 모든 데이터가 삭제됩니다. 계속하시겠습니까?',
+      showCancel: true,
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => {
+        resetExcel();
+      },
+    });
+  };
+
+  const handleSaveData = () => {
+    showAlert({
+      type: 'info',
+      message: `${validCount}개 저장하시겠습니까?`,
+      onConfirm: () => {},
+    });
+  };
 
   return (
     <CardHeader>
@@ -27,7 +47,7 @@ export const ExcelDataPreviewHeader = ({ headerTitle, headerDescription }: Excel
             <X className="h-4 w-4 mr-2" />
             초기화
           </Button>
-          <Button onClick={handleSaveData} disabled={validCount === 0}>
+          <Button onClick={handleSaveData} disabled={validCount > 0}>
             <CheckCircle className="h-4 w-4 mr-2" />
             저장 ({validCount}개)
           </Button>

@@ -1,10 +1,11 @@
 'use client';
 
+import { ExcelRowWithErrors } from '@/types/ExcelInterface';
 import { atom, useAtomValue } from 'jotai';
 import { atomWithReset, selectAtom, useResetAtom } from 'jotai/utils';
 
-export interface ExcelDataState<T = Record<string, unknown>> {
-  data: T[];
+export interface ExcelDataState {
+  data: ExcelRowWithErrors[];
   isUploaded: boolean;
   uploadTime: Date | null;
 }

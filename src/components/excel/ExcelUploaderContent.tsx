@@ -16,10 +16,7 @@ type Props = {
   fileTemplateInfo: ExcelTemplateInfo[];
 };
 
-export const ExcelUploaderContent = <T extends Record<string, unknown>>({
-  contentDescription,
-  fileTemplateInfo,
-}: Props) => {
+export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: Props) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,16 +47,17 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
       setUploadProgress(100);
 
       // 결과에 따른 alert 표시 및 상태 업데이트
-      if (result.success && result.data) {
+      // 1. 정상적 엑셀업로드
+      if (result.success && !result.errorType && result.data) {
         showAlert({
           type: 'success',
           message: '업로드가 완료되었습니다.',
         });
 
-        console.log('최종 업로드 데이터', result.data);
-        setExcelData(result.data as T[]);
+        setExcelData(result.data);
       }
 
+      // 2. 필수 필드가 없어 업로드 에러
       if (!result.success && result.errorType === 'UPLOAD_ERROR') {
         const message = excelUploadErrorCodeToMessage(result.uploadError!);
         showAlert({
@@ -68,12 +66,23 @@ export const ExcelUploaderContent = <T extends Record<string, unknown>>({
         });
       }
 
-      if (!result.success && result.errorType === 'VALIDATE_ERROR') {
-        const message = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
+      // 3. 필수값이 없는 엑셀 미리보기는 가능. 최종 저장 불가
+      if (result.success && result.errorType === 'VALIDATE_ERROR' && result.data) {
+        const mergedErrorsData = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
         showAlert({
           type: 'error',
-          message: message[0],
+          message: mergedErrorsData[0].message!,
         });
+
+        const mergedExcelData = result.data.map((item, index) => {
+          const rowError = mergedErrorsData.filter((value) => value!.row - 1 === index);
+          return {
+            ...item,
+            error: rowError,
+          };
+        });
+
+        setExcelData(mergedExcelData);
       }
     } catch {
       showAlert({

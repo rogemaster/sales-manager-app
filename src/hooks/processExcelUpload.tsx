@@ -44,7 +44,7 @@ export async function processExcelUpload(
     const worksheet = workbook.Sheets[sheetName];
 
     // 엑셀을 이중배열이 아닌 배열 안의 객체 형태(Array of Objects) 로 변형
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
     // 필수값 헤더 추출
     const requiredHeaders = fileTemplateInfo.filter((data) => data.req).map((data) => data.name);
@@ -54,16 +54,17 @@ export async function processExcelUpload(
 
     const success = validationResult.result === 'success';
 
-    if (success) {
+    if (success && validationResult.errors.length === 0) {
       return {
         success,
-        data: jsonData,
+        data: jsonData as ExcelRowType[],
       };
     } else {
       return {
-        success: false,
+        success,
         errorType: 'VALIDATE_ERROR',
         validationResult,
+        data: jsonData as ExcelRowType[],
       };
     }
   } catch (error) {

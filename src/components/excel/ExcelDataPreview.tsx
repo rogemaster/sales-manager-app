@@ -1,31 +1,33 @@
 'use client';
 
-import { ExcelPreviewProps } from '@/types/ExcelInterface';
+import { ExcelHeaderProps, ExcelTableColumnsType } from '@/types/ExcelInterface';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
-import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 import { ExcelDataTable } from './components/ExcelDataTable';
 import { useExcelData } from '@/store/excelDataStore';
+import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 
-export const ExcelDataPreview = <T extends Record<string, unknown>>({
-  excelHeader,
-  tableColumns,
-  getRowKey,
-  getRowClassName,
-  getValidCount,
-  getErrorCount,
-}: ExcelPreviewProps<T>) => {
-  const uploadedData = useExcelData() as T[];
-  console.log('uploadedData', uploadedData);
+type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[] };
+
+export const ExcelDataPreview = ({ excelHeader, tableColumns }: Props) => {
+  const uploadedData = useExcelData();
+
+  // Property 'length' does not exist on type 'string | number | boolean | ValidationError[]'.
+  // Property 'length' does not exist on type 'number'.
+  const errorDatas = uploadedData.filter((data) => Array.isArray(data['error']) && data['error'].length > 0);
 
   const totalCount = uploadedData ? uploadedData.length : 0;
-  const validCount = getValidCount?.(uploadedData) ?? 0;
-  const errorCount = getErrorCount?.(uploadedData) ?? 0;
+  const validCount = totalCount - errorDatas.length || 0;
+  const errorCount = errorDatas.length || 0;
 
   return (
     <Card>
-      <ExcelDataPreviewHeader headerTitle={excelHeader.headerTitle} headerDescription={excelHeader.headerDescription} />
+      <ExcelDataPreviewHeader
+        headerTitle={excelHeader.headerTitle}
+        headerDescription={excelHeader.headerDescription}
+        validCount={validCount}
+      />
 
       <CardContent>
         {/* 요약 정보 */}
@@ -35,12 +37,7 @@ export const ExcelDataPreview = <T extends Record<string, unknown>>({
         {errorCount > 0 && <ExcelDataErrorAlert errorCount={errorCount} />}
 
         {/* 데이터 테이블 */}
-        <ExcelDataTable
-          uploadedData={uploadedData}
-          tableColumns={tableColumns}
-          getRowClassName={getRowClassName}
-          getRowKey={getRowKey}
-        />
+        <ExcelDataTable uploadedData={uploadedData} tableColumns={tableColumns} />
       </CardContent>
     </Card>
   );

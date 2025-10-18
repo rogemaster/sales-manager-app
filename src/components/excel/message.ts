@@ -13,16 +13,30 @@ export function excelUploadErrorCodeToMessage(code: UploadErrorCode) {
   }
 }
 
-export function excelValidErrorsCodeToMessages(errors: ValidationError[]) {
+export function excelMissingFieldErrorCodeToMessages(errors: ValidationError[]) {
   const errorMessages: string[] = [];
 
   errors.forEach((error) => {
     if (error.code === 'MISSING_FIELD') {
       errorMessages.push(`Row ${error.row}, [${error.header}] 필드가 존재하지 않습니다.`);
-    } else {
-      errorMessages.push(`Row ${error.row}, [${error.header}] 값이 비어 있습니다.`);
     }
   });
 
   return errorMessages;
+}
+
+export function excelValidErrorsCodeToMessages(errors: ValidationError[]): ValidationError[] {
+  const mergedErrors = errors
+    .map((item) => {
+      if (item.code === 'EMPTY_VALUE') {
+        return {
+          ...item,
+          message: `Row ${item.row}, [${item.header}] 값이 비어 있습니다.`,
+        };
+      }
+      return item;
+    })
+    .filter((item): item is ValidationError => item !== undefined);
+
+  return mergedErrors;
 }
