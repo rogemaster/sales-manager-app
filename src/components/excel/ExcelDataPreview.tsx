@@ -5,7 +5,7 @@ import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
 import { ExcelDataTable } from './components/ExcelDataTable';
-import { useExcelData } from '@/store/excelDataStore';
+import { useExcelData } from '@/components/excel/store/excelDataStore';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 
 type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[] };

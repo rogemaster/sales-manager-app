@@ -2,13 +2,15 @@ import { ExcelHeaderProps } from '@/types/ExcelInterface';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, FileSpreadsheet, X } from 'lucide-react';
-import { useResetExcelData } from '@/store/excelDataStore';
+import { excelContextAtom, useResetExcelData } from '@/components/excel/store/excelDataStore';
 import { useAlert } from '@/hooks/useAlert';
+import { useAtomValue } from 'jotai';
 
 type Props = { validCount: number };
 
 export const ExcelDataPreviewHeader = ({ headerTitle, headerDescription, validCount }: ExcelHeaderProps & Props) => {
   const { showAlert } = useAlert();
+  const saveType = useAtomValue(excelContextAtom);
   const resetExcel = useResetExcelData();
 
   const handleClearData = () => {
@@ -28,7 +30,13 @@ export const ExcelDataPreviewHeader = ({ headerTitle, headerDescription, validCo
     showAlert({
       type: 'info',
       message: `${validCount}개 저장하시겠습니까?`,
-      onConfirm: () => {},
+      showCancel: true,
+      confirmText: '저장',
+      cancelText: '취소',
+      onConfirm: () => {
+        if (saveType === 'PRODUCT') {
+        }
+      },
     });
   };
 

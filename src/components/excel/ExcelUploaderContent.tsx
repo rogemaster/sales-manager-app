@@ -4,11 +4,11 @@ import { ChangeEvent, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
-import { processExcelUpload } from '@/hooks/processExcelUpload';
+import { processExcelUpload } from '@/components/excel/utils/processExcelUpload';
 import { ExcelTemplateInfo } from '@/types/ExcelInterface';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
-import { setExcelDataAtom } from '@/store/excelDataStore';
+import { setExcelDataAtom } from '@/components/excel/store/excelDataStore';
 import { excelUploadErrorCodeToMessage, excelValidErrorsCodeToMessages } from './message';
 
 type Props = {

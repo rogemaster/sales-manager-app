@@ -5,7 +5,7 @@ import { ExcelTemplateButton } from './ExcelTemplateButton';
 import { ExcelTemplateInfo } from './ExcelTemplateInfo';
 import { Card, CardContent } from '../ui/card';
 import { ExcelHeader } from './components/ExcelHeader';
-import { useExcelDownload } from '@/hooks/useExcelDownload';
+import { excelDownload } from '@/components/excel/utils/excelDownload';
 
 export const ExcelDownloader = ({
   excelHeader,
@@ -14,7 +14,7 @@ export const ExcelDownloader = ({
   templateHeaders,
   templateName = '상품등록',
 }: ExcelDownloaderProps) => {
-  const { downloadTemplate } = useExcelDownload(templateHeaders || [], templateName);
+  const { downloadTemplate } = excelDownload(templateHeaders || [], templateName);
 
   const handleDownload = () => {
     if (templateInfo) {

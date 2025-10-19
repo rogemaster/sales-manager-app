@@ -1,9 +1,8 @@
-import { useCallback } from 'react';
 import Exceljs from 'exceljs';
 import { saveAs } from 'file-saver';
 
-export const useExcelDownload = (templateHeaders: string[], templateName: string) => {
-  const downloadTemplate = useCallback(async () => {
+export const excelDownload = (templateHeaders: string[], templateName: string) => {
+  const downloadTemplate = async () => {
     const workbook = new Exceljs.Workbook();
     const worksheet = workbook.addWorksheet(templateName);
 
@@ -35,7 +34,7 @@ export const useExcelDownload = (templateHeaders: string[], templateName: string
 
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), `${templateName}양식.xlsx`);
-  }, [templateHeaders, templateName]);
+  };
 
   return { downloadTemplate };
 };

@@ -3,7 +3,7 @@
 import * as XLSX from 'xlsx';
 import { ExcelRowType, ExcelTemplateInfo, UploadResult } from '@/types/ExcelInterface';
 import { ChangeEvent } from 'react';
-import { validateExcelData } from '@/lib/excel/validate';
+import { validateExcelData } from '@/components/excel/utils/validate';
 
 export async function processExcelUpload(
   event: ChangeEvent<HTMLInputElement>,
