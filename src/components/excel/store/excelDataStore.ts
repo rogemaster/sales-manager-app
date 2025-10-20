@@ -4,8 +4,6 @@ import { ExcelRowWithErrors } from '@/types/ExcelInterface';
 import { atom, useAtomValue } from 'jotai';
 import { atomWithReset, selectAtom, useResetAtom } from 'jotai/utils';
 
-export const excelContextAtom = atom<'PRODUCT' | 'ORDER' | null>(null);
-
 export interface ExcelDataState {
   data: ExcelRowWithErrors[];
   isUploaded: boolean;

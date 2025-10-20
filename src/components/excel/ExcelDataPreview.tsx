@@ -1,6 +1,7 @@
 'use client';
 
 import { ExcelHeaderProps, ExcelTableColumnsType } from '@/types/ExcelInterface';
+import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
@@ -8,10 +9,13 @@ import { ExcelDataTable } from './components/ExcelDataTable';
 import { useExcelData } from '@/components/excel/store/excelDataStore';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 
-type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[] };
+type saveTypes = 'PRODUCT' | 'ORDER';
+type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: saveTypes };
 
-export const ExcelDataPreview = ({ excelHeader, tableColumns }: Props) => {
+export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props) => {
   const uploadedData = useExcelData();
+
+  const strategy = getExcelSaveStrategy(saveType);
 
   // Property 'length' does not exist on type 'string | number | boolean | ValidationError[]'.
   // Property 'length' does not exist on type 'number'.
@@ -21,12 +25,17 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns }: Props) => {
   const validCount = totalCount - errorDatas.length || 0;
   const errorCount = errorDatas.length || 0;
 
+  const handleExcelSaveData = () => {
+    strategy.processData(uploadedData);
+  };
+
   return (
     <Card>
       <ExcelDataPreviewHeader
         headerTitle={excelHeader.headerTitle}
         headerDescription={excelHeader.headerDescription}
         validCount={validCount}
+        onSaveConfirm={handleExcelSaveData}
       />
 
       <CardContent>
