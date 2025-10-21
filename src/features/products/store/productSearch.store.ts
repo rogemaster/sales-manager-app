@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { ProductSearch } from '@/features/products/types/ProductTypes';
 import dayjs from 'dayjs';
 
-// 기본값 상수
+// 필터 기본 상수값
 const DEFAULT_DATE_TYPE: string = 'register';
 const DEFAULT_DATE: Date[] = [dayjs().subtract(7, 'day').toDate(), new Date()];
 const DEFAULT_PRODUCT_STATUS: string = 'ALL';

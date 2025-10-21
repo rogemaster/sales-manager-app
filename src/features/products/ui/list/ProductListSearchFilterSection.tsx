@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProductSearchInput } from '@/features/products/ui/list/components/productSearchFilter/SearchInput';
 import { ProductSearchButton } from '@/features/products/ui/list/components/productSearchFilter/SearchButton';
-import { ProductSearchDate } from '@/features/products/ui/list/components/productSearchFilter/DateFilter';
+import { ProductSearchDate } from '@/features/products/ui/list/components/productSearchFilter/SearchDateFilter';
 import { ProductSearchSaleState } from '@/features/products/ui/list/components/productSearchFilter/SaleStateFilter';
-import { ProductSearchCategory } from '@/features/products/ui/list/components/productSearchFilter/CategoryFilter';
+import { ProductSearchCategory } from '@/features/products/ui/list/components/productSearchFilter/SearchCategoryFilter';
 
 export const ProductSearchFilterSection = () => {
   return (
@@ -29,5 +29,5 @@ export const ProductSearchFilterSection = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
