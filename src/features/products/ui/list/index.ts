@@ -1,3 +1,3 @@
 export { ProductHeaderSection } from './ProductListHeaderSection';
 export { ProductSearchFilterSection } from './ProductListSearchFilterSection';
-export { ProductTableSection } from './ProductListTableSection';
+export { ProductListTableSection as ProductTableSection } from './ProductListTableSection';

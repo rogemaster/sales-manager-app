@@ -7,7 +7,7 @@ import { ProductTableHeader } from '@/features/products/ui/list/components/produ
 import { ProductTableBody } from './components/productTable/ProductTableBody';
 import { TablePagination } from '@/components/common/TablePagination';
 
-export const ProductTableSection = () => {
+export const ProductListTableSection = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   return (
     <Card>

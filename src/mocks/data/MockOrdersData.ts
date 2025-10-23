@@ -1,7 +1,9 @@
+import { generatorOrderCode } from '@/utils/codeGenerator';
+
 // 샘플 주문 데이터
 export const MOCK_ORDERS_DATA = [
   {
-    id: 1,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-001',
     orderName: '무선 이어폰 외 2건',
     status: '배송준비중',
@@ -11,7 +13,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-21',
   },
   {
-    id: 2,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-002',
     orderName: '스마트워치',
     status: '배송중',
@@ -21,7 +23,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-20',
   },
   {
-    id: 3,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-003',
     orderName: '노트북 가방 외 1건',
     status: '배송완료',
@@ -31,7 +33,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-19',
   },
   {
-    id: 4,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-004',
     orderName: 'USB 충전기',
     status: '주문확인',
@@ -41,7 +43,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-18',
   },
   {
-    id: 5,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-005',
     orderName: '블루투스 스피커',
     status: '배송준비중',
@@ -51,7 +53,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-17',
   },
   {
-    id: 6,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-006',
     orderName: '무선 키보드 외 3건',
     status: '배송중',
@@ -61,7 +63,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-16',
   },
   {
-    id: 7,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-007',
     orderName: '마우스 패드',
     status: '배송완료',
@@ -71,7 +73,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-15',
   },
   {
-    id: 8,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-008',
     orderName: '모니터 거치대',
     status: '취소',
@@ -81,7 +83,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-14',
   },
   {
-    id: 9,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-009',
     orderName: '웹캠',
     status: '주문확인',
@@ -91,7 +93,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-13',
   },
   {
-    id: 10,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-010',
     orderName: '헤드셋 외 1건',
     status: '배송준비중',
@@ -101,7 +103,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-12',
   },
   {
-    id: 11,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-011',
     orderName: 'USB 허브',
     status: '배송중',
@@ -111,7 +113,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-11',
   },
   {
-    id: 12,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-012',
     orderName: '노트북 거치대',
     status: '배송완료',
@@ -121,7 +123,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-10',
   },
   {
-    id: 13,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-013',
     orderName: '케이블 정리함',
     status: '배송준비중',
@@ -131,7 +133,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-09',
   },
   {
-    id: 14,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-014',
     orderName: '무선 충전기',
     status: '주문확인',
@@ -141,7 +143,7 @@ export const MOCK_ORDERS_DATA = [
     modifiedAt: '2024-01-08',
   },
   {
-    id: 15,
+    id: generatorOrderCode(),
     orderNumber: 'ORD-2024-015',
     orderName: '스마트폰 거치대 외 2건',
     status: '배송중',
