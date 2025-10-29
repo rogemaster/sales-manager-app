@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertOptions } from '@/types/CommonInterface';
+import { AlertOptions } from '@/types/common.type';
 import { createContext, useContext } from 'react';
 
 interface AlertContextType {

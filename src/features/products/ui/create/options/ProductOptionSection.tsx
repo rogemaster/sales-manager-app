@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ProductBasicOption } from './ProductBasicOption';
 import { ProductSubOption } from './ProductSubOption';
-import { OptionCombination } from '@/features/products/types/ProductTypes';
+import { OptionCombination } from '@/features/products/types/product.types';
 import { ProductOptionConfirmTable } from './ProductOptionConfirmTable';
 
 type Props = {

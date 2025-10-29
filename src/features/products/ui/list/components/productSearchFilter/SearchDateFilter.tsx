@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PRODUCT_DATE_TYPE } from '@/features/products/constant/ProductInfo';
 import { RangeDatePicker } from '@/components/common/RangeDatePicker';
 import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton';
-import { RangeTypeProps } from '@/types/CommonInterface';
+import { RangeTypeProps } from '@/types/common.type';
 
 export const ProductSearchDate = () => {
   const [rangeValue, setRangeValue] = useState<RangeTypeProps>({ range: 7, uniq: 'day' });

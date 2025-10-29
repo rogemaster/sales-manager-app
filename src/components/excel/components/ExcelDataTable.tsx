@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/ExcelInterface';
+import { ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Props = { uploadedData: ExcelRowWithErrors[]; tableColumns: ExcelTableColumnsType[] };

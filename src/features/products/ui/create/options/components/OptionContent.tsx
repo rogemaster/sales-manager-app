@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
+import { ProductOption, ProductOptionDraft } from '@/features/products/types/product.types';
 
 type Props = {
   type: 'basic' | 'sub';

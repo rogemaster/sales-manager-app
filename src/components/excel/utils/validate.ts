@@ -1,4 +1,4 @@
-import { ExcelRowType, ValidationError, ValidationResult } from '@/types/ExcelInterface';
+import { ExcelRowType, ValidationError, ValidationResult } from '@/types/excel.type';
 
 // 필수 필드가 없는 경우
 export function missingField(row: ExcelRowType, requiredField: string) {

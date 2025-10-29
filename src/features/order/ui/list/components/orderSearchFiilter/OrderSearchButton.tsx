@@ -1,4 +1,4 @@
-import { getOrderSearchFilterAtom } from '@/features/order/store/OrderSearch.store';
+import { getOrderSearchFilterAtom } from '@/features/order/store/search.store';
 import { useAtomValue } from 'jotai';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';

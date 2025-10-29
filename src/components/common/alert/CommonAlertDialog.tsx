@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { CommonAlertDialogProps } from '@/types/CommonInterface';
+import { CommonAlertDialogProps } from '@/types/common.type';
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
 export function CommonAlertDialog({ open, onOpenChange, options }: CommonAlertDialogProps) {

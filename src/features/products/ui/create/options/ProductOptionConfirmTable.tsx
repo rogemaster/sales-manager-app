@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { OptionCombination } from '@/features/products/types/ProductTypes';
+import { OptionCombination } from '@/features/products/types/product.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAlert } from '@/hooks/useAlert';
 import { Label } from '@/components/ui/label';

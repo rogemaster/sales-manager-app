@@ -53,3 +53,34 @@ export interface AlertOptions {
   onConfirm?: () => void | Promise<void>;
   onCancel?: () => void;
 }
+
+export interface ShoppingMallType {
+  code: string;
+  name: string;
+  isActive: boolean;
+}
+
+// 쇼핑몰 지정 타입
+export type ShoppingMalls =
+  | 'AUC'
+  | 'GMK'
+  | '11ST'
+  | 'INTP'
+  | 'NSST'
+  | 'COUP'
+  | 'CJH'
+  | 'GSH'
+  | 'LOTH'
+  | 'SSGC'
+  | 'HDH'
+  | 'OHOU'
+  | 'HALF'
+  | 'MUSIN'
+  | 'KAKAOS'
+  | 'MUST';
+
+// 필터 관련 타입들
+export interface FilterOption {
+  id: string;
+  name: string;
+}

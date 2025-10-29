@@ -5,7 +5,7 @@ import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { processExcelUpload } from '@/components/excel/utils/processExcelUpload';
-import { ExcelTemplateInfo } from '@/types/ExcelInterface';
+import { ExcelTemplateInfo } from '@/types/excel.type';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
 import { setExcelDataAtom } from '@/components/excel/store/excelDataStore';

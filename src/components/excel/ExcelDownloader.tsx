@@ -1,6 +1,6 @@
 'use client';
 
-import { ExcelDownloaderProps } from '@/types/ExcelInterface';
+import { ExcelDownloaderProps } from '@/types/excel.type';
 import { ExcelTemplateButton } from './ExcelTemplateButton';
 import { ExcelTemplateInfo } from './ExcelTemplateInfo';
 import { Card, CardContent } from '../ui/card';

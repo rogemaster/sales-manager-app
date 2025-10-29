@@ -28,12 +28,6 @@ export interface Product {
 
 export type ProductStateType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS';
 
-// 필터 관련 타입들
-export interface FilterOption {
-  id: string;
-  name: string;
-}
-
 // 검색 관련 타입들
 export interface ProductSearchParams {
   category?: string;

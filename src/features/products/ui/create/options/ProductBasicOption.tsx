@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { OptionCombination, ProductOption, ProductOptionDraft } from '@/features/products/types/ProductTypes';
+import { OptionCombination, ProductOption, ProductOptionDraft } from '@/features/products/types/product.types';
 import { Card } from '@/components/ui/card';
 import { OptionHeader } from './components/OptionHeader';
 import { OptionContent } from './components/OptionContent';

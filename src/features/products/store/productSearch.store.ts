@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { ProductSearch } from '@/features/products/types/ProductTypes';
+import { ProductSearch } from '@/features/products/types/product.types';
 import dayjs from 'dayjs';
 
 // 필터 기본 상수값

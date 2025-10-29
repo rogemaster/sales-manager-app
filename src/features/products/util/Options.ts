@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { OptionCombination, ProductOption } from '../types/ProductTypes';
+import { OptionCombination, ProductOption } from '../types/product.types';
 
 /**
  * 옵션 유효성 검사

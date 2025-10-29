@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { searchValueAtom } from '@/features/order/store/OrderSearch.store';
+import { searchValueAtom } from '@/features/order/store/search.store';
 import { useAtom } from 'jotai';
 import { Search } from 'lucide-react';
 import { ChangeEventHandler } from 'react';

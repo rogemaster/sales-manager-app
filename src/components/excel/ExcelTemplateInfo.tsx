@@ -1,4 +1,4 @@
-import { ExcelTemplate } from '@/types/ExcelInterface';
+import { ExcelTemplate } from '@/types/excel.type';
 
 export const ExcelTemplateInfo = ({ templateTitle: title, template }: ExcelTemplate) => {
   return (

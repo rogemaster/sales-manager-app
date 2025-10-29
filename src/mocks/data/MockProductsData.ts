@@ -1,4 +1,4 @@
-import { Product } from '@/features/products/types/ProductTypes';
+import { Product } from '@/features/products/types/product.types';
 
 export const MOCK_PRODUCT_DATA: Product[] = [
   {
@@ -15,7 +15,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },
@@ -33,7 +33,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },
@@ -51,7 +51,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },
@@ -69,7 +69,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },
@@ -87,7 +87,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },
@@ -105,7 +105,7 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     option2: '',
     totalQuantity: 100,
     detailPage: '',
-    keyWords: null,
+    keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
   },

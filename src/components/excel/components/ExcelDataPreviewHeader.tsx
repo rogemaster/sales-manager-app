@@ -1,5 +1,5 @@
 import { useAlert } from '@/hooks/useAlert';
-import { ExcelHeaderProps } from '@/types/ExcelInterface';
+import { ExcelHeaderProps } from '@/types/excel.type';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, FileSpreadsheet, X } from 'lucide-react';

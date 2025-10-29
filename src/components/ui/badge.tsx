@@ -19,6 +19,13 @@ const badgeVariants = cva(
         soldOut:
           'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         saleDisc: 'border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
+        newOrder: 'bg-sky-500 hover:bg-sky-600',
+        confirmedOrder: 'bg-lime-500 hover:bg-lime-600',
+        invoiceRegister: 'bg-indigo-500 hover:bg-blue-600',
+        invoiceComplete: 'bg-blue-900 hover:bg-blue-950',
+        cancelOrder: 'bg-blue-500 hover:bg-blue-600',
+        exchangeOrder: 'bg-yellow-500 hover:bg-yellow-600',
+        returnOrder: 'bg-purple-500 hover:bg-purple-600',
       },
     },
     defaultVariants: {

@@ -1,7 +1,7 @@
 'use client';
 
 import * as XLSX from 'xlsx';
-import { ExcelRowType, ExcelTemplateInfo, UploadResult } from '@/types/ExcelInterface';
+import { ExcelRowType, ExcelTemplateInfo, UploadResult } from '@/types/excel.type';
 import { ChangeEvent } from 'react';
 import { validateExcelData } from '@/components/excel/utils/validate';
 

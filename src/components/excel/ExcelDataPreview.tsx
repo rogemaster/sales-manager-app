@@ -1,6 +1,6 @@
 'use client';
 
-import { ExcelHeaderProps, ExcelTableColumnsType } from '@/types/ExcelInterface';
+import { ExcelHeaderProps, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';

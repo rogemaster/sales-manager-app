@@ -1,4 +1,4 @@
-import { Category } from '@/types/CommonInterface';
+import { Category } from '@/types/common.type';
 
 // 전체 카테고리 옵션 상수
 export const ALL_CATEGORY_OPTION = {

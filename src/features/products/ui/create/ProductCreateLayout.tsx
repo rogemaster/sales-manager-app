@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { Product } from '../../types/ProductTypes';
+import { Product } from '../../types/product.types';
 import { ProductCreateBasicinfo } from './components/ProductBasicInfo';
 import { ProductPriceAndQuantityInfo } from './components/ProductPriceAndQuantityInfo';
 import { ProductOptionSection } from './options/ProductOptionSection';

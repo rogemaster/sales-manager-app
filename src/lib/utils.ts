@@ -2,7 +2,7 @@ import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import dayjs from 'dayjs';
-import { RangeTypeProps } from '@/types/CommonInterface';
+import { RangeTypeProps } from '@/types/common.type';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

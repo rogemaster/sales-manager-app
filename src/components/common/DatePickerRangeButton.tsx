@@ -1,5 +1,5 @@
 import { Button } from '../ui/button';
-import { RangeTypeProps } from '@/types/CommonInterface';
+import { RangeTypeProps } from '@/types/common.type';
 
 type Props = {
   onChangeDateRange: (value: RangeTypeProps) => void;

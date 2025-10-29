@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertContext } from '@/hooks/useAlert';
-import { AlertOptions } from '@/types/CommonInterface';
+import { AlertOptions } from '@/types/common.type';
 import { useCallback, useMemo, useState } from 'react';
 import { CommonAlertDialog } from './CommonAlertDialog';
 

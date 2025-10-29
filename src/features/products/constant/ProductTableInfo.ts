@@ -1,4 +1,4 @@
-import { TableTitleValue } from '@/types/CommonInterface';
+import { TableTitleValue } from '@/types/common.type';
 
 export const LIST_TABLE_HEAD: TableTitleValue[] = [
   {

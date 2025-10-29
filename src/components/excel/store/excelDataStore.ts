@@ -1,6 +1,6 @@
 'use client';
 
-import { ExcelRowWithErrors } from '@/types/ExcelInterface';
+import { ExcelRowWithErrors } from '@/types/excel.type';
 import { atom, useAtomValue } from 'jotai';
 import { atomWithReset, selectAtom, useResetAtom } from 'jotai/utils';
 

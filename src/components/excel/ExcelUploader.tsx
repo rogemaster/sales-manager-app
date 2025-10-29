@@ -1,4 +1,4 @@
-import { ExcelUploaderProps } from '@/types/ExcelInterface';
+import { ExcelUploaderProps } from '@/types/excel.type';
 import { Card, CardContent } from '../ui/card';
 import { ExcelHeader } from './components/ExcelHeader';
 import { ExcelUploaderContent } from './ExcelUploaderContent';

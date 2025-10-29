@@ -4,7 +4,7 @@ import {
   ExcelUploaderProps,
   ExcelHeaderProps,
   ExcelTableColumnsType,
-} from '@/types/ExcelInterface';
+} from '@/types/excel.type';
 
 // 엑셀 양식 템플릿
 export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {

@@ -1,4 +1,4 @@
-import { ProductInfomationDisclosureType } from '@/features/products/types/ProductTypes';
+import { ProductInfomationDisclosureType } from '@/features/products/types/product.types';
 
 export const PRODUCT_INFO_DISC_CATEGORY = {
   clothing: {

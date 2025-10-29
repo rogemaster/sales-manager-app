@@ -2,9 +2,8 @@
 
 import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
+import { FilterOption } from '@/types/common.type';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-import { FilterOption } from '@/features/products/types/ProductTypes';
 
 interface FilterSelectProps {
   htmlFor?: string;

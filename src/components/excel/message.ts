@@ -1,4 +1,4 @@
-import { UploadErrorCode, ValidationError } from '@/types/ExcelInterface';
+import { UploadErrorCode, ValidationError } from '@/types/excel.type';
 
 export function excelUploadErrorCodeToMessage(code: UploadErrorCode) {
   switch (code) {

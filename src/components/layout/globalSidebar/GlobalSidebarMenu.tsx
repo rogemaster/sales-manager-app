@@ -12,7 +12,7 @@ import {
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { GLOBAL_SIDEBAR_MENU } from '@/constant/SidebarMenu';
+import { GLOBAL_SIDEBAR_MENU } from '@/constant/sidebarMenu.constant';
 
 export const GlobalSidebarMenu = () => {
   return (

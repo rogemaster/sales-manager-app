@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PRODUCT_DATE_TYPE } from '@/features/products/constant/ProductInfo';
 import { calculatorRangeDate } from '@/lib/utils';
-import { RangeTypeProps } from '@/types/CommonInterface';
+import { RangeTypeProps } from '@/types/common.type';
 import { useState } from 'react';
 
 export const OrderDateFilter = () => {

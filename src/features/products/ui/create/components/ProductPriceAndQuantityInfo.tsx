@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { DELIVERY_TYPE_OPTION } from '@/features/products/constant/ProductInfo';
-import { Product } from '@/features/products/types/ProductTypes';
+import { Product } from '@/features/products/types/product.types';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DELIVERY_TYPE_OPTION } from '@/constant/delivery.constant';
 
 export const ProductPriceAndQuantityInfo = () => {
   const [deliveryType, setDeliveryType] = useState<string>('');

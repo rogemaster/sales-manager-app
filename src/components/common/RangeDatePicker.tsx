@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { RangeDatePickerProps } from '@/types/CommonInterface';
+import { RangeDatePickerProps } from '@/types/common.type';
 import { CalendarIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';

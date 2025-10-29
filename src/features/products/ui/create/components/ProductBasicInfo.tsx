@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Product } from '@/features/products/types/ProductTypes';
+import { Product } from '@/features/products/types/product.types';
 import { X } from 'lucide-react';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import { FilterSelect } from '@/components/common/FilterSelect';

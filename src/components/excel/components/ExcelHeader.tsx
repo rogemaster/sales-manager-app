@@ -1,4 +1,4 @@
-import { ExcelHeaderProps } from '@/types/ExcelInterface';
+import { ExcelHeaderProps } from '@/types/excel.type';
 import { Download, Upload } from 'lucide-react';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
