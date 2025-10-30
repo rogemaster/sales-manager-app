@@ -1,5 +1,5 @@
 import { HomeIcon, PackageIcon, Settings, StoreIcon } from 'lucide-react';
-import { MenuInterface } from '@/types/SidebarInterface';
+import { MenuInterface } from '@/types/sidebar.type';
 
 export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
   {

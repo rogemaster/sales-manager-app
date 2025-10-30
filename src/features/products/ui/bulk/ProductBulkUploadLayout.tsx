@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { useResetExcelData } from '@/components/excel/store/excelDataStore';
+import { useResetExcelData } from '@/components/excel/store/excelData.store';
 import {
   PRODUCT_EXCEL_PREVIEW_HEADER,
   PRODUCT_EXCEL_TABLE_COLUMNS,
   PRODUCT_EXCEL_TEMPLATE_DOWNLOADER,
   PRODUCT_EXCEL_TEMPLATE_UPLOADER,
-  PRODUCT_BULK_EXCEL_TEMPLATE,
-} from '../../constant/Excel';
+} from '../../constant/excel.constants';
+import { PRODUCT_BULK_EXCEL_TEMPLATE } from '../../constant/bulkTemplate.constant';
 import { ExcelDataPreview, ExcelDownloader, ExcelUploader } from '@/components/excel';
 
 export const ProductBulkUploadLayout = () => {

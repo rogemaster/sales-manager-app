@@ -3,7 +3,7 @@
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAtomValue } from 'jotai';
-import { getSearchFilterAtom } from '@/features/products/store/productSearch.store';
+import { getSearchFilterAtom } from '@/features/products/store/search.store';
 
 export const ProductSearchButton = () => {
   const data = useAtomValue(getSearchFilterAtom);

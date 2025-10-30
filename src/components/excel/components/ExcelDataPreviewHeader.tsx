@@ -3,7 +3,7 @@ import { ExcelHeaderProps } from '@/types/excel.type';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, FileSpreadsheet, X } from 'lucide-react';
-import { useResetExcelData } from '@/components/excel/store/excelDataStore';
+import { useResetExcelData } from '@/components/excel/store/excelData.store';
 
 type Props = { validCount: number; onSaveConfirm: () => void };
 

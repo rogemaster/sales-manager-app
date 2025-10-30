@@ -6,7 +6,7 @@ import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
 import { ExcelDataTable } from './components/ExcelDataTable';
-import { useExcelData } from '@/components/excel/store/excelDataStore';
+import { useExcelData } from '@/components/excel/store/excelData.store';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 
 type saveTypes = 'PRODUCT' | 'ORDER';

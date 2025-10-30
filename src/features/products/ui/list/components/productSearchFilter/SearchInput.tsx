@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
 import { Label } from '@/components/ui/label';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useAtom } from 'jotai';
-import { searchValueAtom } from '@/features/products/store/productSearch.store';
+import { searchValueAtom } from '@/features/products/store/search.store';
 import { ChangeEventHandler } from 'react';
 
 export const ProductSearchInput = () => {
@@ -12,7 +12,7 @@ export const ProductSearchInput = () => {
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);
-  }
+  };
 
   return (
     <div className="flex items-center gap-4">

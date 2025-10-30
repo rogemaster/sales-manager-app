@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { PRODUCT_STATUS } from '@/features/products/constant/ProductInfo';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { ProductStateType } from '@/features/products/types/product.types';
 
 type Props = {

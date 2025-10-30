@@ -8,7 +8,7 @@ import { processExcelUpload } from '@/components/excel/utils/processExcelUpload'
 import { ExcelTemplateInfo } from '@/types/excel.type';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
-import { setExcelDataAtom } from '@/components/excel/store/excelDataStore';
+import { setExcelDataAtom } from '@/components/excel/store/excelData.store';
 import { excelUploadErrorCodeToMessage, excelValidErrorsCodeToMessages } from './message';
 
 type Props = {

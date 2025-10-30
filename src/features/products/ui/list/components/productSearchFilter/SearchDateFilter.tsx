@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { calculatorRangeDate } from '@/lib/utils';
-import { DateTypeAtom, searchDateAtom } from '@/features/products/store/productSearch.store';
+import { DateTypeAtom, searchDateAtom } from '@/features/products/store/search.store';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PRODUCT_DATE_TYPE } from '@/features/products/constant/ProductInfo';
+import { PRODUCT_DATE_TYPE } from '@/features/products/constant/status.constants';
 import { RangeDatePicker } from '@/components/common/RangeDatePicker';
 import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton';
 import { RangeTypeProps } from '@/types/common.type';
