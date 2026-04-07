@@ -2,24 +2,24 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const { status } = useSession({
+    required: true,
 
-  useEffect(() => {
-    if (status === 'loading') return; // 로딩 중일 때는 아무것도 하지 않음
+    // [로그인이 안된 경우 처리]: 권한이 없으면 로그인 페이지로 이동 
+    onUnauthenticated: () => { 
+      router.replace('/');
+    },
+  });
 
-    if (!session) {
-      router.push('/sign-in');
-    }
-  }, [session, status, router]);
-
+  // [로딩 중인 경우]
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -28,9 +28,6 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (!session) {
-    return null;
-  }
-
+  // [로그인이 된 경우]
   return <>{children}</>;
 };

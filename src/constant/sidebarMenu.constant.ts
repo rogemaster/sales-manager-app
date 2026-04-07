@@ -56,7 +56,7 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       },
       {
         title: '주문등록',
-        url: '/order/register',
+        url: '/order/create',
       },
       {
         title: '주문목록',

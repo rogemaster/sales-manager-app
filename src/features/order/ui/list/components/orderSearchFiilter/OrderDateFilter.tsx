@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton';
 import { RangeDatePicker } from '@/components/common/RangeDatePicker';
 import { Label } from '@/components/ui/label';
@@ -7,12 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PRODUCT_DATE_TYPE } from '@/features/products/constant/status.constants';
 import { calculatorRangeDate } from '@/lib/utils';
 import { RangeTypeProps } from '@/types/common.type';
-import { useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { DateTypeAtom, searchDateAtom } from '@/features/order/store/search.store';
 
 export const OrderDateFilter = () => {
   const [rangeValue, setRangeValue] = useState<RangeTypeProps>({ range: 7, uniq: 'day' });
 
+  const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
+  const setSearchDateAtom = useSetAtom(searchDateAtom);
+
   const dates = calculatorRangeDate(rangeValue);
+
+  const handleChangeDate = (date: Date[]) => {
+    setSearchDateAtom(date);
+  };
 
   return (
     <div className="flex items-center gap-4">

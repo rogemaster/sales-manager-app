@@ -84,9 +84,10 @@ const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         // 사용자 정보를 토큰에 저장
+        token.accessToken = account?.access_token || null;
         token.userId = user.id;
         token.email = user.email;
         token.name = user.name;
@@ -105,6 +106,7 @@ const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

@@ -38,7 +38,7 @@ export const ProductTableBody = () => {
             />
           </TableHead>
           {LIST_TABLE_HEAD.map((item) => (
-            <TableHead className="w-32" key={item.id}>
+            <TableHead className="w-32 text-center" key={item.id}>
               {item.title}
             </TableHead>
           ))}

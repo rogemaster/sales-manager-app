@@ -1,17 +1,18 @@
 import { Order } from '@/features/order/types/order.types';
-import { generatorOrderCode } from '@/utils/codeGenerator';
 
 // 샘플 주문 데이터
 export const MOCK_ORDERS_DATA: Order[] = [
   {
-    orderNumber: generatorOrderCode(),
+    orderNumber: 'order_mock_sample_001',
     shopOrderNumber: '111111-222222',
     orderStatus: 'NEW_ORDER',
     paymentDate: '2025-10-27',
     orderCollectionDate: '2025-10-28',
-    shoppingMall: 'GMK',
+    shoppingMallName: 'GMK',
+    shoppingMallId: 'gadmin1111',
     shopProductId: 'G-111223344',
     orderProductName: '쇼핑몰 상품명11 입니다.',
+    orderOption: '',
     orderPrice: 120000,
     orderTotalQuantity: 2,
     orderDeliveryType: 'FREE',

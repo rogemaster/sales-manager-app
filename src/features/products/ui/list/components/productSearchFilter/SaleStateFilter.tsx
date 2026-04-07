@@ -15,6 +15,8 @@ export const ProductSearchSaleState = () => {
   return (
     <FilterSelect
       label="판매 상태"
+      divClassName="flex items-center gap-4"
+      labelClassName="w-20 text-right"
       value={getSaleTypeAtom}
       onValueChange={handleProductStatusChange}
       options={PRODUCT_STATUS}

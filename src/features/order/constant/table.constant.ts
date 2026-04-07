@@ -53,7 +53,15 @@ export const ORDERLIST_TABLE_HEAD: TableTitleValue[] = [
   },
   {
     id: 'orderOption',
-    title: '옵션',
+    title: '주문옵션',
+  },
+  {
+    id: 'orderTotalQuantity',
+    title: '주문수량',
+  },
+  {
+    id: 'orderPrice',
+    title: '판매가',
   },
   {
     id: 'orderName',
@@ -70,14 +78,6 @@ export const ORDERLIST_TABLE_HEAD: TableTitleValue[] = [
   {
     id: 'payeePhoneNumber',
     title: '수취인연락처',
-  },
-  {
-    id: 'orderTotalQuantity',
-    title: '주문수량',
-  },
-  {
-    id: 'orderPrice',
-    title: '판매가',
   },
   {
     id: 'orderDeliveryType',

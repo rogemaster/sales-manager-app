@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// 인증된 사용자만 접근 가능한 경로
 export const config = {
-  matcher: ['/', '/home', '/order', '/products'],
+  matcher: ['/', '/home/:path*', '/products/:path*', '/order/:path*'],
 };
