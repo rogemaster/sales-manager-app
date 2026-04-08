@@ -5,7 +5,11 @@ import { ProductSearchDate } from '@/features/products/ui/list/components/produc
 import { ProductSearchSaleState } from '@/features/products/ui/list/components/productSearchFilter/SaleStateFilter';
 import { ProductSearchCategory } from '@/features/products/ui/list/components/productSearchFilter/SearchCategoryFilter';
 
-export const ProductSearchFilterSection = () => {
+type Props = {
+  onSearch: () => void;
+};
+
+export const ProductSearchFilterSection = ({ onSearch }: Props) => {
   return (
     <Card>
       <CardHeader>
@@ -25,7 +29,7 @@ export const ProductSearchFilterSection = () => {
             <ProductSearchInput />
           </div>
           {/* 오른쪽: 검색 버튼 */}
-          <ProductSearchButton />
+          <ProductSearchButton onSearch={onSearch} />
         </div>
       </CardContent>
     </Card>
