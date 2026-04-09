@@ -3,7 +3,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { calculatorRangeDate } from '@/lib/utils';
-import { DateTypeAtom, searchDateAtom } from '@/features/products/store/search.store';
+import dayjs from 'dayjs';
+import { DateTypeAtom, endDateAtom, startDateAtom } from '@/features/products/store/search.store';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PRODUCT_DATE_TYPE } from '@/features/products/constant/status.constants';
@@ -12,18 +13,35 @@ import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton
 import { RangeTypeProps } from '@/types/common.type';
 
 export const ProductSearchDate = () => {
-  const [rangeValue, setRangeValue] = useState<RangeTypeProps>({ range: 7, uniq: 'day' });
-
   const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
-  const setSearchDateAtom = useSetAtom(searchDateAtom);
+  const setStartDateAtom = useSetAtom(startDateAtom);
+  const setEndDateAtom = useSetAtom(endDateAtom);
 
-  const dates = useMemo(() => calculatorRangeDate(rangeValue), [rangeValue]);
+  const defaultStartDate = useMemo(() => dayjs().subtract(7, 'day').format('YYYY-MM-DD'), []);
+  const defaultEndDate = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
+  const [pickerInitDate, setPickerInitDate] = useState({ startDate: defaultStartDate, endDate: defaultEndDate });
+  const [resetKey, setResetKey] = useState(0);
 
   const handleChangeDate = useCallback(
-    (date: Date[]) => {
-      setSearchDateAtom(date);
+    (startDate: string, endDate: string) => {
+      setStartDateAtom(startDate);
+      setEndDateAtom(endDate);
     },
-    [setSearchDateAtom],
+    [setStartDateAtom, setEndDateAtom],
+  );
+
+  const handleChangeDateRange = useCallback(
+    (value: RangeTypeProps) => {
+      const [startDate, endDate] = calculatorRangeDate(value);
+      const formatStartDate = dayjs(startDate).format('YYYY-MM-DD');
+      const formatEndDate = dayjs(endDate).format('YYYY-MM-DD');
+
+      setPickerInitDate({ startDate: formatStartDate, endDate: formatEndDate });
+      setResetKey((prev) => prev + 1);
+      setStartDateAtom(formatStartDate);
+      setEndDateAtom(formatEndDate);
+    },
+    [setStartDateAtom, setEndDateAtom],
   );
 
   return (
@@ -41,8 +59,13 @@ export const ProductSearchDate = () => {
           ))}
         </SelectContent>
       </Select>
-      <RangeDatePicker date={dates} onChangeDate={handleChangeDate} />
-      <DatePickerRangeButton onChangeDateRange={(value) => setRangeValue(value)} />
+      <RangeDatePicker
+        initStartDate={pickerInitDate.startDate}
+        initEndDate={pickerInitDate.endDate}
+        resetKey={resetKey}
+        onChangeDate={handleChangeDate}
+      />
+      <DatePickerRangeButton onChangeDateRange={handleChangeDateRange} />
     </div>
   );
 };

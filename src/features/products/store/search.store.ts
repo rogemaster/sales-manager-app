@@ -4,7 +4,8 @@ import dayjs from 'dayjs';
 
 // 필터 기본 상수값
 const DEFAULT_DATE_TYPE: string = 'register';
-const DEFAULT_DATE: Date[] = [dayjs().subtract(7, 'day').toDate(), new Date()];
+const DEFAULT_START_DATE: string = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+const DEFAULT_END_DATE: string = dayjs().format('YYYY-MM-DD');
 const DEFAULT_PRODUCT_STATUS: string = 'ALL';
 const DEFAULT_CATEGORY_CODE: string = 'ALL';
 
@@ -13,7 +14,9 @@ const DEFAULT_CATEGORY_CODE: string = 'ALL';
  */
 export const DateTypeAtom = atom<string>(DEFAULT_DATE_TYPE);
 
-export const searchDateAtom = atom<Date[]>(DEFAULT_DATE);
+export const startDateAtom = atom<string>(DEFAULT_START_DATE);
+
+export const endDateAtom = atom<string>(DEFAULT_END_DATE);
 
 export const saleTypeAtom = atom<string>(DEFAULT_PRODUCT_STATUS);
 
@@ -26,7 +29,8 @@ export const searchValueAtom = atom<string>('');
  */
 export const getSearchFilterAtom = atom<ProductSearch>((get) => ({
   dateType: get(DateTypeAtom),
-  searchDate: get(searchDateAtom),
+  startDate: get(startDateAtom),
+  endDate: get(endDateAtom),
   saleType: get(saleTypeAtom),
   categoryId: get(categoryAtom),
   searchValue: get(searchValueAtom),

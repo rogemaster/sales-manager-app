@@ -26,8 +26,10 @@ export type SingleDatePickerProps = BaseDatePickerProps & {
 };
 
 export type RangeDatePickerProps = BaseDatePickerProps & {
-  date: Date[];
-  onChangeDate: (dates: Date[], name?: string) => void;
+  initStartDate: string;
+  initEndDate: string;
+  resetKey?: number;
+  onChangeDate: (startDate: string, endDate: string) => void;
 };
 
 export type RangeTypeProps = {

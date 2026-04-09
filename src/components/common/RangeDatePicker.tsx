@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { RangeDatePickerProps } from '@/types/common.type';
 import { CalendarIcon } from 'lucide-react';
@@ -9,28 +9,40 @@ import { Label } from '../ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 
-export const RangeDatePicker = ({ label, onChangeDate, name, date }: RangeDatePickerProps) => {
+export const RangeDatePicker = ({
+  label,
+  onChangeDate,
+  initStartDate,
+  initEndDate,
+  resetKey,
+}: RangeDatePickerProps) => {
   const [startOpen, setStartOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
-  const [selectDate, setSelectDate] = useState<Date[]>(date);
+  const [startDateValue, setStartDateValue] = useState<string>(initStartDate);
+  const [endDateValue, setEndDateValue] = useState<string>(initEndDate);
 
   useEffect(() => {
-    setSelectDate(date);
-  }, [date]);
+    setStartDateValue(initStartDate);
+    setEndDateValue(initEndDate);
+  }, [resetKey, initStartDate, initEndDate]);
 
-  const onSelectDate = (value: Date | undefined, type: string) => {
-    let newRangeDate: Date[] = [];
+  const onSelectDate = (date: Date | undefined, type: string) => {
+    if (!date) {
+      return;
+    }
+    const selectDate: string = dayjs(date).format('YYYY-MM-DD');
+    const nextStartDate = type === 'start' ? selectDate : startDateValue;
+    const nextEndDate = type === 'end' ? selectDate : endDateValue;
 
     if (type === 'start') {
-      newRangeDate = [value!, selectDate[1]];
+      setStartDateValue(selectDate);
       setStartOpen(false);
     } else {
-      newRangeDate = [selectDate[0], value!];
+      setEndDateValue(selectDate);
       setEndOpen(false);
     }
 
-    setSelectDate(newRangeDate);
-    onChangeDate(newRangeDate, name);
+    onChangeDate(nextStartDate, nextEndDate);
   };
 
   return (
@@ -45,13 +57,13 @@ export const RangeDatePicker = ({ label, onChangeDate, name, date }: RangeDatePi
         <PopoverTrigger asChild>
           <Button variant="outline" id="date" className="w-48 justify-start font-normal">
             <CalendarIcon />
-            {dayjs(selectDate[0]).format('YYYY-MM-DD')}
+            {startDateValue}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
           <Calendar
             mode="single"
-            selected={selectDate[0]}
+            selected={dayjs(startDateValue).toDate()}
             captionLayout="dropdown"
             onSelect={(date) => onSelectDate(date, 'start')}
           />
@@ -70,13 +82,13 @@ export const RangeDatePicker = ({ label, onChangeDate, name, date }: RangeDatePi
         <PopoverTrigger asChild>
           <Button variant="outline" id="date" className="w-48 justify-start font-normal">
             <CalendarIcon />
-            {dayjs(selectDate[1]).format('YYYY-MM-DD')}
+            {endDateValue}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
           <Calendar
             mode="single"
-            selected={selectDate[1]}
+            selected={dayjs(endDateValue).toDate()}
             captionLayout="dropdown"
             onSelect={(date) => onSelectDate(date, 'end')}
           />

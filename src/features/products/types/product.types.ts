@@ -39,7 +39,8 @@ export interface ProductSearchParams {
 
 export interface ProductSearch {
   dateType: string;
-  searchDate: Date[];
+  startDate: string;
+  endDate: string;
   saleType: string;
   categoryId: string;
   searchValue: string;
