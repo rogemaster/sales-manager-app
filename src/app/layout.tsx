@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 
 import './globals.css';
@@ -20,8 +19,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const queryClient = new QueryClient();
-
   if (typeof window === 'undefined') {
     const server = setupServer(...handlers);
     server.listen();
@@ -33,9 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryClientProvider client={queryClient}>
-          <SessionProvider>{children}</SessionProvider>
-        </QueryClientProvider>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

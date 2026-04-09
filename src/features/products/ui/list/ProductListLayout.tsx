@@ -12,13 +12,13 @@ export const ProductListLayout = () => {
   const data = useAtomValue(getSearchFilterAtom);
   const [appliedFilter, setAppliedFilter] = useState(data);
 
-  const { data: products = [] } = useQuery<Product[]>({
-    queryKey: ['products', appliedFilter],
-    queryFn: () => getProducts(appliedFilter),
-  });
+  // const { data: products = [] } = useQuery<Product[]>({
+  //   queryKey: ['products', appliedFilter],
+  //   queryFn: () => getProducts(appliedFilter),
+  // });
 
   const handleSearch = () => {
-    setAppliedFilter(data);
+    // setAppliedFilter(data);
   };
 
   return (
@@ -28,7 +28,7 @@ export const ProductListLayout = () => {
       {/* 검색 및 필터 */}
       <ProductSearchFilterSection onSearch={handleSearch} />
       {/* 상품 목록 테이블 */}
-      <ProductTableSection products={products} />
+      <ProductTableSection products={[]} />
     </>
   );
 };

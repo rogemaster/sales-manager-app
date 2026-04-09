@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { calculatorRangeDate } from '@/lib/utils';
 import { DateTypeAtom, searchDateAtom } from '@/features/products/store/search.store';
@@ -17,11 +17,14 @@ export const ProductSearchDate = () => {
   const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
   const setSearchDateAtom = useSetAtom(searchDateAtom);
 
-  const dates = calculatorRangeDate(rangeValue);
+  const dates = useMemo(() => calculatorRangeDate(rangeValue), [rangeValue]);
 
-  const handleChangeDate = (date: Date[]) => {
-    setSearchDateAtom(date);
-  };
+  const handleChangeDate = useCallback(
+    (date: Date[]) => {
+      setSearchDateAtom(date);
+    },
+    [setSearchDateAtom],
+  );
 
   return (
     <div className="flex items-center gap-4">

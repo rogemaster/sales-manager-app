@@ -16,8 +16,7 @@ export const RangeDatePicker = ({ label, onChangeDate, name, date }: RangeDatePi
 
   useEffect(() => {
     setSelectDate(date);
-    onChangeDate(date);
-  }, [date, onChangeDate]);
+  }, [date]);
 
   const onSelectDate = (value: Date | undefined, type: string) => {
     let newRangeDate: Date[] = [];
