@@ -5,12 +5,16 @@ import isBetween from 'dayjs/plugin/isBetween';
 
 dayjs.extend(isBetween);
 
-const getProductsByDate = (dateType: string, searchDate: Date[]) => {
+const getProductsByDate = (dateType: string, startDateValue: string, endDateValue: string) => {
   if (dateType === 'register') {
-    return MOCK_PRODUCT_DATA.filter((item) => dayjs(item.createDate).isBetween(searchDate[0], searchDate[1]));
+    return MOCK_PRODUCT_DATA.filter((item) =>
+      dayjs(item.createDate).isBetween(startDateValue, endDateValue, 'day', '[]'),
+    );
   }
   if (dateType === 'update') {
-    return MOCK_PRODUCT_DATA.filter((item) => dayjs(item.updateDate).isBetween(searchDate[0], searchDate[1]));
+    return MOCK_PRODUCT_DATA.filter((item) =>
+      dayjs(item.updateDate).isBetween(startDateValue, endDateValue, 'day', '[]'),
+    );
   }
   return MOCK_PRODUCT_DATA;
 };
@@ -37,8 +41,8 @@ const getProductsBysearchValue = (value: string, data: Product[]) => {
 };
 
 export const getMockProducts = (searchParams: ProductSearch) => {
-  const { dateType, searchDate, saleType, categoryId, searchValue } = searchParams;
-  const resultByDate = getProductsByDate(dateType, searchDate);
+  const { dateType, startDate, endDate, saleType, categoryId, searchValue } = searchParams;
+  const resultByDate = getProductsByDate(dateType, startDate, endDate);
   const resultByType = getProductsBySaleType(saleType, resultByDate);
   const resultByCategory = getProductsByCategoryId(categoryId, resultByType);
   return getProductsBysearchValue(searchValue, resultByCategory);

@@ -6,6 +6,7 @@ import './globals.css';
 import { handlers } from '@/mocks/handlers';
 import { setupServer } from 'msw/node';
 import { setupWorker } from 'msw/browser';
+import { MSWProvider } from '@/components/providers/MSWProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,7 +31,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
+        <MSWProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </MSWProvider>
       </body>
     </html>
   );

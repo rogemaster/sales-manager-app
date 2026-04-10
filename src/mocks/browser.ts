@@ -1,11 +1,5 @@
-import { setupServer } from 'msw/node';
 import { setupWorker } from 'msw/browser';
 import { handlers } from './handlers';
 
-if (typeof window === 'undefined') {
-  const server = setupServer(...handlers);
-  server.listen();
-} else {
-  const worker = setupWorker(...handlers);
-  worker.start();
-}
+// MSW 클라이언트용
+export const worker = setupWorker(...handlers);

@@ -7,11 +7,12 @@ import { ProductTableBody } from './components/productTable/ProductTableBody';
 import { TablePagination } from '@/components/common/TablePagination';
 import { Product } from '../../types/product.types';
 
-type Props = {
+type props = {
   products: Product[];
 };
 
-export const ProductListTableSection = ({ products }: Props) => {
+export const ProductListTableSection = ({ products }: props) => {
+  console.log('상품목록', products);
   const [currentPage, setCurrentPage] = useState<number>(1);
   return (
     <Card>
@@ -19,7 +20,7 @@ export const ProductListTableSection = ({ products }: Props) => {
         <ProductTableHeader total={products.length} />
       </CardHeader>
       <CardContent>
-        <ProductTableBody />
+        <ProductTableBody products={products} />
         <TablePagination
           currentPage={currentPage}
           totalPages={products.length}

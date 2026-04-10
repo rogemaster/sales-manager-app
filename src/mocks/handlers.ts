@@ -8,7 +8,6 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const handlers = [
   http.post(`${baseUrl}/api/login`, () => {
-    console.log('로그인');
     return HttpResponse.json(User[0], {
       headers: {
         'Set-Cookie': 'connect.sid=msw-cookie;HttpOnly;Path=/',
@@ -17,7 +16,6 @@ export const handlers = [
   }),
 
   http.post(`${baseUrl}/api/logout`, () => {
-    console.log('로그아웃');
     return new HttpResponse(null, {
       headers: {
         'Set-Cookie': 'connect.sid=;HttpOnly;Path=/;Max-Age=0',
@@ -28,7 +26,6 @@ export const handlers = [
   // 상품목록조회
   http.post(`${baseUrl}/api/products/list`, async ({ request }) => {
     const searchParams = (await request.json()) as ProductSearch;
-    console.log('상품목록조회', searchParams);
     return HttpResponse.json(getMockProducts(searchParams));
   }),
 
