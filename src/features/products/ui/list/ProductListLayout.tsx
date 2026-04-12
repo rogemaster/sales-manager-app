@@ -18,7 +18,6 @@ export const ProductListLayout = () => {
   });
 
   const handleSearch = () => {
-    console.log('검색버튼');
     setAppliedFilter(data);
   };
 

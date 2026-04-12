@@ -21,7 +21,7 @@ export const ProductCreateLayout = () => {
   };
 
   const onSubmit: SubmitHandler<Product> = () => {
-    console.log('상품등록 데이터:: ');
+    console.log('상품등록 데이터:: ', formData.getValues());
   };
 
   return (

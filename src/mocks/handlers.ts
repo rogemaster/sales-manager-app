@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { User } from './data/MockUsersData';
-import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
-import { getMockProducts } from './utils';
-import { ProductSearch } from '@/features/products/types/product.types';
+import { getMockProducts } from './utils/getProducts';
+import { Product, ProductSearch } from '@/features/products/types/product.types';
+import { createMockProduct } from './utils/createProduct';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -30,8 +30,8 @@ export const handlers = [
   }),
 
   // 상품등록
-  http.post(`${baseUrl}/api/products/create`, ({ params }) => {
-    console.log('상품등록', params);
-    return HttpResponse.json(MOCK_PRODUCT_DATA[0]);
+  http.post(`${baseUrl}/api/product/create`, async ({ request }) => {
+    const data = (await request.json()) as Product;
+    return HttpResponse.json(createMockProduct(data));
   }),
 ];

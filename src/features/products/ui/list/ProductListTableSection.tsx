@@ -12,7 +12,6 @@ type props = {
 };
 
 export const ProductListTableSection = ({ products }: props) => {
-  console.log('상품목록', products);
   const [currentPage, setCurrentPage] = useState<number>(1);
   return (
     <Card>

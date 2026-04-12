@@ -1,5 +1,5 @@
 import { Product, ProductSearch } from '@/features/products/types/product.types';
-import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
+import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 

@@ -7,7 +7,7 @@ export const getProducts = async (data: ProductSearch) => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch products');
+    throw new Error('상품목록 호출 실패');
   }
 
   return response.json();

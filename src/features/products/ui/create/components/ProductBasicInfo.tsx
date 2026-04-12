@@ -41,7 +41,7 @@ export const ProductCreateBasicinfo = () => {
     if (keywordInput.trim() && !keywords.includes(keywordInput.trim())) {
       const newKeywords = [...keywords, keywordInput.trim()];
       setKeywords(newKeywords);
-      setValue('keyWords', keywords);
+      setValue('keyWords', newKeywords);
       setKeywordInput('');
     }
   };
@@ -85,7 +85,9 @@ export const ProductCreateBasicinfo = () => {
                 {keywords.map((keyword) => (
                   <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
                     {keyword}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveKeyword(keyword)} />
+                    <span>
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveKeyword(keyword)} />
+                    </span>
                   </Badge>
                 ))}
               </div>
