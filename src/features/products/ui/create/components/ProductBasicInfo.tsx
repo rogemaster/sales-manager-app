@@ -103,17 +103,6 @@ export const ProductCreateBasicinfo = () => {
           options={MOCK_CATEGORY_DATA}
           placeholder="카테고리를 선택하세요."
         />
-        {/* <div className="space-y-2">
-          <Label htmlFor="category">카테고리 *</Label>
-          <Select value={category} onValueChange={(value) => setCategory(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="카테고리를 선택하세요" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="전자제품">전자제품</SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
       </CardContent>
     </Card>
   );

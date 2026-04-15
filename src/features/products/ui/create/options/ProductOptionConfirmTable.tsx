@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { OptionCombination } from '@/features/products/types/product.types';
+import { useEffect, useMemo, useState } from 'react';
+import { OptionCombination, Product } from '@/features/products/types/product.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAlert } from '@/hooks/useAlert';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 
 type Props = {
   optionCombinations: OptionCombination[];
@@ -14,27 +15,39 @@ type Props = {
 };
 
 export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirmed }: Props) => {
-  const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>(optionCombinations);
-  const [bulkQuantity, setBulkQuantity] = useState<number>(0);
+  const [bulkQuantity, setBulkQuantity] = useState<number>();
   const { showAlert } = useAlert();
 
-  // 부모에서 전달된 옵션 조합 변경 시 동기화
+  const { register, setValue, getValues, control } = useFormContext<Product>();
+  const { replace } = useFieldArray({
+    control,
+    name: 'option',
+  });
+  const watchedOptionData = useWatch({ control, name: 'option' });
+  const optionData = useMemo(() => watchedOptionData ?? [], [watchedOptionData]);
+
+  // 부모에서 전달된 옵션 조합을 폼 필드로 동기화
   useEffect(() => {
-    setOptionCombinationsData(optionCombinations);
-  }, [optionCombinations]);
+    // setValue('option', optionCombinations);
+    replace(optionCombinations);
+  }, [optionCombinations, replace]);
 
-  // 옵션 조합 수정
-  const handleOptionCombinationChange = (id: string, field: 'quantity' | 'skuCode' | 'optionPrice', value: string) => {
-    setOptionCombinationsData((prev) =>
-      prev.map((combo) =>
-        combo.id === id ? { ...combo, [field]: field === 'quantity' ? Number(value) || 0 : value } : combo,
-      ),
-    );
-  };
+  // 옵션 수량 합계를 자동 반영
+  useEffect(() => {
+    const total = optionData.reduce((acc, cur) => acc + (Number(cur.quantity) || 0), 0);
+    setValue('totalQuantity', total);
+  }, [optionData, setValue]);
 
+  // 수량 일괄 수정
   const handleOptionBatchQuantity = () => {
-    if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity >= 0) {
-      setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity: bulkQuantity })));
+    if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity > 0) {
+      const newOption = optionData.map((prev) => ({
+        ...prev,
+        quantity: bulkQuantity,
+      }));
+
+      replace(newOption);
+
       showAlert({
         type: 'success',
         message: `모든 조합의 수량이 ${bulkQuantity}개로 설정되었습니다.`,
@@ -43,12 +56,11 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
   };
 
   const handleOptionBatchSKUCode = () => {
-    setOptionCombinationsData((prev) =>
-      prev.map((combo, index) => ({
-        ...combo,
-        skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
-      })),
-    );
+    const newOption = optionData.map((prev, index) => ({
+      ...prev,
+      skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
+    }));
+    replace(newOption);
     showAlert({
       type: 'success',
       message: `모든 조합의 SKU 코드가 생성되었습니다.`,
@@ -56,7 +68,15 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
   };
 
   const handleOptionReset = () => {
-    setOptionCombinationsData((prev) => prev.map((combo) => ({ ...combo, quantity: 0, skuCode: '' })));
+    const resetOption = optionData.map((prev) => ({
+      ...prev,
+      quantity: 0,
+      skuCode: '',
+      optionPrice: 0,
+    }));
+
+    replace(resetOption);
+
     showAlert({
       type: 'info',
       message: '모든 조합의 수량과 SKU 코드가 초기화되었습니다.',
@@ -68,9 +88,9 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
       {isOptionsConfirmed && optionCombinations.length > 0 && (
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>옵션 조합 관리</CardTitle>
+            <CardTitle className="flex items-center justify-between">옵션 관리</CardTitle>
             <CardDescription>
-              생성된 {optionCombinationsData.length}개의 옵션 조합별로 수량과 SKU 코드를 설정하세요.
+              생성된 {optionData.length}개의 옵션 조합별로 수량과 SKU 코드를 설정하세요.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -79,8 +99,8 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/50 px-4 py-2 font-medium text-sm border-b">옵션 조합 목록</div>
                 <div className="divide-y max-h-[25rem] overflow-y-auto">
-                  {optionCombinationsData.map((combo, index) => (
-                    <div key={combo.id} className="p-4 hover:bg-muted/30">
+                  {optionData.map((combo, index) => (
+                    <div key={combo.id ?? `${combo.combination}-${index}`} className="p-4 hover:bg-muted/30">
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                         {/* 조합 정보 */}
                         <div className="md:col-span-1">
@@ -94,9 +114,9 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                           <Input
                             type="number"
                             placeholder="0"
-                            value={combo.quantity}
-                            onChange={(e) => handleOptionCombinationChange(combo.id, 'quantity', e.target.value)}
                             className="h-8"
+                            value={getValues(`option.${index}.quantity`)}
+                            {...register(`option.${index}.quantity`, { valueAsNumber: true })}
                           />
                         </div>
 
@@ -105,9 +125,9 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                           <Label className="text-xs font-medium">SKU 코드</Label>
                           <Input
                             placeholder="SKU-001"
-                            value={combo.skuCode}
-                            onChange={(e) => handleOptionCombinationChange(combo.id, 'skuCode', e.target.value)}
                             className="h-8"
+                            value={getValues(`option.${index}.skuCode`)}
+                            {...register(`option.${index}.skuCode`)}
                           />
                         </div>
 
@@ -117,9 +137,9 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                           <Input
                             type="number"
                             placeholder="0"
-                            value={combo.skuCode}
-                            onChange={(e) => handleOptionCombinationChange(combo.id, 'optionPrice', e.target.value)}
                             className="h-8"
+                            value={getValues(`option.${index}.optionPrice`)}
+                            {...register(`option.${index}.optionPrice`, { valueAsNumber: true })}
                           />
                         </div>
                       </div>

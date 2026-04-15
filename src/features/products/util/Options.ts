@@ -44,6 +44,7 @@ export const optionCombinations = (validOptions: ProductOption[]) => {
         values: { ...currentCombination },
         quantity: 0,
         skuCode: '',
+        optionPrice: 0,
       });
       return;
     }
@@ -60,6 +61,8 @@ export const optionCombinations = (validOptions: ProductOption[]) => {
   };
 
   generateCombinations(0, {}, '');
+
+  console.log('combinations', combinations);
 
   return combinations;
 };

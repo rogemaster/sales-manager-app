@@ -17,8 +17,7 @@ export interface Product {
   deliveryPrice: number;
   mainImage: string;
   detailPage: string;
-  option1?: string;
-  option2?: string;
+  option?: OptionCombination[];
   totalQuantity: number;
   subOption?: string;
   keyWords?: string[];
@@ -64,6 +63,7 @@ export interface OptionCombination {
   values: { [key: string]: string };
   quantity: number;
   skuCode: string;
+  optionPrice: number;
 }
 
 export interface InfoDisclosureBaseField {

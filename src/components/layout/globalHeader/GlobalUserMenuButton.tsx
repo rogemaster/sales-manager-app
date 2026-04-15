@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import {
   DropdownMenu,
@@ -24,7 +24,7 @@ export const GlobalUserMenuButton = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 h-auto p-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={avatar || "/placeholder.svg"} alt={name} />
+              <AvatarImage src={avatar} alt={name} />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>
             </Avatar>
             <span className="hidden sm:block font-medium">{name}</span>

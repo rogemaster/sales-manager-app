@@ -63,6 +63,7 @@ export const ProductBasicOption = ({ onConfirm, onReset }: Props) => {
     }));
 
     const validOptions = validateOptions(optionData);
+    console.log('validOptions', validOptions);
 
     if (validOptions.length === 0) {
       return showAlert({
