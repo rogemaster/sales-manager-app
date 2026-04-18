@@ -18,8 +18,8 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
   const [bulkQuantity, setBulkQuantity] = useState<number>();
   const { showAlert } = useAlert();
 
-  const { register, setValue, getValues, control } = useFormContext<Product>();
-  const { replace } = useFieldArray({
+  const { register, setValue, control } = useFormContext<Product>();
+  const { replace, fields } = useFieldArray({
     control,
     name: 'option',
   });
@@ -28,17 +28,16 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
 
   // 부모에서 전달된 옵션 조합을 폼 필드로 동기화
   useEffect(() => {
-    // setValue('option', optionCombinations);
     replace(optionCombinations);
   }, [optionCombinations, replace]);
 
-  // 옵션 수량 합계를 자동 반영
-  useEffect(() => {
+  // 수량확정
+  const handleOptionTotalQuantity = () => {
     const total = optionData.reduce((acc, cur) => acc + (Number(cur.quantity) || 0), 0);
     setValue('totalQuantity', total);
-  }, [optionData, setValue]);
+  };
 
-  // 수량 일괄 수정
+  // 수량 일괄설정
   const handleOptionBatchQuantity = () => {
     if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity > 0) {
       const newOption = optionData.map((prev) => ({
@@ -47,6 +46,7 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
       }));
 
       replace(newOption);
+      setValue('totalQuantity', newOption.length * bulkQuantity);
 
       showAlert({
         type: 'success',
@@ -55,6 +55,7 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
     }
   };
 
+  // SKU 일괄생성
   const handleOptionBatchSKUCode = () => {
     const newOption = optionData.map((prev, index) => ({
       ...prev,
@@ -67,6 +68,7 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
     });
   };
 
+  // 전체 초기화
   const handleOptionReset = () => {
     const resetOption = optionData.map((prev) => ({
       ...prev,
@@ -88,7 +90,12 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
       {isOptionsConfirmed && optionCombinations.length > 0 && (
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">옵션 관리</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              옵션 관리
+              <Button size="sm" variant="outline" onClick={handleOptionTotalQuantity}>
+                수량확정
+              </Button>
+            </CardTitle>
             <CardDescription>
               생성된 {optionData.length}개의 옵션 조합별로 수량과 SKU 코드를 설정하세요.
             </CardDescription>
@@ -99,13 +106,13 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
               <div className="border rounded-lg overflow-hidden">
                 <div className="bg-muted/50 px-4 py-2 font-medium text-sm border-b">옵션 조합 목록</div>
                 <div className="divide-y max-h-[25rem] overflow-y-auto">
-                  {optionData.map((combo, index) => (
-                    <div key={combo.id ?? `${combo.combination}-${index}`} className="p-4 hover:bg-muted/30">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="p-4 hover:bg-muted/30">
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                         {/* 조합 정보 */}
                         <div className="md:col-span-1">
                           <div className="font-medium text-sm mb-1">조합 {index + 1}</div>
-                          <div className="text-sm text-muted-foreground">{combo.combination}</div>
+                          <div className="text-sm text-muted-foreground">{field.combination}</div>
                         </div>
 
                         {/* 수량 입력 */}
@@ -115,7 +122,6 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                             type="number"
                             placeholder="0"
                             className="h-8"
-                            value={getValues(`option.${index}.quantity`)}
                             {...register(`option.${index}.quantity`, { valueAsNumber: true })}
                           />
                         </div>
@@ -123,12 +129,7 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                         {/* SKU 코드 입력 */}
                         <div className="space-y-1">
                           <Label className="text-xs font-medium">SKU 코드</Label>
-                          <Input
-                            placeholder="SKU-001"
-                            className="h-8"
-                            value={getValues(`option.${index}.skuCode`)}
-                            {...register(`option.${index}.skuCode`)}
-                          />
+                          <Input placeholder="SKU-001" className="h-8" {...register(`option.${index}.skuCode`)} />
                         </div>
 
                         {/* 옵션별 추가가격 */}
@@ -138,7 +139,6 @@ export const ProductOptionConfirmTable = ({ optionCombinations, isOptionsConfirm
                             type="number"
                             placeholder="0"
                             className="h-8"
-                            value={getValues(`option.${index}.optionPrice`)}
                             {...register(`option.${index}.optionPrice`, { valueAsNumber: true })}
                           />
                         </div>

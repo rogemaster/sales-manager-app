@@ -11,8 +11,13 @@ import { ProductDetailInfo } from './components/ProductDetailInfo';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
+import { useMutation } from '@tanstack/react-query';
+import { createProduct } from '../../api/createProduct';
 
 export const ProductCreateLayout = () => {
+  const { mutate } = useMutation({
+    mutationFn: createProduct,
+  });
   const formData = useForm<Product>();
   const router = useRouter();
 
@@ -22,6 +27,7 @@ export const ProductCreateLayout = () => {
 
   const onSubmit: SubmitHandler<Product> = () => {
     console.log('상품등록 데이터:: ', formData.getValues());
+    mutate(formData.getValues());
   };
 
   return (

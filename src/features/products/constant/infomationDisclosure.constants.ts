@@ -163,7 +163,7 @@ export const PRODUCT_INFO_DISC_CATEGORY = {
   },
 } as const;
 
-export const PRODUCT_INFO_DISC_TYPES: Record<string, ProductInfomationDisclosureType> = {
+export const PRODUCT_INFO_DISC_TYPES = {
   clothing: {
     ...PRODUCT_INFO_DISC_CATEGORY['clothing'],
     fields: [
@@ -1292,4 +1292,4 @@ export const PRODUCT_INFO_DISC_TYPES: Record<string, ProductInfomationDisclosure
       { key: 'asCenter', label: 'A/S 책임자와 전화번호 또는 소비자 상담 관련 전화번호', required: true },
     ],
   },
-};
+} satisfies Record<string, ProductInfomationDisclosureType>;
