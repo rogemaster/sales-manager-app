@@ -1,6 +1,6 @@
-import { ProductInfomationDisclosureType } from '@/features/products/types/product.types';
+import { InfomationDisclosureCategory, InfomationDisclosure } from '@/features/products/types/product.types';
 
-export const PRODUCT_INFO_DISC_CATEGORY = {
+export const PRODUCT_INFO_DISC_CATEGORY: Record<string, InfomationDisclosureCategory> = {
   clothing: {
     id: 'PID-01',
     name: '의류',
@@ -163,7 +163,8 @@ export const PRODUCT_INFO_DISC_CATEGORY = {
   },
 } as const;
 
-export const PRODUCT_INFO_DISC_TYPES = {
+export const PRODUCT_INFO_DISC_TYPES: Record<string, InfomationDisclosure> = {
+  // export const PRODUCT_INFO_DISC_TYPES = {
   clothing: {
     ...PRODUCT_INFO_DISC_CATEGORY['clothing'],
     fields: [
@@ -335,7 +336,7 @@ export const PRODUCT_INFO_DISC_TYPES = {
       },
       { key: 'origin', label: '제조국/원산지', required: true },
       { key: 'size', label: '크기, 형태', required: false },
-      { key: 'powerConsumption', label: '화면사양 (화면크기, 해상도, 화면비율 등)', type: 'textarea', required: false },
+      { key: 'viewSize', label: '화면사양 (화면크기, 해상도, 화면비율 등)', type: 'textarea', required: false },
       { key: 'deliveryCost', label: '추가설치비용', required: false },
       { key: 'qualityAssurance', label: '품질보증기준', required: false },
       { key: 'asCenter', label: 'A/S 책임자와 전화번호', required: true },
@@ -402,7 +403,7 @@ export const PRODUCT_INFO_DISC_TYPES = {
       },
       { key: 'origin', label: '제조국/원산지', required: true },
       { key: 'size', label: '크기, 형태 (실외기 포함)', type: 'textarea', required: false },
-      { key: 'powerConsumption', label: '냉난방면적', required: false },
+      { key: 'coldSize', label: '냉난방면적', required: false },
       { key: 'deliveryCost', label: '추가설치비용', required: false },
       { key: 'qualityAssurance', label: '품질보증기준', required: false },
       { key: 'asCenter', label: 'A/S 책임자와 전화번호', required: true },
@@ -437,7 +438,7 @@ export const PRODUCT_INFO_DISC_TYPES = {
       { key: 'origin', label: '제조국/원산지', required: true },
       { key: 'size', label: '크기, 무게', placeholder: '(무게는 노트북 등 휴대형 기기에 한함)', required: false },
       {
-        key: 'powerConsumption',
+        key: 'mainConsumption',
         label: '주요 사양',
         placeholder: '(컴퓨터와 노트북의 경우 성능, 용량, 운영체제 포함여부 등 / 프린터의 경우 인쇄 속도 등)',
         type: 'textarea',
@@ -501,7 +502,7 @@ export const PRODUCT_INFO_DISC_TYPES = {
       },
       { key: 'origin', label: '제조국/원산지', required: true },
       { key: 'size', label: '크기, 무게', required: false },
-      { key: 'powerConsumption', label: '주요 사양', type: 'textarea', required: false },
+      { key: 'mainConsumption', label: '주요 사양', type: 'textarea', required: false },
       { key: 'qualityAssurance', label: '품질보증기준', required: false },
       { key: 'asCenter', label: 'A/S 책임자와 전화번호', required: true },
     ],
@@ -563,7 +564,7 @@ export const PRODUCT_INFO_DISC_TYPES = {
       },
       { key: 'origin', label: '제조국/원산지', required: true },
       { key: 'size', label: '크기, 무게', required: false },
-      { key: 'powerConsumption', label: '주요 사양', type: 'textarea', required: false },
+      { key: 'mainConsumption', label: '주요 사양', type: 'textarea', required: false },
       { key: 'mapUpdateCost', label: '맵 업데이트 비용 및 무상기간', required: false },
       { key: 'qualityAssurance', label: '품질보증기준', required: false },
       { key: 'asCenter', label: 'A/S 책임자와 전화번호', required: true },
@@ -1292,4 +1293,5 @@ export const PRODUCT_INFO_DISC_TYPES = {
       { key: 'asCenter', label: 'A/S 책임자와 전화번호 또는 소비자 상담 관련 전화번호', required: true },
     ],
   },
-} satisfies Record<string, ProductInfomationDisclosureType>;
+  // } satisfies Record<string, ProductInfomationDisclosureType>;
+};

@@ -46,6 +46,10 @@ export const ProductCreateBasicinfo = () => {
     }
   };
 
+  const handleSelectCategory = (id: string) => {
+    setValue('categoryId', id);
+  };
+
   return (
     // 기본 정보
     <Card>
@@ -75,7 +79,6 @@ export const ProductCreateBasicinfo = () => {
                 onChange={(e) => setKeywordInput(e.target.value)}
                 placeholder="키워드를 입력하고 Enter를 누르세요"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               <Button type="button" onClick={handleAddKeyword} size="sm">
                 추가
               </Button>
@@ -99,10 +102,11 @@ export const ProductCreateBasicinfo = () => {
           label="카테고리 *"
           divClassName="space-y-2"
           value={getValues('categoryId')}
-          onValueChange={(id) => setValue('categoryId', id)}
+          onValueChange={handleSelectCategory}
           options={MOCK_CATEGORY_DATA}
           placeholder="카테고리를 선택하세요."
         />
+        {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
       </CardContent>
     </Card>
   );

@@ -18,6 +18,11 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
   {
     productId: 'smp000002',
@@ -35,6 +40,11 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
   {
     productId: 'smp000003',
@@ -52,6 +62,11 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
   {
     productId: 'smp000004',
@@ -69,6 +84,11 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
   {
     productId: 'smp000005',
@@ -86,6 +106,11 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
   {
     productId: 'smp000006',
@@ -103,5 +128,10 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    infomationDisclosure: {
+      id: '',
+      name: '',
+      fields: {},
+    },
   },
 ];

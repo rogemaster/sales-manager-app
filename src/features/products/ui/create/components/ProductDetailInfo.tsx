@@ -22,6 +22,7 @@ export const ProductDetailInfo = () => {
           rows={10}
           className="resize-none"
         />
+        {errors.detailPage && <p className="text-red-500 text-sm">{errors.detailPage.message}</p>}
       </CardContent>
     </Card>
   );

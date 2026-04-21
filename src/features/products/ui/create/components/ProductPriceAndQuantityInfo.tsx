@@ -25,7 +25,6 @@ export const ProductPriceAndQuantityInfo = () => {
   };
 
   const handelDeliveryType = (type: string) => {
-    console.log('배송타입', type);
     setValue('deliveryType', type);
     setDeliveryType(type);
   };
@@ -46,14 +45,14 @@ export const ProductPriceAndQuantityInfo = () => {
           <div className="space-y-2">
             <Label htmlFor="salePrice">판매가 *</Label>
             <Input {...register('price', { required: '판매가를 입력해 주세요.' })} placeholder="0" />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+            {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="totalQuantity">총수량 *</Label>
           <Input {...register('totalQuantity', { required: '총 수량을 입력해 주세요.' })} placeholder="0" />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+          {errors.totalQuantity && <p className="text-red-500 text-sm">{errors.totalQuantity.message}</p>}
         </div>
         {/* 배송 정보 */}
         <div className="space-y-4 pt-4 border-t">
@@ -72,7 +71,7 @@ export const ProductPriceAndQuantityInfo = () => {
             <div className="space-y-2">
               <Label htmlFor="deliveryPrice">배송비 *</Label>
               <Input {...register('deliveryPrice', { required: '배송비를 입력해주세요.' })} placeholder="0" />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              {errors.deliveryPrice && <p className="text-red-500 text-sm">{errors.deliveryPrice.message}</p>}
             </div>
           )}
         </div>
