@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Product } from '@/features/products/types/product.types';
+import { Product, ProductStateType } from '@/features/products/types/product.types';
 import { X } from 'lucide-react';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import { FilterSelect } from '@/components/common/FilterSelect';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 
 export const ProductCreateBasicinfo = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -48,6 +49,10 @@ export const ProductCreateBasicinfo = () => {
 
   const handleSelectCategory = (id: string) => {
     setValue('categoryId', id);
+  };
+
+  const handleSelectStatus = (id: string) => {
+    setValue('state', id as ProductStateType);
   };
 
   return (
@@ -98,15 +103,29 @@ export const ProductCreateBasicinfo = () => {
           </div>
         </div>
 
-        <FilterSelect
-          label="카테고리 *"
-          divClassName="space-y-2"
-          value={getValues('categoryId')}
-          onValueChange={handleSelectCategory}
-          options={MOCK_CATEGORY_DATA}
-          placeholder="카테고리를 선택하세요."
-        />
-        {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
+        <div className="grid gap-4 md:grid-cols-2">
+          <FilterSelect
+            label="카테고리 *"
+            divClassName="space-y-2"
+            triggerClassName="w-full"
+            value={getValues('categoryId')}
+            onValueChange={handleSelectCategory}
+            options={MOCK_CATEGORY_DATA}
+            placeholder="카테고리를 선택하세요."
+          />
+          {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
+
+          <FilterSelect
+            label="판매상태 *"
+            divClassName="space-y-2"
+            triggerClassName="w-full"
+            value={getValues('state')}
+            onValueChange={handleSelectStatus}
+            options={PRODUCT_STATUS}
+            placeholder="판매상태를 선택하세요."
+          />
+          {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
+        </div>
       </CardContent>
     </Card>
   );

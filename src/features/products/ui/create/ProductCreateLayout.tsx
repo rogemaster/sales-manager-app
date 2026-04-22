@@ -13,20 +13,39 @@ import { Save } from 'lucide-react';
 import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
 import { useMutation } from '@tanstack/react-query';
 import { createProduct } from '../../api/createProduct';
+import { useAlert } from '@/hooks/useAlert';
 
 export const ProductCreateLayout = () => {
-  const { mutate } = useMutation({
-    mutationFn: createProduct,
-  });
+  const { showAlert } = useAlert();
   const formData = useForm<Product>();
   const router = useRouter();
+
+  const { mutate } = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      router.push('/products/list');
+    },
+    onError: () => {
+      showAlert({
+        type: 'error',
+        message: '상품등록 실패',
+      });
+    },
+  });
 
   const onBack = () => {
     router.back();
   };
 
   const onSubmit: SubmitHandler<Product> = () => {
-    mutate(formData.getValues());
+    if (formData.getValues('mainImage') == null) {
+      formData.setError('mainImage', {
+        type: 'manual',
+        message: '메인이미지를 선택해 주세요.',
+      });
+    } else {
+      mutate(formData.getValues());
+    }
   };
 
   return (

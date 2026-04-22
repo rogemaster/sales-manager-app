@@ -1,20 +1,48 @@
-import { Button } from '@/components/ui/button';
+import React, { ChangeEvent, useRef, useState } from 'react';
+import { acceptImage } from '@/constant/accept.content';
+import { Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload } from 'lucide-react';
-import { ChangeEvent, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useFormContext } from 'react-hook-form';
+import { Product } from '@/features/products/types/product.types';
 
 export const ProductMainImageInfo = () => {
-  const [mainImages, setMainImages] = useState<File[]>([]);
+  const [mainImages, setMainImages] = useState<{ dataUrl: string; file: File } | null>(null);
+  const handleFileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    setValue,
+    formState: { errors },
+    clearErrors,
+  } = useFormContext<Product>();
+
+  const handleClick = () => {
+    if (handleFileInputRef.current) {
+      handleFileInputRef.current.click();
+    }
+  };
 
   // 이미지 업로드 처리
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    setMainImages((prev) => [...prev, ...files]);
+    if (event.target.files) {
+      Array.from(event.target.files).map((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setMainImages({
+            dataUrl: reader.result as string,
+            file,
+          });
+        };
+        reader.readAsDataURL(file);
+        setValue('mainImage', file);
+        clearErrors('mainImage');
+      });
+    }
   };
 
   // 이미지 삭제
-  const handleRemoveImage = (index: number) => {
-    setMainImages((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = () => {
+    setMainImages(null);
   };
 
   return (
@@ -30,43 +58,34 @@ export const ProductMainImageInfo = () => {
             <p className="text-sm text-muted-foreground mb-2">이미지를 드래그하거나 클릭하여 업로드하세요</p>
             <input
               type="file"
-              accept="image/*"
-              multiple
+              accept={acceptImage}
               onChange={handleImageUpload}
               className="hidden"
-              id="image-upload"
+              ref={handleFileInputRef}
             />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById('image-upload')?.click()}
-            >
+            <Button type="button" className="cursor-pointer" variant="outline" size="sm" onClick={handleClick}>
               파일 선택
             </Button>
           </div>
 
-          {mainImages.length > 0 && (
+          {mainImages && (
             <div className="grid grid-cols-2 gap-4">
-              {mainImages.map((file, index) => (
-                <div key={index} className="relative">
-                  <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                    <span className="text-sm text-muted-foreground">{file.name}</span>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
+              <div className="relative">
+                <img src={mainImages?.dataUrl} />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                  onClick={handleRemoveImage}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
+        {errors.mainImage && <p className="text-red-500 text-sm">{errors.mainImage.message}</p>}
       </CardContent>
     </Card>
   );

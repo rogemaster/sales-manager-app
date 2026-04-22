@@ -8,7 +8,7 @@ export interface Product {
   state: ProductStateType;
   deliveryType: string;
   deliveryPrice: number;
-  mainImage: string;
+  mainImage: string | File;
   detailPage: string;
   option?: OptionCombination[];
   totalQuantity: number;
