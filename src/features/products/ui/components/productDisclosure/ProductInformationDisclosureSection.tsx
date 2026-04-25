@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { PRODUCT_INFO_DISC_CATEGORY, PRODUCT_INFO_DISC_TYPES } from '../../../constant/infomationDisclosure.constants';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,22 +9,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Product } from '@/features/products/types/product.types';
 
-type ProductInfoType = typeof PRODUCT_INFO_DISC_TYPES;
-type ProductInfoKey = keyof ProductInfoType;
-
 export const ProductInformationDisclosureSection = () => {
-  const [selectedKey, setSelectedKey] = useState<ProductInfoKey>('');
-
   const {
     register,
     setValue,
     formState: { errors },
+    watch,
   } = useFormContext<Product>();
+
+  const selectedKey = watch('infomationDisclosure.key');
 
   const handleProductInfoTypeChange = (value: string | undefined) => {
     if (value) {
       const infoDisc = PRODUCT_INFO_DISC_CATEGORY[value];
-      setSelectedKey(value);
+      setValue('infomationDisclosure.key', value);
       setValue('infomationDisclosure.id', infoDisc.id);
       setValue('infomationDisclosure.name', infoDisc.name);
     }

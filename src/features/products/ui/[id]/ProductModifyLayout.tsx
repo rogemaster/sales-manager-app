@@ -15,9 +15,10 @@ type Props = {
 };
 
 export const ProductModifyLayout = ({ productId }: Props) => {
+  const router = useRouter();
+
   const formData = useForm<Product>();
   const { showAlert } = useAlert();
-  const router = useRouter();
 
   const { data: queryData, isSuccess } = useQuery({
     queryKey: ['productId', productId],

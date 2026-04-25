@@ -7,6 +7,7 @@ import { getCategoryName } from '@/lib/utils';
 import { LIST_TABLE_HEAD } from '@/features/products/constant/table.constants';
 import { ProductStatusBadge } from '@/features/products/ui/components/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';
+import Link from 'next/link';
 
 type props = {
   products: Product[];
@@ -56,7 +57,9 @@ export const ProductTableBody = ({ products }: props) => {
                 />
               </TableCell>
               <TableCell className="font-mono text-sm text-muted-foreground">{product.productId}</TableCell>
-              <TableCell className="font-medium">{product.name}</TableCell>
+              <TableCell className="font-medium">
+                <Link href={`/products/${product.productId}`}>{product.name}</Link>
+              </TableCell>
               <TableCell>{getCategoryName(product.categoryId)}</TableCell>
               <TableCell>{product.price.toLocaleString()}원</TableCell>
               <TableCell>{<ProductStatusBadge status={product.state} />}</TableCell>

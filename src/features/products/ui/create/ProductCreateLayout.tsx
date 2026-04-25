@@ -16,7 +16,13 @@ export const ProductCreateLayout = () => {
   const { mutate } = useMutation({
     mutationFn: createProduct,
     onSuccess: () => {
-      router.push('/products/list');
+      showAlert({
+        type: 'success',
+        message: '상품등록 완료',
+        onConfirm: () => {
+          router.push('/products/list');
+        },
+      });
     },
     onError: () => {
       showAlert({

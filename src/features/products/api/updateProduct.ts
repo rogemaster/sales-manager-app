@@ -1,7 +1,7 @@
 import { Product } from '../types/product.types';
 
 export const updateProduct = async (productId: string, data: Product) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/product/${productId}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${productId}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
   });

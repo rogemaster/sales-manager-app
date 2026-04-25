@@ -31,12 +31,37 @@ export const handlers = [
   }),
 
   // 상품등록
-  http.post(`${baseUrl}/api/product/create`, async ({ request }) => {
+  http.post(`${baseUrl}/api/products/create`, async ({ request }) => {
     const data = (await request.json()) as Product;
     const newProduct = createMockProduct(data);
 
     MOCK_PRODUCT_DATA.push(newProduct);
 
     return HttpResponse.json(newProduct);
+  }),
+
+  // 상품조회
+  http.get(`${baseUrl}/api/products/:productId`, async ({ params }) => {
+    const { productId } = params;
+    const data = MOCK_PRODUCT_DATA.find((item) => item.productId === productId);
+    return HttpResponse.json(data);
+  }),
+
+  // 상품수정
+  http.patch(`${baseUrl}/api/products/:productId`, async ({ request, params }) => {
+    const { productId } = params;
+    const update = (await request.json()) as Product;
+    const findIndex = MOCK_PRODUCT_DATA.findIndex((item) => item.productId === productId);
+
+    if (findIndex !== -1) {
+      MOCK_PRODUCT_DATA[findIndex] = {
+        ...MOCK_PRODUCT_DATA[findIndex],
+        ...update,
+      };
+    }
+
+    console.log('업데이트', MOCK_PRODUCT_DATA[findIndex]);
+
+    return HttpResponse.json(MOCK_PRODUCT_DATA[findIndex]);
   }),
 ];

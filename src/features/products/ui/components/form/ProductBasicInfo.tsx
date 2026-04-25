@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 
-export const ProductCreateBasicinfo = () => {
+export const ProductBasicinfo = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>('');
 

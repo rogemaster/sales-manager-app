@@ -82,6 +82,7 @@ export interface InfomationDisclosure {
 export type InfomationDisclosureCategory = Pick<InfomationDisclosure, 'id' | 'name'>;
 
 export type ProductInfomationDisclosure = {
+  key: string;
   id: string;
   name: string;
   fields: {
