@@ -4,6 +4,7 @@ import { getMockProducts } from './utils/getProducts';
 import { Product, ProductSearch } from '@/features/products/types/product.types';
 import { createMockProduct } from './utils/createProduct';
 import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
+import { getMockHomeStats, getMockRecentProducts } from './utils/getHomeData';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -22,6 +23,16 @@ export const handlers = [
         'Set-Cookie': 'connect.sid=;HttpOnly;Path=/;Max-Age=0',
       },
     });
+  }),
+
+  // 홈 통계
+  http.get(`${baseUrl}/api/home/stats`, () => {
+    return HttpResponse.json(getMockHomeStats());
+  }),
+
+  // 홈 최근 등록 상품
+  http.get(`${baseUrl}/api/home/recent-products`, () => {
+    return HttpResponse.json(getMockRecentProducts());
   }),
 
   // 상품목록조회

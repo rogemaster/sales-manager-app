@@ -2,12 +2,12 @@ import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
+  const { pathname } = request.nextUrl;
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  if (url.pathname === '/') {
-    url.pathname = '/login';
-    return NextResponse.rewrite(url);
+  if (pathname === '/') {
+    const destination = token ? '/home' : '/login';
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   if (!token) {

@@ -9,13 +9,9 @@ import { ProductDetailInfo } from './form/ProductDetailInfo';
 import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
-import { Product } from '../../types/product.types';
 
 export const ProductForm = () => {
   const router = useRouter();
-
-  const { getValues } = useFormContext<Product>();
 
   const onBack = () => {
     router.back();
@@ -42,7 +38,7 @@ export const ProductForm = () => {
       </div>
 
       {/* 상품정보고시 */}
-      <ProductInformationDisclosureSection infoKey={getValues('infomationDisclosure.key')} />
+      <ProductInformationDisclosureSection />
 
       {/* 저장 버튼 */}
       <div className="flex justify-end gap-4">

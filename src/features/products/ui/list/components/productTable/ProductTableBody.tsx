@@ -5,7 +5,7 @@ import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/compon
 import { Table } from '@/components/ui/table';
 import { getCategoryName } from '@/lib/utils';
 import { LIST_TABLE_HEAD } from '@/features/products/constant/table.constants';
-import { ProductStatusBadge } from '@/features/products/ui/components/ProductStatusBadge';
+import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';
 import Link from 'next/link';
 
