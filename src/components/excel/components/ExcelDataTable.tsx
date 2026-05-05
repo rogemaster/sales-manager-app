@@ -18,9 +18,9 @@ const ExcelDataTableInner = ({ tableColumns, uploadedData }: Props) => {
         <TableBody>
           {uploadedData.map((row, rowIndex) => (
             <TableRow key={rowIndex} className={Array.isArray(row.error) && row.error.length > 0 ? 'bg-red-50' : ''}>
-              {tableColumns.map((column, colIndex) => (
+              {tableColumns.map((column) => (
                 <TableCell key={column.key} className={column.cellClassName}>
-                  {column.accessor(row, colIndex)}
+                  {column.accessor(row, rowIndex)}
                 </TableCell>
               ))}
             </TableRow>

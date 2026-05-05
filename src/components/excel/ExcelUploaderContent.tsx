@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
@@ -20,7 +20,14 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { showAlert } = useAlert();
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, []);
 
   const setExcelData = useSetAtom(setExcelDataAtom);
 
@@ -31,10 +38,10 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
 
     try {
       // 진행률 시뮬레이션
-      const progressInterval = setInterval(() => {
+      progressIntervalRef.current = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
-            clearInterval(progressInterval);
+            clearInterval(progressIntervalRef.current!);
             return 90;
           }
           return prev + 10;
@@ -43,7 +50,8 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
 
       const result = await processExcelUpload(event, fileTemplateInfo);
 
-      clearInterval(progressInterval);
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
       setUploadProgress(100);
 
       // 결과에 따른 alert 표시 및 상태 업데이트
@@ -69,9 +77,10 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
       // 3. 필수값이 없는 엑셀 미리보기는 가능. 최종 저장 불가
       if (result.success && result.errorType === 'VALIDATE_ERROR' && result.data) {
         const mergedErrorsData = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
+        const errorRowCount = new Set(mergedErrorsData.map((e) => e.row)).size;
         showAlert({
           type: 'error',
-          message: mergedErrorsData[0].message!,
+          message: `${errorRowCount}개 행에 유효성 오류가 있습니다. 오류 내용을 확인하세요.`,
         });
 
         const mergedExcelData = result.data.map((item, index) => {

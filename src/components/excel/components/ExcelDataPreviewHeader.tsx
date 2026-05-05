@@ -58,7 +58,7 @@ export const ExcelDataPreviewHeader = ({
             <X className="h-4 w-4 mr-2" />
             초기화
           </Button>
-          <Button onClick={handleSaveData} disabled={validCount > 0}>
+          <Button onClick={handleSaveData} disabled={validCount === 0}>
             <CheckCircle className="h-4 w-4 mr-2" />
             저장 ({validCount}개)
           </Button>

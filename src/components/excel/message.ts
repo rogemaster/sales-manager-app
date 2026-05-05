@@ -26,17 +26,13 @@ export function excelMissingFieldErrorCodeToMessages(errors: ValidationError[]) 
 }
 
 export function excelValidErrorsCodeToMessages(errors: ValidationError[]): ValidationError[] {
-  const mergedErrors = errors
-    .map((item) => {
-      if (item.code === 'EMPTY_VALUE') {
-        return {
-          ...item,
-          message: `Row ${item.row}, [${item.header}] 값이 비어 있습니다.`,
-        };
-      }
-      return item;
-    })
-    .filter((item): item is ValidationError => item !== undefined);
-
-  return mergedErrors;
+  return errors.map((item) => {
+    if (item.code === 'EMPTY_VALUE') {
+      return { ...item, message: `Row ${item.row}, [${item.header}] 값이 비어 있습니다.` };
+    }
+    if (item.code === 'MISSING_FIELD') {
+      return { ...item, message: `Row ${item.row}, [${item.header}] 필드가 존재하지 않습니다.` };
+    }
+    return item;
+  });
 }

@@ -34,7 +34,7 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   {
     key: 'row',
     headerTitle: '행',
-    accessor: (_, index) => index && index + 1,
+    accessor: (_, index) => (index !== undefined ? index + 1 : ''),
   },
   {
     key: 'state',

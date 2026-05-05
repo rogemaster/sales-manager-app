@@ -25,8 +25,12 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
   const validCount = totalCount - errorDatas.length || 0;
   const errorCount = errorDatas.length || 0;
 
-  const handleExcelSaveData = () => {
-    strategy.processData(uploadedData);
+  const handleExcelSaveData = async () => {
+    try {
+      await strategy.processData(uploadedData);
+    } catch (error) {
+      console.error('저장 중 오류가 발생했습니다.', error);
+    }
   };
 
   return (
