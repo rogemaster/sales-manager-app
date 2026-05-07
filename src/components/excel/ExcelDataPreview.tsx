@@ -17,17 +17,18 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
 
   const strategy = getExcelSaveStrategy(saveType);
 
-  // Property 'length' does not exist on type 'string | number | boolean | ValidationError[]'.
-  // Property 'length' does not exist on type 'number'.
   const errorDatas = uploadedData.filter((data) => Array.isArray(data['error']) && data['error'].length > 0);
 
-  const totalCount = uploadedData ? uploadedData.length : 0;
-  const validCount = totalCount - errorDatas.length || 0;
-  const errorCount = errorDatas.length || 0;
+  const totalCount = uploadedData.length;
+  const validCount = totalCount - errorDatas.length;
+  const errorCount = errorDatas.length;
 
   const handleExcelSaveData = async () => {
     try {
-      await strategy.processData(uploadedData);
+      const validData = uploadedData.filter(
+        (row) => !Array.isArray(row['error']) || row['error'].length === 0,
+      );
+      await strategy(validData);
     } catch (error) {
       console.error('저장 중 오류가 발생했습니다.', error);
     }

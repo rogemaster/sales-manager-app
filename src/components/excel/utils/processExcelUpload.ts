@@ -36,6 +36,15 @@ export async function processExcelUpload(
     };
   }
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_FILE_SIZE) {
+    return {
+      success: false,
+      errorType: 'UPLOAD_ERROR',
+      uploadError: 'FILE_TOO_LARGE',
+    };
+  }
+
   try {
     const arrayBuffer = await file.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);

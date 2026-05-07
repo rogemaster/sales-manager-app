@@ -48,7 +48,7 @@ export type ExcelRowType = { [key: string]: string | number | boolean | null | u
 
 export type ExcelRowWithErrors = { [key: string]: string | number | boolean | null | undefined | ValidationError[] };
 
-export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'PROCESSING_ERROR';
+export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'FILE_TOO_LARGE' | 'PROCESSING_ERROR';
 
 export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE';
 

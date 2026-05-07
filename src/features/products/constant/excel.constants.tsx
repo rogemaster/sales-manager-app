@@ -39,7 +39,7 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   {
     key: 'state',
     headerTitle: '상태',
-    accessor: (r) => (Array.isArray(r.error) && r.error.length === 0 ? '정상' : '오류'),
+    accessor: (r) => (Array.isArray(r.error) && r.error.length > 0 ? '오류' : '정상'),
   },
   {
     key: 'customerCode',
@@ -71,11 +71,12 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
     key: 'error',
     headerTitle: '오류 내용',
     accessor: (r) =>
-      Array.isArray(r.error) &&
-      r.error.map((e, i) => (
-        <div className="text-sm text-red-600" key={i}>
-          • {e.message}
-        </div>
-      )),
+      Array.isArray(r.error)
+        ? r.error.map((e, i) => (
+            <div className="text-sm text-red-600" key={i}>
+              • {e.message}
+            </div>
+          ))
+        : null,
   },
 ];

@@ -16,12 +16,6 @@ export const ExcelDownloader = ({
 }: ExcelDownloaderProps) => {
   const { downloadTemplate } = excelDownload(templateHeaders || [], templateName);
 
-  const handleDownload = () => {
-    if (templateInfo) {
-      downloadTemplate(); // 사용 화면별 이름 주입
-    }
-  };
-
   return (
     <Card>
       <ExcelHeader
@@ -31,9 +25,9 @@ export const ExcelDownloader = ({
       />
       <CardContent>
         {/* 엑셀 양식 다운로드 버튼 */}
-        <ExcelTemplateButton onClick={handleDownload} />
+        <ExcelTemplateButton onClick={downloadTemplate} />
         {isTemplateInfo && templateInfo && (
-          <ExcelTemplateInfo templateTitle={templateInfo?.templateTitle} template={templateInfo?.template} />
+          <ExcelTemplateInfo templateTitle={templateInfo.templateTitle} template={templateInfo.template} />
         )}
       </CardContent>
     </Card>

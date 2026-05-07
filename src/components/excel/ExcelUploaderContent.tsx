@@ -52,10 +52,31 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
 
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
+
+      // 파일 자체 오류 - 100% 없이 즉시 에러 표시
+      if (!result.success && result.errorType === 'UPLOAD_ERROR') {
+        const message = excelUploadErrorCodeToMessage(result.uploadError!);
+        showAlert({
+          type: 'error',
+          message,
+        });
+        return;
+      }
+
+      // 잘못된 양식 - 필수 컬럼이 없는 경우, 미리보기 불가
+      if (!result.success && result.errorType === 'VALIDATE_ERROR') {
+        showAlert({
+          type: 'error',
+          message: '엑셀 양식이 올바르지 않습니다. 제공된 양식을 다운로드하여 사용해 주세요.',
+        });
+        return;
+      }
+
       setUploadProgress(100);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // 결과에 따른 alert 표시 및 상태 업데이트
-      // 1. 정상적 엑셀업로드
+      // 정상적 엑셀업로드
       if (result.success && !result.errorType && result.data) {
         showAlert({
           type: 'success',
@@ -65,16 +86,7 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
         setExcelData(result.data);
       }
 
-      // 2. 필수 필드가 없어 업로드 에러
-      if (!result.success && result.errorType === 'UPLOAD_ERROR') {
-        const message = excelUploadErrorCodeToMessage(result.uploadError!);
-        showAlert({
-          type: 'error',
-          message,
-        });
-      }
-
-      // 3. 필수값이 없는 엑셀 미리보기는 가능. 최종 저장 불가
+      // 필수값이 없는 엑셀 미리보기는 가능. 최종 저장 불가
       if (result.success && result.errorType === 'VALIDATE_ERROR' && result.data) {
         const mergedErrorsData = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
         const errorRowCount = new Set(mergedErrorsData.map((e) => e.row)).size;
