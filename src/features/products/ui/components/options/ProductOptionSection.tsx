@@ -1,18 +1,16 @@
+'use client';
+
 import { useState } from 'react';
-import { ProductBasicOption } from './ProductBasicOption';
-import { ProductSubOption } from './ProductSubOption';
+import { ProductOptionCard } from './ProductOptionCard';
 import { OptionCombination, Product } from '@/features/products/types/product.types';
 import { ProductOptionConfirmTable } from './ProductOptionConfirmTable';
 import { useFormContext } from 'react-hook-form';
 
-type Props = {
-  onConfirm?: (combinations: OptionCombination[]) => void;
-  onReset?: () => void;
-};
-
-export const ProductOptionSection = ({ onConfirm, onReset }: Props) => {
+export const ProductOptionSection = () => {
   const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
+  const [isSubOptionsConfirmed, setIsSubOptionsConfirmed] = useState(false);
   const [optionCombinationsData, setOptionCombinationsData] = useState<OptionCombination[]>([]);
+  const [subOptionCombinationsData, setSubOptionCombinationsData] = useState<OptionCombination[]>([]);
 
   const { setValue } = useFormContext<Product>();
 
@@ -20,26 +18,38 @@ export const ProductOptionSection = ({ onConfirm, onReset }: Props) => {
     <>
       <div className="grid gap-6 lg:grid-cols-2">
         {/* 기본 옵션 */}
-        <ProductBasicOption
+        <ProductOptionCard
+          type="basic"
           onConfirm={(combinations) => {
             setOptionCombinationsData(combinations);
             setIsOptionsConfirmed(true);
-            onConfirm?.(combinations);
             setValue('option', combinations);
           }}
           onReset={() => {
             setOptionCombinationsData([]);
             setIsOptionsConfirmed(false);
-            onReset?.();
             setValue('option', []);
           }}
         />
         {/* 추가 옵션 */}
-        <ProductSubOption />
-
-        {/* 조합된 옵션 테이블 */}
+        <ProductOptionCard
+          type="sub"
+          onConfirm={(combinations) => {
+            setSubOptionCombinationsData(combinations);
+            setIsSubOptionsConfirmed(true);
+            setValue('subOption', combinations);
+          }}
+          onReset={() => {
+            setSubOptionCombinationsData([]);
+            setIsSubOptionsConfirmed(false);
+            setValue('subOption', []);
+          }}
+        />
       </div>
-      <ProductOptionConfirmTable isOptionsConfirmed={isOptionsConfirmed} optionCombinations={optionCombinationsData} />
+      {/* 기본 옵션 테이블 */}
+      <ProductOptionConfirmTable name="option" isOptionsConfirmed={isOptionsConfirmed} optionCombinations={optionCombinationsData} />
+      {/* 추가 옵션 테이블 */}
+      <ProductOptionConfirmTable name="subOption" isOptionsConfirmed={isSubOptionsConfirmed} optionCombinations={subOptionCombinationsData} />
     </>
   );
 };

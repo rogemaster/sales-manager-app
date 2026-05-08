@@ -71,12 +71,11 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
     key: 'error',
     headerTitle: '오류 내용',
     accessor: (r) =>
-      Array.isArray(r.error)
-        ? r.error.map((e, i) => (
-            <div className="text-sm text-red-600" key={i}>
-              • {e.message}
-            </div>
-          ))
-        : null,
+      Array.isArray(r.error) &&
+      r.error.map((e, i) => (
+        <div className="text-sm text-red-600" key={i}>
+          • {e.message}
+        </div>
+      )),
   },
 ];

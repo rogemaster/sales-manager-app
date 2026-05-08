@@ -1,8 +1,9 @@
-import { Product } from '../types/product.types';
+import { CreateProductRequest } from '../types/product.types';
 
-export const createProduct = async (data: Product) => {
+export const createProduct = async (data: CreateProductRequest) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/create`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 

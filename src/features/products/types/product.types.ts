@@ -12,11 +12,11 @@ export interface Product {
   detailPage: string;
   option?: OptionCombination[];
   totalQuantity: number;
-  subOption?: string;
+  subOption?: OptionCombination[];
   keyWords?: string[];
   createDate: Date;
   updateDate: Date;
-  infomationDisclosure: ProductInfomationDisclosure;
+  informationDisclosure: ProductInformationDisclosure;
 }
 
 export interface ProductSaleState {
@@ -44,18 +44,21 @@ export interface ProductSearch {
   searchValue: string;
 }
 
+// 기본옵션
 export interface ProductOption {
   id: string;
   name: string;
   values: string[];
 }
 
+// 옵션 입력 상태 (확정 전 comma-separated string)
 export interface ProductOptionDraft {
   id: string;
   name: string;
   values: string;
 }
 
+// 옵션 조합
 export interface OptionCombination {
   id: string;
   combination: string;
@@ -73,15 +76,17 @@ export interface InfoDisclosureField {
   required: boolean;
 }
 
-export interface InfomationDisclosure {
+export interface InformationDisclosure {
   id: string;
   name: string;
   fields: InfoDisclosureField[];
 }
 
-export type InfomationDisclosureCategory = Pick<InfomationDisclosure, 'id' | 'name'>;
+export type InformationDisclosureCategory = Pick<InformationDisclosure, 'id' | 'name'>;
 
-export type ProductInfomationDisclosure = {
+export type CreateProductRequest = Omit<Product, 'productId' | 'createDate' | 'updateDate'>;
+
+export type ProductInformationDisclosure = {
   key: string;
   id: string;
   name: string;

@@ -9,8 +9,6 @@ import { OptionCombination, ProductOption } from '../types/product.types';
 export const validateOptions = (options: ProductOption[]) => {
   if (options.length === 0) return [];
 
-  // 1) 옵션명 공백 제거 및 비어있지 않은지 확인
-  // 2) 값 배열 내부도 공백 제거 및 비어있는 값 제거
   const normalizedOptions = options.map((opt) => ({
     ...opt,
     name: opt.name.trim(),
@@ -29,7 +27,6 @@ export const validateOptions = (options: ProductOption[]) => {
  * @returns combinations 조합완료된 옵션데이터
  */
 export const optionCombinations = (validOptions: ProductOption[]) => {
-  // 조합 생성 (카르테시안 곱)
   const combinations: OptionCombination[] = [];
 
   const generateCombinations = (
@@ -61,8 +58,6 @@ export const optionCombinations = (validOptions: ProductOption[]) => {
   };
 
   generateCombinations(0, {}, '');
-
-  console.log('combinations', combinations);
 
   return combinations;
 };

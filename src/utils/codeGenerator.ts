@@ -6,6 +6,11 @@ export const generatorProductCode = () => {
   return `prodc_${uuidv4().split('-')[0]}`;
 };
 
+// 옵션
+export const generatorOptionId = () => {
+  return `opt_${uuidv4().split('-')[0]}`;
+};
+
 // 주문
 export const generatorOrderCode = () => {
   const uuid = uuidv4().split('-');

@@ -32,14 +32,14 @@ export const ProductCreateLayout = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<Product> = () => {
-    if (formData.getValues('mainImage') == null) {
+  const onSubmit: SubmitHandler<Product> = (data) => {
+    if (!data.mainImage) {
       formData.setError('mainImage', {
         type: 'manual',
         message: '메인이미지를 선택해 주세요.',
       });
     } else {
-      mutate(formData.getValues());
+      mutate(data);
     }
   };
 

@@ -32,7 +32,7 @@ export const OptionContent = ({
               {/* 옵션명 설정 Input */}
               <div className="flex items-center justify-between">
                 <Input
-                  placeholder={type === 'basic' ? '옵션 (예: 색상)' : '추가옵션 (예: 추가제품)'}
+                  placeholder={type === 'basic' ? '옵션명 (예: 색상)' : '추가 옵션명 (예: 추가제품)'}
                   value={option.name}
                   onChange={(e) => onOptionNameChange(option.id, e.target.value)}
                   className="flex-1 mr-2"
@@ -63,7 +63,7 @@ export const OptionContent = ({
       ) : (
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            설정된 {type === 'basic' ? '옵션' : '추가옵션'}: {/* 예) 색상(2개), 사이즈(2개) */}
+            설정된 {type === 'basic' ? '옵션' : '추가옵션'}
             {confirmedOptions && confirmedOptions.map((opt) => `${opt.name}(${opt.values.length}개)`).join(', ')}
           </div>
         </div>

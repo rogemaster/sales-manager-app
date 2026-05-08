@@ -1,6 +1,6 @@
-import { InfomationDisclosureCategory, InfomationDisclosure } from '@/features/products/types/product.types';
+import { InformationDisclosureCategory, InformationDisclosure } from '@/features/products/types/product.types';
 
-export const PRODUCT_INFO_DISC_CATEGORY: Record<string, InfomationDisclosureCategory> = {
+export const PRODUCT_INFO_DISC_CATEGORY: Record<string, InformationDisclosureCategory> = {
   clothing: {
     id: 'PID-01',
     name: '의류',
@@ -163,8 +163,7 @@ export const PRODUCT_INFO_DISC_CATEGORY: Record<string, InfomationDisclosureCate
   },
 } as const;
 
-export const PRODUCT_INFO_DISC_TYPES: Record<string, InfomationDisclosure> = {
-  // export const PRODUCT_INFO_DISC_TYPES = {
+export const PRODUCT_INFO_DISC_TYPES: Record<string, InformationDisclosure> = {
   clothing: {
     ...PRODUCT_INFO_DISC_CATEGORY['clothing'],
     fields: [
@@ -1293,5 +1292,4 @@ export const PRODUCT_INFO_DISC_TYPES: Record<string, InfomationDisclosure> = {
       { key: 'asCenter', label: 'A/S 책임자와 전화번호 또는 소비자 상담 관련 전화번호', required: true },
     ],
   },
-  // } satisfies Record<string, ProductInfomationDisclosureType>;
 };

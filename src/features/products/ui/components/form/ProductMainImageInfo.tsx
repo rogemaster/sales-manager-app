@@ -1,4 +1,6 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+'use client';
+
+import React, { ChangeEvent, DragEvent, useRef, useState } from 'react';
 import { acceptImage } from '@/constant/accept.content';
 import { Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +10,7 @@ import { Product } from '@/features/products/types/product.types';
 
 export const ProductMainImageInfo = () => {
   const [mainImages, setMainImages] = useState<{ dataUrl: string; file: File } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const handleFileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -16,33 +19,47 @@ export const ProductMainImageInfo = () => {
     clearErrors,
   } = useFormContext<Product>();
 
+  const processFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setMainImages({ dataUrl: reader.result as string, file });
+    };
+    reader.readAsDataURL(file);
+    setValue('mainImage', file);
+    clearErrors('mainImage');
+  };
+
   const handleClick = () => {
-    if (handleFileInputRef.current) {
-      handleFileInputRef.current.click();
-    }
+    handleFileInputRef.current?.click();
   };
 
-  // 이미지 업로드 처리
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      Array.from(event.target.files).map((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setMainImages({
-            dataUrl: reader.result as string,
-            file,
-          });
-        };
-        reader.readAsDataURL(file);
-        setValue('mainImage', file);
-        clearErrors('mainImage');
-      });
-    }
+    const file = event.target.files?.[0];
+    if (file) processFile(file);
   };
 
-  // 이미지 삭제
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
   const handleRemoveImage = () => {
     setMainImages(null);
+    setValue('mainImage', '');
   };
 
   return (
@@ -53,7 +70,14 @@ export const ProductMainImageInfo = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+          <div
+            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-2">이미지를 드래그하거나 클릭하여 업로드하세요</p>
             <input
@@ -71,7 +95,7 @@ export const ProductMainImageInfo = () => {
           {mainImages && (
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <img src={mainImages?.dataUrl} />
+                <img src={mainImages.dataUrl} alt="메인 이미지 미리보기" />
                 <Button
                   type="button"
                   variant="destructive"

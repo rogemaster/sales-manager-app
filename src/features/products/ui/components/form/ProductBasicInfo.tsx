@@ -1,6 +1,8 @@
+'use client';
+
 import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { Product, ProductStateType } from '@/features/products/types/product.types';
+import { Controller, useFormContext } from 'react-hook-form';
+import { Product } from '@/features/products/types/product.types';
 import { X } from 'lucide-react';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
 import { FilterSelect } from '@/components/common/FilterSelect';
@@ -12,24 +14,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 
 export const ProductBasicinfo = () => {
-  const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>('');
 
   const {
     register,
     formState: { errors },
     setValue,
-    getValues,
+    watch,
+    control,
   } = useFormContext<Product>();
 
-  // 키워드 삭제
+  const keyWords = watch('keyWords') ?? [];
+
   const handleRemoveKeyword = (keyword: string) => {
-    const updatedKeywords = keywords.filter((k) => k !== keyword);
-    setKeywords(updatedKeywords);
-    setValue('keyWords', updatedKeywords);
+    setValue('keyWords', keyWords.filter((k) => k !== keyword));
   };
 
-  // 키워드 Enter 키 처리
   const handleKeywordKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -37,26 +37,14 @@ export const ProductBasicinfo = () => {
     }
   };
 
-  // 키워드 추가
   const handleAddKeyword = () => {
-    if (keywordInput.trim() && !keywords.includes(keywordInput.trim())) {
-      const newKeywords = [...keywords, keywordInput.trim()];
-      setKeywords(newKeywords);
-      setValue('keyWords', newKeywords);
+    if (keywordInput.trim() && !keyWords.includes(keywordInput.trim())) {
+      setValue('keyWords', [...keyWords, keywordInput.trim()]);
       setKeywordInput('');
     }
   };
 
-  const handleSelectCategory = (id: string) => {
-    setValue('categoryId', id);
-  };
-
-  const handleSelectStatus = (id: string) => {
-    setValue('state', id as ProductStateType);
-  };
-
   return (
-    // 기본 정보
     <Card>
       <CardHeader>
         <CardTitle>기본 정보</CardTitle>
@@ -88,9 +76,9 @@ export const ProductBasicinfo = () => {
                 추가
               </Button>
             </div>
-            {keywords.length > 0 && (
+            {keyWords.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {keywords.map((keyword) => (
+                {keyWords.map((keyword) => (
                   <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
                     {keyword}
                     <span>
@@ -104,27 +92,45 @@ export const ProductBasicinfo = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <FilterSelect
-            label="카테고리 *"
-            divClassName="space-y-2"
-            triggerClassName="w-full"
-            value={getValues('categoryId')}
-            onValueChange={handleSelectCategory}
-            options={MOCK_CATEGORY_DATA}
-            placeholder="카테고리를 선택하세요."
+          <Controller
+            name="categoryId"
+            control={control}
+            rules={{ required: '카테고리를 선택해 주세요.' }}
+            render={({ field, fieldState }) => (
+              <div>
+                <FilterSelect
+                  label="카테고리 *"
+                  divClassName="space-y-2"
+                  triggerClassName="w-full"
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                  options={MOCK_CATEGORY_DATA}
+                  placeholder="카테고리를 선택하세요."
+                />
+                {fieldState.error && <p className="text-red-500 text-sm">{fieldState.error.message}</p>}
+              </div>
+            )}
           />
-          {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
 
-          <FilterSelect
-            label="판매상태 *"
-            divClassName="space-y-2"
-            triggerClassName="w-full"
-            value={getValues('state')}
-            onValueChange={handleSelectStatus}
-            options={PRODUCT_STATUS}
-            placeholder="판매상태를 선택하세요."
+          <Controller
+            name="state"
+            control={control}
+            rules={{ required: '판매상태를 선택해 주세요.' }}
+            render={({ field, fieldState }) => (
+              <div>
+                <FilterSelect
+                  label="판매상태 *"
+                  divClassName="space-y-2"
+                  triggerClassName="w-full"
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                  options={PRODUCT_STATUS}
+                  placeholder="판매상태를 선택하세요."
+                />
+                {fieldState.error && <p className="text-red-500 text-sm">{fieldState.error.message}</p>}
+              </div>
+            )}
           />
-          {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
         </div>
       </CardContent>
     </Card>

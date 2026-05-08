@@ -18,7 +18,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
@@ -40,7 +41,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
@@ -62,7 +64,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
@@ -84,7 +87,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
@@ -106,7 +110,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
@@ -128,7 +133,8 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
-    infomationDisclosure: {
+    informationDisclosure: {
+      key: '',
       id: '',
       name: '',
       fields: {},
