@@ -42,7 +42,9 @@ export const TablePagination = ({ range = 10, currentPage, totalPages, onChangeP
 
   const handleNextPage: MouseEventHandler = (e) => {
     e.preventDefault();
-    onChangePage(currentPage + 1);
+    if (currentPage < totalPages) {
+      onChangePage(currentPage + 1);
+    }
   };
 
   const handleLastPage: MouseEventHandler = (e) => {
@@ -90,7 +92,7 @@ export const TablePagination = ({ range = 10, currentPage, totalPages, onChangeP
             href="#"
             aria-label="다음"
             onClick={(e) => handleNextPage(e)}
-            className={currentPage === totalPages || pages.length === 1 ? 'pointer-events-none opacity-50' : ''}
+            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
           />
         </PaginationItem>
 
@@ -100,7 +102,7 @@ export const TablePagination = ({ range = 10, currentPage, totalPages, onChangeP
             href="#"
             aria-label="마지막"
             onClick={(e) => handleLastPage(e)}
-            className={currentPage === totalPages || pages.length === 1 ? 'pointer-events-none opacity-50' : ''}
+            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
           >
             마지막
           </PaginationLink>

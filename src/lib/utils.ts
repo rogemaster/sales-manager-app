@@ -16,8 +16,8 @@ export function getCategoryName(id: string) {
 export function getPage(range: number, currentPage: number, totalPages: number) {
   const maxRange = range || 10;
 
-  if (range > totalPages) {
-    return [1];
+  if (totalPages <= range) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
   const currentBlock = Math.floor((currentPage - 1) / maxRange);

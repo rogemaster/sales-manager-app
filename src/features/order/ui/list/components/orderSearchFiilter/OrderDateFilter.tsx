@@ -9,12 +9,12 @@ import { PRODUCT_DATE_TYPE } from '@/features/products/constant/status.constants
 import { calculatorRangeDate } from '@/lib/utils';
 import { RangeTypeProps } from '@/types/common.type';
 import { useAtom, useSetAtom } from 'jotai';
-import { DateTypeAtom, searchDateAtom } from '@/features/order/store/search.store';
+import { dateTypeAtom, searchDateAtom } from '@/features/order/store/search.store';
 
 export const OrderDateFilter = () => {
   const [rangeValue, setRangeValue] = useState<RangeTypeProps>({ range: 7, uniq: 'day' });
 
-  const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
+  const [getDateTypeAtom, setDateTypeAtom] = useAtom(dateTypeAtom);
   const setSearchDateAtom = useSetAtom(searchDateAtom);
 
   const dates = calculatorRangeDate(rangeValue);

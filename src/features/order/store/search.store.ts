@@ -10,7 +10,7 @@ const DEFAULT_ORDER_STATUS: string = 'ALL';
 /**
  * 주문 검색 필터 Atom
  */
-export const DateTypeAtom = atom<string>(DEFAULT_DATE_TYPE);
+export const dateTypeAtom = atom<string>(DEFAULT_DATE_TYPE);
 
 export const searchDateAtom = atom<Date[]>(DEFAULT_DATE);
 
@@ -22,7 +22,7 @@ export const searchValueAtom = atom<string>('');
  * 주문 검색 필터 데이터
  */
 export const getOrderSearchFilterAtom = atom<OrderSearchType>((get) => ({
-  dateType: get(DateTypeAtom),
+  dateType: get(dateTypeAtom),
   searchDate: get(searchDateAtom),
   orderStatus: get(orderStatusAtom),
   searchValue: get(searchValueAtom),

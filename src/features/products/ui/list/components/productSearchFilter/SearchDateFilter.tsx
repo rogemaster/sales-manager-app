@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import { calculatorRangeDate } from '@/lib/utils';
 import dayjs from 'dayjs';
-import { DateTypeAtom, endDateAtom, startDateAtom } from '@/features/products/store/search.store';
+import { dateTypeAtom, endDateAtom, startDateAtom } from '@/features/products/store/search.store';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PRODUCT_DATE_TYPE } from '@/features/products/constant/status.constants';
@@ -13,7 +13,7 @@ import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton
 import { RangeTypeProps } from '@/types/common.type';
 
 export const ProductSearchDate = () => {
-  const [getDateTypeAtom, setDateTypeAtom] = useAtom(DateTypeAtom);
+  const [getDateTypeAtom, setDateTypeAtom] = useAtom(dateTypeAtom);
   const setStartDateAtom = useSetAtom(startDateAtom);
   const setEndDateAtom = useSetAtom(endDateAtom);
 

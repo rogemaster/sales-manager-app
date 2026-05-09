@@ -9,16 +9,20 @@ import { getProducts } from '../../api/getProducts';
 import { Product } from '../../types/product.types';
 
 export const ProductListLayout = () => {
-  const data = useAtomValue(getSearchFilterAtom);
-  const [appliedFilter, setAppliedFilter] = useState(data);
+  const currentFilter = useAtomValue(getSearchFilterAtom);
+  const [appliedFilter, setAppliedFilter] = useState(currentFilter);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchCount, setSearchCount] = useState(0);
 
-  const { data: products = [] } = useQuery<Product[]>({
+  const { data: products = [], isLoading, isError } = useQuery<Product[]>({
     queryKey: ['products', appliedFilter],
     queryFn: () => getProducts(appliedFilter),
   });
 
   const handleSearch = () => {
-    setAppliedFilter(data);
+    setAppliedFilter(currentFilter);
+    setCurrentPage(1);
+    setSearchCount((prev) => prev + 1);
   };
 
   return (
@@ -28,7 +32,17 @@ export const ProductListLayout = () => {
       {/* 검색 및 필터 */}
       <ProductSearchFilterSection onSearch={handleSearch} />
       {/* 상품 목록 테이블 */}
-      <ProductTableSection products={products} />
+      {isError ? (
+        <p className="py-10 text-center text-sm text-destructive">상품 목록을 불러오는데 실패했습니다.</p>
+      ) : (
+        <ProductTableSection
+          products={products}
+          currentPage={currentPage}
+          onChangePage={setCurrentPage}
+          isLoading={isLoading}
+          searchCount={searchCount}
+        />
+      )}
     </>
   );
 };
