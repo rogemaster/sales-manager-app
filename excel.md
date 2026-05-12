@@ -12,7 +12,7 @@
 
 ## 아키텍처 개요
 
-- 상태 저장소: `src/store/excelDataStore.ts`
+- 상태 저장소: `src/components/excel/store/excelData.store.ts`
   - `excelDataAtom`: 업로드 상태(데이터, 업로드 여부, 시간)
   - `setExcelDataAtom`: 업로드 완료 시 상태 설정
   - `useExcelData()`: 업로드 데이터 조회
@@ -20,10 +20,19 @@
 
 - UI 컴포넌트: `src/components/excel/*`
   - `ExcelUploader`: 파일 업로드/파싱 트리거
+  - `ExcelUploaderContent`: 업로드 UI 내부 콘텐츠
   - `ExcelDataPreview`: 요약/오류/테이블 미리보기
   - `ExcelDownloader`: 템플릿/샘플 다운로드
+  - `ExcelTemplateButton`: 템플릿 다운로드 버튼
+  - `ExcelTemplateInfo`: 템플릿 컬럼 정보 표시
+  - `UploadProgress`: 업로드 진행 상태 표시
 
-- 기능 스코프 Provider: `ExcelProvider`
+- 전략 패턴: `src/components/excel/strategies/`
+  - `productExcelSaveStrategy`: 상품 저장 시 `productId`, `createDate` 필드 주입
+  - `orderExcelSaveStrategy`: 주문 저장 시 `orderId`, `createDate` 필드 주입
+  - `getExcelSaveStrategy(type)`: 타입(`'PRODUCT'` | `'ORDER'`)에 따라 전략 반환
+
+- 기능 스코프 Provider: `src/components/providers/ExcelProvider.tsx`
   - 특정 페이지/레이아웃 트리에서만 Jotai Store 제공
 
 ---
@@ -31,9 +40,9 @@
 ## 상태 설계
 
 ```ts
-// excelDataStore.ts 핵심
-export interface ExcelDataState<T = Record<string, unknown>> {
-  data: T[];
+// excelData.store.ts 핵심
+export interface ExcelDataState {
+  data: ExcelRowWithErrors[]; // { [key: string]: string | number | boolean | null | undefined | ValidationError[] }
   isUploaded: boolean;
   uploadTime: Date | null;
 }
@@ -74,13 +83,13 @@ export function useResetExcelData() {
 ## 기능 스코프 Provider
 
 ```tsx
-// src/components/excel/ExcelProvider.tsx (예시)
-'use client';
+// src/components/providers/ExcelProvider.tsx
 import { Provider as JotaiProvider } from 'jotai';
+import { ReactNode } from 'react';
 
-export function ExcelProvider({ children }: { children: React.ReactNode }) {
+export const ExcelProvider = ({ children }: { children: ReactNode }) => {
   return <JotaiProvider>{children}</JotaiProvider>;
-}
+};
 ```
 
 적용 위치 권장
@@ -93,10 +102,10 @@ export function ExcelProvider({ children }: { children: React.ReactNode }) {
 ## 페이지 적용 예시
 
 ```tsx
-// src/app/(authenticated)/products/bulk/page.tsx (예시)
+// src/app/(authenticated)/products/bulk/page.tsx
 'use client';
 import { ProductBulkUploadLayout } from '@/features/products/ui/bulk/ProductBulkUploadLayout';
-import { ExcelProvider } from '@/components/excel/ExcelProvider';
+import { ExcelProvider } from '@/components/providers/ExcelProvider';
 
 export default function ProductBulkUpload() {
   return (
@@ -172,11 +181,34 @@ const reset = useResetExcelData();
 
 ---
 
+## 전략 패턴 (저장 전처리)
+
+업로드된 로우를 서버로 전송하기 전 도메인별 필드를 주입하는 책임을 전략으로 분리합니다.
+
+```ts
+// src/components/excel/utils/getExcelSaveStrategy.ts
+export const getExcelSaveStrategy = (type: string | null) => {
+  switch (type) {
+    case 'PRODUCT':
+      return productExcelSaveStrategy; // productId, createDate 주입
+    case 'ORDER':
+      return orderExcelSaveStrategy;   // orderId, createDate 주입
+    default:
+      throw new Error(`잘못된 엑셀 타입 입니다. ${type} 엑셀`);
+  }
+};
+```
+
+- 새 도메인 추가 시: `src/components/excel/strategies/`에 전략 함수 추가 후 `getExcelSaveStrategy`에 `case` 분기만 추가
+- 전략 함수 시그니처: `(rows: ExcelRowWithErrors[]) => Promise<ExcelRowWithErrors[]>`
+
+---
+
 ## 타입/검증 가이드
 
-- 업로드된 로우 타입은 화면 도메인 타입으로 변환하여 저장(예: `ProductExcelPreviewRow`)
-- `ExcelDataPreview<T>`는 제네릭으로 동작하되, 내부 `useExcelData()` 반환값을 `T[]`로 안전히 매핑
-- 검증 로직은 화면별 유효성 기준에 맞춰 분리 구현
+- `ExcelRowWithErrors`: 셀 값 타입(`string | number | boolean | null | undefined`) 외에 `ValidationError[]`도 값으로 허용하는 유니온 타입. 검증 오류를 동일 로우 객체에 키로 포함시켜 미리보기 테이블에서 인라인 표시 가능
+- 업로드된 로우는 `ExcelRowWithErrors[]` 그대로 전역 스토어에 저장하고, 미리보기/제출 시 화면 도메인 타입으로 변환
+- 검증 로직은 `src/components/excel/utils/validate.ts`에 구현하고, 화면별 유효성 기준에 따라 분리 적용
 
 ---
 
