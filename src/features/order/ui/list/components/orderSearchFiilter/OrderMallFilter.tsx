@@ -1,7 +1,6 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -33,7 +32,7 @@ export const OrderMallFilter = () => {
     [shoppingMall],
   );
 
-  const deliveryOptions = useMemo<FilterOption[]>(() => [ALL_OPTION, ...DELIVERY_COMPANY], []);
+  const deliveryOptions: FilterOption[] = [ALL_OPTION, ...DELIVERY_COMPANY];
 
   const handleMallChange = (value: string) => {
     setShoppingMall(value);
