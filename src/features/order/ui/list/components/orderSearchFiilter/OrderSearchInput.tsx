@@ -1,29 +1,50 @@
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { searchValueAtom } from '@/features/order/store/search.store';
-import { useAtom } from 'jotai';
-import { Search } from 'lucide-react';
+'use client';
+
 import { ChangeEventHandler } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search } from 'lucide-react';
+import { searchValueAtom, searchTypeAtom, getOrderSearchFilterAtom } from '@/features/order/store/search.store';
+import { ORDER_SEARCH_TYPE } from '@/features/order/constant/status.constants';
 
 export const OrderSearchInput = () => {
-  const [getSearchValue, setSearchValue] = useAtom(searchValueAtom);
+  const [searchType, setSearchType] = useAtom(searchTypeAtom);
+  const [searchValue, setSearchValue] = useAtom(searchValueAtom);
+  const filterData = useAtomValue(getOrderSearchFilterAtom);
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);
   };
 
+  const handleSearch = () => {
+    console.log('검색결과', filterData);
+  };
+
   return (
     <div className="flex items-center gap-4">
       <Label className="w-20 text-right">검색어</Label>
+      <Select value={searchType} onValueChange={setSearchType}>
+        <SelectTrigger className="w-36">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {ORDER_SEARCH_TYPE.map((item) => (
+            <SelectItem key={item.id} value={item.id}>
+              {item.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="주문번호 또는 주문명으로 검색..."
-          value={getSearchValue}
-          onChange={handleSearchInput}
-          className="pl-10"
-        />
+        <Input placeholder="검색어를 입력하세요..." value={searchValue} onChange={handleSearchInput} />
       </div>
+      <Button onClick={handleSearch}>
+        <Search className="h-4 w-4 mr-2" />
+        검색
+      </Button>
     </div>
   );
 };
