@@ -1,3 +1,4 @@
+import { FilterOption } from '@/types/common.type';
 import { OrderStatus } from '../types/order.types';
 
 export const ALL_ORDER_STATUS = {
@@ -83,4 +84,18 @@ export const ORDER_STATUS: OrderStatus[] = [
   ...ORDER_CANCEL_STATUS_TYPE,
   ...ORDER_EXCHANGE_STATUS_TYPE,
   ...ORDER_RETURN_STATUS_TYPE,
+];
+
+export const ORDER_DATE_TYPE: FilterOption[] = [
+  { id: 'orderCollectionDate', name: '주문수집일' },
+  { id: 'paymentDate', name: '결제일' },
+  { id: 'deliveryDate', name: '배송일' },
+];
+
+export const ORDER_SEARCH_TYPE: FilterOption[] = [
+  { id: 'orderName', name: '주문자' },
+  { id: 'payeeName', name: '수취인' },
+  { id: 'orderProductName', name: '주문명' },
+  { id: 'orderNumber', name: '주문번호' },
+  { id: 'shopOrderNumber', name: '쇼핑몰 주문번호' },
 ];
