@@ -9,7 +9,6 @@ type Props = {
 
 const RADIAN = Math.PI / 180;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, value }: any) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
