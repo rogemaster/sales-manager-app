@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Errors, LoginInfo } from '@/features/auth/types/Auth';
 import { ERROR_MESSAGE } from '@/features/auth/constant/errorMessage';
 import { validateAuthForm } from '../util/Validators';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export const useAuthForm = () => {
@@ -13,7 +13,6 @@ export const useAuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { data: session } = useSession();
 
   // 입력값 state 관리
   const handleInputChange = (field: keyof LoginInfo, value: string) => {

@@ -19,3 +19,11 @@ export const DELIVERY_TYPE_OPTION: FilterOption[] = [
     name: '조건부 무료배송',
   },
 ] as const;
+
+export const DELIVERY_COMPANY: FilterOption[] = [
+  { id: 'CJ', name: '대한통운' },
+  { id: 'HANJIN', name: '한진택배' },
+  { id: 'LOTTE', name: '롯데택배' },
+  { id: 'EPOST', name: '우체국택배' },
+  { id: 'LOGEN', name: '로젠택배' },
+];

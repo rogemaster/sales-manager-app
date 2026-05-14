@@ -2,8 +2,13 @@ import { ShoppingMalls } from '@/types/common.type';
 
 export interface OrderSearchType {
   dateType: string;
-  searchDate: Date[];
+  startDate: string;
+  endDate: string;
+  shoppingMall: string;
+  mallAccountId: string;
+  deliveryCompany: string;
   orderStatus: string;
+  searchType: string;
   searchValue: string;
 }
 
