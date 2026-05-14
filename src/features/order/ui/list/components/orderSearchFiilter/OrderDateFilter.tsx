@@ -13,9 +13,9 @@ import { ORDER_DATE_TYPE } from '@/features/order/constant/status.constants';
 import dayjs from 'dayjs';
 
 export const OrderDateFilter = () => {
-  const [dateType, setDateType] = useAtom(dateTypeAtom);
-  const setStartDate = useSetAtom(startDateAtom);
-  const setEndDate = useSetAtom(endDateAtom);
+  const [getDateTypeAtom, setDateTypeAtom] = useAtom(dateTypeAtom);
+  const setStartDateAtom = useSetAtom(startDateAtom);
+  const setEndDateAtom = useSetAtom(endDateAtom);
 
   const defaultStartDate = useMemo(() => dayjs().subtract(7, 'day').format('YYYY-MM-DD'), []);
   const defaultEndDate = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
@@ -24,36 +24,36 @@ export const OrderDateFilter = () => {
 
   const handleChangeDate = useCallback(
     (startDate: string, endDate: string) => {
-      setStartDate(startDate);
-      setEndDate(endDate);
+      setStartDateAtom(startDate);
+      setEndDateAtom(endDate);
     },
-    [setStartDate, setEndDate],
+    [setStartDateAtom, setEndDateAtom],
   );
 
   const handleChangeDateRange = useCallback(
     (value: RangeTypeProps) => {
-      const [start, end] = calculatorRangeDate(value);
-      const formatStart = dayjs(start).format('YYYY-MM-DD');
-      const formatEnd = dayjs(end).format('YYYY-MM-DD');
-      setPickerInitDate({ startDate: formatStart, endDate: formatEnd });
+      const [startDate, endDate] = calculatorRangeDate(value);
+      const formatStartDate = dayjs(startDate).format('YYYY-MM-DD');
+      const formatEndDate = dayjs(endDate).format('YYYY-MM-DD');
+      setPickerInitDate({ startDate: formatStartDate, endDate: formatEndDate });
       setResetKey((prev) => prev + 1);
-      setStartDate(formatStart);
-      setEndDate(formatEnd);
+      setStartDateAtom(formatStartDate);
+      setEndDateAtom(formatEndDate);
     },
-    [setStartDate, setEndDate],
+    [setStartDateAtom, setEndDateAtom],
   );
 
   return (
     <div className="flex items-center gap-4">
       <Label className="w-20 text-right">검색 일자</Label>
-      <Select value={dateType} onValueChange={setDateType}>
+      <Select value={getDateTypeAtom} onValueChange={setDateTypeAtom}>
         <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {ORDER_DATE_TYPE.map((item) => (
-            <SelectItem key={item.id} value={item.id}>
-              {item.name}
+          {ORDER_DATE_TYPE.map((value) => (
+            <SelectItem key={value.id} value={value.id}>
+              {value.name}
             </SelectItem>
           ))}
         </SelectContent>
