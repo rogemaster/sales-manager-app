@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useAtom } from 'jotai';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -47,7 +48,7 @@ export const OrderMallFilter = () => {
           <SelectValue placeholder="쇼핑몰 선택" />
         </SelectTrigger>
         <SelectContent>
-          {mallOptions.map((option) => (
+          {mallOptions.map((option: FilterOption) => (
             <SelectItem key={option.id} value={option.id}>
               {option.name}
             </SelectItem>
@@ -59,7 +60,7 @@ export const OrderMallFilter = () => {
           <SelectValue placeholder="아이디 선택" />
         </SelectTrigger>
         <SelectContent>
-          {accountOptions.map((option) => (
+          {accountOptions.map((option: FilterOption) => (
             <SelectItem key={option.id} value={option.id}>
               {option.name}
             </SelectItem>

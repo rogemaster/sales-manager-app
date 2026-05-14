@@ -1,10 +1,11 @@
-import NextAuth from 'next-auth';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const NextAuth = require('next-auth').default;
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { NextAuthOptions } from 'next-auth';
 import { cookies } from 'next/headers';
 import * as cookie from 'cookie';
 
-const authOptions: NextAuthOptions = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const authOptions: any = {
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -84,7 +85,8 @@ const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user, account }: any) {
       if (user) {
         // 사용자 정보를 토큰에 저장
         token.accessToken = account?.access_token || null;
@@ -94,7 +96,8 @@ const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: any) {
       if (token && session.user) {
         // 타입 정의에 따라 세션 구성
         session.user.id = token.userId;
