@@ -61,15 +61,12 @@ const authOptions: NextAuthOptions = {
           }
 
           const user = await authResponse.json();
-          console.log('인증 성공:', user);
 
-          // 사용자 데이터 매핑 수정
           return {
-            id: user.id || user.userId, // id 필드가 없을 경우 userId 사용
+            id: user.id || user.email || credentials.email,
             email: user.email || credentials.email,
             name: user.nickname || user.name || user.username,
             image: user.image || user.avatar || null,
-            // 추가 사용자 정보
             ...user,
           };
         } catch (error) {
@@ -80,15 +77,12 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/sign-in',
+    signIn: '/login',
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
-        // 사용자 정보를 토큰에 저장
-        token.accessToken = account?.access_token || null;
-        token.userId = user.id;
         token.email = user.email;
         token.name = user.name;
       }
@@ -96,8 +90,6 @@ const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token && session.user) {
-        // 타입 정의에 따라 세션 구성
-        session.user.id = token.userId;
         session.user.email = token.email;
         session.user.name = token.name;
       }

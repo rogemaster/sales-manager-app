@@ -10,13 +10,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronDown, LogOut, Settings } from 'lucide-react';
-import { useAtomValue } from 'jotai/index';
-import { getUserInfoAtom } from '@/features/auth/store/auth.store';
+import { useAtomValue, useSetAtom } from 'jotai/index';
+import { getUserInfoAtom, resetUserInfoAtom } from '@/features/auth/store/auth.store';
+import { signOut } from 'next-auth/react';
+import { useState } from 'react';
 
 export const GlobalUserMenuButton = () => {
   const { avatar, name } = useAtomValue(getUserInfoAtom);
+  const resetUserInfo = useSetAtom(resetUserInfoAtom);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = () => {};
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    resetUserInfo();
+    await signOut({ callbackUrl: '/login' });
+  };
 
   return (
     <div className="flex items-center">
@@ -37,9 +46,9 @@ export const GlobalUserMenuButton = () => {
             <span>프로필 수정</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
+          <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
             <LogOut className="mr-2 h-4 w-4" />
-            <span>로그아웃</span>
+            <span>{isLoggingOut ? '로그아웃 중...' : '로그아웃'}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -55,12 +55,12 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
         url: '/order/collect',
       },
       {
-        title: '주문등록',
-        url: '/order/create',
-      },
-      {
         title: '주문목록',
         url: '/order/list',
+      },
+      {
+        title: '주문등록',
+        url: '/order/create',
       },
     ],
   },

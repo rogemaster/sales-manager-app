@@ -36,3 +36,16 @@ export const getUserInfoAtom = atom<User>(get =>({
   company: get(companyAtom),
   location: get(locationAtom)
 }));
+
+/**
+ * 유저 정보 초기화
+ */
+export const resetUserInfoAtom = atom(null, (_, set) => {
+  set(emailAtom, '');
+  set(nameAtom, '');
+  set(avatarAtom, '');
+  set(phoneAtom, '');
+  set(bioAtom, '');
+  set(companyAtom, '');
+  set(locationAtom, '');
+});
