@@ -1,26 +1,39 @@
 'use client';
 
-import { ChangeEventHandler } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { ChangeEventHandler, useState } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import { searchValueAtom, searchTypeAtom, getOrderSearchFilterAtom } from '@/features/order/store/search.store';
+import {
+  searchTypeAtom,
+  getOrderSearchFilterAtom,
+  committedFiltersAtom,
+  currentPageAtom,
+} from '@/features/order/store/search.store';
 import { ORDER_SEARCH_TYPE } from '@/features/order/constant/status.constants';
 
 export const OrderSearchInput = () => {
   const [searchType, setSearchType] = useAtom(searchTypeAtom);
-  const [searchValue, setSearchValue] = useAtom(searchValueAtom);
-  const filterData = useAtomValue(getOrderSearchFilterAtom);
+  const draftFilters = useAtomValue(getOrderSearchFilterAtom);
+  const setCommittedFilters = useSetAtom(committedFiltersAtom);
+  const setCurrentPage = useSetAtom(currentPageAtom);
+
+  const [inputValue, setInputValue] = useState('');
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setSearchValue(e.target.value);
+    setInputValue(e.target.value);
   };
 
   const handleSearch = () => {
-    console.log('검색결과', filterData);
+    setCommittedFilters({ ...draftFilters, searchValue: inputValue });
+    setCurrentPage(1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch();
   };
 
   return (
@@ -39,7 +52,12 @@ export const OrderSearchInput = () => {
         </SelectContent>
       </Select>
       <div className="relative flex-1 max-w-md">
-        <Input placeholder="검색어를 입력하세요..." value={searchValue} onChange={handleSearchInput} />
+        <Input
+          placeholder="검색어를 입력하세요..."
+          value={inputValue}
+          onChange={handleSearchInput}
+          onKeyDown={handleKeyDown}
+        />
       </div>
       <Button onClick={handleSearch}>
         <Search className="h-4 w-4 mr-2" />
