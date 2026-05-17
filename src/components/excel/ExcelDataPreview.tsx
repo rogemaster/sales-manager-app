@@ -1,37 +1,51 @@
 'use client';
 
-import { ExcelHeaderProps, ExcelTableColumnsType } from '@/types/excel.type';
+import { ExcelHeaderProps, ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
 import { ExcelDataTable } from './components/ExcelDataTable';
-import { useExcelData } from '@/components/excel/store/excelData.store';
+import { useExcelData, useResetExcelData } from '@/components/excel/store/excelData.store';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
+import { useMutation } from '@tanstack/react-query';
+import { useAlert } from '@/hooks/useAlert';
 
-type saveTypes = 'PRODUCT' | 'ORDER';
-type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: saveTypes };
+type SaveType = 'PRODUCT' | 'ORDER';
+type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: SaveType };
 
 export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props) => {
   const uploadedData = useExcelData();
+  const resetExcelData = useResetExcelData();
+  const { showAlert } = useAlert();
 
-  const strategy = getExcelSaveStrategy(saveType);
+  const saveFn = getExcelSaveStrategy(saveType);
 
   const errorDatas = uploadedData.filter((data) => Array.isArray(data['error']) && data['error'].length > 0);
-
   const totalCount = uploadedData.length;
   const validCount = totalCount - errorDatas.length;
   const errorCount = errorDatas.length;
 
-  const handleExcelSaveData = async () => {
-    try {
-      const validData = uploadedData.filter(
-        (row) => !Array.isArray(row['error']) || row['error'].length === 0,
-      );
-      await strategy(validData);
-    } catch (error) {
-      console.error('저장 중 오류가 발생했습니다.', error);
-    }
+  const { mutate: saveExcelData } = useMutation({
+    mutationFn: (validData: ExcelRowWithErrors[]) => saveFn(validData),
+    onSuccess: (_, validData) => {
+      showAlert({
+        type: 'success',
+        message: `${validData.length}개의 엑셀 데이터가 저장되었습니다.`,
+        onConfirm: resetExcelData,
+      });
+    },
+    onError: () => {
+      showAlert({
+        type: 'error',
+        message: '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    },
+  });
+
+  const handleExcelSaveData = () => {
+    const validData = uploadedData.filter((row) => !Array.isArray(row['error']) || row['error'].length === 0);
+    saveExcelData(validData);
   };
 
   return (

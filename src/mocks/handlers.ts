@@ -1,10 +1,12 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { User } from './data/MockUsersData';
 import { getMockProducts } from './utils/getProducts';
 import { Product, ProductSearch } from '@/features/products/types/product.types';
 import { createMockProduct } from './utils/createProduct';
 import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
 import { getMockHomeStats, getMockRecentProducts } from './utils/getHomeData';
+import { MOCK_ORDERS_DATA } from './data/MockOrdersData';
+import { Order } from '@/features/order/types/order.types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -74,5 +76,21 @@ export const handlers = [
     console.log('업데이트', MOCK_PRODUCT_DATA[findIndex]);
 
     return HttpResponse.json(MOCK_PRODUCT_DATA[findIndex]);
+  }),
+
+  // 상품 대량 등록
+  http.post(`${baseUrl}/api/products/bulk`, async ({ request }) => {
+    await delay(500);
+    const data = (await request.json()) as Product[];
+    MOCK_PRODUCT_DATA.push(...data);
+    return HttpResponse.json({ success: true, count: data.length });
+  }),
+
+  // 주문 대량 등록
+  http.post(`${baseUrl}/api/orders/bulk`, async ({ request }) => {
+    await delay(500);
+    const data = (await request.json()) as Order[];
+    MOCK_ORDERS_DATA.push(...data);
+    return HttpResponse.json({ success: true, count: data.length });
   }),
 ];

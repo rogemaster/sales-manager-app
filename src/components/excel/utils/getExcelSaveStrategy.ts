@@ -1,13 +1,22 @@
 import { orderExcelSaveStrategy } from '../strategies/orderExcelSaveStrategy';
 import { productExcelSaveStrategy } from '../strategies/productExcelSaveStrategy';
+import { bulkCreateProducts } from '@/features/products/api/bulkCreateProducts';
+import { bulkCreateOrders } from '@/features/order/api/bulkCreateOrders';
+import { ExcelRowWithErrors } from '@/types/excel.type';
 
-export const getExcelSaveStrategy = (type: string | null) => {
+type SaveType = 'PRODUCT' | 'ORDER';
+
+export const getExcelSaveStrategy = (type: SaveType) => {
   switch (type) {
     case 'PRODUCT':
-      return productExcelSaveStrategy;
+      return (rows: ExcelRowWithErrors[]) => {
+        const products = productExcelSaveStrategy(rows);
+        return bulkCreateProducts(products);
+      };
     case 'ORDER':
-      return orderExcelSaveStrategy;
-    default:
-      throw new Error(`잘못된 엑셀 타입 입니다. ${type} 엑셀`);
+      return (rows: ExcelRowWithErrors[]) => {
+        const orders = orderExcelSaveStrategy(rows);
+        return bulkCreateOrders(orders);
+      };
   }
 };
