@@ -6,7 +6,8 @@ import { createMockProduct } from './utils/createProduct';
 import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
 import { getMockHomeStats, getMockRecentProducts } from './utils/getHomeData';
 import { MOCK_ORDERS_DATA } from './data/MockOrdersData';
-import { Order } from '@/features/order/types/order.types';
+import { Order, OrderSearchType } from '@/features/order/types/order.types';
+import { getMockOrders } from './utils/getOrders';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -92,5 +93,16 @@ export const handlers = [
     const data = (await request.json()) as Order[];
     MOCK_ORDERS_DATA.push(...data);
     return HttpResponse.json({ success: true, count: data.length });
+  }),
+
+  // 주문 목록 조회
+  http.post(`${baseUrl}/api/orders/list`, async ({ request }) => {
+    await delay(300);
+    const { filters, page, pageSize } = (await request.json()) as {
+      filters: OrderSearchType;
+      page: number;
+      pageSize: number;
+    };
+    return HttpResponse.json(getMockOrders(filters, page, pageSize));
   }),
 ];

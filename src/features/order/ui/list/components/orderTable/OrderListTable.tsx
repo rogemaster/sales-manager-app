@@ -3,13 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ORDERLIST_TABLE_HEAD } from '@/features/order/constant/table.constant';
-import { MOCK_ORDERS_DATA } from '@/mocks/data/MockOrdersData';
+import { Order } from '@/features/order/types/order.types';
 import { Edit } from 'lucide-react';
 import { useState } from 'react';
 import { generatorDeliveryType } from '@/utils/deliveryGenerator';
 import { phoneNumberFormatter } from '@/utils/numberGenerator';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 
-export const OrderListTable = () => {
+interface OrderListTableProps {
+  orders: Order[];
+}
+
+export const OrderListTable = ({ orders }: OrderListTableProps) => {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
   const handleSelectOrder = (code: string, checked: boolean) => {
@@ -22,7 +27,7 @@ export const OrderListTable = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedOrders(MOCK_ORDERS_DATA.map((item) => item.orderNumber));
+      setSelectedOrders(orders.map((item) => item.orderNumber));
     } else {
       setSelectedOrders([]);
     }
@@ -34,7 +39,7 @@ export const OrderListTable = () => {
         <TableRow>
           <TableHead className="w-12">
             <Checkbox
-              checked={selectedOrders.length === MOCK_ORDERS_DATA.length && MOCK_ORDERS_DATA.length > 0}
+              checked={selectedOrders.length === orders.length && orders.length > 0}
               onCheckedChange={handleSelectAll}
             />
           </TableHead>
@@ -47,7 +52,7 @@ export const OrderListTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {MOCK_ORDERS_DATA.map((order) => (
+        {orders.map((order) => (
           <TableRow key={order.orderNumber}>
             <TableCell>
               <Checkbox
@@ -58,7 +63,7 @@ export const OrderListTable = () => {
             <TableCell className="text-center">{order.orderCollectionDate}</TableCell>
             <TableCell className="font-mono text-sm text-muted-foreground text-center">{order.orderNumber}</TableCell>
             <TableCell className="text-center">{order.shopOrderNumber}</TableCell>
-            <TableCell className="text-center">{order.shoppingMallName}</TableCell>
+            <TableCell className="text-center">{getShoppingMallName(order.shoppingMallName)}</TableCell>
             <TableCell className="text-center">{order.shoppingMallId}</TableCell>
             <TableCell className="text-center">{<OrderStatusBadge status={order.orderStatus} />}</TableCell>
             <TableCell className="text-center">{order.shopProductId}</TableCell>
