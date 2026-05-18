@@ -1,0 +1,1 @@
+export { OrderDetailLayout } from './OrderDetailLayout';
