@@ -1,10 +1,12 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OrderDetail } from '../../types/order.types';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
+import { DELIVERY_TYPE_OPTION } from '@/constant/delivery.constant';
 import { Field } from './Field';
 
 type Props = {
@@ -13,7 +15,7 @@ type Props = {
 };
 
 export const OrderInfoSection = ({ order, isEditMode }: Props) => {
-  const { register } = useFormContext<OrderDetail>();
+  const { register, control } = useFormContext<OrderDetail>();
 
   return (
     <Card>
@@ -60,9 +62,28 @@ export const OrderInfoSection = ({ order, isEditMode }: Props) => {
           </Field>
           <Field label="배송타입">
             {isEditMode ? (
-              <Input {...register('orderDeliveryType')} />
+              <Controller
+                control={control}
+                name="orderDeliveryType"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="배송타입 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DELIVERY_TYPE_OPTION.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             ) : (
-              <p className="text-sm font-medium">{order.orderDeliveryType}</p>
+              <p className="text-sm font-medium">
+                {DELIVERY_TYPE_OPTION.find((t) => t.id === order.orderDeliveryType)?.name ?? order.orderDeliveryType}
+              </p>
             )}
           </Field>
           <Field label="배송비">
