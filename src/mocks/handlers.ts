@@ -8,6 +8,8 @@ import { getMockHomeStats, getMockRecentProducts } from './utils/getHomeData';
 import { MOCK_ORDERS_DATA } from './data/MockOrdersData';
 import { Order, OrderSearchType } from '@/features/order/types/order.types';
 import { getMockOrders } from './utils/getOrders';
+import { MOCK_ORDER_CLAIMS, MOCK_ORDER_COMMENTS, MOCK_ORDER_HISTORIES, MOCK_ORDER_DETAIL_EXTRAS } from './data/MockOrderExtrasData';
+import { OrderDetail, OrderComment, OrderEditHistory } from '@/features/order/types/order.types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -104,5 +106,100 @@ export const handlers = [
       pageSize: number;
     };
     return HttpResponse.json(getMockOrders(filters, page, pageSize));
+  }),
+
+  // 주문 단건 조회
+  http.get(`${baseUrl}/api/orders/:orderId`, ({ params }) => {
+    const { orderId } = params;
+    const base = MOCK_ORDERS_DATA.find((item) => item.orderNumber === orderId);
+    if (!base) return new HttpResponse(null, { status: 404 });
+    const extras = MOCK_ORDER_DETAIL_EXTRAS[orderId as string] ?? {};
+    const order: OrderDetail = { ...base, ...extras };
+    return HttpResponse.json(order);
+  }),
+
+  // 주문 클레임 조회
+  http.get(`${baseUrl}/api/orders/:orderId/claim`, ({ params }) => {
+    const { orderId } = params;
+    const claim = MOCK_ORDER_CLAIMS[orderId as string] ?? null;
+    return HttpResponse.json(claim);
+  }),
+
+  // 주문 코멘트 목록 조회
+  http.get(`${baseUrl}/api/orders/:orderId/comments`, ({ params }) => {
+    const { orderId } = params;
+    const comments = MOCK_ORDER_COMMENTS[orderId as string] ?? [];
+    return HttpResponse.json(comments);
+  }),
+
+  // 주문 수정이력 조회
+  http.get(`${baseUrl}/api/orders/:orderId/history`, ({ params }) => {
+    const { orderId } = params;
+    const history = MOCK_ORDER_HISTORIES[orderId as string] ?? [];
+    return HttpResponse.json(history);
+  }),
+
+  // 주문 수정
+  http.patch(`${baseUrl}/api/orders/:orderId`, async ({ request, params }) => {
+    const { orderId } = params;
+    const update = (await request.json()) as Partial<OrderDetail>;
+    const findIndex = MOCK_ORDERS_DATA.findIndex((item) => item.orderNumber === orderId);
+    if (findIndex === -1) return new HttpResponse(null, { status: 404 });
+
+    const { claim: claimUpdate, orderDetailAddress, payeeDetailAddress, ...orderUpdate } = update;
+
+    const changedFields = Object.keys(orderUpdate).filter(
+      (key) =>
+        JSON.stringify(orderUpdate[key as keyof typeof orderUpdate]) !==
+        JSON.stringify(MOCK_ORDERS_DATA[findIndex][key as keyof typeof orderUpdate]),
+    );
+
+    if (claimUpdate?.handlerNote !== undefined && MOCK_ORDER_CLAIMS[orderId as string]) {
+      MOCK_ORDER_CLAIMS[orderId as string].handlerNote = claimUpdate.handlerNote;
+      changedFields.push('claim.handlerNote');
+    }
+
+    if (orderDetailAddress !== undefined || payeeDetailAddress !== undefined) {
+      MOCK_ORDER_DETAIL_EXTRAS[orderId as string] = {
+        ...(MOCK_ORDER_DETAIL_EXTRAS[orderId as string] ?? {}),
+        ...(orderDetailAddress !== undefined ? { orderDetailAddress } : {}),
+        ...(payeeDetailAddress !== undefined ? { payeeDetailAddress } : {}),
+      };
+    }
+
+    MOCK_ORDERS_DATA[findIndex] = { ...MOCK_ORDERS_DATA[findIndex], ...orderUpdate };
+
+    if (changedFields.length > 0) {
+      if (!MOCK_ORDER_HISTORIES[orderId as string]) {
+        MOCK_ORDER_HISTORIES[orderId as string] = [];
+      }
+      const newHistory: OrderEditHistory = {
+        id: `history_${Date.now()}`,
+        modifiedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        modifiedBy: '담당자',
+        changedFields,
+      };
+      MOCK_ORDER_HISTORIES[orderId as string].push(newHistory);
+    }
+
+    const extras = MOCK_ORDER_DETAIL_EXTRAS[orderId as string] ?? {};
+    return HttpResponse.json({ ...MOCK_ORDERS_DATA[findIndex], ...extras });
+  }),
+
+  // 주문 코멘트 추가
+  http.post(`${baseUrl}/api/orders/:orderId/comments`, async ({ request, params }) => {
+    const { orderId } = params;
+    const { content } = (await request.json()) as { content: string };
+    if (!MOCK_ORDER_COMMENTS[orderId as string]) {
+      MOCK_ORDER_COMMENTS[orderId as string] = [];
+    }
+    const newComment: OrderComment = {
+      id: `comment_${Date.now()}`,
+      content,
+      authorName: '담당자',
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+    };
+    MOCK_ORDER_COMMENTS[orderId as string].push(newComment);
+    return HttpResponse.json(newComment);
   }),
 ];
