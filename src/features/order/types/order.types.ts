@@ -89,3 +89,29 @@ export interface Order {
   payeeAddress: string;
   deliveryMessage?: string;
 }
+
+export interface OrderDetail extends Order {
+  orderDetailAddress?: string;
+  payeeDetailAddress?: string;
+  claim?: OrderClaim;
+}
+
+export interface OrderClaim {
+  claimType: 'CANCEL' | 'EXCHANGE' | 'RETURN';
+  claimMessage: string;
+  handlerNote?: string;
+}
+
+export interface OrderComment {
+  id: string;
+  content: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface OrderEditHistory {
+  id: string;
+  modifiedAt: string;
+  modifiedBy: string;
+  changedFields: string[];
+}
