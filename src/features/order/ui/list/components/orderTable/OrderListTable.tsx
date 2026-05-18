@@ -6,6 +6,7 @@ import { ORDERLIST_TABLE_HEAD } from '@/features/order/constant/table.constant';
 import { Order } from '@/features/order/types/order.types';
 import { Edit } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { generatorDeliveryType } from '@/utils/deliveryGenerator';
 import { phoneNumberFormatter } from '@/utils/numberGenerator';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
@@ -16,6 +17,7 @@ interface OrderListTableProps {
 
 export const OrderListTable = ({ orders }: OrderListTableProps) => {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const router = useRouter();
 
   const handleSelectOrder = (code: string, checked: boolean) => {
     if (checked) {
@@ -53,8 +55,12 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
       </TableHeader>
       <TableBody>
         {orders.map((order) => (
-          <TableRow key={order.orderNumber}>
-            <TableCell>
+          <TableRow
+            key={order.orderNumber}
+            className="cursor-pointer"
+            onClick={() => router.push(`/order/${order.orderNumber}`)}
+          >
+            <TableCell onClick={(e) => e.stopPropagation()}>
               <Checkbox
                 checked={selectedOrders.includes(order.orderNumber)}
                 onCheckedChange={(checked: boolean) => handleSelectOrder(order.orderNumber, checked)}
@@ -79,8 +85,12 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
               {generatorDeliveryType(order.orderDeliveryType, order.orderDeliveryPrice)}
             </TableCell>
             <TableCell className="text-right">{order.orderDeliveryPrice}</TableCell>
-            <TableCell className="items-center">
-              <Button variant="ghost" size="sm">
+            <TableCell className="items-center" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push(`/order/${order.orderNumber}`)}
+              >
                 <Edit className="h-4 w-4" />
               </Button>
             </TableCell>

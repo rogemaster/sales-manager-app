@@ -1,4 +1,5 @@
 import { ShoppingMalls } from '@/types/common.type';
+import { DeliveryTypeId } from '@/constant/delivery.constant';
 
 export interface OrderSearchType {
   dateType: string;
@@ -77,7 +78,7 @@ export interface Order {
   orderOption?: string;
   orderSubOption?: string;
   orderSubTotalQuantity?: string;
-  orderDeliveryType: string;
+  orderDeliveryType: DeliveryTypeId;
   orderDeliveryPrice: number;
   orderName: string;
   payeeName: string;
@@ -88,4 +89,32 @@ export interface Order {
   payeeZipCode: string;
   payeeAddress: string;
   deliveryMessage?: string;
+  deliveryCompany?: string;   // 택배사
+  invoiceNumber?: string;     // 송장번호
+}
+
+export interface OrderDetail extends Order {
+  orderDetailAddress?: string;
+  payeeDetailAddress?: string;
+  claim?: OrderClaim;
+}
+
+export interface OrderClaim {
+  claimType: 'CANCEL' | 'EXCHANGE' | 'RETURN';
+  claimMessage: string;
+  handlerNote?: string;
+}
+
+export interface OrderComment {
+  id: string;
+  content: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface OrderEditHistory {
+  id: string;
+  modifiedAt: string;
+  modifiedBy: string;
+  changedFields: string[];
 }

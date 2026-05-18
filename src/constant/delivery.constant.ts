@@ -1,5 +1,7 @@
 import { FilterOption } from '../types/common.type';
 
+export type DeliveryTypeId = 'FREE' | 'NOT_FREE' | 'CHARGE_RECEIVED' | 'CONDITIONAL_FREE';
+
 // 배송 타입 옵션
 export const DELIVERY_TYPE_OPTION: FilterOption[] = [
   {
