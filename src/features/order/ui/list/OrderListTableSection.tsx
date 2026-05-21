@@ -1,16 +1,22 @@
 'use client';
 
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { OrderListTableHeader } from './components/orderTable/OrderListTableHeader';
 import { OrderListTable } from './components/orderTable/OrderListTable';
 import { TablePagination } from '@/components/common/TablePagination';
-import { currentPageAtom } from '@/features/order/store/search.store';
+import { currentPageAtom, selectedOrdersAtom } from '@/features/order/store/search.store';
 import { useGetOrders } from '@/features/order/api/useGetOrders';
 
 export const OrderListTableSection = () => {
   const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
   const { data, isLoading } = useGetOrders();
+  const setSelectedOrders = useSetAtom(selectedOrdersAtom);
+
+  useEffect(() => {
+    setSelectedOrders([]);
+  }, [data, setSelectedOrders]);
 
   const orders = data?.orders ?? [];
   const total = data?.total ?? 0;

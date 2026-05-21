@@ -20,6 +20,8 @@ export const orderStatusAtom = atom<string>(DEFAULT_ORDER_STATUS);
 export const searchTypeAtom = atom<string>(DEFAULT_SEARCH_TYPE);
 export const searchValueAtom = atom<string>('');
 
+export const selectedOrdersAtom = atom<string[]>([]);
+
 // UI 조작 중인 draft 필터 (검색 버튼 클릭 전까지 API 호출에 사용되지 않음)
 export const getOrderSearchFilterAtom = atom<OrderSearchType>((get) => ({
   dateType: get(dateTypeAtom),

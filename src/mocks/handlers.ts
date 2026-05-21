@@ -141,6 +141,7 @@ export const handlers = [
 
   // 주문 수정
   http.patch(`${baseUrl}/api/orders/:orderId`, async ({ request, params }) => {
+    await delay(300);
     const { orderId } = params;
     const update = (await request.json()) as Partial<OrderDetail>;
     const findIndex = MOCK_ORDERS_DATA.findIndex((item) => item.orderNumber === orderId);
