@@ -2,7 +2,7 @@
 
 import { AlertContext } from '@/hooks/useAlert';
 import { AlertOptions } from '@/types/common.type';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { CommonAlertDialog } from './CommonAlertDialog';
 
 interface AlertProviderProps {
@@ -12,8 +12,10 @@ interface AlertProviderProps {
 export function AlertProvider({ children }: AlertProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [alertOptions, setAlertOptions] = useState<AlertOptions | null>(null);
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showAlert = useCallback((options: AlertOptions) => {
+    if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
     setAlertOptions(options);
     setIsOpen(true);
   }, []);
@@ -22,7 +24,7 @@ export function AlertProvider({ children }: AlertProviderProps) {
     setIsOpen(open);
     if (!open) {
       // 애니메이션이 끝난 후 옵션 초기화
-      setTimeout(() => {
+      clearTimerRef.current = setTimeout(() => {
         setAlertOptions(null);
       }, 200);
     }

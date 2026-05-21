@@ -5,18 +5,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ORDERLIST_TABLE_HEAD } from '@/features/order/constant/table.constant';
 import { Order } from '@/features/order/types/order.types';
 import { Edit } from 'lucide-react';
-import { useState } from 'react';
+import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { generatorDeliveryType } from '@/utils/deliveryGenerator';
 import { phoneNumberFormatter } from '@/utils/numberGenerator';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
+import { selectedOrdersAtom } from '@/features/order/store/search.store';
 
 interface OrderListTableProps {
   orders: Order[];
 }
 
 export const OrderListTable = ({ orders }: OrderListTableProps) => {
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [selectedOrders, setSelectedOrders] = useAtom(selectedOrdersAtom);
   const router = useRouter();
 
   const handleSelectOrder = (code: string, checked: boolean) => {
