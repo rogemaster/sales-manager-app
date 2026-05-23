@@ -4,11 +4,11 @@ export const User = [
   {
     email: 'admin@example.com',
     password: 'admin123',
-    name: '관리자',
+    name: '슈퍼관리자',
     avatar: faker.image.avatar(),
     phone: '010-1234-5678',
-    bio: '시스템 관리자입니다.',
-    company: 'MyApp',
+    bio: '슈퍼 관리자입니다.',
+    company: '앱 컴퍼니',
     location: '서울, 대한민국',
   },
   {
@@ -17,8 +17,8 @@ export const User = [
     name: '홍길동',
     avatar: faker.image.avatar(),
     phone: '010-9876-5432',
-    bio: '일반 사용자입니다.',
-    company: '테크 컴퍼니',
-    location: '부산, 대한민국',
+    bio: '일반 관리자입니다.',
+    company: '앱 컴퍼니',
+    location: '서울, 대한민국',
   },
 ];

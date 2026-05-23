@@ -1,5 +1,5 @@
 import { ShoppingMalls } from '@/types/common.type';
-import { DeliveryTypeId } from '@/constant/delivery.constant';
+import { DeliveryTypeId } from '@/shared/constant/delivery.constant';
 
 export interface OrderSearchType {
   dateType: string;

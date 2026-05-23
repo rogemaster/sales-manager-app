@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { OrderDetail } from '../../types/order.types';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
 import { ORDER_STATUS } from '../../constant/status.constants';
-import { DELIVERY_COMPANY } from '@/constant/delivery.constant';
+import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 
 type Props = {
   order: OrderDetail;

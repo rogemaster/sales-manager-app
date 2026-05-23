@@ -1,5 +1,6 @@
 import { http, HttpResponse, delay } from 'msw';
 import { User } from './data/MockUsersData';
+import { MOCK_MALL_ACCOUNTS } from './data/MockShoppingMallAccountsData';
 import { getMockProducts } from './utils/getProducts';
 import { Product, ProductSearch } from '@/features/products/types/product.types';
 import { createMockProduct } from './utils/createProduct';
@@ -185,6 +186,12 @@ export const handlers = [
 
     const extras = MOCK_ORDER_DETAIL_EXTRAS[orderId as string] ?? {};
     return HttpResponse.json({ ...MOCK_ORDERS_DATA[findIndex], ...extras });
+  }),
+
+  // 쇼핑몰 계정 목록 조회 (패스워드 제외)
+  http.get(`${baseUrl}/api/mall-accounts`, () => {
+    const accounts = MOCK_MALL_ACCOUNTS.map(({ password: _password, ...rest }) => rest);
+    return HttpResponse.json(accounts);
   }),
 
   // 주문 코멘트 추가

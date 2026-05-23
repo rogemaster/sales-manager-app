@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OrderDetail } from '../../types/order.types';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
-import { DELIVERY_TYPE_OPTION } from '@/constant/delivery.constant';
+import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 import { Field } from './Field';
 
 type Props = {

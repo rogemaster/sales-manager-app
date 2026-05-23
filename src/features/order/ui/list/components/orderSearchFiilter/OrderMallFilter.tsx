@@ -9,8 +9,8 @@ import {
   mallAccountIdAtom,
   deliveryCompanyAtom,
 } from '@/features/order/store/search.store';
-import { SHOPPING_MALLS } from '@/constant/shoppingMall.constant';
-import { DELIVERY_COMPANY } from '@/constant/delivery.constant';
+import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 import { FilterOption } from '@/types/common.type';
 
 const ALL_OPTION: FilterOption = { id: 'ALL', name: '전체' };
