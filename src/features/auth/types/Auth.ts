@@ -14,6 +14,8 @@ export interface ValidationResult {
   error: Errors;
 }
 
+export type UserGrade = 'super_admin' | 'admin' | 'operator';
+
 export interface User {
   email: string;
   name: string;
@@ -22,4 +24,5 @@ export interface User {
   bio: string;
   company: string;
   location: string;
+  grade: UserGrade;
 }

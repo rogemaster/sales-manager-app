@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { User } from '../types/Auth';
+import { User, UserGrade } from '../types/Auth';
 
 export const emailAtom = atom<string>('');
 export const nameAtom = atom<string>('');
@@ -8,6 +8,7 @@ export const phoneAtom = atom<string>('');
 export const bioAtom = atom<string>('');
 export const companyAtom = atom<string>('');
 export const locationAtom = atom<string>('');
+export const gradeAtom = atom<UserGrade>('operator');
 
 /**
  * 유저 정보 저장
@@ -21,20 +22,22 @@ export const setUserInfoAtom = atom(null, (_, set, data: User) => {
     set(bioAtom, data.bio);
     set(companyAtom, data.company);
     set(locationAtom, data.location);
+    set(gradeAtom, data.grade);
   }
 });
 
 /**
  * 유저 정보 추출
  */
-export const getUserInfoAtom = atom<User>(get =>({
+export const getUserInfoAtom = atom<User>((get) => ({
   email: get(emailAtom),
   name: get(nameAtom),
   avatar: get(avatarAtom),
   phone: get(phoneAtom),
   bio: get(bioAtom),
   company: get(companyAtom),
-  location: get(locationAtom)
+  location: get(locationAtom),
+  grade: get(gradeAtom),
 }));
 
 /**
@@ -48,4 +51,5 @@ export const resetUserInfoAtom = atom(null, (_, set) => {
   set(bioAtom, '');
   set(companyAtom, '');
   set(locationAtom, '');
+  set(gradeAtom, 'operator');
 });
