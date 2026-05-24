@@ -14,6 +14,9 @@ import { updateMockOrder } from './utils/updateOrder';
 import { addMockOrderComment } from './utils/addOrderComment';
 import { getMockMallAccounts, createMockMallAccount, deleteMockMallAccount } from './utils/mallAccounts';
 import { CreateMallAccountBody } from '@/shared/api/createMallAccount';
+import { CollectionSearchParams, TriggerCollectionBody } from '@/features/order/types/collection.types';
+import { getCollectionJobsMock } from './utils/getCollectionJobs';
+import { triggerOrderCollectionMock } from './utils/triggerOrderCollection';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -168,5 +171,25 @@ export const handlers = [
     const deleted = deleteMockMallAccount(id as string);
     if (!deleted) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json({ success: true });
+  }),
+
+  // 수집 작업 목록 조회
+  http.get(`${baseUrl}/api/order/collection/jobs`, ({ request }) => {
+    const url = new URL(request.url);
+    const params: CollectionSearchParams = {
+      startDate: url.searchParams.get('startDate') ?? '',
+      endDate: url.searchParams.get('endDate') ?? '',
+      mallCode: url.searchParams.get('mallCode') ?? 'ALL',
+      mallAccountId: url.searchParams.get('mallAccountId') ?? 'ALL',
+    };
+    return HttpResponse.json(getCollectionJobsMock(params));
+  }),
+
+  // 주문수집 트리거
+  http.post(`${baseUrl}/api/order/collection/trigger`, async ({ request }) => {
+    await delay(300);
+    const { jobIds } = (await request.json()) as TriggerCollectionBody;
+    const triggeredCount = triggerOrderCollectionMock(jobIds);
+    return HttpResponse.json({ success: true, triggeredCount });
   }),
 ];
