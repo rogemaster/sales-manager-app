@@ -85,14 +85,24 @@ const authOptions: NextAuthOptions = {
       if (user) {
         token.email = user.email;
         token.name = user.name;
+        token.grade = user.grade;
+        token.avatar = user.avatar;
+        token.phone = user.phone;
+        token.bio = user.bio;
+        token.company = user.company;
+        token.location = user.location;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.email = token.email;
-        session.user.name = token.name;
-      }
+      session.user.email = token.email ?? '';
+      session.user.name = token.name ?? '';
+      session.user.grade = token.grade;
+      session.user.avatar = token.avatar;
+      session.user.phone = token.phone;
+      session.user.bio = token.bio;
+      session.user.company = token.company;
+      session.user.location = token.location;
       return session;
     },
   },

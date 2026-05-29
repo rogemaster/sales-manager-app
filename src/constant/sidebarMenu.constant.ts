@@ -1,4 +1,4 @@
-import { HomeIcon, PackageIcon, Settings, StoreIcon } from 'lucide-react';
+import { HomeIcon, PackageIcon, ShoppingCart, StoreIcon, UserCog } from 'lucide-react';
 import { MenuInterface } from '@/types/sidebar.type';
 
 export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
@@ -28,7 +28,7 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
   },
   {
     title: '쇼핑몰관리',
-    url: '#',
+    url: '/shopping',
     icon: StoreIcon,
     items: [
       {
@@ -48,7 +48,7 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
   {
     title: '주문관리',
     url: '/order',
-    icon: PackageIcon,
+    icon: ShoppingCart,
     items: [
       {
         title: '주문수집',
@@ -65,17 +65,21 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
     ],
   },
   {
-    title: '설정',
-    url: '/setting',
-    icon: Settings,
+    title: '계정관리',
+    url: '/account',
+    icon: UserCog,
     items: [
       {
-        title: '계정관리',
-        url: '/account',
+        title: '사용자관리',
+        url: '/account/user',
       },
       {
-        title: '업체관리',
-        url: '/company',
+        title: '매입처관리',
+        url: '/account/purchase',
+      },
+      {
+        title: '매출처관리',
+        url: '/account/sales',
       },
     ],
   },

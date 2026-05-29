@@ -1,20 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { UserGrade } from '@/features/auth/types/Auth';
+import { AccountUser } from '@/features/account/types/user.types';
 
-type MockUser = {
-  email: string;
-  password: string;
-  name: string;
-  avatar: string;
-  phone: string;
-  bio: string;
-  company: string;
-  location: string;
-  grade: UserGrade;
-};
+type MockUserData = AccountUser & { password: string };
 
-export const User: MockUser[] = [
+export const MOCK_USERS_DATA: MockUserData[] = [
   {
+    id: 'usr_001',
     email: 'admin@example.com',
     password: 'admin123',
     name: '슈퍼관리자',
@@ -24,8 +15,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '서울, 대한민국',
     grade: 'super_admin',
+    createdAt: '2025-01-10',
+    updatedAt: '2025-04-15',
   },
   {
+    id: 'usr_002',
     email: 'user@example.com',
     password: 'user123',
     name: '홍길동',
@@ -35,8 +29,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '서울, 대한민국',
     grade: 'admin',
+    createdAt: '2025-02-20',
+    updatedAt: '2025-06-08',
   },
   {
+    id: 'usr_003',
     email: 'user2@example.com',
     password: 'user123',
     name: '김민준',
@@ -46,8 +43,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '서울, 대한민국',
     grade: 'admin',
+    createdAt: '2025-04-05',
+    updatedAt: '2025-08-22',
   },
   {
+    id: 'usr_004',
     email: 'user3@example.com',
     password: 'user123',
     name: '이서연',
@@ -57,8 +57,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '경기, 대한민국',
     grade: 'operator',
+    createdAt: '2025-06-14',
+    updatedAt: '2025-10-30',
   },
   {
+    id: 'usr_005',
     email: 'user4@example.com',
     password: 'user123',
     name: '박지훈',
@@ -68,8 +71,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '인천, 대한민국',
     grade: 'operator',
+    createdAt: '2025-08-01',
+    updatedAt: '2025-12-18',
   },
   {
+    id: 'usr_006',
     email: 'user5@example.com',
     password: 'user123',
     name: '최수아',
@@ -79,8 +85,11 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '부산, 대한민국',
     grade: 'operator',
+    createdAt: '2025-10-11',
+    updatedAt: '2026-02-07',
   },
   {
+    id: 'usr_007',
     email: 'user6@example.com',
     password: 'user123',
     name: '정우진',
@@ -90,5 +99,7 @@ export const User: MockUser[] = [
     company: '앱 컴퍼니',
     location: '대구, 대한민국',
     grade: 'operator',
+    createdAt: '2026-01-03',
+    updatedAt: '2026-05-20',
   },
 ];

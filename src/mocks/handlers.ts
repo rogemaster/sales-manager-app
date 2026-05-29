@@ -1,5 +1,4 @@
 import { http, HttpResponse, delay } from 'msw';
-import { User } from './data/MockUsersData';
 import { getMockProducts } from './utils/getProducts';
 import { Product, ProductSearch } from '@/features/products/types/product.types';
 import { createMockProduct } from './utils/createProduct';
@@ -17,12 +16,19 @@ import { CreateMallAccountBody } from '@/shared/api/createMallAccount';
 import { CollectionSearchParams, TriggerCollectionBody } from '@/features/order/types/collection.types';
 import { getCollectionJobsMock } from './utils/getCollectionJobs';
 import { triggerOrderCollectionMock } from './utils/triggerOrderCollection';
+import { getMockUsers } from './utils/getUsers';
+import { deleteMockUsers } from './utils/deleteUsers';
+import { loginUser } from './utils/loginUser';
+import { UserSearchType } from '@/features/account/types/user.types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const handlers = [
-  http.post(`${baseUrl}/api/login`, () => {
-    return HttpResponse.json(User[0], {
+  http.post(`${baseUrl}/api/login`, async ({ request }) => {
+    const { email, password } = (await request.json()) as { email: string; password: string };
+    const user = loginUser(email, password);
+    if (!user) return new HttpResponse(null, { status: 401 });
+    return HttpResponse.json(user, {
       headers: {
         'Set-Cookie': 'connect.sid=msw-cookie;HttpOnly;Path=/',
       },
@@ -191,5 +197,22 @@ export const handlers = [
     const { jobIds } = (await request.json()) as TriggerCollectionBody;
     const triggeredCount = triggerOrderCollectionMock(jobIds);
     return HttpResponse.json({ success: true, triggeredCount });
+  }),
+
+  // 사용자 목록 조회
+  http.post(`${baseUrl}/api/account/users/list`, async ({ request }) => {
+    const { filters, page, pageSize } = (await request.json()) as {
+      filters: UserSearchType;
+      page: number;
+      pageSize: number;
+    };
+    return HttpResponse.json(getMockUsers(filters, page, pageSize));
+  }),
+
+  // 사용자 일괄 삭제
+  http.delete(`${baseUrl}/api/account/users`, async ({ request }) => {
+    const { ids } = (await request.json()) as { ids: string[] };
+    deleteMockUsers(ids);
+    return HttpResponse.json({ success: true });
   }),
 ];
