@@ -1,12 +1,13 @@
 'use client';
 
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Edit } from 'lucide-react';
 import { selectedUsersAtom } from '@/features/account/store/userSearch.store';
+import { gradeAtom } from '@/features/auth/store/auth.store';
 import { USER_TABLE_HEAD, USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { AccountUser } from '@/features/account/types/user.types';
 
@@ -18,6 +19,8 @@ interface UserTableProps {
 
 export const UserTable = ({ users }: UserTableProps) => {
   const [selectedUsers, setSelectedUsers] = useAtom(selectedUsersAtom);
+  const grade = useAtomValue(gradeAtom);
+  const canEdit = grade === 'super_admin' || grade === 'admin';
   const router = useRouter();
 
   const handleSelectUser = (id: string, checked: boolean) => {
@@ -51,13 +54,13 @@ export const UserTable = ({ users }: UserTableProps) => {
               {item.title}
             </TableHead>
           ))}
-          <TableHead className="text-center">작업</TableHead>
+          {canEdit && <TableHead className="text-center">작업</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={USER_TABLE_HEAD.length + 2} className="h-40 text-center text-muted-foreground text-sm">
+            <TableCell colSpan={USER_TABLE_HEAD.length + 1 + (canEdit ? 1 : 0)} className="h-40 text-center text-muted-foreground text-sm">
               조건에 맞는 사용자가 없습니다.
             </TableCell>
           </TableRow>
@@ -75,11 +78,13 @@ export const UserTable = ({ users }: UserTableProps) => {
               <TableCell className="text-center">{user.name}</TableCell>
               <TableCell className="text-center">{user.createdAt}</TableCell>
               <TableCell className="text-center">{user.updatedAt}</TableCell>
-              <TableCell className="text-center">
-                <Button variant="ghost" size="sm" onClick={() => router.push(`/account/user/${user.id}`)}>
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </TableCell>
+              {canEdit && (
+                <TableCell className="text-center">
+                  <Button variant="ghost" size="sm" onClick={() => router.push(`/account/user/${user.id}`)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              )}
             </TableRow>
           ))
         )}
