@@ -19,7 +19,8 @@ import { triggerOrderCollectionMock } from './utils/triggerOrderCollection';
 import { getMockUsers } from './utils/getUsers';
 import { deleteMockUsers } from './utils/deleteUsers';
 import { loginUser } from './utils/loginUser';
-import { UserSearchType } from '@/features/account/types/user.types';
+import { createMockUser } from './utils/createUser';
+import { UserSearchType, CreateUserBody } from '@/features/account/types/user.types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -214,5 +215,12 @@ export const handlers = [
     const { ids } = (await request.json()) as { ids: string[] };
     deleteMockUsers(ids);
     return HttpResponse.json({ success: true });
+  }),
+
+  // 사용자 등록
+  http.post(`${baseUrl}/api/account/users/create`, async ({ request }) => {
+    const body = (await request.json()) as CreateUserBody;
+    const newUser = createMockUser(body);
+    return HttpResponse.json(newUser, { status: 201 });
   }),
 ];

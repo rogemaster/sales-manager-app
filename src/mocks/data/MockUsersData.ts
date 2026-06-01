@@ -6,6 +6,7 @@ type MockUserData = AccountUser & { password: string };
 export const MOCK_USERS_DATA: MockUserData[] = [
   {
     id: 'usr_001',
+    status: 'active',
     email: 'admin@example.com',
     password: 'admin123',
     name: '슈퍼관리자',
@@ -20,6 +21,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_002',
+    status: 'active',
     email: 'user@example.com',
     password: 'user123',
     name: '홍길동',
@@ -34,6 +36,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_003',
+    status: 'active',
     email: 'user2@example.com',
     password: 'user123',
     name: '김민준',
@@ -48,6 +51,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_004',
+    status: 'active',
     email: 'user3@example.com',
     password: 'user123',
     name: '이서연',
@@ -62,6 +66,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_005',
+    status: 'active',
     email: 'user4@example.com',
     password: 'user123',
     name: '박지훈',
@@ -76,6 +81,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_006',
+    status: 'active',
     email: 'user5@example.com',
     password: 'user123',
     name: '최수아',
@@ -90,6 +96,7 @@ export const MOCK_USERS_DATA: MockUserData[] = [
   },
   {
     id: 'usr_007',
+    status: 'active',
     email: 'user6@example.com',
     password: 'user123',
     name: '정우진',

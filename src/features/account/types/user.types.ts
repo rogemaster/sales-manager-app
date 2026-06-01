@@ -1,9 +1,17 @@
 import { User, UserGrade } from '@/features/auth/types/Auth';
 
+export type UserStatus = 'active' | 'pending';
+
 export interface AccountUser extends User {
   id: string;
+  status: UserStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateUserBody extends Omit<User, 'company' | 'location'> {
+  password: string;
+  status: UserStatus;
 }
 
 export interface UserSearchType {
