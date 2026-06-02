@@ -30,11 +30,14 @@ export const OrdererRecipientSection = ({ order, isEditMode }: Props) => {
   return (
     <div className="grid grid-cols-2 gap-6">
       {/* 주문자 정보 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>주문자 정보</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-border/50 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">주문자 정보</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <Field label="이름">
             {isEditMode ? (
               <Input {...register('orderName')} />
@@ -79,11 +82,14 @@ export const OrdererRecipientSection = ({ order, isEditMode }: Props) => {
       </Card>
 
       {/* 수취인 정보 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>수취인 정보</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-border/50 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">수취인 정보</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <Field label="이름">
             {isEditMode ? (
               <Input {...register('payeeName')} />

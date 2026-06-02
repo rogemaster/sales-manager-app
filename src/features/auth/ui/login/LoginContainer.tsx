@@ -10,7 +10,7 @@ export const LoginContainer = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden gap-0 py-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <LoginForm
             formData={formData}

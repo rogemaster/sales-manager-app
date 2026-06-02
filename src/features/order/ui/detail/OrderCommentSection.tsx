@@ -26,11 +26,14 @@ export const OrderCommentSection = ({ orderId, comments }: Props) => {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>주문 코멘트</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <CardTitle className="text-sm">주문 코멘트</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="space-y-3 max-h-60 overflow-y-auto">
           {comments.length === 0 ? (
             <p className="text-sm text-muted-foreground">작성된 코멘트가 없습니다.</p>

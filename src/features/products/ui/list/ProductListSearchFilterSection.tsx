@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProductSearchInput } from '@/features/products/ui/list/components/productSearchFilter/SearchInput';
-import { ProductSearchButton } from '@/features/products/ui/list/components/productSearchFilter/SearchButton';
 import { ProductSearchDate } from '@/features/products/ui/list/components/productSearchFilter/SearchDateFilter';
 import { ProductSearchSaleState } from '@/features/products/ui/list/components/productSearchFilter/SaleStateFilter';
 import { ProductSearchCategory } from '@/features/products/ui/list/components/productSearchFilter/SearchCategoryFilter';
@@ -11,25 +10,19 @@ type Props = {
 
 export const ProductSearchFilterSection = ({ onSearch }: Props) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>검색 및 필터</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <CardTitle className="text-sm">검색 및 필터</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex gap-6">
-          {/* 왼쪽: 필터 항목들 */}
-          <div className="flex-1 space-y-4">
-            {/* 검색 일자 */}
-            <ProductSearchDate />
-            {/* 판매 상태 */}
-            <ProductSearchSaleState />
-            {/* 카테고리 */}
-            <ProductSearchCategory />
-            {/* 검색어 */}
-            <ProductSearchInput />
-          </div>
-          {/* 오른쪽: 검색 버튼 */}
-          <ProductSearchButton onSearch={onSearch} />
+      <CardContent className="p-0">
+        <div className="space-y-1">
+          <div className="px-6 py-1"><ProductSearchDate /></div>
+          <div className="px-6 py-1"><ProductSearchSaleState /></div>
+          <div className="px-6 py-1"><ProductSearchCategory /></div>
+          <div className="px-6 py-1"><ProductSearchInput onSearch={onSearch} /></div>
         </div>
       </CardContent>
     </Card>

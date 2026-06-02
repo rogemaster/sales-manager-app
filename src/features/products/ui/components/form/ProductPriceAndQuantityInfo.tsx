@@ -21,12 +21,17 @@ export const ProductPriceAndQuantityInfo = () => {
   const isDeliveryPrice = deliveryType === 'NOT_FREE' || deliveryType === 'CONDITIONAL_FREE';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>가격 및 수량 정보</CardTitle>
-        <CardDescription>상품의 가격과 수량 정보를 입력하세요.</CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">가격 및 수량 정보</CardTitle>
+            <CardDescription className="mt-0.5">상품의 가격과 수량 정보를 입력하세요.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="supplyPrice">공급가</Label>

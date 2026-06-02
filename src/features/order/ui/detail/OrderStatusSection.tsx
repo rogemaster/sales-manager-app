@@ -23,11 +23,14 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
     : order.orderStatus === 'INVOICE_REGISTER';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>주문 상태</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <CardTitle className="text-sm">주문 상태</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         {isEditMode ? (
           <Controller
             control={control}

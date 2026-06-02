@@ -8,6 +8,15 @@ export interface HomeStats {
   waitSale: number;
 }
 
+export interface HomeOrderStats {
+  newOrder: number;
+  confirmedOrder: number;
+  invoice: number;
+  cancelClaim: number;
+  returnClaim: number;
+  exchangeClaim: number;
+}
+
 export interface RecentProduct {
   productId: string;
   name: string;

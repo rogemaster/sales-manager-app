@@ -76,7 +76,7 @@ export const ProductOptionCard = ({ type, onConfirm, onReset }: Props) => {
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <OptionHeader
         type={type}
         isOptionsConfirmed={isOptionsConfirmed}

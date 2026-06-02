@@ -43,11 +43,20 @@ export const OrderEditHistorySection = ({ editHistory }: Props) => {
   const latest = editHistory[editHistory.length - 1];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>수정이력</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">수정이력</CardTitle>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+            수정이력 전체보기
+            {isExpanded ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 pt-6">
         <div className="flex items-center justify-between">
           <p className="text-sm">
             <span className="text-muted-foreground">최종 수정: </span>
@@ -56,10 +65,6 @@ export const OrderEditHistorySection = ({ editHistory }: Props) => {
             <span className="text-muted-foreground">수정자: </span>
             <span className="font-medium">{latest.modifiedBy}</span>
           </p>
-          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
-            수정이력 전체보기
-            {isExpanded ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
-          </Button>
         </div>
         {isExpanded && (
           <div className="space-y-2 border-t pt-3">

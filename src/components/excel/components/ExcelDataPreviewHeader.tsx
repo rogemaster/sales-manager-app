@@ -14,7 +14,6 @@ export const ExcelDataPreviewHeader = ({
   onSaveConfirm,
 }: ExcelHeaderProps & Props) => {
   const { showAlert } = useAlert();
-
   const resetExcel = useResetExcelData();
 
   const handleClearData = () => {
@@ -24,9 +23,7 @@ export const ExcelDataPreviewHeader = ({
       showCancel: true,
       confirmText: '삭제',
       cancelText: '취소',
-      onConfirm: () => {
-        resetExcel();
-      },
+      onConfirm: () => resetExcel(),
     });
   };
 
@@ -37,21 +34,22 @@ export const ExcelDataPreviewHeader = ({
       showCancel: true,
       confirmText: '저장',
       cancelText: '취소',
-      onConfirm: () => {
-        onSaveConfirm();
-      },
+      onConfirm: () => onSaveConfirm(),
     });
   };
 
   return (
-    <CardHeader>
+    <CardHeader className="border-b border-border/50 px-6 py-4">
       <div className="flex items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5" />
-            {headerTitle}
-          </CardTitle>
-          <CardDescription>{headerDescription}</CardDescription>
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <FileSpreadsheet className="h-4 w-4" />
+              {headerTitle}
+            </CardTitle>
+            <CardDescription className="mt-0.5">{headerDescription}</CardDescription>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleClearData}>

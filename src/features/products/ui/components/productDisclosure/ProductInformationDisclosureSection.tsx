@@ -27,12 +27,17 @@ export const ProductInformationDisclosureSection = () => {
   };
 
   return (
-    <Card className="lg:col-span-2">
-      <CardHeader>
-        <CardTitle>상품정보고시</CardTitle>
-        <CardDescription>전자상거래법에 따른 상품정보를 입력하세요.</CardDescription>
+    <Card className="overflow-hidden lg:col-span-2">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">상품정보고시</CardTitle>
+            <CardDescription className="mt-0.5">전자상거래법에 따른 상품정보를 입력하세요.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-6">
           {/* 상품정보고시 종류 선택 */}
           <div className="space-y-2">

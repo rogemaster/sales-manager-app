@@ -47,11 +47,14 @@ export const UserCreateForm = ({ gradeOptions }: UserCreateFormProps) => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>필수 정보</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-border/50 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">필수 정보</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
             <Label htmlFor="email">이메일 *</Label>
             <Input id="email" type="email" {...register('email')} placeholder="이메일을 입력하세요." />
@@ -97,11 +100,14 @@ export const UserCreateForm = ({ gradeOptions }: UserCreateFormProps) => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>선택 정보</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-border/50 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">선택 정보</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
             <Label htmlFor="avatar">프로필 사진</Label>
             <Input id="avatar" type="file" accept="image/*" onChange={handleAvatarChange} />

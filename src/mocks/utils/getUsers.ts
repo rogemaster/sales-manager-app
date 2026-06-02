@@ -23,6 +23,7 @@ export const getMockUsers = (filters: UserSearchType, page: number, pageSize: nu
   const totalPages = Math.ceil(total / pageSize) || 1;
   const users: AccountUser[] = filtered
     .slice((page - 1) * pageSize, page * pageSize)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .map(({ password: _password, ...user }) => user as AccountUser);
 
   return { users, total, page, pageSize, totalPages };

@@ -12,9 +12,15 @@ type Props = {
 
 export const OptionHeader = ({ type, onAddOption, isOptionsConfirmed, onConfirmOptions, onResetOptions }: Props) => {
   return (
-    <CardHeader>
-      <CardTitle className="flex items-center justify-between">
-        {type === 'basic' ? '옵션' : '추가옵션'}
+    <CardHeader className="border-b border-border/50 px-6 py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">{type === 'basic' ? '옵션' : '추가옵션'}</CardTitle>
+            <CardDescription className="mt-0.5">상품의 {type === 'basic' ? '옵션' : '추가'} 옵션을 설정하세요.</CardDescription>
+          </div>
+        </div>
         <div className="flex gap-2">
           {!isOptionsConfirmed ? (
             <>
@@ -32,8 +38,7 @@ export const OptionHeader = ({ type, onAddOption, isOptionsConfirmed, onConfirmO
             </Button>
           )}
         </div>
-      </CardTitle>
-      <CardDescription>상품의 {type === 'basic' ? '옵션' : '추가'} 옵션을 설정하세요.</CardDescription>
+      </div>
     </CardHeader>
   );
 };

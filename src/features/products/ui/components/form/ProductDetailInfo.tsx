@@ -12,12 +12,17 @@ export const ProductDetailInfo = () => {
   } = useFormContext<Product>();
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>상품상세설명</CardTitle>
-        <CardDescription>상품에 대한 자세한 설명을 입력하세요.</CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">상품상세설명</CardTitle>
+            <CardDescription className="mt-0.5">상품에 대한 자세한 설명을 입력하세요.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Textarea
           {...register('detailPage', { required: '상품상세설명을 입력하세요.' })}
           placeholder="상세설명 입력"

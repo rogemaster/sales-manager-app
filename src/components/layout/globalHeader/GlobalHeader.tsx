@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export const GlobalHeader = () => {
   return (
-    <header className="w-full h-16 border-b bg-background sticky top-0 z-10">
+    <header className="w-full h-16 border-b border-border/70 bg-background sticky top-0 z-10 shadow-sm">
       <div className="flex h-16 items-center justify-between px-4">
         {/* 왼쪽: 로고 + 햄버거 버튼 */}
         <div className="flex items-center gap-4">

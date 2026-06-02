@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, List, Tag } from 'lucide-react';
+import { Plus, List, ClipboardList } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
@@ -8,31 +8,25 @@ import { Button } from '@/components/ui/button';
 export const QuickActions = () => {
   const router = useRouter();
 
+  const actions = [
+    { label: '상품 등록', Icon: Plus, onClick: () => router.push('/products/create'), variant: 'default' as const },
+    { label: '상품 목록', Icon: List, onClick: () => router.push('/products/list'), variant: 'outline' as const },
+    { label: '주문 목록', Icon: ClipboardList, onClick: () => router.push('/order/list'), variant: 'outline' as const },
+  ];
+
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <h2 className="text-base font-semibold mb-1">빠른 작업</h2>
-      <hr className="mb-4" />
-      <div className="flex flex-col gap-3">
+    <div className="flex gap-3">
+      {actions.map((action) => (
         <Button
-          className="w-full h-12 text-base font-semibold bg-[#2196F3] hover:bg-[#1976D2] text-white"
-          onClick={() => router.push('/products/create')}
+          key={action.label}
+          variant={action.variant}
+          className="flex-1 h-10 gap-2"
+          onClick={action.onClick}
         >
-          <Plus className="mr-2 h-5 w-5" />
-          상품 등록
+          <action.Icon className="h-4 w-4" />
+          {action.label}
         </Button>
-        <Button
-          variant="outline"
-          className="w-full h-12 text-base font-semibold"
-          onClick={() => router.push('/products/list')}
-        >
-          <List className="mr-2 h-5 w-5" />
-          상품 목록 보기
-        </Button>
-        <Button variant="outline" className="w-full h-12 text-base font-semibold">
-          <Tag className="mr-2 h-5 w-5" />
-          판매중 상품 관리
-        </Button>
-      </div>
+      ))}
     </div>
   );
 };

@@ -45,12 +45,17 @@ export const ProductBasicinfo = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>기본 정보</CardTitle>
-        <CardDescription>상품의 기본 정보를 입력하세요.</CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">기본 정보</CardTitle>
+            <CardDescription className="mt-0.5">상품의 기본 정보를 입력하세요.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="space-y-2">
           <Label htmlFor="customerProductCode">고객사 상품코드</Label>
           <Input {...register('customerCode')} />

@@ -20,6 +20,7 @@ export const createMockUser = (body: CreateUserBody): AccountUser => {
     updatedAt: now,
   };
   MOCK_USERS_DATA.push(newUser);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _, ...user } = newUser;
   return user;
 };
