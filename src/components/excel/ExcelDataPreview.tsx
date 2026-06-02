@@ -49,7 +49,7 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <ExcelDataPreviewHeader
         headerTitle={excelHeader.headerTitle}
         headerDescription={excelHeader.headerDescription}
@@ -57,7 +57,7 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
         onSaveConfirm={handleExcelSaveData}
       />
 
-      <CardContent>
+      <CardContent className="pt-6">
         {/* 요약 정보 */}
         <ExcelDataSummaryInfo totalCount={totalCount} validCount={validCount} errorCount={errorCount} />
 

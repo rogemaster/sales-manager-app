@@ -39,7 +39,7 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="h-16 border-b border-border/40 bg-muted/60 hover:bg-muted/30">
           <TableHead className="w-12">
             <Checkbox
               checked={selectedOrders.length === orders.length && orders.length > 0}
@@ -47,18 +47,18 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
             />
           </TableHead>
           {ORDERLIST_TABLE_HEAD.map((item) => (
-            <TableHead key={item.id} className="w-32 text-center">
+            <TableHead key={item.id} className="w-32 text-center font-bold uppercase tracking-widest">
               {item.title}
             </TableHead>
           ))}
-          <TableHead className="text-center">작업</TableHead>
+          <TableHead className="text-center font-bold uppercase tracking-widest">작업</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {orders.map((order) => (
           <TableRow
             key={order.orderNumber}
-            className="cursor-pointer"
+            className="group cursor-pointer border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
             onClick={() => router.push(`/order/${order.orderNumber}`)}
           >
             <TableCell onClick={(e) => e.stopPropagation()}>

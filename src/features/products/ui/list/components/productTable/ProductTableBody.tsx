@@ -37,7 +37,7 @@ export const ProductTableBody = ({ products }: Props) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow className="h-16">
+        <TableRow className="h-16 border-b border-border/40 bg-muted/60 hover:bg-muted/30">
           <TableHead className="w-12">
             <Checkbox
               checked={products.length > 0 && products.every((p) => selectedSet.has(p.productId))}
@@ -45,7 +45,7 @@ export const ProductTableBody = ({ products }: Props) => {
             />
           </TableHead>
           {LIST_TABLE_HEAD.map((item) => (
-            <TableHead className="w-32 text-center" key={item.id}>
+            <TableHead className={`text-center font-bold uppercase tracking-widest ${item.width ?? ''}`} key={item.id}>
               {item.title}
             </TableHead>
           ))}
@@ -53,22 +53,22 @@ export const ProductTableBody = ({ products }: Props) => {
       </TableHeader>
       <TableBody>
         {products.map((product) => (
-          <TableRow key={product.productId} className="h-14">
+          <TableRow key={product.productId} className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30">
             <TableCell>
               <Checkbox
                 checked={selectedSet.has(product.productId)}
                 onCheckedChange={(checked: boolean) => handleSelectProduct(product.productId, checked)}
               />
             </TableCell>
-            <TableCell className="font-mono text-sm text-muted-foreground">{product.productId}</TableCell>
+            <TableCell className="text-center font-mono text-sm text-muted-foreground">{product.productId}</TableCell>
             <TableCell className="font-medium">
               <Link href={`/products/${product.productId}`}>{product.name}</Link>
             </TableCell>
-            <TableCell>{getCategoryName(product.categoryId)}</TableCell>
-            <TableCell>{product.price.toLocaleString()}원</TableCell>
-            <TableCell><ProductStatusBadge status={product.state} /></TableCell>
-            <TableCell>{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>
-            <TableCell>{dayjs(product.updateDate).format('YYYY-MM-DD')}</TableCell>
+            <TableCell className="text-center">{getCategoryName(product.categoryId)}</TableCell>
+            <TableCell className="text-center">{product.price.toLocaleString()}원</TableCell>
+            <TableCell className="text-center"><ProductStatusBadge status={product.state} /></TableCell>
+            <TableCell className="text-center">{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>
+            <TableCell className="text-center">{dayjs(product.updateDate).format('YYYY-MM-DD')}</TableCell>
           </TableRow>
         ))}
       </TableBody>

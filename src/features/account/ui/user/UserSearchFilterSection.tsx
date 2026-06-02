@@ -5,15 +5,18 @@ import { UserSearchInput } from './components/UserSearchInput';
 
 export const UserSearchFilterSection = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>검색 및 필터</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <CardTitle className="text-sm">검색 및 필터</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <UserDateFilter />
-          <UserGradeFilter />
-          <UserSearchInput />
+      <CardContent className="p-0">
+        <div className="space-y-1">
+          <div className="px-6 py-1"><UserDateFilter /></div>
+          <div className="px-6 py-1"><UserGradeFilter /></div>
+          <div className="px-6 py-1"><UserSearchInput /></div>
         </div>
       </CardContent>
     </Card>

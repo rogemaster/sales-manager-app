@@ -1,8 +1,7 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { RecentProduct } from '@/features/home/types/home.types';
@@ -13,40 +12,72 @@ type Props = {
 
 export const RecentProducts = ({ products }: Props) => {
   return (
-    <div className="rounded-lg border bg-card">
-      <div className="p-6 pb-4">
-        <h2 className="text-base font-semibold">최근 등록 상품</h2>
-        <hr className="mt-3" />
+    <div className="overflow-hidden rounded-xl border border-border/60 bg-card">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <h2 className="text-base font-bold tracking-tight">최근 등록 상품</h2>
+        </div>
+        <span className="text-xs text-muted-foreground">최근 5건</span>
       </div>
+
+      {/* 테이블 */}
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/40">
-            <TableHead className="font-semibold text-foreground w-20">ID</TableHead>
-            <TableHead className="font-semibold text-foreground">상품명</TableHead>
-            <TableHead className="font-semibold text-foreground">가격</TableHead>
-            <TableHead className="font-semibold text-foreground">상태</TableHead>
-            <TableHead className="font-semibold text-foreground">등록일</TableHead>
+          <TableRow className="border-b border-border/40 bg-muted/30 hover:bg-muted/30">
+            <TableHead className="h-9 w-28 text-center text-sm font-bold uppercase tracking-widest text-foreground/60">
+              ID
+            </TableHead>
+            <TableHead className="h-9 text-sm font-bold uppercase tracking-widest text-foreground/60">
+              상품명
+            </TableHead>
+            <TableHead className="h-9 text-center text-sm font-bold uppercase tracking-widest text-foreground/60">
+              가격
+            </TableHead>
+            <TableHead className="h-9 text-center text-sm font-bold uppercase tracking-widest text-foreground/60">
+              상태
+            </TableHead>
+            <TableHead className="h-9 text-center text-sm font-bold uppercase tracking-widest text-foreground/60">
+              등록일
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.productId}>
-              <TableCell className="font-bold">{product.productId}</TableCell>
-              <TableCell className="font-medium">{product.name}</TableCell>
-              <TableCell className="font-bold">{product.price.toLocaleString()}원</TableCell>
-              <TableCell>
+            <TableRow
+              key={product.productId}
+              className="group border-b border-border/30 transition-colors last:border-0 hover:bg-muted/20"
+            >
+              <TableCell className="py-3 text-center font-mono text-xs text-muted-foreground">
+                {product.productId}
+              </TableCell>
+              <TableCell className="py-3">
+                <span className="text-sm font-medium group-hover:text-primary transition-colors">
+                  {product.name}
+                </span>
+              </TableCell>
+              <TableCell className="py-3 text-center tabular-nums">
+                <span className="text-sm font-semibold">{product.price.toLocaleString()}</span>
+                <span className="ml-0.5 text-xs text-muted-foreground">원</span>
+              </TableCell>
+              <TableCell className="py-3 text-center">
                 <ProductStatusBadge status={product.state} />
               </TableCell>
-              <TableCell className="text-muted-foreground">{product.createDate}</TableCell>
+              <TableCell className="py-3 text-center font-mono text-xs text-muted-foreground tabular-nums">
+                {product.createDate}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="flex justify-center py-4 border-t">
-        <Button variant="outline" size="sm" className="gap-1">
-          모두 보기
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+
+      {/* 푸터 */}
+      <div className="flex items-center justify-center border-t border-border/40 bg-muted/10 py-3">
+        <button className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+          전체 상품 보기
+          <ArrowRight className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );

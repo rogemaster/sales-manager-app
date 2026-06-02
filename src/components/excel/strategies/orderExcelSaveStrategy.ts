@@ -18,7 +18,7 @@ export const orderExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Order[] => {
     orderOption: (r['주문옵션명'] as string) || undefined,
     orderSubOption: (r['주문추가옵션명'] as string) || undefined,
     orderSubTotalQuantity: (r['주문추가옵션수량'] as string) || undefined,
-    orderDeliveryType: (r['배송타입'] as string) || '',
+    orderDeliveryType: (r['배송타입'] as Order['orderDeliveryType']) || 'FREE',
     orderDeliveryPrice: Number(r['배송비']),
     orderName: (r['주문자명'] as string) || '',
     payeeName: (r['수취인명'] as string) || '',

@@ -4,6 +4,7 @@ import { Product, ProductSearch } from '@/features/products/types/product.types'
 import { createMockProduct } from './utils/createProduct';
 import { MOCK_PRODUCT_DATA } from './data/MockProductsData';
 import { getMockHomeStats, getMockRecentProducts } from './utils/getHomeData';
+import { getMockHomeOrderStats } from './utils/getHomeOrderStats';
 import { MOCK_ORDERS_DATA } from './data/MockOrdersData';
 import { Order, OrderDetail, OrderSearchType } from '@/features/order/types/order.types';
 import { getMockOrders } from './utils/getOrders';
@@ -52,6 +53,12 @@ export const handlers = [
   // 홈 최근 등록 상품
   http.get(`${baseUrl}/api/home/recent-products`, () => {
     return HttpResponse.json(getMockRecentProducts());
+  }),
+
+  // 홈 주문/클레임 통계
+  http.post(`${baseUrl}/api/home/order-stats`, async ({ request }) => {
+    const { startDate, endDate } = (await request.json()) as { startDate: string; endDate: string };
+    return HttpResponse.json(getMockHomeOrderStats(startDate, endDate));
   }),
 
   // 상품 목록 조회

@@ -42,7 +42,7 @@ export const UserTable = ({ users }: UserTableProps) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="h-16 border-b border-border/40 bg-muted/60 hover:bg-muted/30">
           <TableHead className="w-12">
             <Checkbox
               checked={users.length > 0 && selectedUsers.length === users.length}
@@ -50,11 +50,11 @@ export const UserTable = ({ users }: UserTableProps) => {
             />
           </TableHead>
           {USER_TABLE_HEAD.map((item) => (
-            <TableHead key={item.id} className="text-center">
+            <TableHead key={item.id} className="text-center font-bold uppercase tracking-widest">
               {item.title}
             </TableHead>
           ))}
-          {canEdit && <TableHead className="text-center">작업</TableHead>}
+          {canEdit && <TableHead className="text-center font-bold uppercase tracking-widest">작업</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -66,7 +66,7 @@ export const UserTable = ({ users }: UserTableProps) => {
           </TableRow>
         ) : (
           users.map((user) => (
-            <TableRow key={user.id}>
+            <TableRow key={user.id} className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30">
               <TableCell onClick={(e) => e.stopPropagation()}>
                 <Checkbox
                   checked={selectedUsers.includes(user.id)}

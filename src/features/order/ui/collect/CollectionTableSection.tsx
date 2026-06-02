@@ -28,21 +28,21 @@ export const CollectionTableSection = () => {
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="overflow-hidden rounded-xl border border-border/60">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="h-16 border-b border-border/40 bg-muted/60 hover:bg-muted/30">
             <TableHead className="w-10">
               <Checkbox
                 checked={isIndeterminate ? 'indeterminate' : isAllChecked}
                 onCheckedChange={(checked) => handleToggleAll(!!checked)}
               />
             </TableHead>
-            <TableHead>쇼핑몰명</TableHead>
-            <TableHead>아이디</TableHead>
-            <TableHead>수집상태</TableHead>
-            <TableHead>작업ID</TableHead>
-            <TableHead>최종수집일자</TableHead>
+            <TableHead className="text-center font-bold uppercase tracking-widest">쇼핑몰명</TableHead>
+            <TableHead className="text-center font-bold uppercase tracking-widest">아이디</TableHead>
+            <TableHead className="text-center font-bold uppercase tracking-widest">수집상태</TableHead>
+            <TableHead className="text-center font-bold uppercase tracking-widest">작업ID</TableHead>
+            <TableHead className="text-center font-bold uppercase tracking-widest">최종수집일자</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,24 +54,28 @@ export const CollectionTableSection = () => {
             </TableRow>
           ) : (
             jobs.map((job) => (
-              <TableRow key={job.id} data-state={selectedJobIds.includes(job.id) ? 'selected' : undefined}>
+              <TableRow
+                key={job.id}
+                data-state={selectedJobIds.includes(job.id) ? 'selected' : undefined}
+                className="group border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
+              >
                 <TableCell>
                   <Checkbox
                     checked={selectedJobIds.includes(job.id)}
                     onCheckedChange={(checked) => handleToggleRow(job.id, !!checked)}
                   />
                 </TableCell>
-                <TableCell>{getMallName(job.mallName)}</TableCell>
-                <TableCell>{job.mallAccountId}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">{getMallName(job.mallName)}</TableCell>
+                <TableCell className="text-center">{job.mallAccountId}</TableCell>
+                <TableCell className="text-center">
                   <CollectionStatusCell
                     status={job.status}
                     collectedCount={job.collectedCount}
                     totalCount={job.totalCount}
                   />
                 </TableCell>
-                <TableCell>{job.id}</TableCell>
-                <TableCell>{job.lastCollectedAt ?? '-'}</TableCell>
+                <TableCell className="text-center">{job.id}</TableCell>
+                <TableCell className="text-center">{job.lastCollectedAt ?? '-'}</TableCell>
               </TableRow>
             ))
           )}

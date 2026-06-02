@@ -18,7 +18,7 @@ export const GlobalSidebarMenu = () => {
   return (
     <SidebarContent>
       <SidebarGroup>
-        <SidebarGroupContent>
+<SidebarGroupContent>
           <SidebarMenu>
             {GLOBAL_SIDEBAR_MENU.map((menu) => (
               <SidebarMenuItem key={menu.title}>

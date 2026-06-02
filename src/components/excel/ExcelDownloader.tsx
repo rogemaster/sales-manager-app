@@ -17,13 +17,13 @@ export const ExcelDownloader = ({
   const { downloadTemplate } = excelDownload(templateHeaders || [], templateName);
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <ExcelHeader
         excelType={excelHeader.excelType}
         headerTitle={excelHeader.headerTitle}
         headerDescription={excelHeader.headerDescription}
       />
-      <CardContent>
+      <CardContent className="pt-6">
         {/* 엑셀 양식 다운로드 버튼 */}
         <ExcelTemplateButton onClick={downloadTemplate} />
         {isTemplateInfo && templateInfo && (

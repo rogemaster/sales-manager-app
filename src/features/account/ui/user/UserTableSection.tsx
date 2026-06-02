@@ -22,16 +22,19 @@ export const UserTableSection = () => {
   const totalPages = data?.totalPages ?? 1;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
         <div className="flex items-center justify-between">
-          <CardTitle>사용자 목록</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <div className="h-4 w-[3px] rounded-full bg-primary" />
+            <CardTitle className="text-sm">사용자 목록</CardTitle>
+          </div>
           <CardDescription>총 {isLoading ? '-' : total}명의 사용자</CardDescription>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">불러오는 중...</div>
+          <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">불러오는 중...</div>
         ) : (
           <UserTable users={users} />
         )}

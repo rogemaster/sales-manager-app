@@ -8,6 +8,7 @@ export interface dynamicType {
 export interface TableTitleValue {
   id: string;
   title: string;
+  width?: string;
 }
 
 export interface Category {

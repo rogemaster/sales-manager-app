@@ -63,12 +63,17 @@ export const ProductMainImageInfo = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>메인이미지</CardTitle>
-        <CardDescription>상품의 메인 이미지를 업로드하세요.</CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <div>
+            <CardTitle className="text-sm">메인이미지</CardTitle>
+            <CardDescription className="mt-0.5">상품의 메인 이미지를 업로드하세요.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-4">
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${

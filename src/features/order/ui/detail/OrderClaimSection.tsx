@@ -21,11 +21,14 @@ export const OrderClaimSection = ({ claim, isEditMode }: Props) => {
   const { control } = useFormContext<OrderDetail>();
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>클레임</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b border-border/50 px-6 py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-4 w-[3px] rounded-full bg-primary" />
+          <CardTitle className="text-sm">클레임</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {!claim ? (
           <p className="text-sm text-muted-foreground">클레임 없음</p>
         ) : (
