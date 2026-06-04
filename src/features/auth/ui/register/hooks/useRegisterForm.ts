@@ -15,6 +15,7 @@ export const useRegisterForm = () => {
   const [businessLicense, setBusinessLicense] = useState<File | null>(null);
   const [businessLicenseError, setBusinessLicenseError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -67,6 +68,8 @@ export const useRegisterForm = () => {
   };
 
   const handleFormSubmit = async (data: RegisterFormData) => {
+    setSubmitError('');
+
     if (!isEmailChecked || !emailAvailable) {
       form.setError('email', { message: '이메일 중복 확인이 필요합니다' });
       return;
@@ -90,9 +93,13 @@ export const useRegisterForm = () => {
         redirect: false,
       });
 
-      if (result?.ok) router.push('/home');
+      if (result?.ok) {
+        router.push('/home');
+      } else {
+        setSubmitError('가입은 완료되었으나 자동 로그인에 실패했습니다. 로그인 페이지로 이동해주세요.');
+      }
     } catch {
-      // 필요 시 에러 상태 추가
+      setSubmitError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }
@@ -106,6 +113,7 @@ export const useRegisterForm = () => {
     businessLicense,
     businessLicenseError,
     isSubmitting,
+    submitError,
     handleEmailReset,
     handleEmailCheck,
     handleFileChange,
