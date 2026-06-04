@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { phoneSchemaRequired } from '@/shared/utils/phone';
+
+export { formatPhone } from '@/shared/utils/phone';
 
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{9,}$/;
 const BUSINESS_NUMBER_REGEX = /^\d{3}-\d{2}-\d{5}$/;
@@ -14,7 +17,7 @@ export const registerSchema = z
     businessCategory: z.string().min(1, '업종을 선택해주세요'),
     contactName: z.string().min(1, '담당자명을 입력해주세요'),
     contactEmail: z.string().email('올바른 이메일 형식을 입력해주세요'),
-    contactPhone: z.string().min(1, '담당자 휴대폰을 입력해주세요'),
+    contactPhone: phoneSchemaRequired('담당자 휴대폰을 입력해주세요', '올바른 휴대폰 형식이 아닙니다. (예: 010-1234-5678)'),
     settlementName: z.string(),
     settlementEmail: z
       .string()
@@ -36,11 +39,4 @@ export const formatBusinessNumber = (value: string): string => {
   if (digits.length <= 3) return digits;
   if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
   return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-};
-
-export const formatPhone = (value: string): string => {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 };

@@ -29,6 +29,21 @@ import { RegisterFormData } from '@/features/auth/util/registerValidation';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const handlers = [
+  http.post(`${baseUrl}/api/check-email`, async ({ request }) => {
+    const { email } = (await request.json()) as { email: string };
+    const available = checkEmailAvailability(email);
+    return HttpResponse.json({ available });
+  }),
+
+  http.post(`${baseUrl}/api/register`, async ({ request }) => {
+    const body = (await request.json()) as RegisterFormData & { businessLicenseName: string };
+    if (!checkEmailAvailability(body.email)) {
+      return new HttpResponse(null, { status: 400 });
+    }
+    registerMockUser(body);
+    return new HttpResponse(null, { status: 201 });
+  }),
+
   http.post(`${baseUrl}/api/login`, async ({ request }) => {
     const { email, password } = (await request.json()) as { email: string; password: string };
     const user = loginUser(email, password);
@@ -38,21 +53,6 @@ export const handlers = [
         'Set-Cookie': 'connect.sid=msw-cookie;HttpOnly;Path=/',
       },
     });
-  }),
-
-  http.post(`${baseUrl}/api/auth/check-email`, async ({ request }) => {
-    const { email } = (await request.json()) as { email: string };
-    const available = checkEmailAvailability(email);
-    return HttpResponse.json({ available });
-  }),
-
-  http.post(`${baseUrl}/api/auth/register`, async ({ request }) => {
-    const body = (await request.json()) as RegisterFormData & { businessLicenseName: string };
-    if (!checkEmailAvailability(body.email)) {
-      return new HttpResponse(null, { status: 400 });
-    }
-    registerMockUser(body);
-    return new HttpResponse(null, { status: 201 });
   }),
 
   http.post(`${baseUrl}/api/logout`, () => {

@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { useAlert } from '@/hooks/useAlert';
 import { registerSchema, RegisterFormData } from '@/features/auth/util/registerValidation';
 
 export const useRegisterForm = () => {
   const router = useRouter();
+  const { showAlert } = useAlert();
   const [isEmailChecked, setIsEmailChecked] = useState(false);
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
   const [isEmailChecking, setIsEmailChecking] = useState(false);
@@ -48,7 +49,7 @@ export const useRegisterForm = () => {
     const email = form.getValues('email');
     setIsEmailChecking(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/check-email`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/check-email`, {
         method: 'POST',
         body: JSON.stringify({ email }),
       });
@@ -81,23 +82,23 @@ export const useRegisterForm = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/register`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, {
         method: 'POST',
         body: JSON.stringify({ ...data, businessLicenseName: businessLicense.name }),
       });
       if (!res.ok) throw new Error('가입 실패');
 
-      const result = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
+      showAlert({
+        type: 'success',
+        title: '가입이 완료되었습니다',
+        message:
+          '※ MSW 개발 환경으로 인해 실제 신규 가입은 지원되지 않습니다.\n' +
+          '아래 테스트 계정으로 로그인해 주세요.\n\n' +
+          '이메일: admin@example.com\n' +
+          '비밀번호: admin123',
+        confirmText: '로그인 페이지로 이동',
+        onConfirm: () => router.push('/login'),
       });
-
-      if (result?.ok) {
-        router.push('/home');
-      } else {
-        setSubmitError('가입은 완료되었으나 자동 로그인에 실패했습니다. 로그인 페이지로 이동해주세요.');
-      }
     } catch {
       setSubmitError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
