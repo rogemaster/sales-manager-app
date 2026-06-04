@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { MOCK_USERS_DATA } from '../data/MockUsersData';
 import { RegisterFormData } from '@/features/auth/util/registerValidation';
 
-export const registerMockUser = (data: RegisterFormData & { businessLicenseName: string }): void => {
+export const registerMockUser = (data: RegisterFormData): void => {
   MOCK_USERS_DATA.push({
     id: `usr_${String(MOCK_USERS_DATA.length + 1).padStart(3, '0')}`,
     status: 'active',
