@@ -74,7 +74,7 @@ export function CommonAlertDialog({ open, onOpenChange, options }: CommonAlertDi
             {getIcon()}
             {getTitle()}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-base">{options.message}</AlertDialogDescription>
+          <AlertDialogDescription className="whitespace-pre-line text-base">{options.message}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           {options.showCancel && (

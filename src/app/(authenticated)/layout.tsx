@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
-import { AlertProvider } from '@/components/common/alert/AlertProvider';
 import { GlobalHeader } from '@/components/layout';
 import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -37,9 +36,7 @@ export default function Layout({ children }: Props) {
           {/* 메인 콘텐츠 */}
           <main className="flex-1 p-6 pl-[15rem]">
             <QueryClientProvider client={queryClient}>
-              <AlertProvider>
-                <div className="max-w-[80%] mx-auto space-y-6">{children}</div>
-              </AlertProvider>
+              <div className="max-w-[80%] mx-auto space-y-6">{children}</div>
             </QueryClientProvider>
           </main>
         </SidebarInset>
