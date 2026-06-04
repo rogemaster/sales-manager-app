@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { Controller, useFormContext } from 'react-hook-form';
+import { phoneSchemaRequired } from '@/shared/utils/phone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,10 +15,7 @@ export const createUserSchema = z.object({
   password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다.'),
   grade: z.enum(['super_admin', 'admin', 'operator'], { message: '등급을 선택해주세요.' }),
   name: z.string().min(1, '이름을 입력해주세요.'),
-  phone: z
-    .string()
-    .min(1, '연락처를 입력해주세요.')
-    .regex(/^(0[0-9]{1,2})-?([0-9]{3,4})-?([0-9]{4})$/, '올바른 연락처 형식이 아닙니다. (예: 010-1234-5678)'),
+  phone: phoneSchemaRequired(),
   avatar: z.string().optional(),
   bio: z.string().optional(),
 });
