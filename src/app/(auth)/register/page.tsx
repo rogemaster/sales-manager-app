@@ -1,5 +1,13 @@
+import { RegisterForm } from '@/features/auth/ui/register/RegisterForm';
+
 const RegisterPage = () => {
-  return <div>회원가입</div>;
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <div className="w-full max-w-2xl">
+        <RegisterForm />
+      </div>
+    </div>
+  );
 };
 
 export default RegisterPage;
