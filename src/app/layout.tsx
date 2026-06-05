@@ -2,12 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { AlertProvider } from '@/components/common/alert/AlertProvider';
+import { MSWProvider } from '@/components/providers/MSWProvider';
 
 import './globals.css';
-import { handlers } from '@/mocks/handlers';
-import { setupServer } from 'msw/node';
-import { setupWorker } from 'msw/browser';
-import { MSWProvider } from '@/components/providers/MSWProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,14 +18,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  if (typeof window === 'undefined') {
-    const server = setupServer(...handlers);
-    server.listen();
-  } else {
-    const worker = setupWorker(...handlers);
-    worker.start();
-  }
-
   return (
     <html lang="en">
       <body className={inter.className}>
