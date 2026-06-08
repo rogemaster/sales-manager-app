@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Errors, LoginInfo } from '../../types/Auth';
+import { useAlert } from '@/hooks/useAlert';
 
 type SignInFormProps = {
   formData: LoginInfo;
@@ -13,6 +14,13 @@ type SignInFormProps = {
 };
 
 export const LoginForm = ({ formData, errors, isLoading, handleInputChange, handleLogin }: SignInFormProps) => {
+  const { showAlert } = useAlert();
+
+  const handleFindPasswordClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    showAlert({ message: '개발 진행 중인 기능입니다.', type: 'info' });
+  };
+
   return (
     <form className="p-8 md:p-10" onSubmit={handleLogin}>
       <div className="flex flex-col gap-6">
@@ -41,9 +49,13 @@ export const LoginForm = ({ formData, errors, isLoading, handleInputChange, hand
           <div className="grid gap-2">
             <div className="flex items-center">
               <Label htmlFor="password">비밀번호</Label>
-              <Link href="/findPassword" className="ml-auto text-sm text-muted-foreground underline-offset-4 hover:underline">
+              <a
+                href="/findPassword"
+                onClick={handleFindPasswordClick}
+                className="ml-auto text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
                 비밀번호 찾기
-              </Link>
+              </a>
             </div>
             <Input
               id="password"

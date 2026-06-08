@@ -14,11 +14,17 @@ import { useAtomValue, useSetAtom } from 'jotai/index';
 import { getUserInfoAtom, resetUserInfoAtom } from '@/features/auth/store/auth.store';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
+import { useAlert } from '@/hooks/useAlert';
 
 export const GlobalUserMenuButton = () => {
   const { avatar, name } = useAtomValue(getUserInfoAtom);
   const resetUserInfo = useSetAtom(resetUserInfoAtom);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { showAlert } = useAlert();
+
+  const handleEditProfile = () => {
+    showAlert({ message: '개발 진행 중인 기능입니다.', type: 'info' });
+  };
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -41,7 +47,7 @@ export const GlobalUserMenuButton = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEditProfile}>
             <Settings className="mr-2 h-4 w-4" />
             <span>프로필 수정</span>
           </DropdownMenuItem>

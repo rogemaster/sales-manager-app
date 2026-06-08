@@ -1,7 +1,6 @@
 'use client';
 
 import { useAtom, useAtomValue } from 'jotai';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,6 +9,7 @@ import { selectedUsersAtom } from '@/features/account/store/userSearch.store';
 import { gradeAtom } from '@/features/auth/store/auth.store';
 import { USER_TABLE_HEAD, USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { AccountUser } from '@/features/account/types/user.types';
+import { useAlert } from '@/hooks/useAlert';
 
 const gradeLabel = (grade: string) => USER_GRADE_OPTIONS.find((o) => o.id === grade)?.name ?? grade;
 
@@ -21,7 +21,7 @@ export const UserTable = ({ users }: UserTableProps) => {
   const [selectedUsers, setSelectedUsers] = useAtom(selectedUsersAtom);
   const grade = useAtomValue(gradeAtom);
   const canEdit = grade === 'super_admin' || grade === 'admin';
-  const router = useRouter();
+  const { showAlert } = useAlert();
 
   const handleSelectUser = (id: string, checked: boolean) => {
     if (checked) {
@@ -80,7 +80,11 @@ export const UserTable = ({ users }: UserTableProps) => {
               <TableCell className="text-center">{user.updatedAt}</TableCell>
               {canEdit && (
                 <TableCell className="text-center">
-                  <Button variant="ghost" size="sm" onClick={() => router.push(`/account/user/${user.id}`)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => showAlert({ message: '개발 진행 중인 기능입니다.', type: 'info' })}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                 </TableCell>

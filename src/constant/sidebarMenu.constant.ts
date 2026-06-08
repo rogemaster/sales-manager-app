@@ -34,14 +34,17 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       {
         title: '쇼핑몰설정',
         url: '/shopping/settings',
+        disabled: true,
       },
       {
         title: '쇼핑몰상품등록',
         url: '/shopping/register',
+        disabled: true,
       },
       {
         title: '쇼핑몰상품목록',
         url: '/shopping/list',
+        disabled: true,
       },
     ],
   },
@@ -76,10 +79,12 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
       {
         title: '매입처관리',
         url: '/account/purchase',
+        disabled: true,
       },
       {
         title: '매출처관리',
         url: '/account/sales',
+        disabled: true,
       },
     ],
   },
