@@ -9,8 +9,8 @@
 
 | 기능 | 설명 |
 |------|------|
-| 인증 | 이메일/비밀번호 로그인, JWT 세션, 미인증 라우트 자동 차단 |
-| 홈 대시보드 | 판매 현황 통계 카드, 상품 상태별 도넛 차트, 최근 등록 상품 목록 |
+| 인증 | 이메일/비밀번호 로그인, 회원가입(사업자 정보·연락처·정산 정보 입력 및 이메일 중복 검증), JWT 세션, 미인증 라우트 자동 차단 |
+| 홈 대시보드 | 판매·주문·클레임·문의 현황 통계 카드, 최근 등록 상품 목록 |
 | 상품 목록 | 날짜·카테고리·판매 상태 복합 필터, 키워드 검색, 페이지네이션 |
 | 상품 등록/수정 | 기본 정보, 가격/수량, 옵션 조합, 상품 고시 정보 등 전체 CRUD |
 | 상품 대량 등록 | 엑셀 템플릿 다운로드 → 업로드 → 미리보기 → 일괄 제출 |
@@ -35,7 +35,6 @@
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
 | API Mocking | MSW 2 | 서비스 워커 레벨 인터셉트로 실제 네트워크와 동일한 개발 환경 |
 | 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
-| 차트 | Recharts | React 친화적 선언형 차트 API |
 
 <br />
 
@@ -162,10 +161,10 @@ src/
 │   ├── types/                  # 공통 타입
 │   └── constant/               # 쇼핑몰·배송 상수
 ├── components/
-│   ├── common/                 # TablePagination, RangeDatePicker, FilterSelect 등
+│   ├── common/                 # TablePagination, RangeDatePicker, FilterSelect, Alert(useAlert) 등
 │   ├── excel/                  # 엑셀 업로드/다운로드/미리보기 + 전략 패턴
 │   ├── layout/                 # 글로벌 헤더, 사이드바
-│   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider
+│   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider (AlertProvider는 common/alert)
 │   └── ui/                     # Radix UI 기반 기본 컴포넌트
 ├── mocks/                      # MSW 핸들러 및 목업 데이터
 │   ├── handlers.ts
