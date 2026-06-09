@@ -25,6 +25,8 @@ import { UserSearchType, CreateUserBody } from '@/features/account/types/user.ty
 import { checkEmailAvailability } from './utils/checkEmail';
 import { registerMockUser } from './utils/registerUser';
 import { RegisterFormData } from '@/features/auth/util/registerValidation';
+import { updateMockProfile } from './utils/updateProfile';
+import { UpdateProfileBody } from '@/features/profile/api/updateProfile';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -247,5 +249,13 @@ export const handlers = [
     const body = (await request.json()) as CreateUserBody;
     const newUser = createMockUser(body);
     return HttpResponse.json(newUser, { status: 201 });
+  }),
+
+  // 프로필 수정
+  http.patch(`${baseUrl}/api/profile`, async ({ request }) => {
+    const body = (await request.json()) as UpdateProfileBody;
+    const updated = updateMockProfile(body);
+    if (!updated) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json(updated);
   }),
 ];
