@@ -5,6 +5,7 @@ import { RegisterFormData } from '@/features/auth/util/registerValidation';
 export const registerMockUser = (data: RegisterFormData): void => {
   MOCK_USERS_DATA.push({
     id: `usr_${String(MOCK_USERS_DATA.length + 1).padStart(3, '0')}`,
+    ownerId: null,
     status: 'active',
     email: data.email,
     password: data.password,
@@ -14,7 +15,7 @@ export const registerMockUser = (data: RegisterFormData): void => {
     bio: '',
     company: data.companyName,
     location: '',
-    grade: 'operator',
+    grade: 'super_admin',
     createdAt: new Date().toISOString().split('T')[0],
     updatedAt: new Date().toISOString().split('T')[0],
   });

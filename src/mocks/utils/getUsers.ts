@@ -5,10 +5,11 @@ import { AccountUser, GetUsersResponse, UserSearchType } from '@/features/accoun
 
 dayjs.extend(isBetween);
 
-export const getMockUsers = (filters: UserSearchType, page: number, pageSize: number): GetUsersResponse => {
+export const getMockUsers = (ownerId: string, filters: UserSearchType, page: number, pageSize: number): GetUsersResponse => {
   const { dateType, startDate, endDate, grade, searchType, searchValue } = filters;
 
   const filtered = MOCK_USERS_DATA.filter((user) => {
+    if (user.ownerId !== ownerId) return false;
     const dateValue = dateType === 'createdAt' ? user.createdAt : user.updatedAt;
     if (!dayjs(dateValue).isBetween(startDate, endDate, 'day', '[]')) return false;
     if (grade !== 'ALL' && user.grade !== grade) return false;

@@ -7,7 +7,6 @@ import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { setUserInfoAtom } from '@/features/auth/store/auth.store';
-import { User } from '@/features/auth/types/Auth';
 
 interface Props {
   children: React.ReactNode;
@@ -20,7 +19,7 @@ export default function Layout({ children }: Props) {
 
   useEffect(() => {
     if (session?.user) {
-      setUserInfo(session.user as unknown as User);
+      setUserInfo(session.user);
     }
   }, [session, setUserInfo]);
 

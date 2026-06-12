@@ -229,12 +229,13 @@ export const handlers = [
 
   // 사용자 목록 조회
   http.post(`${baseUrl}/api/account/users/list`, async ({ request }) => {
-    const { filters, page, pageSize } = (await request.json()) as {
+    const { ownerId, filters, page, pageSize } = (await request.json()) as {
+      ownerId: string;
       filters: UserSearchType;
       page: number;
       pageSize: number;
     };
-    return HttpResponse.json(getMockUsers(filters, page, pageSize));
+    return HttpResponse.json(getMockUsers(ownerId, filters, page, pageSize));
   }),
 
   // 사용자 일괄 삭제
@@ -246,8 +247,8 @@ export const handlers = [
 
   // 사용자 등록
   http.post(`${baseUrl}/api/account/users/create`, async ({ request }) => {
-    const body = (await request.json()) as CreateUserBody;
-    const newUser = createMockUser(body);
+    const { ownerId, ...body } = (await request.json()) as CreateUserBody & { ownerId: string };
+    const newUser = createMockUser(body, ownerId);
     return HttpResponse.json(newUser, { status: 201 });
   }),
 

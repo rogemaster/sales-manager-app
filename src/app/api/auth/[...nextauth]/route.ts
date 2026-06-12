@@ -83,6 +83,8 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
+        token.ownerId = user.ownerId;
         token.email = user.email;
         token.name = user.name;
         token.grade = user.grade;
@@ -95,6 +97,8 @@ const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.ownerId = token.ownerId;
       session.user.email = token.email ?? '';
       session.user.name = token.name ?? '';
       session.user.grade = token.grade;
