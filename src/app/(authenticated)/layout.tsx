@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
 import { GlobalHeader } from '@/components/layout';
@@ -7,20 +7,19 @@ import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { setUserInfoAtom } from '@/features/auth/store/auth.store';
-import { User } from '@/features/auth/types/Auth';
 
 interface Props {
   children: React.ReactNode;
 }
 
 export default function Layout({ children }: Props) {
-  const queryClient = new QueryClient();
+  const [queryClient] = useState(() => new QueryClient());
   const { data: session } = useSession();
   const setUserInfo = useSetAtom(setUserInfoAtom);
 
   useEffect(() => {
     if (session?.user) {
-      setUserInfo(session.user as unknown as User);
+      setUserInfo(session.user);
     }
   }, [session, setUserInfo]);
 

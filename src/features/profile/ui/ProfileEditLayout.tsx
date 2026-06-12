@@ -28,7 +28,8 @@ const profileEditSchema = z.object({
 type ProfileEditFormData = z.infer<typeof profileEditSchema>;
 
 export const ProfileEditLayout = () => {
-  const { avatar, name, email, grade, phone, company, bio } = useAtomValue(getUserInfoAtom);
+  const userInfo = useAtomValue(getUserInfoAtom);
+  const { avatar, name, email, grade, phone, company, bio } = userInfo;
   const setUserInfo = useSetAtom(setUserInfoAtom);
   const router = useRouter();
   const { showAlert } = useAlert();
@@ -49,7 +50,7 @@ export const ProfileEditLayout = () => {
       { email, ...data },
       {
         onSuccess: (updated) => {
-          setUserInfo(updated);
+          setUserInfo({ ...userInfo, ...updated });
           showAlert({
             type: 'success',
             message: '저장되었습니다.',

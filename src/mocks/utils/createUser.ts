@@ -2,10 +2,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { AccountUser, CreateUserBody } from '@/features/account/types/user.types';
 import { MOCK_USERS_DATA } from '../data/MockUsersData';
 
-export const createMockUser = (body: CreateUserBody): AccountUser => {
+export const createMockUser = (body: CreateUserBody, ownerId: string): AccountUser => {
   const now = new Date().toISOString().split('T')[0];
   const newUser = {
     id: `usr_${uuidv4()}`,
+    ownerId,
     email: body.email,
     password: body.password,
     name: body.name,

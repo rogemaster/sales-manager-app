@@ -15,6 +15,7 @@ export interface ValidationResult {
 }
 
 export type UserGrade = 'super_admin' | 'admin' | 'operator';
+export type SubUserGrade = Exclude<UserGrade, 'super_admin'>;
 
 export interface User {
   email: string;
