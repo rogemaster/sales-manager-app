@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
@@ -74,10 +75,10 @@ export const RecentProducts = ({ products }: Props) => {
 
       {/* 푸터 */}
       <div className="flex items-center justify-center border-t border-border/40 bg-muted/10 py-3">
-        <button className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+        <Link href="/products/list" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
           전체 상품 보기
           <ArrowRight className="h-3 w-3" />
-        </button>
+        </Link>
       </div>
     </div>
   );

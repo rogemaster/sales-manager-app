@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
 import { GlobalHeader } from '@/components/layout';
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Layout({ children }: Props) {
-  const queryClient = new QueryClient();
+  const [queryClient] = useState(() => new QueryClient());
   const { data: session } = useSession();
   const setUserInfo = useSetAtom(setUserInfoAtom);
 
