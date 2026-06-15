@@ -19,9 +19,7 @@ export const UserCreateLayout = () => {
   const { mutate, isPending } = useCreateUser();
 
   const isSuperAdmin = grade === 'super_admin';
-  const gradeOptions = isSuperAdmin
-    ? USER_GRADE_OPTIONS
-    : USER_GRADE_OPTIONS.filter((o) => o.id !== 'super_admin');
+  const gradeOptions = USER_GRADE_OPTIONS.filter((o) => o.id !== 'super_admin');
 
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),

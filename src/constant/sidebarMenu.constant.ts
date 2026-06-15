@@ -32,6 +32,10 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
     icon: StoreIcon,
     items: [
       {
+        title: '쇼핑몰 계정관리',
+        url: '/shopping/accounts',
+      },
+      {
         title: '쇼핑몰설정',
         url: '/shopping/settings',
         disabled: true,
