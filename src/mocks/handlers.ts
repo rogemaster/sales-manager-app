@@ -27,6 +27,17 @@ import { registerMockUser } from './utils/registerUser';
 import { RegisterFormData } from '@/features/auth/util/registerValidation';
 import { updateMockProfile } from './utils/updateProfile';
 import { UpdateProfileBody } from '@/features/profile/api/updateProfile';
+import { getMockShoppingAccounts } from './utils/getShoppingAccounts';
+import { getMockShoppingAccount } from './utils/getShoppingAccount';
+import { createMockShoppingAccount } from './utils/createShoppingAccount';
+import { updateMockShoppingAccount } from './utils/updateShoppingAccount';
+import { deleteMockShoppingAccounts } from './utils/deleteShoppingAccounts';
+import { updateMockShoppingAccountsStatus } from './utils/updateShoppingAccountsStatus';
+import {
+  ShoppingAccountSearchType,
+  CreateShoppingAccountBody,
+  UpdateShoppingAccountBody,
+} from '@/features/shoppingAccount/types/shoppingAccount.types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -258,5 +269,52 @@ export const handlers = [
     const updated = updateMockProfile(body);
     if (!updated) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(updated);
+  }),
+
+  // 쇼핑몰 계정 목록 조회
+  http.post(`${baseUrl}/api/shopping/accounts/list`, async ({ request }) => {
+    const { ownerId, filters, page, pageSize } = (await request.json()) as {
+      ownerId: string;
+      filters: ShoppingAccountSearchType;
+      page: number;
+      pageSize: number;
+    };
+    return HttpResponse.json(getMockShoppingAccounts(ownerId, filters, page, pageSize));
+  }),
+
+  // 쇼핑몰 계정 등록
+  http.post(`${baseUrl}/api/shopping/accounts`, async ({ request }) => {
+    const { ownerId, ...body } = (await request.json()) as CreateShoppingAccountBody & { ownerId: string };
+    const newAccount = createMockShoppingAccount(body, ownerId);
+    return HttpResponse.json(newAccount, { status: 201 });
+  }),
+
+  // 쇼핑몰 계정 다중 삭제
+  http.post(`${baseUrl}/api/shopping/accounts/delete`, async ({ request }) => {
+    const { ids } = (await request.json()) as { ids: string[] };
+    deleteMockShoppingAccounts(ids);
+    return HttpResponse.json({ success: true });
+  }),
+
+  // 쇼핑몰 계정 사용여부 일괄 변경 — status 핸들러를 :id 핸들러보다 먼저 등록해야 경로 충돌 방지
+  http.patch(`${baseUrl}/api/shopping/accounts/status`, async ({ request }) => {
+    const { ids, isActive } = (await request.json()) as { ids: string[]; isActive: boolean };
+    updateMockShoppingAccountsStatus(ids, isActive);
+    return HttpResponse.json({ success: true });
+  }),
+
+  // 쇼핑몰 계정 수정
+  http.patch(`${baseUrl}/api/shopping/accounts/:id`, async ({ request, params }) => {
+    const body = (await request.json()) as UpdateShoppingAccountBody;
+    const updated = updateMockShoppingAccount(params.id as string, body);
+    if (!updated) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json(updated);
+  }),
+
+  // 쇼핑몰 계정 단건 조회
+  http.get(`${baseUrl}/api/shopping/accounts/:id`, ({ params }) => {
+    const account = getMockShoppingAccount(params.id as string);
+    if (!account) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json(account);
   }),
 ];
