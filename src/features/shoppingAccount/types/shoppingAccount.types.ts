@@ -1,6 +1,8 @@
+import { ShoppingMalls } from '@/types/common.type';
+
 export interface ShoppingAccount {
   id: string;
-  mallName: string;
+  mallCode: ShoppingMalls;
   mallId: string;
   password: string;
   isActive: boolean;
@@ -21,7 +23,7 @@ export interface ShoppingAccountSearchType {
   startDate: string;
   endDate: string;
   isActive: 'true' | 'false' | 'ALL';
-  mallName: string;
+  mallCode: ShoppingMalls | 'ALL';
   searchValue: string;
 }
 
