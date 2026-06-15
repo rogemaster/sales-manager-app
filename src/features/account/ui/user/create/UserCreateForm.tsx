@@ -13,7 +13,7 @@ import { FilterOption } from '@/types/common.type';
 export const createUserSchema = z.object({
   email: z.string().email('올바른 이메일 형식이 아닙니다.'),
   password: z.string().min(6, '비밀번호는 6자 이상이어야 합니다.'),
-  grade: z.enum(['super_admin', 'admin', 'operator'], { message: '등급을 선택해주세요.' }),
+  grade: z.enum(['admin', 'operator'], { message: '등급을 선택해주세요.' }),
   name: z.string().min(1, '이름을 입력해주세요.'),
   phone: phoneSchemaRequired(),
   avatar: z.string().optional(),
