@@ -3,6 +3,8 @@
 쇼핑몰 판매자를 위한 **상품 · 주문 · 계정 통합 관리 웹 애플리케이션**입니다.  
 상품 등록/수정/대량 업로드, 주문 수집/조회/처리, 사용자 관리 기능을 제공합니다.
 
+**[라이브 데모 →](https://sales-manager-app-nine.vercel.app/)** | 테스트 계정: `admin@example.com` / `admin123`
+
 <br />
 
 ## 주요 기능
@@ -18,7 +20,9 @@
 | 주문 목록 | 날짜·쇼핑몰·상태 필터, 일괄 상태변경 |
 | 주문 상세 | 주문 정보, 클레임, 코멘트, 수정이력, 배송 처리 |
 | 주문 등록 | 수동 주문 생성 |
+| 쇼핑몰 계정 관리 | 쇼핑몰별 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
 | 사용자 관리 | 사용자 목록 조회, 등록, 삭제 (등급별 권한 분리) |
+| 프로필 수정 | 닉네임·연락처·소개·회사·지역 정보 수정 |
 
 <br />
 
@@ -35,6 +39,7 @@
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
 | API Mocking | MSW 2 | 서비스 워커 레벨 인터셉트로 실제 네트워크와 동일한 개발 환경 |
 | 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
+| 테스트 | Vitest | 핵심 비즈니스 로직(옵션 조합, 폼 유효성 검사) 단위 테스트 |
 
 <br />
 
@@ -42,16 +47,18 @@
 
 ### Feature-driven 모듈 구조
 
-도메인(상품·주문·홈·인증·계정)별로 `api / store / types / ui / util`을 각 feature 폴더에 응집시켰습니다.  
+도메인(상품·주문·홈·인증·계정·쇼핑몰 계정·프로필)별로 `api / store / types / ui / util`을 각 feature 폴더에 응집시켰습니다.  
 기능이 추가될 때 기존 코드를 수정하지 않고 새 feature 폴더를 추가하는 방식으로 확장합니다.
 
 ```
 src/features/
-├── products/   # 상품 관련 api, store, types, ui, util
-├── order/      # 주문 관련 api, store, types, ui, util
-├── account/    # 사용자 관리 api, store, types, ui
-├── home/       # 홈 대시보드
-└── auth/       # 인증
+├── products/        # 상품 관련 api, store, types, ui, util
+├── order/           # 주문 관련 api, store, types, ui, util
+├── account/         # 사용자 관리 api, store, types, ui
+├── shoppingAccount/ # 쇼핑몰 계정 관리 api, store, types, ui
+├── profile/         # 프로필 수정 api, ui
+├── home/            # 홈 대시보드
+└── auth/            # 인증
 ```
 
 공통 쇼핑몰 계정 등 여러 도메인이 공유하는 리소스는 `src/shared/`로 분리합니다.
@@ -149,11 +156,15 @@ src/
 │       ├── home/               # 홈 대시보드
 │       ├── products/           # 상품목록, 등록, 수정, 대량등록
 │       ├── order/              # 주문수집, 목록, 상세, 등록
-│       └── account/            # 사용자관리
+│       ├── shopping/           # 쇼핑몰 계정 목록, 등록, 수정
+│       ├── account/            # 사용자관리
+│       └── profile/            # 프로필 수정
 ├── features/                   # 도메인별 Feature 모듈
 │   ├── products/
 │   ├── order/
 │   ├── account/
+│   ├── shoppingAccount/
+│   ├── profile/
 │   ├── home/
 │   └── auth/
 ├── shared/                     # 도메인 간 공유 리소스
@@ -164,7 +175,7 @@ src/
 │   ├── common/                 # TablePagination, RangeDatePicker, FilterSelect, Alert(useAlert) 등
 │   ├── excel/                  # 엑셀 업로드/다운로드/미리보기 + 전략 패턴
 │   ├── layout/                 # 글로벌 헤더, 사이드바
-│   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider (AlertProvider는 common/alert)
+│   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider
 │   └── ui/                     # Radix UI 기반 기본 컴포넌트
 ├── mocks/                      # MSW 핸들러 및 목업 데이터
 │   ├── handlers.ts
@@ -178,7 +189,9 @@ src/
 ## 스크립트
 
 ```bash
-npm run dev      # 개발 서버 실행
-npm run build    # 프로덕션 빌드
-npm run lint     # ESLint 실행
+npm run dev          # 개발 서버 실행
+npm run build        # 프로덕션 빌드
+npm run lint         # ESLint 실행
+npm test             # 단위 테스트 실행
+npm run test:watch   # 테스트 감시 모드 (파일 변경 시 자동 재실행)
 ```
