@@ -1,9 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { baseUrl } from '../config';
-import { UserSearchType, CreateUserBody } from '@/features/account/types/user.types';
+import { UserSearchType } from '@/features/account/types/user.types';
 import { getMockUsers } from '../utils/getUsers';
 import { deleteMockUsers } from '../utils/deleteUsers';
-import { createMockUser } from '../utils/createUser';
 
 export const userHandlers = [
   http.post(`${baseUrl}/api/account/users/list`, async ({ request }) => {
@@ -20,11 +19,5 @@ export const userHandlers = [
     const { ids } = (await request.json()) as { ids: string[] };
     deleteMockUsers(ids);
     return HttpResponse.json({ success: true });
-  }),
-
-  http.post(`${baseUrl}/api/account/users/create`, async ({ request }) => {
-    const { ownerId, ...body } = (await request.json()) as CreateUserBody & { ownerId: string };
-    const newUser = createMockUser(body, ownerId);
-    return HttpResponse.json(newUser, { status: 201 });
   }),
 ];

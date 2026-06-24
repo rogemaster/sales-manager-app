@@ -1,8 +1,11 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { NextAuthOptions } from 'next-auth';
-import { cookies } from 'next/headers';
-import * as cookie from 'cookie';
+import { UserGrade } from '@/features/auth/types/Auth';
+import { db } from '@/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { verifyPassword } from '@/db/password';
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -25,52 +28,27 @@ const authOptions: NextAuthOptions = {
         }
 
         try {
-          // 실제 api 호출로 사용자 조회
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-          const authResponse = await fetch(`${baseUrl}/api/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-            // 타임아웃 설정 (10초)
-            signal: AbortSignal.timeout(10000),
-          });
+          const result = await db.select().from(users).where(eq(users.email, credentials.email)).limit(1);
+          const user = result[0];
+          if (!user) return null;
 
-          const setCookie = authResponse.headers.get('Set-Cookie');
-          if (setCookie) {
-            const parsed = cookie.parse(setCookie);
-            const cookieStore = await cookies();
-            // connect.sid 쿠키 설정
-            if (parsed['connect.sid']) {
-              cookieStore.set('connect.sid', parsed['connect.sid'], {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-              });
-            }
-          }
-
-          if (!authResponse.ok) {
-            console.error('인증 API 호출 실패:', authResponse.status, authResponse.statusText);
-            return null;
-          }
-
-          const user = await authResponse.json();
+          const isValid = await verifyPassword(credentials.password, user.password);
+          if (!isValid) return null;
 
           return {
-            id: user.id || user.email || credentials.email,
-            email: user.email || credentials.email,
-            name: user.nickname || user.name || user.username,
-            image: user.image || user.avatar || null,
-            ...user,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            ownerId: user.ownerId,
+            grade: user.grade as UserGrade,
+            avatar: user.avatar ?? '',
+            phone: user.phone,
+            bio: user.bio,
+            company: user.company,
+            location: user.location,
           };
         } catch (error) {
-          console.error('인증 API 호출 중 에러:', error);
+          console.error('인증 DB 조회 중 에러:', error);
           return null;
         }
       },
