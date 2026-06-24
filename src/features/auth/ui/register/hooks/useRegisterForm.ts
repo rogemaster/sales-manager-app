@@ -91,11 +91,7 @@ export const useRegisterForm = () => {
       showAlert({
         type: 'success',
         title: '가입이 완료되었습니다',
-        message:
-          '※ MSW 개발 환경으로 인해 실제 신규 가입은 지원되지 않습니다.\n' +
-          '아래 테스트 계정으로 로그인해 주세요.\n\n' +
-          '이메일: admin@example.com\n' +
-          '비밀번호: admin123',
+        message: '가입하신 이메일과 비밀번호로 로그인해 주세요.',
         confirmText: '로그인 페이지로 이동',
         onConfirm: () => router.push('/login'),
       });
