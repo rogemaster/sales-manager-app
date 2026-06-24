@@ -82,9 +82,11 @@ export const useRegisterForm = () => {
 
     setIsSubmitting(true);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordConfirm: _, ...rest } = data;
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, {
         method: 'POST',
-        body: JSON.stringify({ ...data, businessLicenseName: businessLicense.name }),
+        body: JSON.stringify({ ...rest, businessLicenseName: businessLicense.name }),
       });
       if (!res.ok) throw new Error('가입 실패');
 
