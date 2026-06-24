@@ -37,7 +37,8 @@
 | 서버 상태 | TanStack Query 5 | 캐싱·자동 동기화·뮤테이션 후 무효화를 선언적으로 처리 |
 | 폼 · 검증 | React Hook Form + Zod | 비제어 컴포넌트 기반 렌더링 최소화, 스키마 기반 유효성 검사 |
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
-| API Mocking | MSW 2 | 서비스 워커 레벨 인터셉트로 실제 네트워크와 동일한 개발 환경 |
+| DB | Neon (PostgreSQL) + Drizzle ORM | 유저 정보 영속성 보장, 서버리스 환경에 최적화된 serverless driver |
+| API Mocking | MSW 2 | 비즈니스 데이터(상품·주문 등) 개발용 mock, 서비스 워커 레벨 인터셉트 |
 | 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
 | 테스트 | Vitest | 핵심 비즈니스 로직(옵션 조합, 폼 유효성 검사) 단위 테스트 |
 
@@ -80,6 +81,29 @@ src/shared/
 
 각 상태를 하나의 도구로만 관리해 책임 범위를 명확히 분리했습니다.
 
+### MSW / DB 경계 설계
+
+MSW의 구조적 한계(서비스 워커가 서버사이드 `authorize()` 실행에 관여 불가)로 인해 유저 관련 API는 실제 DB route handler로 전환했습니다.
+
+| 처리 방식 | 대상 엔드포인트 |
+|-----------|----------------|
+| **DB route handler** | 로그인, 회원가입, 이메일 중복 확인, 사용자 등록·목록·삭제, 프로필 수정 |
+| **MSW** | 상품, 주문, 쇼핑몰 계정, 홈 대시보드 등 비즈니스 데이터 전반 |
+
+판단 기준: **유저 인증·식별에 직접 연관되는 데이터**는 DB, 나머지 비즈니스 데이터는 MSW 유지.
+
+```
+src/app/api/                          # DB 연동 route handlers
+├── auth/[...nextauth]/route.ts       # NextAuth
+├── register/route.ts                 # 회원가입
+├── check-email/route.ts              # 이메일 중복 확인
+├── profile/route.ts                  # 프로필 수정
+└── account/users/
+    ├── route.ts                      # 사용자 삭제 (DELETE)
+    ├── list/route.ts                 # 사용자 목록 조회 (POST)
+    └── create/route.ts               # 사용자 등록 (POST)
+```
+
 ### 등급 기반 권한 제어
 
 사용자 등급(`UserGrade`)에 따라 UI 레벨에서 기능 접근을 제한합니다.
@@ -103,13 +127,21 @@ components/excel/strategies/
 
 ### MSW 핸들러 구조
 
-`src/mocks/handlers.ts`는 라우팅과 request/response 처리만 담당하고, 모든 비즈니스 로직은 `src/mocks/utils/`로 위임합니다.
+`src/mocks/handlers.ts`는 라우팅과 request/response 처리만 담당하고, 비즈니스 로직은 `src/mocks/utils/`로 위임합니다.
 
 ```
 src/mocks/
-├── handlers.ts   # 라우팅 전용
-├── data/         # 정적 mock 원본 데이터
-└── utils/        # 핸들러에서 호출하는 비즈니스 로직
+├── handlers.ts              # 인덱스 — 도메인 핸들러 spread
+├── handlers/                # 도메인별 핸들러
+│   ├── auth.ts              # logout
+│   ├── home.ts
+│   ├── products.ts
+│   ├── orders.ts
+│   ├── mallAccounts.ts
+│   ├── collection.ts
+│   └── shoppingAccounts.ts
+├── data/                    # 정적 mock 원본 데이터
+└── utils/                   # 핸들러 비즈니스 로직
 ```
 
 <br />
@@ -126,7 +158,7 @@ npm run dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-> 별도의 백엔드 서버 없이 MSW(Mock Service Worker)가 API 요청을 가로채 응답합니다.
+> 비즈니스 데이터(상품·주문 등)는 MSW가 처리하고, 유저 관련 API(로그인·회원가입·사용자 관리 등)는 Neon DB에 직접 연결됩니다.
 
 ### 환경 변수
 
@@ -136,13 +168,18 @@ npm run dev
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
+DATABASE_URL=your-neon-database-url
 ```
 
 ### 테스트 계정
 
+유저 정보는 Neon DB에 저장됩니다. 라이브 데모 환경의 테스트 계정은 아래와 같습니다.
+
 | 이메일 | 비밀번호 |
 |--------|----------|
 | `admin@example.com` | `admin123` |
+
+로컬 환경에서는 `/register`에서 직접 회원가입 후 사용하세요.
 
 <br />
 
@@ -152,13 +189,23 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 src/
 ├── app/                        # Next.js App Router 페이지
 │   ├── (auth)/                 # 로그인, 회원가입
-│   └── (authenticated)/        # 인증 필요 페이지
-│       ├── home/               # 홈 대시보드
-│       ├── products/           # 상품목록, 등록, 수정, 대량등록
-│       ├── order/              # 주문수집, 목록, 상세, 등록
-│       ├── shopping/           # 쇼핑몰 계정 목록, 등록, 수정
-│       ├── account/            # 사용자관리
-│       └── profile/            # 프로필 수정
+│   ├── (authenticated)/        # 인증 필요 페이지
+│   │   ├── home/               # 홈 대시보드
+│   │   ├── products/           # 상품목록, 등록, 수정, 대량등록
+│   │   ├── order/              # 주문수집, 목록, 상세, 등록
+│   │   ├── shopping/           # 쇼핑몰 계정 목록, 등록, 수정
+│   │   ├── account/            # 사용자관리
+│   │   └── profile/            # 프로필 수정
+│   └── api/                    # DB 연동 route handlers
+│       ├── auth/[...nextauth]/  # NextAuth
+│       ├── register/            # 회원가입
+│       ├── check-email/         # 이메일 중복 확인
+│       ├── profile/             # 프로필 수정
+│       └── account/users/       # 사용자 목록·등록·삭제
+├── db/                         # Neon DB 연결 및 스키마
+│   ├── index.ts                # Drizzle 클라이언트
+│   ├── schema.ts               # users 테이블 정의
+│   └── password.ts             # bcrypt 해싱 유틸
 ├── features/                   # 도메인별 Feature 모듈
 │   ├── products/
 │   ├── order/
@@ -177,9 +224,10 @@ src/
 │   ├── layout/                 # 글로벌 헤더, 사이드바
 │   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider
 │   └── ui/                     # Radix UI 기반 기본 컴포넌트
-├── mocks/                      # MSW 핸들러 및 목업 데이터
+├── mocks/                      # MSW 핸들러 및 목업 데이터 (비즈니스 데이터)
 │   ├── handlers.ts
-│   ├── data/                   # faker.js 기반 목업 데이터
+│   ├── handlers/               # 도메인별 핸들러
+│   ├── data/                   # 정적 목업 데이터
 │   └── utils/                  # 핸들러 비즈니스 로직
 ├── constant/                   # 사이드바 메뉴 등 앱 전역 상수
 ├── types/                      # 공통 타입 정의
