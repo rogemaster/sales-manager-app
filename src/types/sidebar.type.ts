@@ -10,5 +10,4 @@ export interface MenuInterface {
 export interface SubMenuInterface {
   title: string;
   url: string;
-  disabled?: boolean;
 }

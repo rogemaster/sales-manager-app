@@ -13,20 +13,12 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { GLOBAL_SIDEBAR_MENU } from '@/constant/sidebarMenu.constant';
-import { useAlert } from '@/hooks/useAlert';
 
 export const GlobalSidebarMenu = () => {
-  const { showAlert } = useAlert();
-
-  const handleDisabledMenuClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    showAlert({ message: '개발 진행 중인 메뉴입니다.', type: 'info' });
-  };
-
   return (
     <SidebarContent>
       <SidebarGroup>
-<SidebarGroupContent>
+        <SidebarGroupContent>
           <SidebarMenu>
             {GLOBAL_SIDEBAR_MENU.map((menu) => (
               <SidebarMenuItem key={menu.title}>
@@ -43,17 +35,9 @@ export const GlobalSidebarMenu = () => {
                       <SidebarMenuSub>
                         {menu.items.map((subMenu) => (
                           <SidebarMenuSubItem key={subMenu.title}>
-                            {subMenu.disabled ? (
-                              <SidebarMenuSubButton asChild>
-                                <a href={subMenu.url} onClick={handleDisabledMenuClick}>
-                                  {subMenu.title}
-                                </a>
-                              </SidebarMenuSubButton>
-                            ) : (
-                              <SidebarMenuSubButton asChild>
-                                <Link href={subMenu.url}>{subMenu.title}</Link>
-                              </SidebarMenuSubButton>
-                            )}
+                            <SidebarMenuSubButton asChild>
+                              <Link href={subMenu.url}>{subMenu.title}</Link>
+                            </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}
                       </SidebarMenuSub>
