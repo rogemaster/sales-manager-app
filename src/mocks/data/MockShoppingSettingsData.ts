@@ -1,0 +1,48 @@
+import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
+
+export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
+  {
+    id: 'ss_001',
+    mallAccountId: 'sa_001',
+    mallCode: 'COUP',
+    mallId: 'coupang_seller_001',
+    nickname: '쿠팡 메인 설정',
+    isActive: true,
+    ownerId: 'usr_2f20748f',
+    createdAt: '2025-05-01',
+    updatedAt: '2025-05-01',
+  },
+  {
+    id: 'ss_002',
+    mallAccountId: 'sa_001',
+    mallCode: 'COUP',
+    mallId: 'coupang_seller_001',
+    nickname: '쿠팡 프로모션용',
+    isActive: true,
+    ownerId: 'usr_2f20748f',
+    createdAt: '2025-05-10',
+    updatedAt: '2025-05-12',
+  },
+  {
+    id: 'ss_003',
+    mallAccountId: 'sa_002',
+    mallCode: 'NSST',
+    mallId: 'naver_store_002',
+    nickname: '네이버 기본 설정',
+    isActive: true,
+    ownerId: 'usr_2f20748f',
+    createdAt: '2025-05-15',
+    updatedAt: '2025-05-15',
+  },
+  {
+    id: 'ss_004',
+    mallAccountId: 'sa_004',
+    mallCode: 'GMK',
+    mallId: 'gmarket_seller_004',
+    nickname: '지마켓 설정',
+    isActive: false,
+    ownerId: 'usr_2f20748f',
+    createdAt: '2025-05-20',
+    updatedAt: '2025-05-22',
+  },
+];

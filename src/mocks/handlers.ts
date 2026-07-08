@@ -5,6 +5,7 @@ import { orderHandlers } from './handlers/orders';
 import { mallAccountHandlers } from './handlers/mallAccounts';
 import { collectionHandlers } from './handlers/collection';
 import { shoppingAccountHandlers } from './handlers/shoppingAccounts';
+import { shoppingSettingHandlers } from './handlers/shoppingSettings';
 
 export const handlers = [
   ...authHandlers,
@@ -14,4 +15,5 @@ export const handlers = [
   ...mallAccountHandlers,
   ...collectionHandlers,
   ...shoppingAccountHandlers,
+  ...shoppingSettingHandlers,
 ];

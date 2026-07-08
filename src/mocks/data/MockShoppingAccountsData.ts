@@ -1,7 +1,6 @@
 import { ShoppingAccount } from '@/features/shoppingAccount/types/shoppingAccount.types';
 
-const SUPER_A_ID = 'usr_001';
-const SUPER_B_ID = 'usr_005';
+const SUPER_A_ID = 'usr_2f20748f';
 
 export const MOCK_SHOPPING_ACCOUNTS_DATA: ShoppingAccount[] = [
   {
@@ -88,39 +87,5 @@ export const MOCK_SHOPPING_ACCOUNTS_DATA: ShoppingAccount[] = [
     apiKey: 'au-api-key-005',
     createdAt: '2025-04-01',
     updatedAt: '2025-05-15',
-  },
-  {
-    id: 'sa_006',
-    ownerId: SUPER_B_ID,
-    mallCode: 'COUP',
-    mallId: 'coupang_seller_006',
-    password: 'pass789!',
-    isActive: true,
-    nickname: '쿠팡 B계정',
-    managerMd: '정담당',
-    phone: '010-9999-0000',
-    email: 'coupang_b@example.com',
-    domain: 'https://wing.coupang.com/b',
-    category: '패션잡화',
-    apiKey: 'cpg-api-key-006',
-    createdAt: '2025-02-15',
-    updatedAt: '2025-04-30',
-  },
-  {
-    id: 'sa_007',
-    ownerId: SUPER_B_ID,
-    mallCode: 'SSGC',
-    mallId: 'ssg_007',
-    password: 'ssg333!',
-    isActive: true,
-    nickname: 'SSG 공식',
-    managerMd: '조담당',
-    phone: '010-1212-3434',
-    email: 'ssg@example.com',
-    domain: 'https://www.ssg.com/seller/007',
-    category: '가전',
-    apiKey: 'ssg-api-key-007',
-    createdAt: '2025-03-05',
-    updatedAt: '2025-05-20',
   },
 ];

@@ -30,9 +30,10 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date().toISOString().split('T')[0];
+    const id = `usr_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
     await db.insert(users).values({
-      id: `usr_${uuidv4().replace(/-/g, '').slice(0, 8)}`,
-      ownerId: null,
+      id,
+      ownerId: id,
       status: 'active',
       email,
       password: await hashPassword(password),
