@@ -35,8 +35,28 @@ ACCOUNTS.push(
   makeAccount({ id: 'sa_006', ownerId: 'usr_005', mallCode: 'COUP', mallId: 'coupang_seller_006' }),
 );
 SETTINGS.push(
-  { id: 'ss_001', mallAccountId: 'sa_001', mallCode: 'COUP', mallId: 'coupang_seller_001', nickname: '쿠팡1', isActive: true, ownerId: 'usr_001', createdAt: '2025-05-01', updatedAt: '2025-05-01' },
-  { id: 'ss_002', mallAccountId: 'sa_001', mallCode: 'COUP', mallId: 'coupang_seller_001', nickname: '쿠팡2', isActive: true, ownerId: 'usr_001', createdAt: '2025-05-02', updatedAt: '2025-05-02' },
+  {
+    id: 'ss_001',
+    mallAccountId: 'sa_001',
+    mallCode: 'COUP',
+    mallId: 'coupang_seller_001',
+    nickname: '쿠팡1',
+    isActive: true,
+    ownerId: 'usr_001',
+    createdAt: '2025-05-01',
+    updatedAt: '2025-05-01',
+  },
+  {
+    id: 'ss_002',
+    mallAccountId: 'sa_001',
+    mallCode: 'COUP',
+    mallId: 'coupang_seller_001',
+    nickname: '쿠팡2',
+    isActive: true,
+    ownerId: 'usr_001',
+    createdAt: '2025-05-02',
+    updatedAt: '2025-05-02',
+  },
 );
 
 import { getMockAvailableMallAccounts } from './getAvailableMallAccounts';
