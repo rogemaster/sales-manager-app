@@ -31,11 +31,11 @@ export const NewSettingModal = () => {
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="text-center">쇼핑몰</TableHead>
-                <TableHead className="text-center">아이디</TableHead>
-                <TableHead className="text-center">설정현황</TableHead>
-                <TableHead className="text-center">등록</TableHead>
+              <TableRow className="h-16 border-b border-border/40 bg-muted/60 hover:bg-muted/30">
+                <TableHead className="text-center font-bold uppercase tracking-widest">쇼핑몰</TableHead>
+                <TableHead className="text-center font-bold uppercase tracking-widest">아이디</TableHead>
+                <TableHead className="text-center font-bold uppercase tracking-widest">설정현황</TableHead>
+                <TableHead className="text-center font-bold uppercase tracking-widest">등록</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -47,7 +47,7 @@ export const NewSettingModal = () => {
                 </TableRow>
               ) : (
                 accounts.map((account) => (
-                  <TableRow key={account.id}>
+                  <TableRow key={account.id} className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30">
                     <TableCell className="text-center">{getMallName(account.mallCode)}</TableCell>
                     <TableCell className="text-center">{account.mallId}</TableCell>
                     <TableCell className="text-center">
