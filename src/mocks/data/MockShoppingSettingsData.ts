@@ -1,5 +1,21 @@
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
+const SAMPLE_SHIPPING_ADDRESS = {
+  code: 'COUP-WH-01',
+  name: '쿠팡 본사 물류센터',
+  zipCode: '08589',
+  address: '서울특별시 금천구 가산디지털1로 168',
+  addressDetail: '3층 301호',
+};
+
+const SAMPLE_RETURN_ADDRESS = {
+  code: 'COUP-WH-02',
+  name: '쿠팡 경기 물류센터',
+  zipCode: '14548',
+  address: '경기도 부천시 원미구 길주로 210',
+  addressDetail: '2층 202호',
+};
+
 export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
   {
     id: 'ss_001',
@@ -8,6 +24,10 @@ export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
     mallId: 'coupang_seller_001',
     nickname: '쿠팡 메인 설정',
     isActive: true,
+    productCondition: 'NEW',
+    salesPeriod: 30,
+    shippingAddress: SAMPLE_SHIPPING_ADDRESS,
+    returnAddress: SAMPLE_RETURN_ADDRESS,
     ownerId: 'usr_2f20748f',
     createdAt: '2025-05-01',
     updatedAt: '2025-05-01',
@@ -19,6 +39,10 @@ export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
     mallId: 'coupang_seller_001',
     nickname: '쿠팡 프로모션용',
     isActive: true,
+    productCondition: 'USED',
+    salesPeriod: 15,
+    shippingAddress: SAMPLE_SHIPPING_ADDRESS,
+    returnAddress: SAMPLE_RETURN_ADDRESS,
     ownerId: 'usr_2f20748f',
     createdAt: '2025-05-10',
     updatedAt: '2025-05-12',
@@ -30,6 +54,10 @@ export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
     mallId: 'naver_store_002',
     nickname: '네이버 기본 설정',
     isActive: true,
+    productCondition: 'NEW',
+    salesPeriod: 60,
+    shippingAddress: null,
+    returnAddress: null,
     ownerId: 'usr_2f20748f',
     createdAt: '2025-05-15',
     updatedAt: '2025-05-15',
@@ -41,6 +69,10 @@ export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
     mallId: 'gmarket_seller_004',
     nickname: '지마켓 설정',
     isActive: false,
+    productCondition: 'NEW',
+    salesPeriod: 90,
+    shippingAddress: null,
+    returnAddress: null,
     ownerId: 'usr_2f20748f',
     createdAt: '2025-05-20',
     updatedAt: '2025-05-22',
