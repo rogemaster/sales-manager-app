@@ -5,6 +5,8 @@ import { getMockShoppingSettings } from '../utils/getShoppingSettings';
 import { updateMockShoppingSettingsStatus } from '../utils/updateShoppingSettingsStatus';
 import { deleteMockShoppingSettings } from '../utils/deleteShoppingSettings';
 import { getMockAvailableMallAccounts } from '../utils/getAvailableMallAccounts';
+import { ShoppingMalls } from '@/types/common.type';
+import { getMockAddressBook } from '../utils/getAddressBook';
 
 export const shoppingSettingHandlers = [
   http.post(`${baseUrl}/api/shopping/settings/list`, async ({ request }) => {
@@ -32,5 +34,10 @@ export const shoppingSettingHandlers = [
   http.post(`${baseUrl}/api/shopping/settings/available-accounts`, async ({ request }) => {
     const { ownerId } = (await request.json()) as { ownerId: string };
     return HttpResponse.json(getMockAvailableMallAccounts(ownerId));
+  }),
+
+  http.post(`${baseUrl}/api/shopping/settings/addresses`, async ({ request }) => {
+    const { mallCode } = (await request.json()) as { mallCode: ShoppingMalls; mallId: string };
+    return HttpResponse.json(getMockAddressBook(mallCode));
   }),
 ];
