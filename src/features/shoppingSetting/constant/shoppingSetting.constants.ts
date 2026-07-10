@@ -26,3 +26,16 @@ export const SHOPPING_SETTING_TABLE_HEAD: TableTitleValue[] = [
   { id: 'createdAt', title: '등록일' },
   { id: 'updatedAt', title: '수정일' },
 ];
+
+export const PRODUCT_CONDITION_OPTIONS: FilterOption[] = [
+  { id: 'NEW', name: '신상품' },
+  { id: 'USED', name: '중고상품' },
+];
+
+export const SALES_PERIOD_OPTIONS: FilterOption[] = [
+  { id: '7', name: '7일' },
+  { id: '15', name: '15일' },
+  { id: '30', name: '30일' },
+  { id: '60', name: '60일' },
+  { id: '90', name: '90일' },
+];
