@@ -1,6 +1,7 @@
 'use client';
 
 import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface ShoppingSettingTableProps {
 export const ShoppingSettingTable = ({ settings }: ShoppingSettingTableProps) => {
   const [selectedSettings, setSelectedSettings] = useAtom(selectedSettingsAtom);
   const { showAlert } = useAlert();
+  const router = useRouter();
 
   const handleSelect = (id: string, checked: boolean) => {
     if (checked) {
@@ -87,7 +89,7 @@ export const ShoppingSettingTable = ({ settings }: ShoppingSettingTableProps) =>
               <TableCell className="text-center">{setting.createdAt}</TableCell>
               <TableCell className="text-center">{setting.updatedAt}</TableCell>
               <TableCell className="text-center">
-                <Button variant="outline" size="sm" onClick={notReady}>
+                <Button variant="outline" size="sm" onClick={() => router.push(`/shopping/settings/${setting.id}`)}>
                   수정
                 </Button>
               </TableCell>
