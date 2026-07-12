@@ -11,6 +11,8 @@ import { createMockShoppingAccount } from '../utils/createShoppingAccount';
 import { updateMockShoppingAccount } from '../utils/updateShoppingAccount';
 import { deleteMockShoppingAccounts } from '../utils/deleteShoppingAccounts';
 import { updateMockShoppingAccountsStatus } from '../utils/updateShoppingAccountsStatus';
+import { getMockShoppingAccountsByMall } from '../utils/getShoppingAccountsByMall';
+import { ShoppingMalls } from '@/types/common.type';
 
 export const shoppingAccountHandlers = [
   http.post(`${baseUrl}/api/shopping/accounts/list`, async ({ request }) => {
@@ -21,6 +23,11 @@ export const shoppingAccountHandlers = [
       pageSize: number;
     };
     return HttpResponse.json(getMockShoppingAccounts(ownerId, filters, page, pageSize));
+  }),
+
+  http.post(`${baseUrl}/api/shopping/accounts/by-mall`, async ({ request }) => {
+    const { ownerId, mallCode } = (await request.json()) as { ownerId: string; mallCode: ShoppingMalls };
+    return HttpResponse.json(getMockShoppingAccountsByMall(ownerId, mallCode));
   }),
 
   http.post(`${baseUrl}/api/shopping/accounts`, async ({ request }) => {
