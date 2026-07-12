@@ -3,30 +3,25 @@
 
 import { useMemo } from 'react';
 import { useAtom } from 'jotai';
-import { useQuery } from '@tanstack/react-query';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { collectMallAtom, collectMallAccountIdAtom } from '@/features/order/store/collect.store';
+import { collectMallAtom, collectMallIdAtom } from '@/features/order/store/collect.store';
 import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-import { getMallAccounts } from '@/shared/api/getMallAccounts';
+import { useGetShoppingAccountsByMall } from '@/features/shoppingAccount/api/useGetShoppingAccountsByMall';
 import { FilterOption, ShoppingMalls } from '@/types/common.type';
 
 const ALL_OPTION: FilterOption = { id: 'ALL', name: '전체' };
 
 export const CollectionMallFilter = () => {
   const [mall, setMall] = useAtom(collectMallAtom);
-  const [mallAccountId, setMallAccountId] = useAtom(collectMallAccountIdAtom);
+  const [mallId, setMallId] = useAtom(collectMallIdAtom);
 
   const mallOptions = useMemo<FilterOption[]>(
     () => [ALL_OPTION, ...SHOPPING_MALLS.map((m) => ({ id: m.code, name: m.name }))],
     [],
   );
 
-  const { data: mallAccounts = [] } = useQuery({
-    queryKey: ['mallAccounts', mall],
-    queryFn: () => getMallAccounts({ mallCode: mall as ShoppingMalls }),
-    enabled: mall !== 'ALL',
-  });
+  const { data: mallAccounts = [] } = useGetShoppingAccountsByMall(mall);
 
   const accountOptions = useMemo<FilterOption[]>(
     () => [ALL_OPTION, ...mallAccounts.map((a) => ({ id: a.mallId, name: a.mallId }))],
@@ -34,8 +29,8 @@ export const CollectionMallFilter = () => {
   );
 
   const handleMallChange = (value: string) => {
-    setMall(value);
-    setMallAccountId('ALL');
+    setMall(value as ShoppingMalls | 'ALL');
+    setMallId('ALL');
   };
 
   return (
@@ -53,7 +48,7 @@ export const CollectionMallFilter = () => {
           ))}
         </SelectContent>
       </Select>
-      <Select value={mallAccountId} onValueChange={setMallAccountId} disabled={mall === 'ALL'}>
+      <Select value={mallId} onValueChange={setMallId} disabled={mall === 'ALL'}>
         <SelectTrigger className="w-36">
           <SelectValue placeholder="아이디 선택" />
         </SelectTrigger>

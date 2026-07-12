@@ -60,7 +60,6 @@ export interface AlertOptions {
 export interface ShoppingMallType {
   code: string;
   name: string;
-  isActive: boolean;
 }
 
 // 쇼핑몰 지정 타입

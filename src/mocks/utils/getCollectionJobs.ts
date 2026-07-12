@@ -24,7 +24,7 @@ export function getCollectionJobsMock(params: CollectionSearchParams): Collectio
 
   return MOCK_COLLECTION_JOBS.filter((job) => {
     if (params.mallCode !== 'ALL' && job.mallName !== params.mallCode) return false;
-    if (params.mallAccountId !== 'ALL' && job.mallAccountId !== params.mallAccountId) return false;
+    if (params.mallId !== 'ALL' && job.mallId !== params.mallId) return false;
     return true;
   });
 }

@@ -37,3 +37,9 @@ export interface GetShoppingAccountsResponse {
 
 export type CreateShoppingAccountBody = Omit<ShoppingAccount, 'id' | 'ownerId' | 'createdAt' | 'updatedAt'>;
 export type UpdateShoppingAccountBody = Partial<CreateShoppingAccountBody>;
+
+export interface MallAccountOption {
+  id: string;
+  mallCode: ShoppingMalls;
+  mallId: string;
+}

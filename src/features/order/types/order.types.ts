@@ -5,8 +5,8 @@ export interface OrderSearchType {
   dateType: string;
   startDate: string;
   endDate: string;
-  shoppingMall: string;
-  mallAccountId: string;
+  shoppingMall: ShoppingMalls | 'ALL';
+  mallId: string;
   deliveryCompany: string;
   orderStatus: string;
   searchType: string;

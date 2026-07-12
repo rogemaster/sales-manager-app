@@ -6,7 +6,7 @@ export type CollectionStatus = 'WAITING' | 'COLLECTING' | 'COMPLETED' | 'FAILED'
 export interface CollectionJob {
   id: string;
   mallName: ShoppingMalls;
-  mallAccountId: string;
+  mallId: string;
   status: CollectionStatus;
   lastCollectedAt: string | null;
   totalCount?: number;
@@ -16,8 +16,8 @@ export interface CollectionJob {
 export interface CollectionSearchParams {
   startDate: string;
   endDate: string;
-  mallCode: string;
-  mallAccountId: string;
+  mallCode: ShoppingMalls | 'ALL';
+  mallId: string;
 }
 
 export interface TriggerCollectionBody {

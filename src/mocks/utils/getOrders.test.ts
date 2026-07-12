@@ -51,7 +51,7 @@ const defaultFilters: OrderSearchType = {
   startDate: '2024-01-01',
   endDate: '2024-12-31',
   shoppingMall: 'ALL',
-  mallAccountId: 'ALL',
+  mallId: 'ALL',
   deliveryCompany: 'ALL',
   orderStatus: 'ALL',
   searchType: 'orderName',
@@ -88,15 +88,15 @@ describe('getMockOrders', () => {
     });
   });
 
-  describe('계정 ID 필터', () => {
-    it("'mall-1' 계정만 필터링하면 2개를 반환한다", () => {
-      const result = getMockOrders({ ...defaultFilters, mallAccountId: 'mall-1' }, 1, 10);
+  describe('아이디 필터', () => {
+    it("'mall-1' 아이디만 필터링하면 2개를 반환한다", () => {
+      const result = getMockOrders({ ...defaultFilters, mallId: 'mall-1' }, 1, 10);
       expect(result.total).toBe(2);
       result.orders.forEach((o) => expect(o.shoppingMallId).toBe('mall-1'));
     });
 
-    it("'mall-2' 계정만 필터링하면 1개를 반환한다", () => {
-      const result = getMockOrders({ ...defaultFilters, mallAccountId: 'mall-2' }, 1, 10);
+    it("'mall-2' 아이디만 필터링하면 1개를 반환한다", () => {
+      const result = getMockOrders({ ...defaultFilters, mallId: 'mall-2' }, 1, 10);
       expect(result.total).toBe(1);
       expect(result.orders[0].orderNumber).toBe('ORD-002');
     });
