@@ -5,7 +5,7 @@ import { getCollectionProgressMap } from './triggerOrderCollection';
 
 const COLLECTION_DURATION_MS = 10_000; // 10초 후 완료
 
-export function getCollectionJobsMock(params: CollectionSearchParams): CollectionJob[] {
+export function getCollectionJobsMock(ownerId: string, params: CollectionSearchParams): CollectionJob[] {
   const progressMap = getCollectionProgressMap();
   const now = Date.now();
 
@@ -23,6 +23,7 @@ export function getCollectionJobsMock(params: CollectionSearchParams): Collectio
   });
 
   return MOCK_COLLECTION_JOBS.filter((job) => {
+    if (job.ownerId !== ownerId) return false;
     if (params.mallCode !== 'ALL' && job.mallName !== params.mallCode) return false;
     if (params.mallId !== 'ALL' && job.mallId !== params.mallId) return false;
     return true;

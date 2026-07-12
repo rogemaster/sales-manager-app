@@ -1,8 +1,9 @@
 // src/features/order/api/getCollectionJobs.ts
 import { CollectionJob, CollectionSearchParams } from '../types/collection.types';
 
-export async function getCollectionJobs(params: CollectionSearchParams): Promise<CollectionJob[]> {
+export async function getCollectionJobs(ownerId: string, params: CollectionSearchParams): Promise<CollectionJob[]> {
   const query = new URLSearchParams({
+    ownerId,
     startDate: params.startDate,
     endDate: params.endDate,
     mallCode: params.mallCode,
