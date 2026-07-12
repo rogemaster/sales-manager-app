@@ -2,10 +2,12 @@
 
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 
 import { getHomeStats } from '@/features/home/api/getHomeStats';
 import { getHomeOrderStats } from '@/features/home/api/getHomeOrderStats';
 import { getRecentProducts } from '@/features/home/api/getRecentProducts';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { ClaimStatCards } from './components/ClaimStatCards';
 import { InquiryStatCards } from './components/InquiryStatCards';
 import { OrderStatCards } from './components/OrderStatCards';
@@ -16,20 +18,24 @@ import { StatCards } from './components/StatCards';
 export const HomeLayout = () => {
   const endDate = dayjs().format('YYYY-MM-DD');
   const startDate = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: stats } = useQuery({
-    queryKey: ['home', 'stats'],
-    queryFn: getHomeStats,
+    queryKey: ['home', 'stats', workspaceOwnerId],
+    queryFn: () => getHomeStats(workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   const { data: orderStats } = useQuery({
-    queryKey: ['home', 'order-stats', startDate, endDate],
-    queryFn: () => getHomeOrderStats(startDate, endDate),
+    queryKey: ['home', 'order-stats', workspaceOwnerId, startDate, endDate],
+    queryFn: () => getHomeOrderStats(workspaceOwnerId, startDate, endDate),
+    enabled: !!workspaceOwnerId,
   });
 
   const { data: recentProducts = [] } = useQuery({
-    queryKey: ['home', 'recent-products'],
-    queryFn: getRecentProducts,
+    queryKey: ['home', 'recent-products', workspaceOwnerId],
+    queryFn: () => getRecentProducts(workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   return (

@@ -1,10 +1,10 @@
 import { Order } from '../types/order.types';
 
-export const bulkCreateOrders = async (data: Order[]) => {
+export const bulkCreateOrders = async (data: Omit<Order, 'ownerId'>[], ownerId: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/bulk`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ ownerId, orders: data }),
   });
 
   if (!response.ok) throw new Error('주문 대량 등록 실패');

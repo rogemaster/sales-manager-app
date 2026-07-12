@@ -1,10 +1,10 @@
 import { HomeOrderStats } from '../types/home.types';
 
-export const getHomeOrderStats = async (startDate: string, endDate: string): Promise<HomeOrderStats> => {
+export const getHomeOrderStats = async (ownerId: string, startDate: string, endDate: string): Promise<HomeOrderStats> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/home/order-stats`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ startDate, endDate }),
+    body: JSON.stringify({ ownerId, startDate, endDate }),
   });
 
   if (!response.ok) {

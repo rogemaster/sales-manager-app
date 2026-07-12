@@ -39,10 +39,11 @@ const filterBySearchValue = (searchType: string, searchValue: string, data: Orde
   return data.filter((item) => getter(item).includes(searchValue));
 };
 
-export const getMockOrders = (filters: OrderSearchType, page: number, pageSize: number) => {
+export const getMockOrders = (ownerId: string, filters: OrderSearchType, page: number, pageSize: number) => {
   const { dateType, startDate, endDate, shoppingMall, mallId, orderStatus, searchType, searchValue } = filters;
 
-  const byDate = filterByDate(dateType, startDate, endDate, MOCK_ORDERS_DATA);
+  const byOwner = MOCK_ORDERS_DATA.filter((o) => o.ownerId === ownerId);
+  const byDate = filterByDate(dateType, startDate, endDate, byOwner);
   const byMall = filterByShoppingMall(shoppingMall, byDate);
   const byAccountId = filterByMallId(mallId, byMall);
   const byStatus = filterByOrderStatus(orderStatus, byAccountId);

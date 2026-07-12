@@ -91,6 +91,7 @@ export interface Order {
   deliveryMessage?: string;
   deliveryCompany?: string;   // 택배사
   invoiceNumber?: string;     // 송장번호
+  ownerId: string;
 }
 
 export interface OrderDetail extends Order {

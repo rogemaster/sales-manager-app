@@ -1,7 +1,9 @@
 // src/mocks/data/MockCollectionJobsData.ts
 import { CollectionJob } from '@/features/order/types/collection.types';
 
-export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
+const SUPER_A_ID = 'usr_2f20748f';
+
+const RAW_COLLECTION_JOBS: Omit<CollectionJob, 'ownerId'>[] = [
   {
     id: 'JOB-001',
     mallName: 'COUP',
@@ -53,3 +55,5 @@ export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
     collectedCount: 80,
   },
 ];
+
+export const MOCK_COLLECTION_JOBS: CollectionJob[] = RAW_COLLECTION_JOBS.map((j) => ({ ...j, ownerId: SUPER_A_ID }));

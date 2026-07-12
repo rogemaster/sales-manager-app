@@ -1,5 +1,6 @@
 'use client';
 
+import { useAtomValue } from 'jotai';
 import { ExcelHeaderProps, ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
 import { Card, CardContent } from '../ui/card';
@@ -10,6 +11,7 @@ import { useExcelData, useResetExcelData } from '@/components/excel/store/excelD
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
 import { useMutation } from '@tanstack/react-query';
 import { useAlert } from '@/hooks/useAlert';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 
 type SaveType = 'PRODUCT' | 'ORDER';
 type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: SaveType };
@@ -18,8 +20,9 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
   const uploadedData = useExcelData();
   const resetExcelData = useResetExcelData();
   const { showAlert } = useAlert();
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
-  const saveFn = getExcelSaveStrategy(saveType);
+  const saveFn = getExcelSaveStrategy(saveType, workspaceOwnerId);
 
   const errorDatas = uploadedData.filter((data) => Array.isArray(data['error']) && data['error'].length > 0);
   const totalCount = uploadedData.length;

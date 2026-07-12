@@ -11,6 +11,7 @@ export interface CollectionJob {
   lastCollectedAt: string | null;
   totalCount?: number;
   collectedCount?: number;
+  ownerId: string;
 }
 
 export interface CollectionSearchParams {
