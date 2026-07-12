@@ -7,16 +7,19 @@ import { useAtomValue } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '../../api/getProducts';
 import { Product } from '../../types/product.types';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 
 export const ProductListLayout = () => {
   const currentFilter = useAtomValue(getSearchFilterAtom);
   const [appliedFilter, setAppliedFilter] = useState(currentFilter);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchCount, setSearchCount] = useState(0);
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: products = [], isLoading, isError } = useQuery<Product[]>({
-    queryKey: ['products', appliedFilter],
-    queryFn: () => getProducts(appliedFilter),
+    queryKey: ['products', workspaceOwnerId, appliedFilter],
+    queryFn: () => getProducts(workspaceOwnerId, appliedFilter),
+    enabled: !!workspaceOwnerId,
   });
 
   const handleSearch = () => {

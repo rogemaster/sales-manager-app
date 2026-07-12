@@ -2,7 +2,7 @@ import { generatorProductCode } from '@/utils/codeGenerator';
 import { ExcelRowWithErrors } from '@/types/excel.type';
 import { Product } from '@/features/products/types/product.types';
 
-export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] => {
+export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Product, 'ownerId'>[] => {
   return rows.map((r) => ({
     productId: generatorProductCode(),
     customerCode: (r['고객상품코드'] as string) || undefined,

@@ -8,13 +8,13 @@ import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 
 export const productHandlers = [
   http.post(`${baseUrl}/api/products/list`, async ({ request }) => {
-    const searchParams = (await request.json()) as ProductSearch;
-    return HttpResponse.json(getMockProducts(searchParams));
+    const { ownerId, ...searchParams } = (await request.json()) as ProductSearch & { ownerId: string };
+    return HttpResponse.json(getMockProducts(ownerId, searchParams));
   }),
 
   http.post(`${baseUrl}/api/products/create`, async ({ request }) => {
-    const data = (await request.json()) as Product;
-    const newProduct = createMockProduct(data);
+    const { ownerId, ...data } = (await request.json()) as Product & { ownerId: string };
+    const newProduct = createMockProduct({ ...data, ownerId });
     MOCK_PRODUCT_DATA.push(newProduct);
     return HttpResponse.json(newProduct);
   }),
@@ -34,8 +34,8 @@ export const productHandlers = [
 
   http.post(`${baseUrl}/api/products/bulk`, async ({ request }) => {
     await delay(500);
-    const data = (await request.json()) as Product[];
-    MOCK_PRODUCT_DATA.push(...data);
-    return HttpResponse.json({ success: true, count: data.length });
+    const { ownerId, products } = (await request.json()) as { ownerId: string; products: Omit<Product, 'ownerId'>[] };
+    MOCK_PRODUCT_DATA.push(...products.map((p) => ({ ...p, ownerId })));
+    return HttpResponse.json({ success: true, count: products.length });
   }),
 ];

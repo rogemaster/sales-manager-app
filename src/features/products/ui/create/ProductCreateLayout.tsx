@@ -4,17 +4,20 @@ import { useRouter } from 'next/navigation';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Product } from '../../types/product.types';
 import { useMutation } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { createProduct } from '../../api/createProduct';
 import { useAlert } from '@/hooks/useAlert';
 import { ProductForm } from '../components/ProductForm';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 
 export const ProductCreateLayout = () => {
   const { showAlert } = useAlert();
   const formData = useForm<Product>();
   const router = useRouter();
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { mutate } = useMutation({
-    mutationFn: createProduct,
+    mutationFn: (data: Product) => createProduct(data, workspaceOwnerId),
     onSuccess: () => {
       showAlert({
         type: 'success',

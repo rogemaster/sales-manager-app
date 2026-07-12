@@ -17,6 +17,7 @@ export interface Product {
   createDate: Date;
   updateDate: Date;
   informationDisclosure: ProductInformationDisclosure;
+  ownerId: string;
 }
 
 export interface ProductSaleState {
@@ -84,7 +85,7 @@ export interface InformationDisclosure {
 
 export type InformationDisclosureCategory = Pick<InformationDisclosure, 'id' | 'name'>;
 
-export type CreateProductRequest = Omit<Product, 'productId' | 'createDate' | 'updateDate'>;
+export type CreateProductRequest = Omit<Product, 'productId' | 'ownerId' | 'createDate' | 'updateDate'>;
 
 export type ProductInformationDisclosure = {
   key: string;

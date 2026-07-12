@@ -1,7 +1,9 @@
 import { Product } from '@/features/products/types/product.types';
 import { faker, fakerKO } from '@faker-js/faker';
 
-export const MOCK_PRODUCT_DATA: Product[] = [
+const SUPER_A_ID = 'usr_2f20748f';
+
+const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
   {
     productId: 'smp000001',
     name: fakerKO.commerce.productName(),
@@ -463,3 +465,5 @@ export const MOCK_PRODUCT_DATA: Product[] = [
     },
   },
 ];
+
+export const MOCK_PRODUCT_DATA: Product[] = RAW_PRODUCTS.map((p) => ({ ...p, ownerId: SUPER_A_ID }));

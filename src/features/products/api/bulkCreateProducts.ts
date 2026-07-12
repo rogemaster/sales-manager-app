@@ -1,10 +1,10 @@
 import { Product } from '../types/product.types';
 
-export const bulkCreateProducts = async (data: Product[]) => {
+export const bulkCreateProducts = async (data: Omit<Product, 'ownerId'>[], ownerId: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/bulk`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ ownerId, products: data }),
   });
 
   if (!response.ok) throw new Error('상품 대량 등록 실패');
