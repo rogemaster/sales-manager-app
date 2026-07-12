@@ -1,7 +1,9 @@
 import { Order } from '@/features/order/types/order.types';
 
+const SUPER_A_ID = 'usr_2f20748f';
+
 // 샘플 주문 데이터 (날짜: 2026-01-01 ~ 2026-05-17, 약 5일 간격으로 균등 배분)
-export const MOCK_ORDERS_DATA: Order[] = [
+const RAW_ORDERS: Omit<Order, 'ownerId'>[] = [
   {
     orderNumber: 'order_sample_001',
     shopOrderNumber: '111111-222222',
@@ -1164,3 +1166,5 @@ export const MOCK_ORDERS_DATA: Order[] = [
     payeeAddress: '서울특별시 강남구 테헤란로 12',
   },
 ];
+
+export const MOCK_ORDERS_DATA: Order[] = RAW_ORDERS.map((o) => ({ ...o, ownerId: SUPER_A_ID }));

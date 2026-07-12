@@ -2,7 +2,7 @@ import { generatorOrderCode } from '@/utils/codeGenerator';
 import { ExcelRowWithErrors } from '@/types/excel.type';
 import { Order } from '@/features/order/types/order.types';
 
-export const orderExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Order[] => {
+export const orderExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Order, 'ownerId'>[] => {
   return rows.map((r) => ({
     orderNumber: generatorOrderCode(),
     shopOrderNumber: (r['쇼핑몰주문번호'] as string) || '',

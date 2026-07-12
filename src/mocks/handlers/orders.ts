@@ -10,19 +10,20 @@ import { addMockOrderComment } from '../utils/addOrderComment';
 export const orderHandlers = [
   http.post(`${baseUrl}/api/orders/bulk`, async ({ request }) => {
     await delay(500);
-    const data = (await request.json()) as Order[];
-    MOCK_ORDERS_DATA.push(...data);
-    return HttpResponse.json({ success: true, count: data.length });
+    const { ownerId, orders } = (await request.json()) as { ownerId: string; orders: Omit<Order, 'ownerId'>[] };
+    MOCK_ORDERS_DATA.push(...orders.map((o) => ({ ...o, ownerId })));
+    return HttpResponse.json({ success: true, count: orders.length });
   }),
 
   http.post(`${baseUrl}/api/orders/list`, async ({ request }) => {
     await delay(300);
-    const { filters, page, pageSize } = (await request.json()) as {
+    const { ownerId, filters, page, pageSize } = (await request.json()) as {
+      ownerId: string;
       filters: OrderSearchType;
       page: number;
       pageSize: number;
     };
-    return HttpResponse.json(getMockOrders(filters, page, pageSize));
+    return HttpResponse.json(getMockOrders(ownerId, filters, page, pageSize));
   }),
 
   http.get(`${baseUrl}/api/orders/:orderId`, ({ params }) => {
