@@ -6,12 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   shoppingMallAtom,
-  mallAccountIdAtom,
+  mallIdAtom,
   deliveryCompanyAtom,
 } from '@/features/order/store/search.store';
 import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
 import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
-import { FilterOption } from '@/types/common.type';
+import { FilterOption, ShoppingMalls } from '@/types/common.type';
 
 const ALL_OPTION: FilterOption = { id: 'ALL', name: '전체' };
 
@@ -20,7 +20,7 @@ const MALL_ACCOUNTS: Record<string, FilterOption[]> = {};
 
 export const OrderMallFilter = () => {
   const [shoppingMall, setShoppingMall] = useAtom(shoppingMallAtom);
-  const [mallAccountId, setMallAccountId] = useAtom(mallAccountIdAtom);
+  const [mallId, setMallId] = useAtom(mallIdAtom);
   const [deliveryCompany, setDeliveryCompany] = useAtom(deliveryCompanyAtom);
 
   const mallOptions = useMemo<FilterOption[]>(
@@ -36,8 +36,8 @@ export const OrderMallFilter = () => {
   const deliveryOptions: FilterOption[] = [ALL_OPTION, ...DELIVERY_COMPANY];
 
   const handleMallChange = (value: string) => {
-    setShoppingMall(value);
-    setMallAccountId('ALL');
+    setShoppingMall(value as ShoppingMalls | 'ALL');
+    setMallId('ALL');
   };
 
   return (
@@ -55,7 +55,7 @@ export const OrderMallFilter = () => {
           ))}
         </SelectContent>
       </Select>
-      <Select value={mallAccountId} onValueChange={setMallAccountId}>
+      <Select value={mallId} onValueChange={setMallId}>
         <SelectTrigger className="w-36">
           <SelectValue placeholder="아이디 선택" />
         </SelectTrigger>

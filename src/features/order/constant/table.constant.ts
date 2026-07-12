@@ -36,7 +36,7 @@ export const ORDERLIST_TABLE_HEAD: TableTitleValue[] = [
     title: '쇼핑몰명',
   },
   {
-    id: 'shopId',
+    id: 'shoppingMallId',
     title: '쇼핑몰ID',
   },
   {

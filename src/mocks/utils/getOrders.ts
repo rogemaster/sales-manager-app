@@ -15,9 +15,9 @@ const filterByShoppingMall = (shoppingMall: string, data: Order[]) => {
   return data.filter((item) => item.shoppingMallName === shoppingMall);
 };
 
-const filterByMallAccountId = (mallAccountId: string, data: Order[]) => {
-  if (!mallAccountId || mallAccountId === 'ALL') return data;
-  return data.filter((item) => item.shoppingMallId === mallAccountId);
+const filterByMallId = (mallId: string, data: Order[]) => {
+  if (!mallId || mallId === 'ALL') return data;
+  return data.filter((item) => item.shoppingMallId === mallId);
 };
 
 const filterByOrderStatus = (orderStatus: string, data: Order[]) => {
@@ -40,11 +40,11 @@ const filterBySearchValue = (searchType: string, searchValue: string, data: Orde
 };
 
 export const getMockOrders = (filters: OrderSearchType, page: number, pageSize: number) => {
-  const { dateType, startDate, endDate, shoppingMall, mallAccountId, orderStatus, searchType, searchValue } = filters;
+  const { dateType, startDate, endDate, shoppingMall, mallId, orderStatus, searchType, searchValue } = filters;
 
   const byDate = filterByDate(dateType, startDate, endDate, MOCK_ORDERS_DATA);
   const byMall = filterByShoppingMall(shoppingMall, byDate);
-  const byAccountId = filterByMallAccountId(mallAccountId, byMall);
+  const byAccountId = filterByMallId(mallId, byMall);
   const byStatus = filterByOrderStatus(orderStatus, byAccountId);
   const filtered = filterBySearchValue(searchType, searchValue, byStatus);
 
