@@ -3,6 +3,7 @@ import { baseUrl } from '../config';
 import { CollectionSearchParams, TriggerCollectionBody } from '@/features/order/types/collection.types';
 import { getCollectionJobsMock } from '../utils/getCollectionJobs';
 import { triggerOrderCollectionMock } from '../utils/triggerOrderCollection';
+import { ShoppingMalls } from '@/types/common.type';
 
 export const collectionHandlers = [
   http.get(`${baseUrl}/api/order/collection/jobs`, ({ request }) => {
@@ -10,8 +11,8 @@ export const collectionHandlers = [
     const params: CollectionSearchParams = {
       startDate: url.searchParams.get('startDate') ?? '',
       endDate: url.searchParams.get('endDate') ?? '',
-      mallCode: url.searchParams.get('mallCode') ?? 'ALL',
-      mallAccountId: url.searchParams.get('mallAccountId') ?? 'ALL',
+      mallCode: (url.searchParams.get('mallCode') ?? 'ALL') as ShoppingMalls | 'ALL',
+      mallId: url.searchParams.get('mallId') ?? 'ALL',
     };
     return HttpResponse.json(getCollectionJobsMock(params));
   }),

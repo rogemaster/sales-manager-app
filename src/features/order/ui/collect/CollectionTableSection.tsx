@@ -66,7 +66,7 @@ export const CollectionTableSection = () => {
                   />
                 </TableCell>
                 <TableCell className="text-center">{getMallName(job.mallName)}</TableCell>
-                <TableCell className="text-center">{job.mallAccountId}</TableCell>
+                <TableCell className="text-center">{job.mallId}</TableCell>
                 <TableCell className="text-center">
                   <CollectionStatusCell
                     status={job.status}

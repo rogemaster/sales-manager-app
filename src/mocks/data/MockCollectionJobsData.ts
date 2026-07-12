@@ -5,7 +5,7 @@ export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
   {
     id: 'JOB-001',
     mallName: 'COUP',
-    mallAccountId: 'coupang_seller1',
+    mallId: 'coupang_seller1',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-25 09:00:00',
     totalCount: 150,
@@ -14,14 +14,14 @@ export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
   {
     id: 'JOB-002',
     mallName: 'GMK',
-    mallAccountId: 'gadmin1111',
+    mallId: 'gadmin1111',
     status: 'WAITING',
     lastCollectedAt: null,
   },
   {
     id: 'JOB-003',
     mallName: 'NSST',
-    mallAccountId: 'naver_store1',
+    mallId: 'naver_store1',
     status: 'FAILED',
     lastCollectedAt: '2026-05-24 15:30:00',
     totalCount: 200,
@@ -30,7 +30,7 @@ export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
   {
     id: 'JOB-004',
     mallName: 'AUC',
-    mallAccountId: 'auction_admin1',
+    mallId: 'auction_admin1',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-25 08:00:00',
     totalCount: 300,
@@ -39,14 +39,14 @@ export const MOCK_COLLECTION_JOBS: CollectionJob[] = [
   {
     id: 'JOB-005',
     mallName: '11ST',
-    mallAccountId: 'elevenst_shop1',
+    mallId: 'elevenst_shop1',
     status: 'WAITING',
     lastCollectedAt: null,
   },
   {
     id: 'JOB-006',
     mallName: 'INTP',
-    mallAccountId: 'ipark_seller',
+    mallId: 'ipark_seller',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-23 11:00:00',
     totalCount: 80,

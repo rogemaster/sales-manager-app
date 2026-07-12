@@ -9,7 +9,7 @@ import {
   collectStartDateAtom,
   collectEndDateAtom,
   collectMallAtom,
-  collectMallAccountIdAtom,
+  collectMallIdAtom,
   collectSearchParamsAtom,
   selectedJobIdsAtom,
 } from '@/features/order/store/collect.store';
@@ -18,13 +18,13 @@ export const CollectionFilterSection = () => {
   const startDate = useAtomValue(collectStartDateAtom);
   const endDate = useAtomValue(collectEndDateAtom);
   const mallCode = useAtomValue(collectMallAtom);
-  const mallAccountId = useAtomValue(collectMallAccountIdAtom);
+  const mallId = useAtomValue(collectMallIdAtom);
   const setSearchParams = useSetAtom(collectSearchParamsAtom);
   const setSelectedJobIds = useSetAtom(selectedJobIdsAtom);
 
   const handleSearch = () => {
     setSelectedJobIds([]);
-    setSearchParams({ startDate, endDate, mallCode, mallAccountId });
+    setSearchParams({ startDate, endDate, mallCode, mallId });
   };
 
   return (
