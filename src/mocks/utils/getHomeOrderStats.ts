@@ -2,8 +2,9 @@ import { HomeOrderStats } from '@/features/home/types/home.types';
 import { OrderStatusTypes } from '@/features/order/types/order.types';
 import { MOCK_ORDERS_DATA } from '../data/MockOrdersData';
 
-export const getMockHomeOrderStats = (startDate: string, endDate: string): HomeOrderStats => {
-  const filtered = MOCK_ORDERS_DATA.filter((o) => {
+export const getMockHomeOrderStats = (ownerId: string, startDate: string, endDate: string): HomeOrderStats => {
+  const owned = MOCK_ORDERS_DATA.filter((o) => o.ownerId === ownerId);
+  const filtered = owned.filter((o) => {
     const date = o.orderCollectionDate.split(' ')[0];
     return date >= startDate && date <= endDate;
   });
