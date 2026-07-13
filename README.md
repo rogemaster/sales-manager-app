@@ -3,7 +3,7 @@
 쇼핑몰 판매자를 위한 **상품 · 주문 · 계정 통합 관리 웹 애플리케이션**입니다.  
 상품 등록/수정/대량 업로드, 주문 수집/조회/처리, 쇼핑몰 계정·정보설정 관리, 사용자 관리 기능을 제공하며, `ownerId` 기반으로 슈퍼계정별 데이터가 격리되는 멀티 테넌트 구조입니다.
 
-**[라이브 데모 →](https://sales-manager-app-nine.vercel.app/)** | 테스트 계정: `admin@example.com` / `admin123`
+**[라이브 데모 →](https://sales-manager-app-nine.vercel.app/)** | 테스트 계정: `admin@example.com` / `admin123@@`
 
 <br />
 
