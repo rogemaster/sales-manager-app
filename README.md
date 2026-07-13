@@ -1,7 +1,7 @@
 # Sales Manager App
 
 쇼핑몰 판매자를 위한 **상품 · 주문 · 계정 통합 관리 웹 애플리케이션**입니다.  
-상품 등록/수정/대량 업로드, 주문 수집/조회/처리, 사용자 관리 기능을 제공합니다.
+상품 등록/수정/대량 업로드, 주문 수집/조회/처리, 쇼핑몰 계정·정보설정 관리, 사용자 관리 기능을 제공하며, `ownerId` 기반으로 슈퍼계정별 데이터가 격리되는 멀티 테넌트 구조입니다.
 
 **[라이브 데모 →](https://sales-manager-app-nine.vercel.app/)** | 테스트 계정: `admin@example.com` / `admin123`
 
@@ -20,7 +20,8 @@
 | 주문 목록 | 날짜·쇼핑몰·상태 필터, 일괄 상태변경 |
 | 주문 상세 | 주문 정보, 클레임, 코멘트, 수정이력, 배송 처리 |
 | 주문 등록 | 수동 주문 생성 |
-| 쇼핑몰 계정 관리 | 쇼핑몰별 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
+| 쇼핑몰 계정 관리 | 쇼핑몰별 API 연동 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
+| 쇼핑몰 정보설정 | 몰별 판매 정보(별칭·상품상태·판매기간) 등록/수정, 출고지·반품지 주소록 연동 |
 | 사용자 관리 | 사용자 목록 조회, 등록, 삭제 (등급별 권한 분리) |
 | 프로필 수정 | 닉네임·연락처·소개·회사·지역 정보 수정 |
 
@@ -40,7 +41,7 @@
 | DB | Neon (PostgreSQL) + Drizzle ORM | 유저 정보 영속성 보장, 서버리스 환경에 최적화된 serverless driver |
 | API Mocking | MSW 2 | 비즈니스 데이터(상품·주문 등) 개발용 mock, 서비스 워커 레벨 인터셉트 |
 | 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
-| 테스트 | Vitest | 핵심 비즈니스 로직(옵션 조합, 폼 유효성 검사) 단위 테스트 |
+| 테스트 | Vitest | MSW mock 유틸의 도메인 조회·필터링 로직(주문/상품/쇼핑몰 설정, ownerId 테넌트 격리 등) 단위 테스트 |
 
 <br />
 
@@ -48,7 +49,7 @@
 
 ### Feature-driven 모듈 구조
 
-도메인(상품·주문·홈·인증·계정·쇼핑몰 계정·프로필)별로 `api / store / types / ui / util`을 각 feature 폴더에 응집시켰습니다.  
+도메인(상품·주문·홈·인증·계정·쇼핑몰 계정·쇼핑몰 정보설정·프로필)별로 `api / store / types / ui / util`을 각 feature 폴더에 응집시켰습니다.  
 기능이 추가될 때 기존 코드를 수정하지 않고 새 feature 폴더를 추가하는 방식으로 확장합니다.
 
 ```
@@ -56,19 +57,19 @@ src/features/
 ├── products/        # 상품 관련 api, store, types, ui, util
 ├── order/           # 주문 관련 api, store, types, ui, util
 ├── account/         # 사용자 관리 api, store, types, ui
-├── shoppingAccount/ # 쇼핑몰 계정 관리 api, store, types, ui
+├── shoppingAccount/ # 쇼핑몰 계정(API 연동 계정) 관리 api, store, types, ui
+├── shoppingSetting/ # 쇼핑몰 정보설정(판매 정보) 관리 api, store, types, ui
 ├── profile/         # 프로필 수정 api, ui
 ├── home/            # 홈 대시보드
 └── auth/            # 인증
 ```
 
-공통 쇼핑몰 계정 등 여러 도메인이 공유하는 리소스는 `src/shared/`로 분리합니다.
+여러 도메인이 공유하는 상수·유틸은 `src/shared/`로 분리합니다.
 
 ```
 src/shared/
-├── api/        # 공통 API (쇼핑몰 계정 등)
-├── types/      # 공통 타입
-└── constant/   # 공통 상수 (쇼핑몰, 배송 유형 등)
+├── constant/   # 공통 상수 (쇼핑몰, 배송 유형 등)
+└── utils/      # 공통 유틸 (연락처 검증/포맷 등)
 ```
 
 ### 3계층 상태 관리
@@ -104,6 +105,18 @@ src/app/api/                          # DB 연동 route handlers
     └── create/route.ts               # 사용자 등록 (POST)
 ```
 
+### ownerId 기반 멀티 테넌시
+
+가입으로 생성되는 계정(`super_admin`)만 최상위 테넌트이며, 사용자 관리에서 등록되는 계정은 그 슈퍼계정에 종속됩니다. 모든 도메인 리소스(주문·상품·쇼핑몰 계정·쇼핑몰 정보설정 등)는 `ownerId` 필드로 테넌트를 구분합니다.
+
+- **목록/생성 API**: 로그인 계정의 `ownerId`(`workspaceOwnerIdAtom`)를 요청 body에 실어 보내고, 서버는 그 값으로 필터링/스탬핑합니다.
+- **단건 조회/수정 API**: `X-Owner-Id` 헤더로 `ownerId`를 전달하고, 서버는 리소스의 `ownerId`와 비교해 불일치·미존재 시 모두 `404`로 응답합니다(다른 테넌트 리소스의 존재 여부 자체를 노출하지 않기 위함). 여러 항목을 한 번에 처리하는 액션(주문수집 트리거 등)은 예외적으로 거부 대신 소유한 항목만 필터링해 실행합니다.
+
+```
+ownerId === id  → 슈퍼계정 (super_admin, 자기참조)
+ownerId === X   → X 슈퍼계정에 종속된 서브유저 (admin, operator)
+```
+
 ### 등급 기반 권한 제어
 
 사용자 등급(`UserGrade`)에 따라 UI 레벨에서 기능 접근을 제한합니다.
@@ -113,6 +126,14 @@ src/app/api/                          # DB 연동 route handlers
 | `super_admin` | ✅ | ✅ | ✅ |
 | `admin` | ✅ | ✅ | ❌ |
 | `operator` | ❌ | ❌ | ❌ |
+
+쇼핑몰 계정 관리 화면의 일괄 액션도 동일한 등급 체계를 따릅니다.
+
+| 등급 | 계정 삭제 | 사용 여부 변경 |
+|------|----------|--------------|
+| `super_admin` | ✅ | ✅ |
+| `admin` | ❌ | ✅ |
+| `operator` | ❌ | ❌ |
 
 ### 엑셀 전략 패턴 (Strategy Pattern)
 
@@ -137,9 +158,9 @@ src/mocks/
 │   ├── home.ts
 │   ├── products.ts
 │   ├── orders.ts
-│   ├── mallAccounts.ts
-│   ├── collection.ts
-│   └── shoppingAccounts.ts
+│   ├── collection.ts        # 주문수집 작업/트리거
+│   ├── shoppingAccounts.ts
+│   └── shoppingSettings.ts
 ├── data/                    # 정적 mock 원본 데이터
 └── utils/                   # 핸들러 비즈니스 로직
 ```
@@ -193,7 +214,9 @@ src/
 │   │   ├── home/               # 홈 대시보드
 │   │   ├── products/           # 상품목록, 등록, 수정, 대량등록
 │   │   ├── order/              # 주문수집, 목록, 상세, 등록
-│   │   ├── shopping/           # 쇼핑몰 계정 목록, 등록, 수정
+│   │   ├── shopping/           # 쇼핑몰 계정/정보설정
+│   │   │   ├── accounts/       # 쇼핑몰 계정 목록, 등록, 수정
+│   │   │   └── settings/       # 쇼핑몰 정보설정 목록, 등록, 수정
 │   │   ├── account/            # 사용자관리
 │   │   └── profile/            # 프로필 수정
 │   └── api/                    # DB 연동 route handlers
@@ -211,13 +234,13 @@ src/
 │   ├── order/
 │   ├── account/
 │   ├── shoppingAccount/
+│   ├── shoppingSetting/
 │   ├── profile/
 │   ├── home/
 │   └── auth/
-├── shared/                     # 도메인 간 공유 리소스
-│   ├── api/                    # 쇼핑몰 계정 API
-│   ├── types/                  # 공통 타입
-│   └── constant/               # 쇼핑몰·배송 상수
+├── shared/                     # 도메인 간 공유 상수·유틸
+│   ├── constant/               # 쇼핑몰·배송 상수
+│   └── utils/                  # 연락처 검증/포맷 등
 ├── components/
 │   ├── common/                 # TablePagination, RangeDatePicker, FilterSelect, Alert(useAlert) 등
 │   ├── excel/                  # 엑셀 업로드/다운로드/미리보기 + 전략 패턴
