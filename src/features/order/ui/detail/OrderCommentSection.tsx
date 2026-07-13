@@ -11,17 +11,18 @@ import { createOrderComment } from '../../api/createOrderComment';
 type Props = {
   orderId: string;
   comments: OrderComment[];
+  ownerId: string;
 };
 
-export const OrderCommentSection = ({ orderId, comments }: Props) => {
+export const OrderCommentSection = ({ orderId, comments, ownerId }: Props) => {
   const [content, setContent] = useState('');
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () => createOrderComment(orderId, content),
+    mutationFn: () => createOrderComment(orderId, content, ownerId),
     onSuccess: () => {
       setContent('');
-      queryClient.invalidateQueries({ queryKey: ['order-comments', orderId] });
+      queryClient.invalidateQueries({ queryKey: ['order-comments', orderId, ownerId] });
     },
   });
 
