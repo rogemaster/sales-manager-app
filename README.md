@@ -198,7 +198,7 @@ DATABASE_URL=your-neon-database-url
 
 | 이메일 | 비밀번호 |
 |--------|----------|
-| `admin@example.com` | `admin123` |
+| `admin@example.com` | `admin123@@` |
 
 로컬 환경에서는 `/register`에서 직접 회원가입 후 사용하세요.
 
