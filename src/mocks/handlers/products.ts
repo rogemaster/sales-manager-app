@@ -5,6 +5,7 @@ import { getMockProducts } from '../utils/getProducts';
 import { createMockProduct } from '../utils/createProduct';
 import { updateMockProduct } from '../utils/updateProduct';
 import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
+import { isOwnerMatch } from '../utils/verifyOwnership';
 
 export const productHandlers = [
   http.post(`${baseUrl}/api/products/list`, async ({ request }) => {
@@ -19,14 +20,19 @@ export const productHandlers = [
     return HttpResponse.json(newProduct);
   }),
 
-  http.get(`${baseUrl}/api/products/:productId`, ({ params }) => {
+  http.get(`${baseUrl}/api/products/:productId`, ({ params, request }) => {
     const { productId } = params;
+    const ownerId = request.headers.get('X-Owner-Id');
     const data = MOCK_PRODUCT_DATA.find((item) => item.productId === productId);
+    if (!data || !isOwnerMatch(data.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(data);
   }),
 
   http.patch(`${baseUrl}/api/products/:productId`, async ({ request, params }) => {
     const { productId } = params;
+    const ownerId = request.headers.get('X-Owner-Id');
+    const data = MOCK_PRODUCT_DATA.find((item) => item.productId === productId);
+    if (!data || !isOwnerMatch(data.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     const update = (await request.json()) as Product;
     const updated = updateMockProduct(productId as string, update);
     return HttpResponse.json(updated);

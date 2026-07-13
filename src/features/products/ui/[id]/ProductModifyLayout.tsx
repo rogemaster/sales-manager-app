@@ -4,6 +4,8 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { ProductForm } from '../components/ProductForm';
 import { Product } from '../../types/product.types';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getProduct } from '../../api/getProduct';
 import { updateProduct } from '../../api/updateProduct';
 import { useEffect } from 'react';
@@ -19,14 +21,16 @@ export const ProductModifyLayout = ({ productId }: Props) => {
 
   const formData = useForm<Product>();
   const { showAlert } = useAlert();
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: queryData, isSuccess } = useQuery({
-    queryKey: ['productId', productId],
-    queryFn: () => getProduct(productId),
+    queryKey: ['productId', productId, workspaceOwnerId],
+    queryFn: () => getProduct(productId, workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   const { mutate } = useMutation({
-    mutationFn: (data: Product) => updateProduct(productId, data),
+    mutationFn: (data: Product) => updateProduct(productId, data, workspaceOwnerId),
     onSuccess: () => {
       showAlert({
         type: 'success',
