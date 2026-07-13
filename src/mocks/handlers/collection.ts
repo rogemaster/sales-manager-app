@@ -20,8 +20,9 @@ export const collectionHandlers = [
 
   http.post(`${baseUrl}/api/order/collection/trigger`, async ({ request }) => {
     await delay(300);
+    const ownerId = request.headers.get('X-Owner-Id');
     const { jobIds } = (await request.json()) as TriggerCollectionBody;
-    const triggeredCount = triggerOrderCollectionMock(jobIds);
+    const triggeredCount = triggerOrderCollectionMock(jobIds, ownerId);
     return HttpResponse.json({ success: true, triggeredCount });
   }),
 ];

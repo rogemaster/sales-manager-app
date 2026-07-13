@@ -8,6 +8,7 @@ export const updateMockShoppingSetting = (id: string, body: UpdateShoppingSettin
   MOCK_SHOPPING_SETTINGS_DATA[index] = {
     ...MOCK_SHOPPING_SETTINGS_DATA[index],
     ...body,
+    ownerId: MOCK_SHOPPING_SETTINGS_DATA[index].ownerId,
     updatedAt: dayjs().format('YYYY-MM-DD'),
   };
   return MOCK_SHOPPING_SETTINGS_DATA[index];

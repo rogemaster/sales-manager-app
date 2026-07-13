@@ -5,6 +5,6 @@ export const updateMockProduct = (productId: string, update: Product): Product |
   const index = MOCK_PRODUCT_DATA.findIndex((item) => item.productId === productId);
   if (index === -1) return undefined;
 
-  MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update };
+  MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update, ownerId: MOCK_PRODUCT_DATA[index].ownerId };
   return MOCK_PRODUCT_DATA[index];
 };
