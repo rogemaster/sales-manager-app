@@ -12,6 +12,7 @@ import { updateMockShoppingAccount } from '../utils/updateShoppingAccount';
 import { deleteMockShoppingAccounts } from '../utils/deleteShoppingAccounts';
 import { updateMockShoppingAccountsStatus } from '../utils/updateShoppingAccountsStatus';
 import { getMockShoppingAccountsByMall } from '../utils/getShoppingAccountsByMall';
+import { isOwnerMatch } from '../utils/verifyOwnership';
 import { ShoppingMalls } from '@/types/common.type';
 
 export const shoppingAccountHandlers = [
@@ -50,15 +51,18 @@ export const shoppingAccountHandlers = [
   }),
 
   http.patch(`${baseUrl}/api/shopping/accounts/:id`, async ({ request, params }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
+    const existing = getMockShoppingAccount(params.id as string);
+    if (!existing || !isOwnerMatch(existing.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     const body = (await request.json()) as UpdateShoppingAccountBody;
     const updated = updateMockShoppingAccount(params.id as string, body);
-    if (!updated) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(updated);
   }),
 
-  http.get(`${baseUrl}/api/shopping/accounts/:id`, ({ params }) => {
+  http.get(`${baseUrl}/api/shopping/accounts/:id`, ({ params, request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const account = getMockShoppingAccount(params.id as string);
-    if (!account) return new HttpResponse(null, { status: 404 });
+    if (!account || !isOwnerMatch(account.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(account);
   }),
 ];

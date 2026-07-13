@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { FormProvider, useForm } from 'react-hook-form';
 import Script from 'next/script';
 import { Button } from '@/components/ui/button';
 import { useAlert } from '@/hooks/useAlert';
+import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getOrder } from '../../api/getOrder';
 import { getOrderClaim } from '../../api/getOrderClaim';
 import { getOrderComments } from '../../api/getOrderComments';
@@ -28,25 +30,30 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
   const { showAlert } = useAlert();
   const queryClient = useQueryClient();
   const form = useForm<OrderDetail>();
+  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: order, isSuccess: orderSuccess } = useQuery({
-    queryKey: ['order', orderId],
-    queryFn: () => getOrder(orderId),
+    queryKey: ['order', orderId, workspaceOwnerId],
+    queryFn: () => getOrder(orderId, workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   const { data: claim, isSuccess: claimSuccess } = useQuery({
-    queryKey: ['order-claim', orderId],
-    queryFn: () => getOrderClaim(orderId),
+    queryKey: ['order-claim', orderId, workspaceOwnerId],
+    queryFn: () => getOrderClaim(orderId, workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   const { data: comments = [] } = useQuery({
-    queryKey: ['order-comments', orderId],
-    queryFn: () => getOrderComments(orderId),
+    queryKey: ['order-comments', orderId, workspaceOwnerId],
+    queryFn: () => getOrderComments(orderId, workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   const { data: history = [] } = useQuery({
-    queryKey: ['order-history', orderId],
-    queryFn: () => getOrderHistory(orderId),
+    queryKey: ['order-history', orderId, workspaceOwnerId],
+    queryFn: () => getOrderHistory(orderId, workspaceOwnerId),
+    enabled: !!workspaceOwnerId,
   });
 
   useEffect(() => {
@@ -56,11 +63,11 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
   }, [orderSuccess, claimSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { mutate: saveOrder, isPending } = useMutation({
-    mutationFn: (data: OrderDetail) => updateOrder(orderId, data),
+    mutationFn: (data: OrderDetail) => updateOrder(orderId, data, workspaceOwnerId),
     onSuccess: (updatedOrder) => {
       form.reset({ ...updatedOrder, claim: claim ?? undefined });
-      queryClient.setQueryData(['order', orderId], updatedOrder);
-      queryClient.invalidateQueries({ queryKey: ['order-history', orderId] });
+      queryClient.setQueryData(['order', orderId, workspaceOwnerId], updatedOrder);
+      queryClient.invalidateQueries({ queryKey: ['order-history', orderId, workspaceOwnerId] });
       setIsEditMode(false);
       showAlert({ type: 'success', message: '주문 수정 완료' });
     },
@@ -112,7 +119,7 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
       </FormProvider>
 
       <div className="space-y-6 mt-6">
-        <OrderCommentSection orderId={orderId} comments={comments} />
+        <OrderCommentSection orderId={orderId} comments={comments} ownerId={workspaceOwnerId} />
         <OrderEditHistorySection editHistory={history} />
       </div>
     </>

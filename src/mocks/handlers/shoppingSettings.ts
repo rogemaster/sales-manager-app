@@ -14,6 +14,7 @@ import { getMockAddressBook } from '../utils/getAddressBook';
 import { getMockShoppingSetting } from '../utils/getShoppingSetting';
 import { createMockShoppingSetting } from '../utils/createShoppingSetting';
 import { updateMockShoppingSetting } from '../utils/updateShoppingSetting';
+import { isOwnerMatch } from '../utils/verifyOwnership';
 
 export const shoppingSettingHandlers = [
   http.post(`${baseUrl}/api/shopping/settings/list`, async ({ request }) => {
@@ -54,16 +55,19 @@ export const shoppingSettingHandlers = [
   }),
 
   // status/addresses 등 고정경로를 모두 등록한 뒤 동적경로(/:id)를 등록 - :id가 고정 세그먼트와 매칭되는 것을 방지
-  http.get(`${baseUrl}/api/shopping/settings/:id`, ({ params }) => {
+  http.get(`${baseUrl}/api/shopping/settings/:id`, ({ params, request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const setting = getMockShoppingSetting(params.id as string);
-    if (!setting) return new HttpResponse(null, { status: 404 });
+    if (!setting || !isOwnerMatch(setting.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(setting);
   }),
 
   http.patch(`${baseUrl}/api/shopping/settings/:id`, async ({ request, params }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
+    const existing = getMockShoppingSetting(params.id as string);
+    if (!existing || !isOwnerMatch(existing.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
     const body = (await request.json()) as UpdateShoppingSettingBody;
     const updated = updateMockShoppingSetting(params.id as string, body);
-    if (!updated) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(updated);
   }),
 ];

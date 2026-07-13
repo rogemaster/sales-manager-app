@@ -8,6 +8,7 @@ export const updateMockShoppingAccount = (id: string, body: UpdateShoppingAccoun
   MOCK_SHOPPING_ACCOUNTS_DATA[index] = {
     ...MOCK_SHOPPING_ACCOUNTS_DATA[index],
     ...body,
+    ownerId: MOCK_SHOPPING_ACCOUNTS_DATA[index].ownerId,
     updatedAt: dayjs().format('YYYY-MM-DD'),
   };
   return MOCK_SHOPPING_ACCOUNTS_DATA[index];

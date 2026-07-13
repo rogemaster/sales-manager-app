@@ -27,7 +27,7 @@ export const updateMockOrder = (orderId: string, update: Partial<OrderDetail>): 
     };
   }
 
-  MOCK_ORDERS_DATA[index] = { ...MOCK_ORDERS_DATA[index], ...orderUpdate };
+  MOCK_ORDERS_DATA[index] = { ...MOCK_ORDERS_DATA[index], ...orderUpdate, ownerId: MOCK_ORDERS_DATA[index].ownerId };
 
   if (changedFields.length > 0) {
     if (!MOCK_ORDER_HISTORIES[orderId]) {

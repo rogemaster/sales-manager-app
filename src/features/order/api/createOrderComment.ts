@@ -1,9 +1,13 @@
 import { OrderComment } from '../types/order.types';
 
-export const createOrderComment = async (orderId: string, content: string): Promise<OrderComment> => {
+export const createOrderComment = async (
+  orderId: string,
+  content: string,
+  ownerId: string,
+): Promise<OrderComment> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}/comments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
     body: JSON.stringify({ content }),
   });
   if (!response.ok) throw new Error('코멘트 저장 실패');
