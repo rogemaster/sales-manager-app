@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { requireSession } from '@/shared/utils/apiAuth';
 
 export async function PATCH(req: NextRequest) {
+  const session = await requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   try {
-    const { email, name, phone, company, bio } = await req.json();
+    const { name, phone, company, bio } = await req.json();
 
     const now = new Date().toISOString().split('T')[0];
 
@@ -18,7 +22,7 @@ export async function PATCH(req: NextRequest) {
         ...(bio !== undefined && { bio }),
         updatedAt: now,
       })
-      .where(eq(users.email, email));
+      .where(eq(users.id, session.id));
 
     const [updated] = await db
       .select({
@@ -32,7 +36,7 @@ export async function PATCH(req: NextRequest) {
         grade: users.grade,
       })
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.id, session.id))
       .limit(1);
 
     if (!updated) return new NextResponse(null, { status: 404 });

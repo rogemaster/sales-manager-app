@@ -13,7 +13,7 @@ export const useGetUsers = () => {
 
   return useQuery({
     queryKey: [USER_LIST_QUERY_KEY, workspaceOwnerId, filters, currentPage],
-    queryFn: () => getUsers(workspaceOwnerId, filters, currentPage),
+    queryFn: () => getUsers(filters, currentPage),
     enabled: !!workspaceOwnerId,
   });
 };

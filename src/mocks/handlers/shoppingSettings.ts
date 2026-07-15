@@ -14,7 +14,8 @@ import { getMockAddressBook } from '../utils/getAddressBook';
 import { getMockShoppingSetting } from '../utils/getShoppingSetting';
 import { createMockShoppingSetting } from '../utils/createShoppingSetting';
 import { updateMockShoppingSetting } from '../utils/updateShoppingSetting';
-import { isOwnerMatch } from '../utils/verifyOwnership';
+import { isOwnerMatch, allOwnedBy } from '../utils/verifyOwnership';
+import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 
 export const shoppingSettingHandlers = [
   http.post(`${baseUrl}/api/shopping/settings/list`, async ({ request }) => {
@@ -28,13 +29,21 @@ export const shoppingSettingHandlers = [
   }),
 
   http.patch(`${baseUrl}/api/shopping/settings/status`, async ({ request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const { ids, isActive } = (await request.json()) as { ids: string[]; isActive: boolean };
+    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
+      return new HttpResponse(null, { status: 403 });
+    }
     updateMockShoppingSettingsStatus(ids, isActive);
     return HttpResponse.json({ success: true });
   }),
 
   http.post(`${baseUrl}/api/shopping/settings/delete`, async ({ request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const { ids } = (await request.json()) as { ids: string[] };
+    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
+      return new HttpResponse(null, { status: 403 });
+    }
     deleteMockShoppingSettings(ids);
     return HttpResponse.json({ success: true });
   }),

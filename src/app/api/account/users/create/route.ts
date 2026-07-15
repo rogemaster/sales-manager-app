@@ -4,10 +4,18 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
 import { v4 as uuidv4 } from 'uuid';
+import { requireSuperAdminSession } from '@/shared/utils/apiAuth';
 
 export async function POST(req: NextRequest) {
+  const session = await requireSuperAdminSession(req);
+  if (session instanceof NextResponse) return session;
+
   try {
-    const { ownerId, email, password, name, phone, grade, status, avatar, bio } = await req.json();
+    const { email, password, name, phone, grade, status, avatar, bio } = await req.json();
+
+    if (grade === 'super_admin') {
+      return NextResponse.json({ error: '허용되지 않는 등급입니다.' }, { status: 403 });
+    }
 
     const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
     if (existing.length > 0) {
@@ -19,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     await db.insert(users).values({
       id,
-      ownerId,
+      ownerId: session.ownerId,
       status: status ?? 'active',
       email,
       password: await hashPassword(password),
@@ -32,7 +40,6 @@ export async function POST(req: NextRequest) {
       grade,
       createdAt: now,
       updatedAt: now,
-      // 회사 정보 필드는 DB default('')으로 처리
     });
 
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
