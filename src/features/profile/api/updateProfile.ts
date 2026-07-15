@@ -1,7 +1,6 @@
 import { User } from '@/features/auth/types/Auth';
 
 export type UpdateProfileBody = {
-  email: string;
   name: string;
   phone: string;
   company?: string;

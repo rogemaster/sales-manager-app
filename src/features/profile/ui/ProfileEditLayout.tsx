@@ -46,22 +46,19 @@ export const ProfileEditLayout = () => {
   });
 
   const onSubmit = (data: ProfileEditFormData) => {
-    mutate(
-      { email, ...data },
-      {
-        onSuccess: (updated) => {
-          setUserInfo({ ...userInfo, ...updated });
-          showAlert({
-            type: 'success',
-            message: '저장되었습니다.',
-            onConfirm: () => router.back(),
-          });
-        },
-        onError: () => {
-          showAlert({ type: 'error', message: '저장에 실패했습니다.' });
-        },
+    mutate(data, {
+      onSuccess: (updated) => {
+        setUserInfo({ ...userInfo, ...updated });
+        showAlert({
+          type: 'success',
+          message: '저장되었습니다.',
+          onConfirm: () => router.back(),
+        });
       },
-    );
+      onError: () => {
+        showAlert({ type: 'error', message: '저장에 실패했습니다.' });
+      },
+    });
   };
 
   return (
