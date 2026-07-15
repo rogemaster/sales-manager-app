@@ -12,7 +12,8 @@ import { updateMockShoppingAccount } from '../utils/updateShoppingAccount';
 import { deleteMockShoppingAccounts } from '../utils/deleteShoppingAccounts';
 import { updateMockShoppingAccountsStatus } from '../utils/updateShoppingAccountsStatus';
 import { getMockShoppingAccountsByMall } from '../utils/getShoppingAccountsByMall';
-import { isOwnerMatch } from '../utils/verifyOwnership';
+import { isOwnerMatch, allOwnedBy } from '../utils/verifyOwnership';
+import { MOCK_SHOPPING_ACCOUNTS_DATA } from '../data/MockShoppingAccountsData';
 import { ShoppingMalls } from '@/types/common.type';
 
 export const shoppingAccountHandlers = [
@@ -38,14 +39,22 @@ export const shoppingAccountHandlers = [
   }),
 
   http.post(`${baseUrl}/api/shopping/accounts/delete`, async ({ request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const { ids } = (await request.json()) as { ids: string[] };
+    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_ACCOUNTS_DATA)) {
+      return new HttpResponse(null, { status: 403 });
+    }
     deleteMockShoppingAccounts(ids);
     return HttpResponse.json({ success: true });
   }),
 
   // status 핸들러는 :id 핸들러보다 먼저 등록해야 경로 충돌 방지
   http.patch(`${baseUrl}/api/shopping/accounts/status`, async ({ request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
     const { ids, isActive } = (await request.json()) as { ids: string[]; isActive: boolean };
+    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_ACCOUNTS_DATA)) {
+      return new HttpResponse(null, { status: 403 });
+    }
     updateMockShoppingAccountsStatus(ids, isActive);
     return HttpResponse.json({ success: true });
   }),
