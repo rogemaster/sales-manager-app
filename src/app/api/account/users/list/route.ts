@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
+import { requireSuperAdminSession } from '@/shared/utils/apiAuth';
 
 export async function POST(req: NextRequest) {
+  const session = await requireSuperAdminSession(req);
+  if (session instanceof NextResponse) return session;
+
   try {
-    const { ownerId, filters, page, pageSize } = await req.json();
+    const { filters, page, pageSize } = await req.json();
     const { dateType, startDate, endDate, grade, searchType, searchValue } = filters;
 
-    const conditions = [eq(users.ownerId, ownerId)];
+    const conditions = [eq(users.ownerId, session.ownerId)];
 
     if (dateType === 'createdAt') {
       conditions.push(gte(users.createdAt, startDate));
