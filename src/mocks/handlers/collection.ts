@@ -4,6 +4,8 @@ import { CollectionSearchParams, TriggerCollectionBody } from '@/features/order/
 import { getCollectionJobsMock } from '../utils/getCollectionJobs';
 import { triggerOrderCollectionMock } from '../utils/triggerOrderCollection';
 import { ShoppingMalls } from '@/types/common.type';
+import { MOCK_COLLECTION_JOBS } from '../data/MockCollectionJobsData';
+import { allOwnedBy } from '../utils/verifyOwnership';
 
 export const collectionHandlers = [
   http.get(`${baseUrl}/api/order/collection/jobs`, ({ request }) => {
@@ -22,7 +24,10 @@ export const collectionHandlers = [
     await delay(300);
     const ownerId = request.headers.get('X-Owner-Id');
     const { jobIds } = (await request.json()) as TriggerCollectionBody;
-    const triggeredCount = triggerOrderCollectionMock(jobIds, ownerId);
+    if (!allOwnedBy(jobIds, ownerId, MOCK_COLLECTION_JOBS)) {
+      return new HttpResponse(null, { status: 403 });
+    }
+    const triggeredCount = triggerOrderCollectionMock(jobIds);
     return HttpResponse.json({ success: true, triggeredCount });
   }),
 ];
