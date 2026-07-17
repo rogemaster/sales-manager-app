@@ -14,7 +14,7 @@ export const currentPageAtom = atom<number>(1);
 export const dateTypeAtom = atom<string>(DEFAULT_DATE_TYPE);
 export const startDateAtom = atom<string>(DEFAULT_START_DATE);
 export const endDateAtom = atom<string>(DEFAULT_END_DATE);
-export const shoppingMallAtom = atom<ShoppingMalls | 'ALL'>('ALL');
+export const mallCodeAtom = atom<ShoppingMalls | 'ALL'>('ALL');
 export const mallIdAtom = atom<string>('ALL');
 export const deliveryCompanyAtom = atom<string>('ALL');
 export const orderStatusAtom = atom<string>(DEFAULT_ORDER_STATUS);
@@ -28,7 +28,7 @@ export const getOrderSearchFilterAtom = atom<OrderSearchType>((get) => ({
   dateType: get(dateTypeAtom),
   startDate: get(startDateAtom),
   endDate: get(endDateAtom),
-  shoppingMall: get(shoppingMallAtom),
+  mallCode: get(mallCodeAtom),
   mallId: get(mallIdAtom),
   deliveryCompany: get(deliveryCompanyAtom),
   orderStatus: get(orderStatusAtom),
@@ -41,7 +41,7 @@ export const committedFiltersAtom = atom<OrderSearchType>({
   dateType: DEFAULT_DATE_TYPE,
   startDate: DEFAULT_START_DATE,
   endDate: DEFAULT_END_DATE,
-  shoppingMall: 'ALL',
+  mallCode: 'ALL',
   mallId: 'ALL',
   deliveryCompany: 'ALL',
   orderStatus: DEFAULT_ORDER_STATUS,

@@ -13,7 +13,7 @@ export const ShoppingAccountCreateLayout = () => {
 
   const handleSubmit = (data: ShoppingAccountFormData) => {
     const body: CreateShoppingAccountBody = {
-      mallCode: data.mallCode as CreateShoppingAccountBody['mallCode'],
+      mallCode: data.mallCode,
       mallId: data.mallId,
       password: data.password,
       isActive: data.isActive,

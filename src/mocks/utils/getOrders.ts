@@ -10,14 +10,14 @@ const filterByDate = (dateType: string, startDate: string, endDate: string, data
   return data.filter((item) => dayjs(item[field]).isBetween(startDate, endDate, 'day', '[]'));
 };
 
-const filterByShoppingMall = (shoppingMall: string, data: Order[]) => {
-  if (!shoppingMall || shoppingMall === 'ALL') return data;
-  return data.filter((item) => item.shoppingMallName === shoppingMall);
+const filterByMallCode = (mallCode: string, data: Order[]) => {
+  if (!mallCode || mallCode === 'ALL') return data;
+  return data.filter((item) => item.mallCode === mallCode);
 };
 
 const filterByMallId = (mallId: string, data: Order[]) => {
   if (!mallId || mallId === 'ALL') return data;
-  return data.filter((item) => item.shoppingMallId === mallId);
+  return data.filter((item) => item.mallId === mallId);
 };
 
 const filterByOrderStatus = (orderStatus: string, data: Order[]) => {
@@ -40,11 +40,11 @@ const filterBySearchValue = (searchType: string, searchValue: string, data: Orde
 };
 
 export const getMockOrders = (ownerId: string, filters: OrderSearchType, page: number, pageSize: number) => {
-  const { dateType, startDate, endDate, shoppingMall, mallId, orderStatus, searchType, searchValue } = filters;
+  const { dateType, startDate, endDate, mallCode, mallId, orderStatus, searchType, searchValue } = filters;
 
   const byOwner = MOCK_ORDERS_DATA.filter((o) => o.ownerId === ownerId);
   const byDate = filterByDate(dateType, startDate, endDate, byOwner);
-  const byMall = filterByShoppingMall(shoppingMall, byDate);
+  const byMall = filterByMallCode(mallCode, byDate);
   const byAccountId = filterByMallId(mallId, byMall);
   const byStatus = filterByOrderStatus(orderStatus, byAccountId);
   const filtered = filterBySearchValue(searchType, searchValue, byStatus);

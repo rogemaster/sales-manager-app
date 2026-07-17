@@ -5,7 +5,7 @@ export interface OrderSearchType {
   dateType: string;
   startDate: string;
   endDate: string;
-  shoppingMall: ShoppingMalls | 'ALL';
+  mallCode: ShoppingMalls | 'ALL';
   mallId: string;
   deliveryCompany: string;
   orderStatus: string;
@@ -40,8 +40,8 @@ export type OrderStatusTypes =
 결제일 - paymentDate
 주문수집일 - orderCollectionDate
 
-쇼핑몰명 - shoppingMallName - 글로벌 쇼핑몰 인터페이스 참조
-쇼핑몰ID - shoppingMallId
+쇼핑몰명(코드) - mallCode - 글로벌 쇼핑몰 인터페이스 참조
+쇼핑몰계정ID - mallId
 쇼핑몰상품코드 - shopProductId
 주문상품명 - orderProductName
 총주문금액(실결제가) - orderPrice
@@ -69,8 +69,8 @@ export interface Order {
   orderStatus: OrderStatusTypes;
   paymentDate: string;
   orderCollectionDate: string;
-  shoppingMallName: ShoppingMalls;
-  shoppingMallId: string;
+  mallCode: ShoppingMalls;
+  mallId: string;
   shopProductId: string;
   orderProductName: string;
   orderPrice: number;

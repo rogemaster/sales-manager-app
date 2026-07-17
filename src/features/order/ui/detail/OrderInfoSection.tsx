@@ -40,7 +40,7 @@ export const OrderInfoSection = ({ order, isEditMode }: Props) => {
             <p className="text-sm font-medium">{order.orderCollectionDate}</p>
           </Field>
           <Field label="쇼핑몰">
-            <p className="text-sm font-medium">{getShoppingMallName(order.shoppingMallName)}</p>
+            <p className="text-sm font-medium">{getShoppingMallName(order.mallCode)}</p>
           </Field>
           <Field label="주문상품명">
             {isEditMode ? (

@@ -10,8 +10,8 @@ const { ORDERS } = vi.hoisted(() => {
     orderStatus: 'NEW_ORDER',
     paymentDate: '2024-01-15',
     orderCollectionDate: '2024-01-15',
-    shoppingMallName: 'COUP',
-    shoppingMallId: 'mall-1',
+    mallCode: 'COUP',
+    mallId: 'mall-1',
     shopProductId: 'prod-1',
     orderProductName: '나이키 운동화',
     orderPrice: 100000,
@@ -32,10 +32,10 @@ const { ORDERS } = vi.hoisted(() => {
 
   return {
     ORDERS: [
-      makeOrder({ orderNumber: 'ORD-001', shoppingMallName: 'COUP', shoppingMallId: 'mall-1', orderStatus: 'NEW_ORDER', paymentDate: '2024-01-15', orderName: '홍길동', orderProductName: '나이키 운동화' }),
-      makeOrder({ orderNumber: 'ORD-002', shoppingMallName: 'NSST', shoppingMallId: 'mall-2', orderStatus: 'CONFIRMED_ORDER', paymentDate: '2024-01-20', orderName: '김철수', orderProductName: '아디다스 슬리퍼' }),
-      makeOrder({ orderNumber: 'ORD-003', shoppingMallName: 'COUP', shoppingMallId: 'mall-1', orderStatus: 'INVOICE_REGISTER', paymentDate: '2024-02-01', orderName: '이영희', orderProductName: '뉴발란스 운동화' }),
-      makeOrder({ orderNumber: 'ORD-004', ownerId: 'owner-2', shoppingMallName: 'COUP', shoppingMallId: 'mall-1', orderStatus: 'NEW_ORDER', paymentDate: '2024-01-15', orderName: '박민수', orderProductName: '타 owner 주문' }),
+      makeOrder({ orderNumber: 'ORD-001', mallCode: 'COUP', mallId: 'mall-1', orderStatus: 'NEW_ORDER', paymentDate: '2024-01-15', orderName: '홍길동', orderProductName: '나이키 운동화' }),
+      makeOrder({ orderNumber: 'ORD-002', mallCode: 'NSST', mallId: 'mall-2', orderStatus: 'CONFIRMED_ORDER', paymentDate: '2024-01-20', orderName: '김철수', orderProductName: '아디다스 슬리퍼' }),
+      makeOrder({ orderNumber: 'ORD-003', mallCode: 'COUP', mallId: 'mall-1', orderStatus: 'INVOICE_REGISTER', paymentDate: '2024-02-01', orderName: '이영희', orderProductName: '뉴발란스 운동화' }),
+      makeOrder({ orderNumber: 'ORD-004', ownerId: 'owner-2', mallCode: 'COUP', mallId: 'mall-1', orderStatus: 'NEW_ORDER', paymentDate: '2024-01-15', orderName: '박민수', orderProductName: '타 owner 주문' }),
     ],
   };
 });
@@ -52,7 +52,7 @@ const defaultFilters: OrderSearchType = {
   dateType: 'paymentDate',
   startDate: '2024-01-01',
   endDate: '2024-12-31',
-  shoppingMall: 'ALL',
+  mallCode: 'ALL',
   mallId: 'ALL',
   deliveryCompany: 'ALL',
   orderStatus: 'ALL',
@@ -85,19 +85,19 @@ describe('getMockOrders', () => {
 
   describe('쇼핑몰 필터', () => {
     it("'COUP'만 필터링하면 COUP 주문 2개를 반환한다", () => {
-      const result = getMockOrders('owner-1', { ...defaultFilters, shoppingMall: 'COUP' }, 1, 10);
+      const result = getMockOrders('owner-1', { ...defaultFilters, mallCode: 'COUP' }, 1, 10);
       expect(result.total).toBe(2);
-      result.orders.forEach((o) => expect(o.shoppingMallName).toBe('COUP'));
+      result.orders.forEach((o) => expect(o.mallCode).toBe('COUP'));
     });
 
     it("'NSST'만 필터링하면 NSST 주문 1개를 반환한다", () => {
-      const result = getMockOrders('owner-1', { ...defaultFilters, shoppingMall: 'NSST' }, 1, 10);
+      const result = getMockOrders('owner-1', { ...defaultFilters, mallCode: 'NSST' }, 1, 10);
       expect(result.total).toBe(1);
       expect(result.orders[0].orderNumber).toBe('ORD-002');
     });
 
     it("'ALL'이면 전체를 반환한다", () => {
-      const result = getMockOrders('owner-1', { ...defaultFilters, shoppingMall: 'ALL' }, 1, 10);
+      const result = getMockOrders('owner-1', { ...defaultFilters, mallCode: 'ALL' }, 1, 10);
       expect(result.total).toBe(3);
     });
   });
@@ -106,7 +106,7 @@ describe('getMockOrders', () => {
     it("'mall-1' 아이디만 필터링하면 2개를 반환한다", () => {
       const result = getMockOrders('owner-1', { ...defaultFilters, mallId: 'mall-1' }, 1, 10);
       expect(result.total).toBe(2);
-      result.orders.forEach((o) => expect(o.shoppingMallId).toBe('mall-1'));
+      result.orders.forEach((o) => expect(o.mallId).toBe('mall-1'));
     });
 
     it("'mall-2' 아이디만 필터링하면 1개를 반환한다", () => {

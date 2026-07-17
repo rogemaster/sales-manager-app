@@ -5,7 +5,7 @@ export type CollectionStatus = 'WAITING' | 'COLLECTING' | 'COMPLETED' | 'FAILED'
 
 export interface CollectionJob {
   id: string;
-  mallName: ShoppingMalls;
+  mallCode: ShoppingMalls;
   mallId: string;
   status: CollectionStatus;
   lastCollectedAt: string | null;
