@@ -12,9 +12,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MALL_NAME_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
 import { PHONE_REGEX } from '@/shared/utils/phone';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { ShoppingMalls } from '@/types/common.type';
+
+const MALL_CODES: string[] = SHOPPING_MALLS.map((mall) => mall.code);
 
 const shoppingAccountSchema = z.object({
-  mallCode: z.string().min(1, '쇼핑몰을 선택해주세요.'),
+  mallCode: z
+    .string()
+    .min(1, '쇼핑몰을 선택해주세요.')
+    .refine((val): val is ShoppingMalls => MALL_CODES.includes(val), {
+      message: '유효하지 않은 쇼핑몰입니다.',
+    }),
   mallId: z.string().min(1, '쇼핑몰 ID를 입력해주세요.'),
   password: z.string().min(1, '패스워드를 입력해주세요.'),
   isActive: z.boolean(),
@@ -37,7 +46,8 @@ const shoppingAccountSchema = z.object({
   apiKey: z.string().optional(),
 });
 
-export type ShoppingAccountFormData = z.infer<typeof shoppingAccountSchema>;
+export type ShoppingAccountFormInput = z.input<typeof shoppingAccountSchema>;
+export type ShoppingAccountFormData = z.output<typeof shoppingAccountSchema>;
 
 interface ShoppingAccountFormProps {
   defaultValues?: Partial<ShoppingAccountFormData>;
@@ -54,7 +64,7 @@ const IS_ACTIVE_OPTIONS = [
 export const ShoppingAccountForm = ({ defaultValues, onSubmit, isSubmitting, mode }: ShoppingAccountFormProps) => {
   const router = useRouter();
 
-  const form = useForm<ShoppingAccountFormData>({
+  const form = useForm<ShoppingAccountFormInput, unknown, ShoppingAccountFormData>({
     resolver: zodResolver(shoppingAccountSchema),
     defaultValues: {
       mallCode: '',

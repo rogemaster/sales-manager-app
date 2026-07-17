@@ -19,7 +19,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
 
   const handleSubmit = (data: ShoppingAccountFormData) => {
     const body: UpdateShoppingAccountBody = {
-      mallCode: data.mallCode as UpdateShoppingAccountBody['mallCode'],
+      mallCode: data.mallCode,
       mallId: data.mallId,
       password: data.password,
       isActive: data.isActive,
