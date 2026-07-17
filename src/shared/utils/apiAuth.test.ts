@@ -25,12 +25,6 @@ describe('requireSession', () => {
     const result = await requireSession(makeReq());
     expect(result).toEqual({ id: 'usr_1', ownerId: 'usr_1', grade: 'super_admin', email: 'a@a.com' });
   });
-
-  it('ownerId가 null이면 자기 id로 대체한다', async () => {
-    getToken.mockResolvedValue({ id: 'usr_1', ownerId: null, grade: 'super_admin', email: 'a@a.com' });
-    const result = await requireSession(makeReq());
-    expect(result).toEqual({ id: 'usr_1', ownerId: 'usr_1', grade: 'super_admin', email: 'a@a.com' });
-  });
 });
 
 describe('requireSuperAdminSession', () => {

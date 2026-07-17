@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { User, UserGrade } from '../types/Auth';
 
 export const idAtom = atom<string>('');
-export const ownerIdAtom = atom<string | null>(null);
+export const ownerIdAtom = atom<string>('');
 export const emailAtom = atom<string>('');
 export const nameAtom = atom<string>('');
 export const avatarAtom = atom<string>('');
@@ -12,7 +12,7 @@ export const companyAtom = atom<string>('');
 export const locationAtom = atom<string>('');
 export const gradeAtom = atom<UserGrade>('operator');
 
-export type UserWithId = User & { id: string; ownerId: string | null };
+export type UserWithId = User & { id: string; ownerId: string };
 
 /**
  * 유저 정보 저장
@@ -50,21 +50,18 @@ export const getUserInfoAtom = atom<UserWithId>((get) => ({
 
 /**
  * 로그인한 계정의 워크스페이스 소유자 id
- * - super_admin: 자신의 id
+ * - super_admin: 자신의 id (가입 시 ownerId=id로 자기참조 기록됨)
  * - admin/operator: 자신의 ownerId (슈퍼계정 id)
+ * - 로그아웃 상태: '' (falsy이므로 React Query enabled 게이팅에 그대로 사용 가능)
  */
-export const workspaceOwnerIdAtom = atom<string>((get) => {
-  const id = get(idAtom);
-  const ownerId = get(ownerIdAtom);
-  return ownerId ?? id;
-});
+export const workspaceOwnerIdAtom = atom<string>((get) => get(ownerIdAtom));
 
 /**
  * 유저 정보 초기화
  */
 export const resetUserInfoAtom = atom(null, (_, set) => {
   set(idAtom, '');
-  set(ownerIdAtom, null);
+  set(ownerIdAtom, '');
   set(emailAtom, '');
   set(nameAtom, '');
   set(avatarAtom, '');

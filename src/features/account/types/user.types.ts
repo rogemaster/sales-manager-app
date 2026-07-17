@@ -5,8 +5,7 @@ export type UserStatus = 'active' | 'pending';
 export interface AccountUser extends User {
   id: string;
   status: UserStatus;
-  /** null: 직접 가입한 슈퍼계정 / string: 종속된 슈퍼계정의 id */
-  ownerId: string | null;
+  ownerId: string;
   createdAt: string;
   updatedAt: string;
 
