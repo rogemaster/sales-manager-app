@@ -16,7 +16,7 @@ export async function requireSession(req: NextRequest): Promise<ApiSession | Nex
   }
   return {
     id: token.id,
-    ownerId: token.ownerId ?? token.id,
+    ownerId: token.ownerId,
     grade: token.grade,
     email: token.email ?? '',
   };

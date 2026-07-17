@@ -39,7 +39,9 @@ const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
-            ownerId: user.ownerId,
+            // DB 컬럼(owner_id)은 nullable이지만 앱 레벨에서는 항상 non-null로 기록됨
+            // (가입/사용자등록 시 자기 id 또는 세션 ownerId로 채움). 2026-07-17 실 DB 확인: null 0건.
+            ownerId: user.ownerId as string,
             grade: user.grade as UserGrade,
             avatar: user.avatar ?? '',
             phone: user.phone,

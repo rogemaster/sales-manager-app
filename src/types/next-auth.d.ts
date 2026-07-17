@@ -3,7 +3,7 @@ import { UserGrade } from '@/features/auth/types/Auth';
 declare module 'next-auth' {
   interface User {
     id: string;
-    ownerId: string | null;
+    ownerId: string;
     grade: UserGrade;
     avatar: string;
     phone: string;
@@ -15,7 +15,7 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      ownerId: string | null;
+      ownerId: string;
       email: string;
       name: string;
       grade: UserGrade;
@@ -31,7 +31,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
-    ownerId: string | null;
+    ownerId: string;
     grade: UserGrade;
     avatar: string;
     phone: string;

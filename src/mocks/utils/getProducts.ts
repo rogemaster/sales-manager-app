@@ -36,11 +36,17 @@ const getProductsBysearchValue = (value: string, data: Product[]) => {
   return data.filter((item) => item.name.includes(value));
 };
 
-export const getMockProducts = (ownerId: string, searchParams: ProductSearch) => {
+export const getMockProducts = (ownerId: string, searchParams: ProductSearch, page: number, pageSize: number) => {
   const { dateType, startDate, endDate, saleType, categoryId, searchValue } = searchParams;
   const byOwner = MOCK_PRODUCT_DATA.filter((p) => p.ownerId === ownerId);
   const resultByDate = getProductsByDate(dateType, startDate, endDate, byOwner);
   const resultByType = getProductsBySaleType(saleType, resultByDate);
   const resultByCategory = getProductsByCategoryId(categoryId, resultByType);
-  return getProductsBysearchValue(searchValue, resultByCategory);
+  const filtered = getProductsBysearchValue(searchValue, resultByCategory);
+
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const products = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  return { products, total, page, pageSize, totalPages };
 };
