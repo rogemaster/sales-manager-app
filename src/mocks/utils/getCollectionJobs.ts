@@ -24,7 +24,7 @@ export function getCollectionJobsMock(ownerId: string, params: CollectionSearchP
 
   return MOCK_COLLECTION_JOBS.filter((job) => {
     if (job.ownerId !== ownerId) return false;
-    if (params.mallCode !== 'ALL' && job.mallName !== params.mallCode) return false;
+    if (params.mallCode !== 'ALL' && job.mallCode !== params.mallCode) return false;
     if (params.mallId !== 'ALL' && job.mallId !== params.mallId) return false;
     return true;
   });

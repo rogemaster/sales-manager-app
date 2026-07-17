@@ -65,7 +65,7 @@ export const CollectionTableSection = () => {
                     onCheckedChange={(checked) => handleToggleRow(job.id, !!checked)}
                   />
                 </TableCell>
-                <TableCell className="text-center">{getMallName(job.mallName)}</TableCell>
+                <TableCell className="text-center">{getMallName(job.mallCode)}</TableCell>
                 <TableCell className="text-center">{job.mallId}</TableCell>
                 <TableCell className="text-center">
                   <CollectionStatusCell

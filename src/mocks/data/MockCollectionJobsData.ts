@@ -6,7 +6,7 @@ const SUPER_A_ID = 'usr_2f20748f';
 const RAW_COLLECTION_JOBS: Omit<CollectionJob, 'ownerId'>[] = [
   {
     id: 'JOB-001',
-    mallName: 'COUP',
+    mallCode: 'COUP',
     mallId: 'coupang_seller1',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-25 09:00:00',
@@ -15,14 +15,14 @@ const RAW_COLLECTION_JOBS: Omit<CollectionJob, 'ownerId'>[] = [
   },
   {
     id: 'JOB-002',
-    mallName: 'GMK',
+    mallCode: 'GMK',
     mallId: 'gadmin1111',
     status: 'WAITING',
     lastCollectedAt: null,
   },
   {
     id: 'JOB-003',
-    mallName: 'NSST',
+    mallCode: 'NSST',
     mallId: 'naver_store1',
     status: 'FAILED',
     lastCollectedAt: '2026-05-24 15:30:00',
@@ -31,7 +31,7 @@ const RAW_COLLECTION_JOBS: Omit<CollectionJob, 'ownerId'>[] = [
   },
   {
     id: 'JOB-004',
-    mallName: 'AUC',
+    mallCode: 'AUC',
     mallId: 'auction_admin1',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-25 08:00:00',
@@ -40,14 +40,14 @@ const RAW_COLLECTION_JOBS: Omit<CollectionJob, 'ownerId'>[] = [
   },
   {
     id: 'JOB-005',
-    mallName: '11ST',
+    mallCode: '11ST',
     mallId: 'elevenst_shop1',
     status: 'WAITING',
     lastCollectedAt: null,
   },
   {
     id: 'JOB-006',
-    mallName: 'INTP',
+    mallCode: 'INTP',
     mallId: 'ipark_seller',
     status: 'COMPLETED',
     lastCollectedAt: '2026-05-23 11:00:00',

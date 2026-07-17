@@ -3,7 +3,7 @@ import type { CollectionJob } from '@/features/order/types/collection.types';
 
 const makeJob = (overrides: Partial<CollectionJob>): CollectionJob => ({
   id: 'JOB-001',
-  mallName: 'COUP',
+  mallCode: 'COUP',
   mallId: 'coupang_seller1',
   status: 'WAITING',
   lastCollectedAt: null,
@@ -15,9 +15,9 @@ const { JOBS } = vi.hoisted(() => ({ JOBS: [] as CollectionJob[] }));
 vi.mock('../data/MockCollectionJobsData', () => ({ MOCK_COLLECTION_JOBS: JOBS }));
 
 JOBS.push(
-  makeJob({ id: 'JOB-001', ownerId: 'owner-1', mallName: 'COUP' }),
-  makeJob({ id: 'JOB-002', ownerId: 'owner-1', mallName: 'NSST' }),
-  makeJob({ id: 'JOB-003', ownerId: 'owner-2', mallName: 'COUP' }),
+  makeJob({ id: 'JOB-001', ownerId: 'owner-1', mallCode: 'COUP' }),
+  makeJob({ id: 'JOB-002', ownerId: 'owner-1', mallCode: 'NSST' }),
+  makeJob({ id: 'JOB-003', ownerId: 'owner-2', mallCode: 'COUP' }),
 );
 
 import { getCollectionJobsMock } from './getCollectionJobs';
