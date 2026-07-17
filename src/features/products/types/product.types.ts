@@ -28,14 +28,6 @@ export interface ProductSaleState {
 export type ProductStateType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS';
 
 // 검색 관련 타입들
-export interface ProductSearchParams {
-  category?: string;
-  saleType?: string;
-  keyword?: string;
-  page?: number;
-  limit?: number;
-}
-
 export interface ProductSearch {
   dateType: string;
   startDate: string;

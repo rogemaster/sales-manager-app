@@ -9,8 +9,12 @@ import { isOwnerMatch } from '../utils/verifyOwnership';
 
 export const productHandlers = [
   http.post(`${baseUrl}/api/products/list`, async ({ request }) => {
-    const { ownerId, ...searchParams } = (await request.json()) as ProductSearch & { ownerId: string };
-    return HttpResponse.json(getMockProducts(ownerId, searchParams));
+    const { ownerId, page, pageSize, ...searchParams } = (await request.json()) as ProductSearch & {
+      ownerId: string;
+      page: number;
+      pageSize: number;
+    };
+    return HttpResponse.json(getMockProducts(ownerId, searchParams, page, pageSize));
   }),
 
   http.post(`${baseUrl}/api/products/create`, async ({ request }) => {

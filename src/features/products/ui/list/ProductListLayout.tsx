@@ -5,8 +5,7 @@ import { ProductHeaderSection, ProductSearchFilterSection, ProductTableSection }
 import { getSearchFilterAtom } from '../../store/search.store';
 import { useAtomValue } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
-import { getProducts } from '../../api/getProducts';
-import { Product } from '../../types/product.types';
+import { getProducts, GetProductsResponse } from '../../api/getProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 
 export const ProductListLayout = () => {
@@ -16,11 +15,15 @@ export const ProductListLayout = () => {
   const [searchCount, setSearchCount] = useState(0);
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
-  const { data: products = [], isLoading, isError } = useQuery<Product[]>({
-    queryKey: ['products', workspaceOwnerId, appliedFilter],
-    queryFn: () => getProducts(workspaceOwnerId, appliedFilter),
+  const { data, isLoading, isError } = useQuery<GetProductsResponse>({
+    queryKey: ['products', workspaceOwnerId, appliedFilter, currentPage],
+    queryFn: () => getProducts(workspaceOwnerId, appliedFilter, currentPage),
     enabled: !!workspaceOwnerId,
   });
+
+  const products = data?.products ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
 
   const handleSearch = () => {
     setAppliedFilter(currentFilter);
@@ -40,6 +43,8 @@ export const ProductListLayout = () => {
       ) : (
         <ProductTableSection
           products={products}
+          total={total}
+          totalPages={totalPages}
           currentPage={currentPage}
           onChangePage={setCurrentPage}
           isLoading={isLoading}
