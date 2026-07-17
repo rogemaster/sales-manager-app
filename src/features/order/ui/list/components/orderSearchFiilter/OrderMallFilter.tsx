@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  shoppingMallAtom,
+  mallCodeAtom,
   mallIdAtom,
   deliveryCompanyAtom,
 } from '@/features/order/store/search.store';
@@ -19,7 +19,7 @@ const ALL_OPTION: FilterOption = { id: 'ALL', name: '전체' };
 const MALL_ACCOUNTS: Record<string, FilterOption[]> = {};
 
 export const OrderMallFilter = () => {
-  const [shoppingMall, setShoppingMall] = useAtom(shoppingMallAtom);
+  const [mallCode, setMallCode] = useAtom(mallCodeAtom);
   const [mallId, setMallId] = useAtom(mallIdAtom);
   const [deliveryCompany, setDeliveryCompany] = useAtom(deliveryCompanyAtom);
 
@@ -29,21 +29,21 @@ export const OrderMallFilter = () => {
   );
 
   const accountOptions = useMemo<FilterOption[]>(
-    () => [ALL_OPTION, ...(shoppingMall !== 'ALL' ? (MALL_ACCOUNTS[shoppingMall] ?? []) : [])],
-    [shoppingMall],
+    () => [ALL_OPTION, ...(mallCode !== 'ALL' ? (MALL_ACCOUNTS[mallCode] ?? []) : [])],
+    [mallCode],
   );
 
   const deliveryOptions: FilterOption[] = [ALL_OPTION, ...DELIVERY_COMPANY];
 
   const handleMallChange = (value: string) => {
-    setShoppingMall(value as ShoppingMalls | 'ALL');
+    setMallCode(value as ShoppingMalls | 'ALL');
     setMallId('ALL');
   };
 
   return (
     <div className="flex items-center gap-4">
       <Label className="w-20 text-right">선택사항</Label>
-      <Select value={shoppingMall} onValueChange={handleMallChange}>
+      <Select value={mallCode} onValueChange={handleMallChange}>
         <SelectTrigger className="w-36">
           <SelectValue placeholder="쇼핑몰 선택" />
         </SelectTrigger>

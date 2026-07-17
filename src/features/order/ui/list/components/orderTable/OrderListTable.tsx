@@ -70,8 +70,8 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
             <TableCell className="text-center">{order.orderCollectionDate}</TableCell>
             <TableCell className="font-mono text-sm text-muted-foreground text-center">{order.orderNumber}</TableCell>
             <TableCell className="text-center">{order.shopOrderNumber}</TableCell>
-            <TableCell className="text-center">{getShoppingMallName(order.shoppingMallName)}</TableCell>
-            <TableCell className="text-center">{order.shoppingMallId}</TableCell>
+            <TableCell className="text-center">{getShoppingMallName(order.mallCode)}</TableCell>
+            <TableCell className="text-center">{order.mallId}</TableCell>
             <TableCell className="text-center">{<OrderStatusBadge status={order.orderStatus} />}</TableCell>
             <TableCell className="text-center">{order.shopProductId}</TableCell>
             <TableCell>{order.orderProductName}</TableCell>
