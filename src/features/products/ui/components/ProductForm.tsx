@@ -7,6 +7,7 @@ import { ProductOptionSection } from './options/ProductOptionSection';
 import { ProductMainImageInfo } from './form/ProductMainImageInfo';
 import { ProductDetailInfo } from './form/ProductDetailInfo';
 import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
+import { ProductComplianceSection } from './form/ProductComplianceSection';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 
@@ -25,6 +26,9 @@ export const ProductForm = () => {
         {/* 가격 및 수량 정보 */}
         <ProductPriceAndQuantityInfo />
       </div>
+
+      {/* 규정 정보 (원산지/부가세유형/성인상품여부) */}
+      <ProductComplianceSection />
 
       {/* 옵션 정보 및 옵션 조합 관리 (섹션 내부 포함) */}
       <ProductOptionSection />

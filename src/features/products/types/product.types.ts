@@ -1,3 +1,6 @@
+export type TaxType = 'TAXABLE' | 'TAX_FREE' | 'ZERO_RATED'; // 과세/면세/영세
+export type AdultProductType = 'GENERAL' | 'ADULT'; // 일반상품/성인상품
+
 export interface Product {
   productId: string;
   customerCode?: string;
@@ -18,6 +21,10 @@ export interface Product {
   updateDate: Date;
   informationDisclosure: ProductInformationDisclosure;
   ownerId: string;
+  originCountryCode?: string; // ORIGIN_COUNTRIES 코드('KR' 포함) 또는 'ETC'
+  originCountryEtc?: string; // originCountryCode === 'ETC'일 때만 사용하는 자유텍스트
+  taxType?: TaxType;
+  adultProductType?: AdultProductType;
 }
 
 export interface ProductSaleState {
