@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { AddressSelectModal } from '../address/AddressSelectModal';
-import { ShoppingSetting, MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import { ShoppingSettingFormValues, MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 interface AddressPickerFieldProps {
   name: 'shippingAddress' | 'returnAddress';
   label: string;
-  mallCode: ShoppingSetting['mallCode'];
+  mallCode: ShoppingSettingFormValues['mallCode'];
   mallId: string;
 }
 
@@ -19,7 +19,7 @@ const formatAddress = (address: MallAddress) =>
   `${address.name} (${address.zipCode}) ${address.address} ${address.addressDetail}`;
 
 const AddressPickerField = ({ name, label, mallCode, mallId }: AddressPickerFieldProps) => {
-  const { control } = useFormContext<ShoppingSetting>();
+  const { control } = useFormContext<ShoppingSettingFormValues>();
   const [open, setOpen] = useState(false);
 
   return (
@@ -56,7 +56,7 @@ const AddressPickerField = ({ name, label, mallCode, mallId }: AddressPickerFiel
 };
 
 export const ShoppingSettingAddressSection = () => {
-  const { watch } = useFormContext<ShoppingSetting>();
+  const { watch } = useFormContext<ShoppingSettingFormValues>();
   const mallCode = watch('mallCode');
   const mallId = watch('mallId');
 

@@ -6,9 +6,13 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useAlert } from '@/hooks/useAlert';
 import { useGetAvailableMallAccounts } from '@/features/shoppingSetting/api/useGetAvailableMallAccounts';
 import { useCreateShoppingSetting } from '@/features/shoppingSetting/api/useCreateShoppingSetting';
-import { ShoppingSetting, CreateShoppingSettingBody } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import {
+  ShoppingSettingFormValues,
+  CreateShoppingSettingBody,
+} from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { ShoppingMalls } from '@/types/common.type';
 import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ShoppingSettingForm } from '../components/ShoppingSettingForm';
 
 const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
@@ -23,7 +27,7 @@ export const ShoppingSettingCreateLayout = () => {
   const { data: accounts, isLoading: isAccountsLoading } = useGetAvailableMallAccounts();
   const { mutate: createSetting, isPending } = useCreateShoppingSetting();
 
-  const formData = useForm<ShoppingSetting>();
+  const formData = useForm<ShoppingSettingFormValues>();
   const matchedAccount = accounts?.find((account) => account.mallCode === mallCode && account.mallId === mallId);
 
   useEffect(() => {
@@ -47,19 +51,26 @@ export const ShoppingSettingCreateLayout = () => {
     }
   }, [isAccountsLoading, accounts, matchedAccount, router, showAlert]);
 
-  const onSubmit = (data: ShoppingSetting) => {
+  const onSubmit = (data: ShoppingSettingFormValues) => {
     if (!matchedAccount) return;
-    const body: CreateShoppingSettingBody = {
+    const common = {
       mallAccountId: matchedAccount.id,
-      mallCode: matchedAccount.mallCode,
       mallId: matchedAccount.mallId,
       nickname: data.nickname,
-      isActive: true,
+      isActive: true as const,
       productCondition: data.productCondition,
       salesPeriod: data.salesPeriod,
       shippingAddress: data.shippingAddress,
       returnAddress: data.returnAddress,
     };
+    let body: CreateShoppingSettingBody;
+    if (matchedAccount.mallCode === 'NSST') {
+      body = { ...common, mallCode: 'NSST', mallSettings: buildMallSettingsPayload('NSST', data.mallSettings) };
+    } else if (matchedAccount.mallCode === 'KAKAOS') {
+      body = { ...common, mallCode: 'KAKAOS', mallSettings: buildMallSettingsPayload('KAKAOS', data.mallSettings) };
+    } else {
+      body = { ...common, mallCode: matchedAccount.mallCode };
+    }
     createSetting(body, {
       onSuccess: () => {
         showAlert({

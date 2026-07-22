@@ -6,8 +6,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useAlert } from '@/hooks/useAlert';
 import { useGetShoppingSetting } from '@/features/shoppingSetting/api/useGetShoppingSetting';
 import { useUpdateShoppingSetting } from '@/features/shoppingSetting/api/useUpdateShoppingSetting';
-import { ShoppingSetting, UpdateShoppingSettingBody } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import {
+  ShoppingSettingFormValues,
+  UpdateShoppingSettingBody,
+} from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ShoppingSettingForm } from '../components/ShoppingSettingForm';
 
 interface Props {
@@ -22,7 +26,7 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
   const { data: setting, isLoading } = useGetShoppingSetting(id);
   const { mutate: updateSetting, isPending } = useUpdateShoppingSetting(id);
 
-  const formData = useForm<ShoppingSetting>();
+  const formData = useForm<ShoppingSettingFormValues>();
 
   useEffect(() => {
     if (setting) {
@@ -30,14 +34,22 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
     }
   }, [setting, formData]);
 
-  const onSubmit = (data: ShoppingSetting) => {
-    const body: UpdateShoppingSettingBody = {
+  const onSubmit = (data: ShoppingSettingFormValues) => {
+    const common = {
       nickname: data.nickname,
       productCondition: data.productCondition,
       salesPeriod: data.salesPeriod,
       shippingAddress: data.shippingAddress,
       returnAddress: data.returnAddress,
     };
+    let body: UpdateShoppingSettingBody;
+    if (data.mallCode === 'NSST') {
+      body = { ...common, mallSettings: buildMallSettingsPayload('NSST', data.mallSettings) };
+    } else if (data.mallCode === 'KAKAOS') {
+      body = { ...common, mallSettings: buildMallSettingsPayload('KAKAOS', data.mallSettings) };
+    } else {
+      body = common;
+    }
     updateSetting(body, {
       onSuccess: () => {
         showAlert({

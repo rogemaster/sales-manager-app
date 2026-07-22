@@ -2,22 +2,24 @@ import { describe, it, expect, vi } from 'vitest';
 import type { ShoppingSetting, ShoppingSettingSearchType } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 const { SETTINGS } = vi.hoisted(() => {
-  const makeSetting = (overrides: Partial<ShoppingSetting>): ShoppingSetting => ({
-    id: 'ss_001',
-    mallAccountId: 'sa_001',
-    mallCode: 'COUP',
-    mallId: 'coupang_seller_001',
-    nickname: '기본 설정',
-    isActive: true,
-    productCondition: 'NEW',
-    salesPeriod: 30,
-    shippingAddress: null,
-    returnAddress: null,
-    ownerId: 'usr_001',
-    createdAt: '2025-05-01',
-    updatedAt: '2025-05-01',
-    ...overrides,
-  });
+  // spread는 discriminated union의 mallCode/mallSettings 상관관계를 지워버리므로 단언이 필요
+  const makeSetting = (overrides: Partial<ShoppingSetting>): ShoppingSetting =>
+    ({
+      id: 'ss_001',
+      mallAccountId: 'sa_001',
+      mallCode: 'COUP',
+      mallId: 'coupang_seller_001',
+      nickname: '기본 설정',
+      isActive: true,
+      productCondition: 'NEW',
+      salesPeriod: 30,
+      shippingAddress: null,
+      returnAddress: null,
+      ownerId: 'usr_001',
+      createdAt: '2025-05-01',
+      updatedAt: '2025-05-01',
+      ...overrides,
+    }) as ShoppingSetting;
 
   return {
     SETTINGS: [

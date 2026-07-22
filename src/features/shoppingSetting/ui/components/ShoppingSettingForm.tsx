@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ShoppingSettingBasicInfoSection } from './form/ShoppingSettingBasicInfoSection';
 import { ShoppingSettingAddressSection } from './form/ShoppingSettingAddressSection';
+import { ShoppingSettingMallInfoSection } from './form/ShoppingSettingMallInfoSection';
 
 interface ShoppingSettingFormProps {
   submitLabel: string;
@@ -17,6 +18,7 @@ export const ShoppingSettingForm = ({ submitLabel, isSubmitting }: ShoppingSetti
     <div className="space-y-6">
       <ShoppingSettingBasicInfoSection />
       <ShoppingSettingAddressSection />
+      <ShoppingSettingMallInfoSection />
 
       <div className="flex justify-end gap-3">
         <Button type="button" variant="outline" onClick={() => router.push('/shopping/settings')}>

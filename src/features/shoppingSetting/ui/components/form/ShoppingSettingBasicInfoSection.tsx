@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import { ShoppingSettingFormValues } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import {
   PRODUCT_CONDITION_OPTIONS,
   SALES_PERIOD_OPTIONS,
@@ -16,7 +16,7 @@ export const ShoppingSettingBasicInfoSection = () => {
     register,
     control,
     formState: { errors },
-  } = useFormContext<ShoppingSetting>();
+  } = useFormContext<ShoppingSettingFormValues>();
 
   return (
     <Card className="overflow-hidden">
