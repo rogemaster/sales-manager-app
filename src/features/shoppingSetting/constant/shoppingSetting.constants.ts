@@ -39,3 +39,8 @@ export const SALES_PERIOD_OPTIONS: FilterOption[] = [
   { id: '60', name: '60일' },
   { id: '90', name: '90일' },
 ];
+
+export const YES_NO_OPTIONS: FilterOption[] = [
+  { id: 'true', name: '예' },
+  { id: 'false', name: '아니오' },
+];
