@@ -58,6 +58,11 @@ export const MOCK_SHOPPING_SETTINGS_DATA: ShoppingSetting[] = [
     salesPeriod: 60,
     shippingAddress: null,
     returnAddress: null,
+    mallSettings: {
+      afterServiceContact: '1588-0000',
+      purchaseReviewExposure: true,
+      certificationInfo: 'KC-2026-001',
+    },
     ownerId: 'usr_2f20748f',
     createdAt: '2025-05-15',
     updatedAt: '2025-05-15',
