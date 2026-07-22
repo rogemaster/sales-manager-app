@@ -11,10 +11,9 @@ export interface MallAddress {
   addressDetail: string;
 }
 
-export interface ShoppingSetting {
+interface ShoppingSettingBase {
   id: string;
   mallAccountId: string; // 참조: ShoppingAccount.id
-  mallCode: ShoppingMalls;
   mallId: string;
   nickname: string;
   isActive: boolean;
@@ -25,6 +24,33 @@ export interface ShoppingSetting {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface NaverSettingAttributes {
+  afterServiceContact?: string; // A/S 전화번호
+  afterServiceGuide?: string; // A/S 안내문구
+  purchaseReviewExposure?: boolean; // 구매평 노출 설정
+  logisticsCompanyId?: string; // 풀필먼트 물류사 ID (사용 시만)
+  logisticsCenterId?: string; // 풀필먼트 물류센터 ID (사용 시만)
+  certificationInfo?: string; // 인증정보
+  certificationExcludeReason?: string; // 인증 예외처리 사유
+}
+
+export interface KakaoSettingAttributes {
+  certs?: string; // 인증정보
+  additionalInfo?: string; // 부가정보 (선물포장/맞춤제작/반품가능여부)
+  shoppingHowDisplayable?: boolean; // 쇼핑하우 전시여부
+  storeboardDisplayStatus?: string; // 스토어보드 전시상태
+}
+
+export type ShoppingSetting =
+  | (ShoppingSettingBase & { mallCode: 'NSST'; mallSettings?: NaverSettingAttributes })
+  | (ShoppingSettingBase & { mallCode: 'KAKAOS'; mallSettings?: KakaoSettingAttributes })
+  | (ShoppingSettingBase & { mallCode: Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never });
+
+export interface ShoppingSettingFormValues extends ShoppingSettingBase {
+  mallCode: ShoppingMalls;
+  mallSettings?: Partial<NaverSettingAttributes & KakaoSettingAttributes>;
 }
 
 export interface ShoppingSettingSearchType {
