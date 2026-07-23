@@ -21,7 +21,7 @@
 | 주문 상세 | 주문 정보, 클레임, 코멘트, 수정이력, 배송 처리 |
 | 주문 등록 | 수동 주문 생성 |
 | 쇼핑몰 계정 관리 | 쇼핑몰별 API 연동 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
-| 쇼핑몰 정보설정 | 몰별 판매 정보(별칭·상품상태·판매기간) 등록/수정, 출고지·반품지 주소록 연동 |
+| 쇼핑몰 정보설정 | 몰별 판매 정보(별칭·상품상태·판매기간) 등록/수정, 출고지·반품지 주소록 연동, 네이버·카카오 등 몰 고유 항목(A/S 정보·구매평 노출 여부 등) 입력 |
 | 사용자 관리 | 사용자 목록 조회, 등록, 삭제 (등급별 권한 분리) |
 | 프로필 수정 | 닉네임·연락처·소개·회사·지역 정보 수정 |
 
@@ -145,6 +145,19 @@ components/excel/strategies/
 ├── productExcelSaveStrategy.ts  # 상품 ID · 등록일 주입
 └── orderExcelSaveStrategy.ts    # 주문 번호 · 등록일 주입
 ```
+
+### 몰(mallCode)별 고유 설정 — Discriminated Union
+
+쇼핑몰마다 고유 설정 필드가 다릅니다(네이버: A/S 정보·풀필먼트 물류센터 ID, 카카오: 인증정보·쇼핑하우 전시여부 등). `ShoppingSetting`을 `mallCode` 기준 discriminated union으로 설계해 몰별로 다른 필드 셋을 타입 레벨에서 표현합니다.
+
+```ts
+type ShoppingSetting =
+  | (ShoppingSettingBase & { mallCode: 'NSST'; mallSettings?: NaverSettingAttributes })
+  | (ShoppingSettingBase & { mallCode: 'KAKAOS'; mallSettings?: KakaoSettingAttributes })
+  | (ShoppingSettingBase & { mallCode: Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never });
+```
+
+React Hook Form은 `keyof`가 유니온 타입에서 공통 키만 남기는 특성 때문에 discriminated union을 폼 상태로 직접 다루기 어려워, RHF 쪽은 느슨한 flat 타입(`ShoppingSettingFormValues`)으로 관리하고 제출 시점에만 `buildMallSettingsPayload`로 도메인 타입으로 변환합니다 — 폼 상태 타입과 도메인 타입을 분리해 타입 안전성이 필요한 경계에서만 좁히는 전략입니다. 설계 배경과 트레이드오프는 [`docs/solutions/conventions/typescript-type-design-patterns.md`](docs/solutions/conventions/typescript-type-design-patterns.md), 확장 시 체크리스트는 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)에 정리했습니다.
 
 ### MSW 핸들러 구조
 
