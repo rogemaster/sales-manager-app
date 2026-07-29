@@ -6,6 +6,8 @@ import { createMockProduct } from '../utils/createProduct';
 import { updateMockProduct } from '../utils/updateProduct';
 import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 import { isOwnerMatch } from '../utils/verifyOwnership';
+import { registerMockProductsToMalls } from '../utils/registerProductsToMalls';
+import { MallRegistrationRequestItem } from '@/features/mallRegistration/types/mallRegistration.types';
 
 export const productHandlers = [
   http.post(`${baseUrl}/api/products/list`, async ({ request }) => {
@@ -47,5 +49,20 @@ export const productHandlers = [
     const { ownerId, products } = (await request.json()) as { ownerId: string; products: Omit<Product, 'ownerId'>[] };
     MOCK_PRODUCT_DATA.push(...products.map((p) => ({ ...p, ownerId })));
     return HttpResponse.json({ success: true, count: products.length });
+  }),
+
+  http.post(`${baseUrl}/api/products/mall-registration`, async ({ request }) => {
+    await delay(500);
+    const { ownerId, items } = (await request.json()) as { ownerId: string; items: MallRegistrationRequestItem[] };
+    const productIds = [...new Set(items.map((item) => item.productId))];
+    const allOwned = productIds.every((id) => {
+      const product = MOCK_PRODUCT_DATA.find((p) => p.productId === id);
+      return !!product && isOwnerMatch(product.ownerId, ownerId);
+    });
+    if (!allOwned) {
+      return new HttpResponse(null, { status: 403 });
+    }
+    const count = registerMockProductsToMalls(items);
+    return HttpResponse.json({ success: true, count });
   }),
 ];
