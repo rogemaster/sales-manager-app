@@ -39,6 +39,10 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
         title: '쇼핑몰 정보설정',
         url: '/shopping/settings',
       },
+      {
+        title: '쇼핑몰 상품등록',
+        url: '/shopping/register',
+      },
     ],
   },
   {
