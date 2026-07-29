@@ -1,8 +1,9 @@
 import { MallRegistrationRequestItem } from '../types/mallRegistration.types';
 
 export interface RegisterProductsToMallsResponse {
-  success: boolean;
-  count: number;
+  totalCount: number;
+  successCount: number;
+  failCount: number;
 }
 
 export const registerProductsToMalls = async (
