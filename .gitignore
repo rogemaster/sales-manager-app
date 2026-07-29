@@ -39,7 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# claude (rules/docs are intentionally committed as portfolio material — see AI-COLLABORATION.md)
+# claude (rules/docs are intentionally committed as portfolio material)
 .claude/settings.json
 .claude/settings.local.json
 /.superpowers/
