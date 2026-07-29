@@ -1,5 +1,14 @@
+import { ShoppingMalls } from '@/types/common.type';
+
 export type TaxType = 'TAXABLE' | 'TAX_FREE' | 'ZERO_RATED'; // 과세/면세/영세
 export type AdultProductType = 'GENERAL' | 'ADULT'; // 일반상품/성인상품
+
+export interface MallRegistration {
+  id: string;
+  mallCode: ShoppingMalls;
+  shoppingSettingId: string;
+  registeredAt: string;
+}
 
 export interface Product {
   productId: string;
@@ -25,6 +34,7 @@ export interface Product {
   originCountryEtc?: string; // originCountryCode === 'ETC'일 때만 사용하는 자유텍스트
   taxType?: TaxType;
   adultProductType?: AdultProductType;
+  registeredMalls?: MallRegistration[];
 }
 
 export interface ProductSaleState {
