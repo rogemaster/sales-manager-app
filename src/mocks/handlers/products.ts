@@ -52,7 +52,8 @@ export const productHandlers = [
   }),
 
   http.post(`${baseUrl}/api/products/mall-registration`, async ({ request }) => {
-    await delay(500);
+    // 외부 쇼핑몰 API 응답 지연 시뮬레이션
+    await delay(800);
     const { ownerId, items } = (await request.json()) as { ownerId: string; items: MallRegistrationRequestItem[] };
     const productIds = [...new Set(items.map((item) => item.productId))];
     const allOwned = productIds.every((id) => {
@@ -62,7 +63,6 @@ export const productHandlers = [
     if (!allOwned) {
       return new HttpResponse(null, { status: 403 });
     }
-    const count = registerMockProductsToMalls(items);
-    return HttpResponse.json({ success: true, count });
+    return HttpResponse.json(registerMockProductsToMalls(items));
   }),
 ];

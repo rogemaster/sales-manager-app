@@ -129,8 +129,8 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
 - **작업 중 git 명령 절대 금지:** `git add`, `git commit`, `git push`, 브랜치 생성 등 모든 git 작업은 사용자가 명시적으로 요청할 때만 실행한다. 코드 작성·파일 저장 후 자동으로 commit하지 않는다. 모든 작업이 완료된 후 사용자가 직접 검토하고 git 작업을 진행한다.
 - **이 규칙은 서브에이전트/스킬 위임 시에도 동일하게 적용된다.** `workflow.md`의 TDD 사이클이나 `subagent-driven-development` 등 워크플로우 스킬의 기본 템플릿이 "Task 완료 후 커밋"을 표준 스텝으로 포함하고 있어도, 서브에이전트 디스패치 프롬프트에 git commit 지시를 넣지 않는다. 커밋이 필요해 보이는 시점마다 매번 사용자에게 먼저 확인한다 — 과거 이 규칙을 스킬 기본 템플릿을 그대로 따르다 어긴 전례가 반복됐다.
 - **작업은 항상 새 브랜치에서 진행:** `main`에 직접 커밋하지 않는다. git 작업 요청 시 현재 브랜치를 먼저 확인하고, `main`이면 사용자에게 안내하여 `feat/<작업명>` 브랜치를 먼저 생성한 뒤 진행한다.
-- **git add/commit 전 반드시 `.gitignore`를 확인한다.** `CLAUDE.md`, `.claude/` 등은 `.gitignore`에 등록되어 있어 커밋 대상이 아니다. ignore된 파일은 스테이징에서 제외하고, 커밋 가능한 파일만 처리한다.
-- **`docs/solutions/` 문서는 git 커밋 대상이 아니다.** 로컬에만 유지하며, 다른 파일과 함께 커밋할 때도 스테이징에서 제외한다 (`docs/superpowers/specs/`, `docs/superpowers/plans/` 등 다른 문서의 커밋 여부는 각 워크플로우 규칙을 따로 따른다).
+- **AI 협업 문서는 전부 커밋 대상이다.** `CLAUDE.md`, `.claude/rules/`, `docs/solutions/`, `docs/superpowers/`(specs·plans), `docs/research/` 모두 git에 추적된다 — 2026-07-23 커밋 `cb0ac97`로 취업용 포트폴리오 자료로 공개 전환했다. 스테이징에서 제외하지 말 것.
+- **`.gitignore`가 실제로 무시하는 것은 `.claude/settings.json`, `.claude/settings.local.json`, `/.superpowers/` 뿐이다.** 커밋 전 확신이 안 서면 규칙 문구가 아니라 `git ls-tree -r --name-only HEAD -- <경로>`로 실측할 것.
 - **`gh` CLI가 이 환경에 설치되어 있지 않다.** PR 생성은 GitHub 웹에서 직접 진행하거나, 사용자에게 URL을 안내하는 것으로 마무리할 것.
 - **소프트웨어 설치 절대 금지:** `winget`, `npm install -g`, `choco` 등 시스템에 영구적인 변경을 주는 명령은 사용자가 명시적으로 요청한 경우에만 실행할 것. 도구가 없다고 해서 자동으로 설치를 시도하지 말 것.
 - push 후 GitHub가 출력하는 PR 생성 URL을 사용자에게 안내하면 충분하다:

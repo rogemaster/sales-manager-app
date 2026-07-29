@@ -46,9 +46,20 @@ export const MallRegistrationActionSection = () => {
     }
 
     registerToMalls(items, {
-      onSuccess: (data) => {
+      onSuccess: ({ totalCount, successCount, failCount }) => {
+        // 결과와 무관하게 staging은 항상 비운다.
+        // 실패 건은 registeredMalls에 남아 후속 "쇼핑몰 등록 상품 목록" 화면에서 수정·재전송한다.
         resetState();
-        showAlert({ message: `${data.count}건이 쇼핑몰로 전송되었습니다.`, type: 'success' });
+
+        if (failCount === 0) {
+          showAlert({ message: `${successCount}건이 쇼핑몰로 전송되었습니다.`, type: 'success' });
+          return;
+        }
+
+        showAlert({
+          message: `총 ${totalCount}건 중 ${successCount}건 전송 성공, ${failCount}건 실패했습니다.`,
+          type: 'warning',
+        });
       },
       onError: () => {
         showAlert({ message: '전송 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });
