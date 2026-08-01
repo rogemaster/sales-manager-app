@@ -43,6 +43,10 @@ export const GLOBAL_SIDEBAR_MENU: MenuInterface[] = [
         title: '쇼핑몰 상품등록',
         url: '/shopping/register',
       },
+      {
+        title: '쇼핑몰 연동상품',
+        url: '/shopping/linked-products',
+      },
     ],
   },
   {
