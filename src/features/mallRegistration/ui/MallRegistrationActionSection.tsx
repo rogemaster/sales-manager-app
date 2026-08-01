@@ -48,7 +48,7 @@ export const MallRegistrationActionSection = () => {
     registerToMalls(items, {
       onSuccess: ({ totalCount, successCount, failCount }) => {
         // 결과와 무관하게 staging은 항상 비운다.
-        // 실패 건은 registeredMalls에 남아 후속 "쇼핑몰 등록 상품 목록" 화면에서 수정·재전송한다.
+        // 실패 건은 연동 데이터로 남아 '쇼핑몰 연동 상품 목록' 화면에서 확인·수정한다.
         resetState();
 
         if (failCount === 0) {

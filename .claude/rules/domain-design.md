@@ -25,6 +25,20 @@
 
 매입처, 매출처 등 향후 추가되는 등록 엔티티도 동일한 `ownerId` 종속 패턴을 따른다. 새 도메인 설계 시 `ownerId` 필드로 슈퍼계정 종속 처리하고, 목록 조회 API는 반드시 로그인 계정의 `id`로 필터링한다.
 
+## 오리지널 데이터와 쇼핑몰 연동 데이터
+
+`/products/create`로 만든 **오리지널 상품**(`Product`), `/shopping/settings`로 만든 **오리지널 쇼핑몰정보설정**(`ShoppingSetting`), 그리고 `/shopping/register` 전송으로 만들어지는 **쇼핑몰 연동 데이터**(`MallLinkedProduct`)는 서로 별개의 데이터다.
+
+- 연동 데이터는 생성 시점의 상품·설정 값을 **스냅샷으로 복사해 보유**한다 (`productSnapshot`, `settingSnapshot`).
+- **오리지널을 수정해도 연동 데이터는 바뀌지 않는다.** 연동 데이터의 수정은 각 연동 건을 직접 고쳐서 해당 몰로 전송하는 방식이다.
+- **연동 데이터 1건 = 외부 쇼핑몰 상품 1개** (외부몰이 부여한 `externalProductId` 1개).
+- 같은 상품을 같은 몰로 **여러 번 전송할 수 있고**, 그때마다 별도 연동 데이터가 생성된다. 외부몰이 중복이라 판단하면 실패 응답을 준다.
+- 스냅샷은 반드시 **깊은 복사**(`structuredClone`)로 만든다. 얕은 복사는 중첩 객체가 오리지널과 공유되어 위 원칙이 깨진다.
+- `MallLinkedProduct`는 **불변 식별 정보**(`sourceProductId`, `sourceShoppingSettingId`, `mallCode`)와 **가변 스냅샷**을 분리해 둔다. 수정 기능이 스냅샷만 건드리고 원본 추적 정보는 못 건드리게 하기 위해서다.
+- 시각 필드는 셋으로 나뉜다 — `createdAt`(최초 생성) / `lastSentAt`(최종 전송, 화면의 '최종연동일시') / `updatedAt`(마지막 수정). 하나로 합치면 "수정만 하고 전송은 나중에" 하는 순간 의미가 갈라져 깨진다.
+
+설계 근거: `docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md`
+
 ## 몰(mallCode)별 고유 필드 컴포넌트 분리 기준
 
 `ShoppingSettingMallInfoSection.tsx`는 현재 네이버·카카오 2개 몰의 필드 컴포넌트(`NaverMallSettingsFields`, `KakaoMallSettingsFields`)를 파일 내부에 함께 정의한다(공식 Open API 문서 근거가 확인된 몰만 우선 구현했고, 나머지 몰은 근거 확보 시 추가 예정). 몰 고유 필드 컴포넌트가 3개 이상으로 늘어나면 Excel 전략 패턴(`src/components/excel/strategies/`, `.claude/rules/excel.md` 참고)과 동일하게 `ui/components/form/mallFields/` 디렉토리로 분리하고, `ShoppingSettingMallInfoSection`은 `mallCode`에 맞는 컴포넌트를 선택하는 역할만 담당하도록 얇게 유지한다.

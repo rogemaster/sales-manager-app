@@ -15,9 +15,12 @@ tags:
   - domain-design
   - yagni
   - mall-registration
+superseded_by: docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md
 ---
 
 # registeredMalls는 전송 이력이 아니라 조합별 현재 상태다
+
+> **⚠️ Superseded (2026-08-01).** 이 문서가 확정한 `Product.registeredMalls`(조합당 1건 upsert)는 이후 라운드에서 뒤집혔다. "연동 데이터의 수정은 원본을 건드리지 않고 별도로 이루어진다"는 요구가 나오면서, 오리지널 상품에 상태 메타데이터만 얹는 방식으로는 상품·설정 값 자체의 스냅샷을 가질 수 없다는 게 드러났다. 지금 유효한 모델은 `Product`/`ShoppingSetting`과 분리된 독립 엔티티 `MallLinkedProduct`이며, 같은 조합이라도 매 전송마다 새 레코드가 append된다(중복 연동 허용) — 이 문서의 upsert 결론과 정반대다. 현재 모델과 마이그레이션 배경은 `docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md`를 참고할 것. 아래 append vs upsert에 대한 추론 과정(소비 화면이 데이터 모델을 결정한다는 논지)은 여전히 유효하므로 남겨둔다.
 
 ## Context
 

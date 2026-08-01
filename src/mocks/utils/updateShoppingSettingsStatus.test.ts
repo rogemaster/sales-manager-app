@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import dayjs from 'dayjs';
 import type { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 const { SETTINGS } = vi.hoisted(() => ({
@@ -49,7 +50,9 @@ describe('updateMockShoppingSettingsStatus', () => {
   });
 
   it('updatedAt을 오늘 날짜로 갱신한다', () => {
-    const today = new Date().toISOString().slice(0, 10);
+    // 구현이 dayjs()(로컬 시간대) 기준으로 기록하므로 기댓값도 같은 기준으로 만든다.
+    // new Date().toISOString()(UTC)을 쓰면 KST 00:00~09:00 구간에만 하루 어긋나 실패한다.
+    const today = dayjs().format('YYYY-MM-DD');
     updateMockShoppingSettingsStatus(['ss_002'], false);
     expect(SETTINGS.find((s) => s.id === 'ss_002')?.updatedAt).toBe(today);
   });
