@@ -2,9 +2,12 @@
 module: mallRegistration
 tags: [external-api, gateway, msw, architecture, mock]
 problem_type: design-decision
+superseded_by: docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md
 ---
 
 # 몰 등록 전송 — 외부 쇼핑몰 API 게이트웨이 설계 결정
+
+> **⚠️ Superseded (2026-08-01).** 이 문서가 제시한 영속화 위치(`MOCK_PRODUCT_DATA`의 `registeredMalls`)와 프로덕션 전환 경로(`src/app/api/products/mall-registration/route.ts` 신설)는 둘 다 폐기됐다. 전송 결과는 이제 오리지널 상품과 분리된 독립 엔티티 `MallLinkedProduct`(`src/mocks/data/MockMallLinkedProductsData.ts`)에 스냅샷으로 영속화되고, 그 route.ts는 애초에 `msw-rules.md`가 금지하는 패턴이라 실제로 만들어진 적 없이 삭제됐다 — MSW 핸들러(`src/mocks/handlers/mallLinkedProducts.ts`)가 계속 담당한다. 지금 유효한 모델은 `docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md`를 참고할 것. "몰 등록은 내부 저장이 아니라 외부 전송이다", 백엔드가 게이트웨이 역할을 해야 하는 이유 등 아래 본문의 추론 과정은 여전히 유효하므로 남겨둔다.
 
 ## 배경
 
