@@ -1,19 +1,5 @@
-import { ShoppingMalls } from '@/types/common.type';
-
 export type TaxType = 'TAXABLE' | 'TAX_FREE' | 'ZERO_RATED'; // 과세/면세/영세
 export type AdultProductType = 'GENERAL' | 'ADULT'; // 일반상품/성인상품
-
-export type MallRegistrationStatus = 'success' | 'failed';
-
-export interface MallRegistration {
-  id: string;
-  mallCode: ShoppingMalls;
-  shoppingSettingId: string;
-  status: MallRegistrationStatus;
-  registeredAt: string; // 마지막 전송 시각
-  externalId?: string; // 성공 시 외부몰이 부여한 상품 ID
-  errorMessage?: string; // 실패 시 사유
-}
 
 export interface Product {
   productId: string;
@@ -39,7 +25,6 @@ export interface Product {
   originCountryEtc?: string; // originCountryCode === 'ETC'일 때만 사용하는 자유텍스트
   taxType?: TaxType;
   adultProductType?: AdultProductType;
-  registeredMalls?: MallRegistration[];
 }
 
 export interface ProductSaleState {
