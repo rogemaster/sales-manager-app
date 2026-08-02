@@ -30,10 +30,12 @@ export const MallLinkedConditionFilter = () => {
 
   const { data: activeSettings } = useGetActiveShoppingSettings();
 
+  // 몰을 고르기 전에는 계정 옵션을 노출하지 않는다 — 몰과 무관한 계정까지 섞여 보이면 선택 의미가 없다.
   const settingOptions: FilterOption[] = useMemo(() => {
-    const settings = activeSettings ?? [];
-    const scoped = mallCode === 'ALL' ? settings : settings.filter((setting) => setting.mallCode === mallCode);
-    return scoped.map((setting) => ({ id: setting.id, name: setting.nickname }));
+    if (mallCode === 'ALL') return [];
+    return (activeSettings ?? [])
+      .filter((setting) => setting.mallCode === mallCode)
+      .map((setting) => ({ id: setting.id, name: setting.nickname }));
   }, [activeSettings, mallCode]);
 
   // 몰을 바꾸면 이전 몰의 설정 id가 남지 않도록 계정 선택을 초기화한다.
