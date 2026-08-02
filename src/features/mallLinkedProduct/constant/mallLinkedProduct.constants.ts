@@ -1,4 +1,5 @@
 import { FilterOption, TableTitleValue } from '@/types/common.type';
+import { MallLinkedProductSearchType } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 
 export const ALL_FILTER_OPTION: FilterOption = { id: 'ALL', name: '전체' };
 
@@ -31,3 +32,10 @@ export const MALL_LINKED_SEARCH_TYPE: FilterOption[] = [
   { id: 'createdBy', name: '등록자' },
   { id: 'updatedBy', name: '수정자' },
 ];
+
+/**
+ * 검색어 앞뒤 공백을 제거한 뒤 호출할 검색 타입.
+ * 코드값은 완전일치에 가깝게 매칭되므로 공백 하나에 결과가 통째로 사라진다.
+ * ex) 'code_A ' 로 검색하면 'code_A' 상품이 조회되지 않는다.
+ */
+export const TRIMMED_SEARCH_TYPES: MallLinkedProductSearchType[] = ['productCode', 'externalProductCode'];

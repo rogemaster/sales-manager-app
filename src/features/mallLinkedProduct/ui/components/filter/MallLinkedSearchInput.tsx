@@ -13,7 +13,11 @@ import {
   draftFilterAtom,
   searchTypeAtom,
 } from '@/features/mallLinkedProduct/store/search.store';
-import { MALL_LINKED_SEARCH_TYPE } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import {
+  MALL_LINKED_SEARCH_TYPE,
+  TRIMMED_SEARCH_TYPES,
+} from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import { selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { MallLinkedProductSearchType } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 
 export const MallLinkedSearchInput = () => {
@@ -21,6 +25,7 @@ export const MallLinkedSearchInput = () => {
   const draftFilter = useAtomValue(draftFilterAtom);
   const setCommittedFilter = useSetAtom(committedFilterAtom);
   const setCurrentPage = useSetAtom(currentPageAtom);
+  const setSelectedLinkedIds = useSetAtom(selectedLinkedIdsAtom);
 
   const [inputValue, setInputValue] = useState('');
 
@@ -29,8 +34,10 @@ export const MallLinkedSearchInput = () => {
   };
 
   const handleSearch = () => {
-    setCommittedFilter({ ...draftFilter, searchValue: inputValue });
+    const searchValue = TRIMMED_SEARCH_TYPES.includes(searchType) ? inputValue.trim() : inputValue;
+    setCommittedFilter({ ...draftFilter, searchValue });
     setCurrentPage(1);
+    setSelectedLinkedIds([]);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
