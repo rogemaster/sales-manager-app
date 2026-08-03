@@ -74,3 +74,29 @@ export interface CreateMallLinkedProductsResult {
   successCount: number;
   failCount: number;
 }
+
+/**
+ * 저장(스냅샷 수정) 요청 본문.
+ * ownerId는 본문이 아니라 X-Owner-Id 헤더로 전달한다 — 단건 리소스를 다루는 기존 API와 같은 방식이다.
+ */
+export interface UpdateMallLinkedProductBody {
+  updatedByEmail: string;
+  productSnapshot: Product;
+  settingSnapshot: ShoppingSetting;
+}
+
+/** 재전송 요청 본문 — 단건도 원소가 하나인 배열로 보낸다. */
+export interface ResendMallLinkedProductsBody {
+  ownerId: string;
+  ids: string[];
+}
+
+/**
+ * 재전송 집계 결과.
+ * CreateMallLinkedProductsResult와 구조가 같지만 의미가 다르고 한쪽만 바뀔 수 있어 따로 둔다.
+ */
+export interface ResendMallLinkedProductsResult {
+  totalCount: number;
+  successCount: number;
+  failCount: number;
+}

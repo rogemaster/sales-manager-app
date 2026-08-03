@@ -2,7 +2,9 @@
 
 import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
@@ -18,6 +20,7 @@ type Props = {
 const getMallName = (code: string) => SHOPPING_MALLS.find((mall) => mall.code === code)?.name ?? code;
 
 export const MallLinkedProductTable = ({ linkedProducts }: Props) => {
+  const router = useRouter();
   const [selectedLinkedIds, setSelectedLinkedIds] = useAtom(selectedLinkedIdsAtom);
 
   const handleSelect = (linkedId: string, checked: boolean) => {
@@ -97,6 +100,16 @@ export const MallLinkedProductTable = ({ linkedProducts }: Props) => {
                   </div>
                 </TableCell>
                 <TableCell className="text-center">{dayjs(linked.lastSentAt).format('YYYY-MM-DD HH:mm')}</TableCell>
+                <TableCell className="text-center">{dayjs(linked.updatedAt).format('YYYY-MM-DD HH:mm')}</TableCell>
+                <TableCell className="text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push(`/shopping/linked-products/${linked.id}`)}
+                  >
+                    수정
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           )}

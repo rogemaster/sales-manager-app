@@ -13,7 +13,11 @@ interface Props {
 
 export const ShoppingAccountModifyLayout = ({ id }: Props) => {
   const router = useRouter();
-  const { data: account, isLoading } = useGetShoppingAccount(id);
+  // workspaceOwnerId는 세션 하이드레이션 전 ''이라 useGetShoppingAccount가 enabled:false로 시작한다.
+  // TanStack Query v5에서 disabled 쿼리는 status:'pending' + fetchStatus:'idle'이라 isLoading(=isPending && isFetching)이
+  // false가 되어, isLoading으로 분기하면 하이드레이션 완료 전 "찾을 수 없습니다"가 먼저 노출된다. isPending을 써야
+  // "데이터가 아직 없다"(로딩 중이든 비활성 상태든)를 하나로 묶어 로딩 문구로 처리할 수 있다.
+  const { data: account, isPending: isAccountPending } = useGetShoppingAccount(id);
   const { mutate: updateAccount, isPending } = useUpdateShoppingAccount(id);
   const { showAlert } = useAlert();
 
@@ -42,7 +46,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
     });
   };
 
-  if (isLoading) {
+  if (isAccountPending) {
     return <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">불러오는 중...</div>;
   }
 

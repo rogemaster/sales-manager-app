@@ -39,6 +39,21 @@
 
 설계 근거: `docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md`
 
+### 연동 데이터의 저장과 재전송
+
+연동 데이터를 고치는 것과 그것을 외부몰로 보내는 것은 **별개 액션**이다.
+
+- **저장** — 스냅샷(`productSnapshot`·`settingSnapshot`)만 교체하고 `updatedAt`·`updatedByEmail`을 갱신한다. `status`·`lastSentAt`·`externalProductId`는 건드리지 않는다.
+- **재전송** — 현재 스냅샷을 외부몰로 보내고 `status`·`lastSentAt`을 갱신한다. 스냅샷과 `updatedAt`은 건드리지 않는다.
+
+`externalProductId`의 유무가 **"외부몰에 이 상품이 존재하는가"의 단일 판정 기준**이다.
+
+- 값이 있으면 그 전송은 신규 등록이 아니라 **기존 외부몰 상품의 수정**이다. 코드를 유지하고, 중복 판정을 하지 않는다.
+- 값이 없으면 신규 등록이므로 중복 판정(같은 상품 × 같은 몰에 성공 이력이 있으면 중복)을 적용한다.
+- **재전송이 실패해도 이 값은 지우지 않는다.** 외부몰 상품은 이전 값으로 살아있기 때문이다. 이때 `status`는 `failed`가 되는데, `status`는 "외부몰에 상품이 있는가"가 아니라 **"마지막 전송이 성공했는가"**를 뜻하기 때문이다.
+
+설계 근거: `docs/superpowers/specs/2026-08-03-mall-linked-product-edit-resend-design.md`
+
 ## 몰(mallCode)별 고유 필드 컴포넌트 분리 기준
 
 `ShoppingSettingMallInfoSection.tsx`는 현재 네이버·카카오 2개 몰의 필드 컴포넌트(`NaverMallSettingsFields`, `KakaoMallSettingsFields`)를 파일 내부에 함께 정의한다(공식 Open API 문서 근거가 확인된 몰만 우선 구현했고, 나머지 몰은 근거 확보 시 추가 예정). 몰 고유 필드 컴포넌트가 3개 이상으로 늘어나면 Excel 전략 패턴(`src/components/excel/strategies/`, `.claude/rules/excel.md` 참고)과 동일하게 `ui/components/form/mallFields/` 디렉토리로 분리하고, `ShoppingSettingMallInfoSection`은 `mallCode`에 맞는 컴포넌트를 선택하는 역할만 담당하도록 얇게 유지한다.

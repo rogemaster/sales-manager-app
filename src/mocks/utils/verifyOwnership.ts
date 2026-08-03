@@ -1,5 +1,6 @@
 import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
+import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 
 export const isOwnerMatch = (resourceOwnerId: string, requestOwnerId: string | null): boolean =>
@@ -36,3 +37,8 @@ export const areMallLinkRequestsOwnedBy = (
     allOwnedBy(settingIds, requestOwnerId, MOCK_SHOPPING_SETTINGS_DATA)
   );
 };
+
+// 연동 데이터는 식별자가 `id`라 제네릭 allOwnedBy를 그대로 쓸 수 있다.
+// 핸들러가 mock 데이터를 직접 import하지 않도록 얇은 래퍼로 감싼다 (msw-rules.md).
+export const areLinkedProductsOwnedBy = (ids: string[], requestOwnerId: string | null): boolean =>
+  allOwnedBy(ids, requestOwnerId, MOCK_MALL_LINKED_PRODUCT_DATA);
