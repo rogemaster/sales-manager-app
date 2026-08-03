@@ -10,6 +10,7 @@ applies_when:
   - 다른 화면(다른 feature)의 테이블 헤더 상수를 그대로 import해서 재사용하려 할 때
   - 새 화면이 기존 목록 화면과 컬럼 구성이 다를 때(일부 컬럼 제외/추가/순서 변경)
   - 상품/주문 등 같은 도메인 데이터를 여러 화면에서 서로 다른 형태로 테이블 렌더링할 때
+  - 헤더 상수 배열을 `.map`으로 렌더링하고 바디 셀은 손으로 나열하는 테이블을 만들거나 수정할 때(같은 화면 안에서도 개수가 어긋날 수 있음)
 symptoms:
   - 테이블 헤더 컬럼 수와 바디에서 실제 렌더링한 TableCell 개수가 어긋나 컬럼이 한 칸씩 밀려 보인다
   - 빈 상태(empty state) 행의 colSpan이 헤더 배열 길이 기준인데 실제 렌더링 셀 수와 안 맞는다
@@ -58,6 +59,23 @@ export const MALL_REGISTRATION_TABLE_HEAD: TableTitleValue[] = [
 
 컬럼 수를 셀 때는 체크박스 컬럼과 배지/액션 컬럼처럼 헤더 배열에 없는 고정 컬럼도 함께 계산해야 한다 — 이번 화면은 `MALL_REGISTRATION_TABLE_HEAD.length(7) + 체크박스(1) + 등록예정 쇼핑몰(1) = 9`가 헤더와 바디 양쪽에서 일치해야 했다.
 
+## 재발 사례 — 같은 화면 안에서의 헤더/셀 불일치 (2026-08-03)
+
+위 사례에서 "범위 밖"으로 남겨둔 `products/list`의 원본 버그가 실제로 화면에 드러나 있었다. `LIST_TABLE_HEAD`는 8개 컬럼인데 `ProductTableBody.tsx`의 바디는 7개 셀만 렌더링해(`netPrice` 셀 누락), 공급가 자리부터 데이터가 한 칸씩 왼쪽으로 밀리고 마지막 수정일 컬럼이 비어 있었다.
+
+여기서 알 수 있는 것: **이 버그 유형은 "다른 화면의 상수를 재사용"할 때만 생기는 게 아니다.** 헤더는 배열 `.map`으로 자동 생성하고 바디 셀은 손으로 나열하는 구조 자체가 원인이라, 화면 전용 상수를 제대로 소유하고 있어도 상수에 컬럼을 추가하면서 바디 셀을 빠뜨리면 똑같이 깨진다. 타입 체커도 린트도 이걸 못 잡는다.
+
+수정은 누락된 셀을 채우는 쪽이었다 — 이 화면은 앞선 사례와 달리 공급가를 실제로 보여줘야 하는 목록 화면이기 때문이다.
+
+```tsx
+// src/features/products/ui/list/components/productTable/ProductTableBody.tsx
+<TableCell className="text-center">
+  {product.netPrice === undefined ? '-' : `${product.netPrice.toLocaleString()}원`}
+</TableCell>
+```
+
+**옵셔널 필드는 렌더링 가드가 필요하다.** `Product.netPrice`는 `number | undefined`(엑셀 대량등록에서도 선택 입력)라, 옆 컬럼의 `product.price.toLocaleString()`을 그대로 복사했다면 값이 없는 상품에서 런타임 에러가 났을 것이다. 헤더에 컬럼을 추가할 때는 대응 필드가 필수인지 옵셔널인지도 함께 확인한다.
+
 ## Why This Matters
 
 - **재사용한 상수가 "소유자 화면" 기준으로 계속 바뀔 수 있다.** `LIST_TABLE_HEAD`는 `products/list` 화면이 필요에 따라 컬럼을 추가/제거할 수 있는 상수인데, 이걸 그대로 참조하는 다른 화면은 자기가 손댄 적 없는 변경에 의해 조용히 깨진다.
@@ -67,12 +85,14 @@ export const MALL_REGISTRATION_TABLE_HEAD: TableTitleValue[] = [
 ## When to Apply
 
 - 새 화면의 테이블이 기존 목록 화면과 컬럼 구성이 다르다면(제외/추가/순서 변경), 처음부터 화면 전용 헤더 상수를 만든다. "일단 재사용하고 나중에 맞춘다"는 접근은 이번처럼 밀림 버그로 이어지기 쉽다.
-- 컬럼 목록을 만들 때는 헤더 배열 렌더링(`.map`)과 바디 행 렌더링을 나란히 놓고 개수를 세어본다 — 체크박스/액션 등 배열에 없는 고정 컬럼도 함께 포함해서.
+- 컬럼 목록을 만들 때는 헤더 배열 렌더링(`.map`)과 바디 행 렌더링을 나란히 놓고 개수를 세어본다 — 체크박스/액션 등 배열에 없는 고정 컬럼도 함께 포함해서. **헤더 상수에 컬럼을 추가·삭제하는 수정을 할 때도 매번 이 대조를 한다** — 재사용 여부와 무관하게 어긋날 수 있다(2026-08-03 재발 사례).
+- 컬럼을 추가할 때 대응 필드가 옵셔널(`?:`)이면 값 없는 경우의 표시(`'-'` 등)를 함께 정한다. 필수 필드용 렌더링 코드를 복사하면 런타임 에러가 난다.
 - `colSpan`을 배열 길이 기반으로 계산하는 빈 상태 행이 있다면, 그 계산식도 실제 렌더링 컬럼 수와 일치하는지 함께 확인한다.
 
 ## Related
 
 - `src/features/mallRegistration/constant/mallRegistration.constants.ts` — 이번에 신설한 화면 전용 헤더 상수
 - `src/features/shoppingSetting/constant/shoppingSetting.constants.ts` — `SHOPPING_SETTING_TABLE_HEAD`, 동일 원칙의 기존 선례
-- `src/features/products/constant/table.constants.ts` — `LIST_TABLE_HEAD`, `products/list` 전용 상수(참고로, 이 파일 자체도 8개 헤더에 7개 셀만 렌더링하는 동일한 유형의 버그를 이미 갖고 있었다 — 이번 작업에서는 신규 파일만 고치고 기존 파일은 범위 밖으로 남겨둠)
+- `src/features/products/constant/table.constants.ts` — `LIST_TABLE_HEAD`, `products/list` 전용 상수
+- `src/features/products/ui/list/components/productTable/ProductTableBody.tsx` — 2026-08-03에 누락 셀을 채워 밀림을 해소한 파일(위 "재발 사례" 절)
 - `docs/superpowers/specs/2026-07-28-mall-registration-action-ui-design.md` / `docs/superpowers/plans/2026-07-28-mall-registration-action-ui.md` — 이 결정이 나온 작업의 설계/계획 문서
