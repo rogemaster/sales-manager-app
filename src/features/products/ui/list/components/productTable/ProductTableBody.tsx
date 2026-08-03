@@ -65,6 +65,9 @@ export const ProductTableBody = ({ products }: Props) => {
               <Link href={`/products/${product.productId}`}>{product.name}</Link>
             </TableCell>
             <TableCell className="text-center">{getCategoryName(product.categoryId)}</TableCell>
+            <TableCell className="text-center">
+              {product.netPrice === undefined ? '-' : `${product.netPrice.toLocaleString()}원`}
+            </TableCell>
             <TableCell className="text-center">{product.price.toLocaleString()}원</TableCell>
             <TableCell className="text-center"><ProductStatusBadge status={product.state} /></TableCell>
             <TableCell className="text-center">{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>
