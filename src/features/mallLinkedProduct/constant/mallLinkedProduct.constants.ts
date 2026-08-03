@@ -13,6 +13,8 @@ export const MALL_LINKED_PRODUCT_TABLE_HEAD: TableTitleValue[] = [
   { id: 'saleState', title: '판매상태', width: 'w-24' },
   { id: 'linkStatus', title: '연동상태', width: 'w-44' },
   { id: 'lastSentAt', title: '최종연동일시', width: 'w-36' },
+  { id: 'updatedAt', title: '수정일', width: 'w-36' },
+  { id: 'action', title: '관리', width: 'w-24' },
 ];
 
 export const MALL_LINKED_DATE_TYPE: FilterOption[] = [
