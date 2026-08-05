@@ -86,3 +86,15 @@ export interface FilterOption {
   id: string;
   name: string;
 }
+
+/**
+ * 목록 API 응답의 페이징 정보.
+ * 각 도메인 응답은 이걸 extends 하고 데이터 배열 필드만 자기 이름으로 선언한다.
+ * (`TablePagination`이 기대하는 형태이기도 하다)
+ */
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}

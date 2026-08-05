@@ -1,4 +1,4 @@
-import { ShoppingMalls } from '@/types/common.type';
+import { PaginationMeta, ShoppingMalls } from '@/types/common.type';
 
 export type ProductCondition = 'NEW' | 'USED'; // 신상품 / 중고상품
 export type SalesPeriod = 7 | 15 | 30 | 60 | 90;
@@ -62,12 +62,8 @@ export interface ShoppingSettingSearchType {
   searchValue: string;
 }
 
-export interface GetShoppingSettingsResponse {
+export interface GetShoppingSettingsResponse extends PaginationMeta {
   settings: ShoppingSetting[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 export interface AvailableMallAccount {

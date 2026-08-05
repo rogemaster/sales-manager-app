@@ -22,7 +22,7 @@ export const searchTypeAtom = atom<MallLinkedProductSearchType>(DEFAULT_SEARCH_T
 export const searchValueAtom = atom<string>('');
 
 // UI 조작 중인 draft 필터 (검색 버튼 클릭 전까지 API 호출에 사용되지 않음)
-export const draftFilterAtom = atom<MallLinkedProductSearch>((get) => ({
+export const getMallLinkedSearchFilterAtom = atom<MallLinkedProductSearch>((get) => ({
   dateType: get(dateTypeAtom),
   startDate: get(startDateAtom),
   endDate: get(endDateAtom),
@@ -35,7 +35,7 @@ export const draftFilterAtom = atom<MallLinkedProductSearch>((get) => ({
 }));
 
 // 검색 버튼 클릭 시 확정된 필터 (API 쿼리에 실제로 사용)
-export const committedFilterAtom = atom<MallLinkedProductSearch>({
+export const committedFiltersAtom = atom<MallLinkedProductSearch>({
   dateType: DEFAULT_DATE_TYPE,
   startDate: DEFAULT_START_DATE,
   endDate: DEFAULT_END_DATE,

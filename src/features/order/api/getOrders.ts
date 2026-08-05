@@ -1,11 +1,8 @@
+import { PaginationMeta } from '@/types/common.type';
 import { Order, OrderSearchType } from '../types/order.types';
 
-export interface GetOrdersResponse {
+export interface GetOrdersResponse extends PaginationMeta {
   orders: Order[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 export const getOrders = async (ownerId: string, filters: OrderSearchType, page: number, pageSize: number = 20) => {
