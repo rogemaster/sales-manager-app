@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  committedFilterAtom,
+  committedFiltersAtom,
   currentPageAtom,
-  draftFilterAtom,
+  getMallLinkedSearchFilterAtom,
   searchTypeAtom,
 } from '@/features/mallLinkedProduct/store/search.store';
 import {
@@ -22,8 +22,8 @@ import { MallLinkedProductSearchType } from '@/features/mallLinkedProduct/types/
 
 export const MallLinkedSearchInput = () => {
   const [searchType, setSearchType] = useAtom(searchTypeAtom);
-  const draftFilter = useAtomValue(draftFilterAtom);
-  const setCommittedFilter = useSetAtom(committedFilterAtom);
+  const draftFilters = useAtomValue(getMallLinkedSearchFilterAtom);
+  const setCommittedFilters = useSetAtom(committedFiltersAtom);
   const setCurrentPage = useSetAtom(currentPageAtom);
   const setSelectedLinkedIds = useSetAtom(selectedLinkedIdsAtom);
 
@@ -35,7 +35,7 @@ export const MallLinkedSearchInput = () => {
 
   const handleSearch = () => {
     const searchValue = TRIMMED_SEARCH_TYPES.includes(searchType) ? inputValue.trim() : inputValue;
-    setCommittedFilter({ ...draftFilter, searchValue });
+    setCommittedFilters({ ...draftFilters, searchValue });
     setCurrentPage(1);
     setSelectedLinkedIds([]);
   };

@@ -1,4 +1,4 @@
-import { ShoppingMalls } from '@/types/common.type';
+import { PaginationMeta, ShoppingMalls } from '@/types/common.type';
 
 export interface ShoppingAccount {
   id: string;
@@ -27,12 +27,8 @@ export interface ShoppingAccountSearchType {
   searchValue: string;
 }
 
-export interface GetShoppingAccountsResponse {
+export interface GetShoppingAccountsResponse extends PaginationMeta {
   accounts: ShoppingAccount[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 export type CreateShoppingAccountBody = Omit<ShoppingAccount, 'id' | 'ownerId' | 'createdAt' | 'updatedAt'>;

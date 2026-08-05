@@ -69,6 +69,48 @@
 - 새 필터를 만들 때 "이 도메인 전용 '전체' 옵션"이 필요해 보이면 대부분 착각이다. `id: 'ALL'`은 검색 필터 타입들이 `T | 'ALL'` 형태로 이미 전제하고 있는 값이다.
 - `SHOPPING_MALLS`(원본 배열) 직접 참조는 **다른 형태로 파생할 때만** 허용한다 (예: `ShoppingAccountForm`의 코드 목록 `MALL_CODES`, mock 데이터 생성). 이름 조회·필터 옵션 목적이면 위 표를 쓴다.
 
+## 날짜 범위 필터
+
+목록 화면의 "검색 일자" 행은 **`RangeDateFilter`**(`@/components/common/RangeDateFilter`)를 쓴다. `RangeDatePicker`·`DatePickerRangeButton`을 직접 조립하지 않는다.
+
+```tsx
+export const XxxDateFilter = () => {
+  const [dateType, setDateType] = useAtom(xxxDateTypeAtom);
+  const setStartDate = useSetAtom(xxxStartDateAtom);
+  const setEndDate = useSetAtom(xxxEndDateAtom);
+
+  const handleChangeDate = useCallback(
+    (startDate: string, endDate: string) => {
+      setStartDate(startDate);
+      setEndDate(endDate);
+    },
+    [setStartDate, setEndDate],
+  );
+
+  return (
+    <RangeDateFilter
+      onChangeDate={handleChangeDate}
+      dateType={{ value: dateType, options: XXX_DATE_TYPE, onChange: setDateType }}
+    />
+  );
+};
+```
+
+- `dateType`은 **선택적**이다. 기준일이 하나뿐인 화면(주문수집 등)은 생략하고 `label`만 바꾼다.
+- `dateType`을 값·옵션·핸들러 개별 prop으로 흩지 않고 한 객체로 묶은 이유는 셋이 항상 함께 필요하기 때문이다. 일부만 넘기는 잘못된 조합을 타입 레벨에서 막는다.
+- **Why:** 이 배선(`pickerInitDate`·`resetKey`·`handleChangeDateRange`)이 7개 화면에 통째로 복사돼 있었다. 특히 "기간 버튼을 누르면 `resetKey`를 올려 `RangeDatePicker` 내부 state를 재동기화한다"는 비자명한 트릭이 7벌 복제돼, 여기 버그가 생기면 7곳을 고쳐야 했다. 2026-08-06 공용화 완료.
+
+## 목록 화면 검색 필터 store 네이밍
+
+검색 필터를 draft/committed 두 단계로 두는 목록 화면은 아래 이름을 쓴다. **복수형이 표준이다.**
+
+| 역할 | 이름 |
+|------|------|
+| UI 조작 중인 draft (검색 버튼 전) | `get<Domain>SearchFilterAtom` |
+| 검색 버튼으로 확정된 값 (쿼리에 사용) | `committedFiltersAtom` |
+
+`draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만, 5개 도메인(account·order·shoppingAccount·shoppingSetting·mallLinkedProduct) 중 4개가 이미 위 형태였고 2026-08-06에 나머지 하나를 맞춰 통일했다. 새 목록 화면은 위 표를 따른다.
+
 ## 검색 필터 섹션 (주문·상품·사용자 목록 페이지 공통)
 
 ```tsx

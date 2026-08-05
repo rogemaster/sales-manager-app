@@ -1,11 +1,8 @@
+import { PaginationMeta } from '@/types/common.type';
 import { Product, ProductSearch } from '../types/product.types';
 
-export interface GetProductsResponse {
+export interface GetProductsResponse extends PaginationMeta {
   products: Product[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 export const getProducts = async (ownerId: string, data: ProductSearch, page: number, pageSize: number = 10) => {

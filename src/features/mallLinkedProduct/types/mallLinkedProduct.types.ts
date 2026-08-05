@@ -1,6 +1,6 @@
 import { Product, ProductStateType } from '@/features/products/types/product.types';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { ShoppingMalls } from '@/types/common.type';
+import { PaginationMeta, ShoppingMalls } from '@/types/common.type';
 
 export type MallLinkStatus = 'success' | 'failed';
 
@@ -54,12 +54,8 @@ export interface MallLinkedProductSearch {
   searchValue: string;
 }
 
-export interface GetMallLinkedProductsResponse {
+export interface GetMallLinkedProductsResponse extends PaginationMeta {
   linkedProducts: MallLinkedProduct[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 /** 전송 요청 1건 — 어떤 상품을 어떤 몰·설정으로 보낼지 */

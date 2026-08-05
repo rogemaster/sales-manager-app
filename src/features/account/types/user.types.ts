@@ -1,4 +1,5 @@
 import { User, UserGrade, SubUserGrade } from '@/features/auth/types/Auth';
+import { PaginationMeta } from '@/types/common.type';
 
 export type UserStatus = 'active' | 'pending';
 
@@ -39,10 +40,6 @@ export interface UserSearchType {
   searchValue: string;
 }
 
-export interface GetUsersResponse {
+export interface GetUsersResponse extends PaginationMeta {
   users: AccountUser[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }

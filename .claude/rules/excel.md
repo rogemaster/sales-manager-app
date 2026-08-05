@@ -146,6 +146,12 @@ export const ExcelProvider = ({ children }: { children: ReactNode }) => {
 - 현재 적용됨: `products/bulk`
 - 향후 적용 예정: `order/create` (미구현)
 
+**⚠️ 이 패턴을 Excel 밖으로 확장할 때의 제약**
+
+`<Provider>`는 하위 트리에 **새 store**를 만들어 그 트리가 읽는 **모든 atom**을 초기값으로 되돌린다. auth 정보는 `(authenticated)/layout.tsx`가 **전역 store**에 주입하므로, Provider로 감싼 트리에서는 `workspaceOwnerIdAtom`이 `''`이 되고 `enabled: !!workspaceOwnerId` 게이팅에 걸려 **목록 쿼리가 영구히 비활성화된다**(에러도 요청도 없이 빈 화면).
+
+`products/bulk`에서 문제가 없는 이유는 그 트리가 auth atom을 읽지 않기 때문이다. 즉 이 패턴은 **자기 완결적 기능 상태에만** 쓸 수 있고, 화면 간 상태 격리 용도로는 쓸 수 없다. 자세한 내용과 대안은 [`docs/solutions/architecture-patterns/scoped-jotai-provider-breaks-auth-atoms.md`](../../docs/solutions/architecture-patterns/scoped-jotai-provider-breaks-auth-atoms.md) 참고.
+
 ---
 
 ## 페이지 적용 예시
