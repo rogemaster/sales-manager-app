@@ -5,8 +5,6 @@ export const USER_DATE_TYPE: FilterOption[] = [
   { id: 'updatedAt', name: '수정일' },
 ];
 
-export const ALL_USER_GRADE: FilterOption = { id: 'ALL', name: '전체' };
-
 export const USER_GRADE_OPTIONS: FilterOption[] = [
   { id: 'super_admin', name: '슈퍼관리자' },
   { id: 'admin', name: '일반관리자' },

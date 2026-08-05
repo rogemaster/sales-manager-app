@@ -9,10 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { selectedSettingsAtom } from '@/features/shoppingSetting/store/search.store';
 import { SHOPPING_SETTING_TABLE_HEAD } from '@/features/shoppingSetting/constant/shoppingSetting.constants';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { useAlert } from '@/hooks/useAlert';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
 
 interface ShoppingSettingTableProps {
   settings: ShoppingSetting[];
@@ -78,7 +76,7 @@ export const ShoppingSettingTable = ({ settings }: ShoppingSettingTableProps) =>
                   onCheckedChange={(checked: boolean) => handleSelect(setting.id, checked)}
                 />
               </TableCell>
-              <TableCell className="text-center">{getMallName(setting.mallCode)}</TableCell>
+              <TableCell className="text-center">{getShoppingMallName(setting.mallCode)}</TableCell>
               <TableCell className="text-center">{setting.mallId}</TableCell>
               <TableCell className="text-left">{setting.nickname || '-'}</TableCell>
               <TableCell className="text-center">

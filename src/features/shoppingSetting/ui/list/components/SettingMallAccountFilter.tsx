@@ -5,9 +5,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { settingMallAccountIdAtom, settingMallCodeAtom } from '@/features/shoppingSetting/store/search.store';
 import { useGetAvailableMallAccounts } from '@/features/shoppingSetting/api/useGetAvailableMallAccounts';
-import { FilterOption } from '@/types/common.type';
-
-const ALL_MALL_ACCOUNT: FilterOption = { id: 'ALL', name: '전체' };
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 
 export const SettingMallAccountFilter = () => {
   const mallCode = useAtomValue(settingMallCodeAtom);
@@ -30,7 +28,7 @@ export const SettingMallAccountFilter = () => {
       value={mallAccountId}
       onValueChange={setMallAccountId}
       options={options}
-      allOption={ALL_MALL_ACCOUNT}
+      allOption={ALL_FILTER_OPTION}
       triggerClassName="w-44"
     />
   );

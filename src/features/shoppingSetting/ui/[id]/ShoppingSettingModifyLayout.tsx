@@ -10,15 +10,13 @@ import {
   ShoppingSettingFormValues,
   UpdateShoppingSettingBody,
 } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ShoppingSettingForm } from '../components/ShoppingSettingForm';
 
 interface Props {
   id: string;
 }
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
 
 export const ShoppingSettingModifyLayout = ({ id }: Props) => {
   const router = useRouter();
@@ -80,7 +78,7 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
       <div>
         <h1 className="text-3xl font-bold">쇼핑몰 정보설정 수정</h1>
         <p className="text-muted-foreground">
-          {getMallName(setting.mallCode)} · {setting.mallId}
+          {getShoppingMallName(setting.mallCode)} · {setting.mallId}
         </p>
       </div>
       <FormProvider {...formData}>

@@ -10,7 +10,7 @@ import { getCategoryName } from '@/lib/utils';
 import { MALL_REGISTRATION_TABLE_HEAD } from '@/features/mallRegistration/constant/mallRegistration.constants';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import {
   selectedProductIdsAtom,
   stagedRegistrationsAtom,
@@ -20,8 +20,6 @@ import {
 type Props = {
   products: Product[];
 };
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
 
 export const MallRegistrationTable = ({ products }: Props) => {
   const [selectedProductIds, setSelectedProductIds] = useAtom(selectedProductIdsAtom);
@@ -100,7 +98,7 @@ export const MallRegistrationTable = ({ products }: Props) => {
                           variant="secondary"
                           className="gap-1"
                         >
-                          {getMallName(badge.mallCode)} - {badge.nickname}
+                          {getShoppingMallName(badge.mallCode)} - {badge.nickname}
                           <button
                             type="button"
                             onClick={() =>

@@ -1,8 +1,6 @@
 import { FilterOption, TableTitleValue } from '@/types/common.type';
 import { MallLinkedProductSearchType } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 
-export const ALL_FILTER_OPTION: FilterOption = { id: 'ALL', name: '전체' };
-
 export const MALL_LINKED_PRODUCT_TABLE_HEAD: TableTitleValue[] = [
   { id: 'productCode', title: '상품코드', width: 'w-32' },
   { id: 'productName', title: '상품명' },

@@ -55,6 +55,20 @@
 - **Why:** alert 차단 코드는 "나중에 제거해야 한다"는 부채를 만들고, 클릭해도 아무것도 안 되는 버튼이 보이는 것 자체가 어색한 UX다. 없는 기능은 아예 안 보이는 게 자연스럽다.
 - (2026-06-25 alert 차단 방식을 전면 폐기하고 이 방침으로 전환 완료)
 
+## 필터·쇼핑몰 공용 상수 (도메인별 재정의 금지)
+
+필터 Select와 쇼핑몰 표시는 아래 세 가지를 **반드시 공용 모듈에서 import**한다. 도메인 상수 파일이나 컴포넌트 파일 안에 같은 값을 다시 만들지 않는다.
+
+| 용도 | import 대상 |
+|------|------------|
+| 필터 '전체' 옵션 | `ALL_FILTER_OPTION` — `@/shared/constant/filter.constant` |
+| 쇼핑몰 목록을 `FilterOption[]`으로 | `SHOPPING_MALL_OPTIONS` — `@/shared/constant/shoppingMall.constant` |
+| mallCode → 쇼핑몰 한글명 | `getShoppingMallName(code)` — `@/utils/shoppingMallGenerator` |
+
+- **Why:** 셋 다 공용 구현이 있는데도 도메인마다 다른 이름으로 재정의되어 있었다. 2026-08-06 정리 시점에 `{ id: 'ALL', name: '전체' }`가 8개 이름(`ALL_USER_GRADE`, `ALL_ACCOUNT_STATUS`, `ALL_MALL_NAME`, `ALL_SETTING_MALL_NAME`, `ALL_MALL_ACCOUNT`, `ALL_PRODUCT_STATUS_OPTION`, `ALL_ORDER_STATUS`, 로컬 `ALL_OPTION` 2곳)으로, `SHOPPING_MALLS.map(...)` 파생이 5곳, 로컬 `getMallName` 정의가 **10곳**에 있었다. 전부 제거하고 위 3개로 통일했다.
+- 새 필터를 만들 때 "이 도메인 전용 '전체' 옵션"이 필요해 보이면 대부분 착각이다. `id: 'ALL'`은 검색 필터 타입들이 `T | 'ALL'` 형태로 이미 전제하고 있는 값이다.
+- `SHOPPING_MALLS`(원본 배열) 직접 참조는 **다른 형태로 파생할 때만** 허용한다 (예: `ShoppingAccountForm`의 코드 목록 `MALL_CODES`, mock 데이터 생성). 이름 조회·필터 옵션 목적이면 위 표를 쓴다.
+
 ## 검색 필터 섹션 (주문·상품·사용자 목록 페이지 공통)
 
 ```tsx

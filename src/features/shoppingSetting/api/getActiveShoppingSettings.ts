@@ -1,4 +1,4 @@
-import { ActiveShoppingSettingOption } from '../types/mallRegistration.types';
+import { ActiveShoppingSettingOption } from '../types/shoppingSetting.types';
 
 export const getActiveShoppingSettings = async (ownerId: string): Promise<ActiveShoppingSettingOption[]> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/settings/active`, {

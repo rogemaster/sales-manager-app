@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { MALL_LINKED_PRODUCT_TABLE_HEAD } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
 import { selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
@@ -16,8 +16,6 @@ import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinked
 type Props = {
   linkedProducts: MallLinkedProduct[];
 };
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((mall) => mall.code === code)?.name ?? code;
 
 export const MallLinkedProductTable = ({ linkedProducts }: Props) => {
   const router = useRouter();
@@ -80,7 +78,7 @@ export const MallLinkedProductTable = ({ linkedProducts }: Props) => {
                   {linked.sourceProductId}
                 </TableCell>
                 <TableCell className="font-medium">{linked.productSnapshot.name}</TableCell>
-                <TableCell className="text-center">{getMallName(linked.mallCode)}</TableCell>
+                <TableCell className="text-center">{getShoppingMallName(linked.mallCode)}</TableCell>
                 <TableCell className="text-center">{linked.settingSnapshot.nickname}</TableCell>
                 <TableCell className="text-center font-mono text-sm text-muted-foreground">
                   {linked.externalProductId ?? '-'}

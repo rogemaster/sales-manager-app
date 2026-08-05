@@ -77,5 +77,13 @@ export interface AvailableMallAccount {
   settingCount: number;
 }
 
+/** 활성(isActive) 설정만 추린 선택용 옵션 — 쇼핑몰 전송 대상 선택, 연동 목록 필터 등에서 쓴다. */
+export interface ActiveShoppingSettingOption {
+  id: string; // ShoppingSetting.id
+  mallCode: ShoppingMalls;
+  mallId: string;
+  nickname: string;
+}
+
 export type CreateShoppingSettingBody = Omit<ShoppingSetting, 'id' | 'ownerId' | 'createdAt' | 'updatedAt'>;
 export type UpdateShoppingSettingBody = Partial<CreateShoppingSettingBody>;

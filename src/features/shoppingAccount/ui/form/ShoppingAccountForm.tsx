@@ -9,10 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MALL_NAME_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
 import { PHONE_REGEX } from '@/shared/utils/phone';
 import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { SHOPPING_MALLS, SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
 import { ShoppingMalls } from '@/types/common.type';
 
 const MALL_CODES: string[] = SHOPPING_MALLS.map((mall) => mall.code);
@@ -107,7 +106,7 @@ export const ShoppingAccountForm = ({ defaultValues, onSubmit, isSubmitting, mod
                           <SelectValue placeholder="쇼핑몰을 선택하세요." />
                         </SelectTrigger>
                         <SelectContent>
-                          {MALL_NAME_OPTIONS.map((option) => (
+                          {SHOPPING_MALL_OPTIONS.map((option) => (
                             <SelectItem key={option.id} value={option.id}>
                               {option.name}
                             </SelectItem>

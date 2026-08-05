@@ -25,6 +25,23 @@
 
 매입처, 매출처 등 향후 추가되는 등록 엔티티도 동일한 `ownerId` 종속 패턴을 따른다. 새 도메인 설계 시 `ownerId` 필드로 슈퍼계정 종속 처리하고, 목록 조회 API는 반드시 로그인 계정의 `id`로 필터링한다.
 
+## API·타입은 엔드포인트가 속한 도메인에 둔다
+
+`api/` 함수, `useGetX` 훅, 응답 타입은 **그 API가 다루는 리소스의 도메인**에 배치한다. 그것을 소비하는 화면의 도메인이 아니다.
+
+판정 기준은 **엔드포인트 경로**다. `/api/shopping/settings/active` 는 `shoppingSetting` 도메인이므로, 그 화면이 `mallRegistration`이든 `mallLinkedProduct`든 관계없이 `shoppingSetting/api/`에 둔다.
+
+- **Why:** 2026-08-06 정리 전, `getActiveShoppingSettings`는 MSW 핸들러(`handlers/shoppingSettings.ts`)와 mock util은 shoppingSetting 쪽에 있는데 클라이언트 api/훅/타입만 `mallRegistration`에 있었다. 처음 그 화면을 만들면서 그 자리에 둔 것뿐인데, 결과적으로 두 개의 역방향 의존이 생겼다:
+  - `mallLinkedProduct`의 필터가 `mallRegistration`의 훅을 import — 의미상 `shoppingSetting`을 봐야 할 의존이 엉뚱한 형제 도메인으로 향함
+  - `mocks/utils/getActiveShoppingSettings.ts`(shoppingSetting 데이터 처리)가 `mallRegistration`의 타입을 import
+- **징후:** "이 훅을 두 번째 화면에서도 쓰게 됐다"면 배치를 의심할 시점이다. 첫 소비처가 정본 위치라는 보장은 없다.
+- 두 도메인에서 같은 리소스를 요청하는데 응답 형태만 다르면, 타입을 복제하지 말고 리소스 도메인의 타입 파일에 **둘 다** 둔다 (예: `shoppingSetting.types.ts`의 `AvailableMallAccount`와 `ActiveShoppingSettingOption`은 나란히 있어야 관계가 드러난다).
+
+### 요청/응답 타입은 구조가 같아도 함부로 합치지 않는다 — 단, 같은 호출 경로면 반드시 하나여야 한다
+
+- **합쳐야 하는 경우:** 같은 API 호출 경로를 지나는 타입. `MallRegistrationRequestItem`과 `MallLinkedProductRequestItem`은 필드가 같은 채로 한쪽은 호출부, 한쪽은 api 함수 시그니처에 쓰이고 있었다. 구조가 같아 타입 체커가 통과시킬 뿐, 한쪽만 바뀌면 조용히 깨진다. 이런 건 즉시 하나로 합친다.
+- **합치면 안 되는 경우:** 구조만 같고 의미가 다르며 독립적으로 변할 수 있는 것. `CreateMallLinkedProductsResult`와 `ResendMallLinkedProductsResult`가 그 예로, 분리 유지가 맞다 — 이런 판단은 **타입 주석에 근거를 남긴다.**
+
 ## 오리지널 데이터와 쇼핑몰 연동 데이터
 
 `/products/create`로 만든 **오리지널 상품**(`Product`), `/shopping/settings`로 만든 **오리지널 쇼핑몰정보설정**(`ShoppingSetting`), 그리고 `/shopping/register` 전송으로 만들어지는 **쇼핑몰 연동 데이터**(`MallLinkedProduct`)는 서로 별개의 데이터다.

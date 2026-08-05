@@ -2,7 +2,8 @@
 
 import { useAtom } from 'jotai';
 import { accountIsActiveAtom } from '@/features/shoppingAccount/store/search.store';
-import { ACCOUNT_STATUS_OPTIONS, ALL_ACCOUNT_STATUS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
+import { ACCOUNT_STATUS_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const AccountStatusFilter = () => {
@@ -16,7 +17,7 @@ export const AccountStatusFilter = () => {
       value={isActive}
       onValueChange={(v) => setIsActive(v as 'true' | 'false' | 'ALL')}
       options={ACCOUNT_STATUS_OPTIONS}
-      allOption={ALL_ACCOUNT_STATUS}
+      allOption={ALL_FILTER_OPTION}
       triggerClassName="w-32"
     />
   );
