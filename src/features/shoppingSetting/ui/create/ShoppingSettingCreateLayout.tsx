@@ -11,11 +11,9 @@ import {
   CreateShoppingSettingBody,
 } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { ShoppingMalls } from '@/types/common.type';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ShoppingSettingForm } from '../components/ShoppingSettingForm';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
 
 export const ShoppingSettingCreateLayout = () => {
   const router = useRouter();
@@ -91,7 +89,7 @@ export const ShoppingSettingCreateLayout = () => {
       <div>
         <h1 className="text-3xl font-bold">쇼핑몰 정보설정 등록</h1>
         <p className="text-muted-foreground">
-          {getMallName(matchedAccount.mallCode)} · {matchedAccount.mallId}
+          {getShoppingMallName(matchedAccount.mallCode)} · {matchedAccount.mallId}
         </p>
       </div>
       <FormProvider {...formData}>

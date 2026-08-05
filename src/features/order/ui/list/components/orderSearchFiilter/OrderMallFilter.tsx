@@ -9,11 +9,10 @@ import {
   mallIdAtom,
   deliveryCompanyAtom,
 } from '@/features/order/store/search.store';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 import { FilterOption, ShoppingMalls } from '@/types/common.type';
-
-const ALL_OPTION: FilterOption = { id: 'ALL', name: '전체' };
 
 // 쇼핑몰별 계정 ID 목록 (실 데이터 연동 전 빈 매핑)
 const MALL_ACCOUNTS: Record<string, FilterOption[]> = {};
@@ -23,17 +22,14 @@ export const OrderMallFilter = () => {
   const [mallId, setMallId] = useAtom(mallIdAtom);
   const [deliveryCompany, setDeliveryCompany] = useAtom(deliveryCompanyAtom);
 
-  const mallOptions = useMemo<FilterOption[]>(
-    () => [ALL_OPTION, ...SHOPPING_MALLS.map((mall) => ({ id: mall.code, name: mall.name }))],
-    [],
-  );
+  const mallOptions = useMemo<FilterOption[]>(() => [ALL_FILTER_OPTION, ...SHOPPING_MALL_OPTIONS], []);
 
   const accountOptions = useMemo<FilterOption[]>(
-    () => [ALL_OPTION, ...(mallCode !== 'ALL' ? (MALL_ACCOUNTS[mallCode] ?? []) : [])],
+    () => [ALL_FILTER_OPTION, ...(mallCode !== 'ALL' ? (MALL_ACCOUNTS[mallCode] ?? []) : [])],
     [mallCode],
   );
 
-  const deliveryOptions: FilterOption[] = [ALL_OPTION, ...DELIVERY_COMPANY];
+  const deliveryOptions: FilterOption[] = [ALL_FILTER_OPTION, ...DELIVERY_COMPANY];
 
   const handleMallChange = (value: string) => {
     setMallCode(value as ShoppingMalls | 'ALL');

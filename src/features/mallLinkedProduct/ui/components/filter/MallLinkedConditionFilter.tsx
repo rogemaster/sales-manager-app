@@ -4,23 +4,19 @@ import { useEffect, useMemo } from 'react';
 import { useAtom } from 'jotai';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { FilterOption, ShoppingMalls } from '@/types/common.type';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-import { ALL_PRODUCT_STATUS_OPTION, PRODUCT_STATUS } from '@/features/products/constant/status.constants';
+import { SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { ProductStateType } from '@/features/products/types/product.types';
-import { useGetActiveShoppingSettings } from '@/features/mallRegistration/api/useGetActiveShoppingSettings';
+import { useGetActiveShoppingSettings } from '@/features/shoppingSetting/api/useGetActiveShoppingSettings';
 import {
   linkStatusAtom,
   mallCodeAtom,
   saleStateAtom,
   shoppingSettingIdAtom,
 } from '@/features/mallLinkedProduct/store/search.store';
-import {
-  ALL_FILTER_OPTION,
-  MALL_LINK_STATUS_OPTIONS,
-} from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import { MALL_LINK_STATUS_OPTIONS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
 import { MallLinkStatus } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
-
-const MALL_OPTIONS: FilterOption[] = SHOPPING_MALLS.map((mall) => ({ id: mall.code, name: mall.name }));
 
 export const MallLinkedConditionFilter = () => {
   const [mallCode, setMallCode] = useAtom(mallCodeAtom);
@@ -54,7 +50,7 @@ export const MallLinkedConditionFilter = () => {
         triggerClassName="w-40"
         value={mallCode}
         onValueChange={(value) => setMallCode(value as ShoppingMalls | 'ALL')}
-        options={MALL_OPTIONS}
+        options={SHOPPING_MALL_OPTIONS}
         allOption={ALL_FILTER_OPTION}
       />
       <FilterSelect
@@ -85,7 +81,7 @@ export const MallLinkedConditionFilter = () => {
         value={saleState}
         onValueChange={(value) => setSaleState(value as ProductStateType | 'ALL')}
         options={PRODUCT_STATUS}
-        allOption={ALL_PRODUCT_STATUS_OPTION}
+        allOption={ALL_FILTER_OPTION}
       />
     </div>
   );

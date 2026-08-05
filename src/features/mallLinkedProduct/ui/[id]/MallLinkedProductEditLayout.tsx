@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { useAlert } from '@/hooks/useAlert';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { Product } from '@/features/products/types/product.types';
 import { ShoppingSetting, ShoppingSettingFormValues } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
@@ -30,8 +30,6 @@ type Props = {
 };
 
 const LIST_PATH = '/shopping/linked-products';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((mall) => mall.code === code)?.name ?? code;
 
 export const MallLinkedProductEditLayout = ({ id }: Props) => {
   const router = useRouter();
@@ -147,7 +145,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
       <div>
         <h1 className="text-3xl font-bold">쇼핑몰 연동 상품 수정</h1>
         <p className="text-muted-foreground">
-          {getMallName(linked.mallCode)} · {linked.settingSnapshot.nickname}
+          {getShoppingMallName(linked.mallCode)} · {linked.settingSnapshot.nickname}
         </p>
       </div>
 

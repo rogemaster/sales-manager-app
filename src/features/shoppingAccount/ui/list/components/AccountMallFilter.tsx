@@ -2,7 +2,8 @@
 
 import { useAtom } from 'jotai';
 import { accountMallCodeAtom } from '@/features/shoppingAccount/store/search.store';
-import { MALL_NAME_OPTIONS, ALL_MALL_NAME } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
+import { SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const AccountMallFilter = () => {
@@ -15,8 +16,8 @@ export const AccountMallFilter = () => {
       labelClassName="w-20 text-right"
       value={mallCode}
       onValueChange={setMallCode}
-      options={MALL_NAME_OPTIONS}
-      allOption={ALL_MALL_NAME}
+      options={SHOPPING_MALL_OPTIONS}
+      allOption={ALL_FILTER_OPTION}
       triggerClassName="w-36"
     />
   );

@@ -2,7 +2,8 @@
 
 import { useAtom } from 'jotai';
 import { saleTypeAtom } from '@/features/products/store/search.store';
-import { ALL_PRODUCT_STATUS_OPTION, PRODUCT_STATUS } from '@/features/products/constant/status.constants';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const ProductSearchSaleState = () => {
@@ -20,7 +21,7 @@ export const ProductSearchSaleState = () => {
       value={getSaleTypeAtom}
       onValueChange={handleProductStatusChange}
       options={PRODUCT_STATUS}
-      allOption={ALL_PRODUCT_STATUS_OPTION}
+      allOption={ALL_FILTER_OPTION}
     />
   );
 };

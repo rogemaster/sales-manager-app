@@ -8,9 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { isNewSettingModalOpenAtom } from '@/features/shoppingSetting/store/search.store';
 import { useGetAvailableMallAccounts } from '@/features/shoppingSetting/api/useGetAvailableMallAccounts';
 import { AvailableMallAccount } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 
 export const NewSettingModal = () => {
   const [open, setOpen] = useAtom(isNewSettingModalOpenAtom);
@@ -55,7 +53,7 @@ export const NewSettingModal = () => {
                     key={account.id}
                     className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
                   >
-                    <TableCell className="text-center">{getMallName(account.mallCode)}</TableCell>
+                    <TableCell className="text-center">{getShoppingMallName(account.mallCode)}</TableCell>
                     <TableCell className="text-center">{account.mallId}</TableCell>
                     <TableCell className="text-center">
                       {account.settingCount > 0 ? `이미 ${account.settingCount}건 설정됨` : '미설정'}

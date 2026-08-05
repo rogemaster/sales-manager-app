@@ -6,10 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { selectedJobIdsAtom } from '@/features/order/store/collect.store';
 import { useGetCollectionJobs } from '@/features/order/api/useGetCollectionJobs';
 import { CollectionStatusCell } from './components/CollectionStatusCell';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-
-const getMallName = (mallCode: string): string =>
-  SHOPPING_MALLS.find((m) => m.code === mallCode)?.name ?? mallCode;
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 
 export const CollectionTableSection = () => {
   const { data: jobs = [] } = useGetCollectionJobs();
@@ -65,7 +62,7 @@ export const CollectionTableSection = () => {
                     onCheckedChange={(checked) => handleToggleRow(job.id, !!checked)}
                   />
                 </TableCell>
-                <TableCell className="text-center">{getMallName(job.mallCode)}</TableCell>
+                <TableCell className="text-center">{getShoppingMallName(job.mallCode)}</TableCell>
                 <TableCell className="text-center">{job.mallId}</TableCell>
                 <TableCell className="text-center">
                   <CollectionStatusCell

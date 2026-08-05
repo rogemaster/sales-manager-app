@@ -8,9 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { selectedAccountsAtom } from '@/features/shoppingAccount/store/search.store';
 import { SHOPPING_ACCOUNT_TABLE_HEAD } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
 import { ShoppingAccount } from '@/features/shoppingAccount/types/shoppingAccount.types';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 
 interface ShoppingAccountTableProps {
   accounts: ShoppingAccount[];
@@ -76,7 +74,7 @@ export const ShoppingAccountTable = ({ accounts }: ShoppingAccountTableProps) =>
                   onCheckedChange={(checked: boolean) => handleSelectAccount(account.id, checked)}
                 />
               </TableCell>
-              <TableCell className="text-center">{getMallName(account.mallCode)}</TableCell>
+              <TableCell className="text-center">{getShoppingMallName(account.mallCode)}</TableCell>
               <TableCell className="text-left">{account.nickname || '-'}</TableCell>
               <TableCell className="text-center">
                 <Badge variant={account.isActive ? 'default' : 'secondary'}>

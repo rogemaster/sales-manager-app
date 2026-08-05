@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { orderStatusAtom } from '@/features/order/store/search.store';
-import { ALL_ORDER_STATUS, ORDER_STATUS } from '@/features/order/constant/status.constants';
+import { ORDER_STATUS } from '@/features/order/constant/status.constants';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const OrderStateFilter = () => {
@@ -18,7 +19,7 @@ export const OrderStateFilter = () => {
       value={getOrderStatusAtom}
       onValueChange={handleOrderStatusChange}
       options={ORDER_STATUS}
-      allOption={ALL_ORDER_STATUS}
+      allOption={ALL_FILTER_OPTION}
     />
   );
 };

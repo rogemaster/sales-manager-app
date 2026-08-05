@@ -7,16 +7,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { ShoppingMalls } from '@/types/common.type';
-import { useGetActiveShoppingSettings } from '@/features/mallRegistration/api/useGetActiveShoppingSettings';
+import { useGetActiveShoppingSettings } from '@/features/shoppingSetting/api/useGetActiveShoppingSettings';
 import {
   isRegisterModalOpenAtom,
   selectedProductIdsAtom,
   addStagedRegistrationsAtom,
 } from '@/features/mallRegistration/store/mallRegistration.store';
-
-const getMallName = (code: string) => SHOPPING_MALLS.find((m) => m.code === code)?.name ?? code;
 
 export const MallSelectModal = () => {
   const [open, setOpen] = useAtom(isRegisterModalOpenAtom);
@@ -83,7 +81,7 @@ export const MallSelectModal = () => {
                     checked={selectedMalls.includes(mallCode)}
                     onCheckedChange={(checked: boolean) => handleToggleMall(mallCode, checked)}
                   />
-                  <span className="text-sm font-medium">{getMallName(mallCode)}</span>
+                  <span className="text-sm font-medium">{getShoppingMallName(mallCode)}</span>
                 </div>
                 {selectedMalls.includes(mallCode) && (
                   <RadioGroup

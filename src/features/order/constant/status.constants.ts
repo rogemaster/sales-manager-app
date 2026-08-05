@@ -1,11 +1,6 @@
 import { FilterOption } from '@/types/common.type';
 import { OrderStatus } from '../types/order.types';
 
-export const ALL_ORDER_STATUS = {
-  id: 'ALL',
-  name: '전체',
-} as const;
-
 // 주문처리: 신규주문 -> 발주확인 -> 송장등록 -> 송장전송완료
 // 취소처리: 취소요청 -> 취소처리중 -> 취소완료
 // 교환처리: 교환요청 -> 교환처리중 -> 교환완료

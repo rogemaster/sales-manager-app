@@ -11,7 +11,7 @@ import {
   stagedCountAtom,
   resetMallRegistrationStateAtom,
 } from '@/features/mallRegistration/store/mallRegistration.store';
-import { MallRegistrationRequestItem } from '@/features/mallRegistration/types/mallRegistration.types';
+import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 
 export const MallRegistrationActionSection = () => {
   const selectedProductIds = useAtomValue(selectedProductIdsAtom);
@@ -31,7 +31,7 @@ export const MallRegistrationActionSection = () => {
   };
 
   const handleSend = () => {
-    const items: MallRegistrationRequestItem[] = Object.entries(stagedRegistrations).flatMap(
+    const items: MallLinkedProductRequestItem[] = Object.entries(stagedRegistrations).flatMap(
       ([productId, registrations]) =>
         registrations.map((reg) => ({
           productId,

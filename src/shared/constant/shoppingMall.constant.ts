@@ -1,4 +1,4 @@
-import { ShoppingMallType } from '@/types/common.type';
+import { FilterOption, ShoppingMallType } from '@/types/common.type';
 
 export const SHOPPING_MALLS: ShoppingMallType[] = [
   { code: 'AUC', name: '옥션' },
@@ -18,3 +18,9 @@ export const SHOPPING_MALLS: ShoppingMallType[] = [
   { code: 'KAKAOS', name: '카카오스토어' },
   { code: 'MUST', name: '머스트잇' },
 ];
+
+/** 쇼핑몰 목록을 필터 Select 옵션(`FilterOption`) 형태로 변환한 것 — 도메인별로 같은 map을 반복하지 않도록 여기서 한 번만 만든다. */
+export const SHOPPING_MALL_OPTIONS: FilterOption[] = SHOPPING_MALLS.map((mall) => ({
+  id: mall.code,
+  name: mall.name,
+}));
