@@ -111,6 +111,16 @@ export const XxxDateFilter = () => {
 
 `draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만, 5개 도메인(account·order·shoppingAccount·shoppingSetting·mallLinkedProduct) 중 4개가 이미 위 형태였고 2026-08-06에 나머지 하나를 맞춰 통일했다. 새 목록 화면은 위 표를 따른다.
 
+## 검색 필터는 화면이 소유한다 (다른 도메인 것을 가져다 쓰지 않는다)
+
+라우트가 다르면 화면도 다르다. **검색 필터 컴포넌트와 그 store는 화면마다 자기 것을 갖는다.** 목록 구성이 비슷해 보여도 다른 도메인의 필터 섹션을 import하지 않는다.
+
+- 조립 재료(`RangeDateFilter`, `FilterSelect`, `Select`)는 공용을 쓴다. 화면이 소유하는 건 **atom에 바인딩된 얇은 래퍼와 그 store**다.
+- 반대로 **요청 타입·조회 API·표시용 상수는 공유한다.** 두 화면이 같은 엔드포인트를 부르면 요청 타입은 하나여야 한다([`domain-design.md`](domain-design.md) 참고). 분리하는 것은 UI와 store뿐이다.
+- **Why:** `/shopping/register`가 `/products/list`의 `ProductSearchFilterSection`을 가져다 썼다. 그 하위 컴포넌트가 전부 products의 전역 atom에 직접 바인딩돼 있어 **컴포넌트를 가져오면 store까지 딸려왔고**, 상품목록에서 필터를 걸고 등록 화면으로 이동하면 필터가 따라오는 버그가 됐다.
+- **격리 기법을 찾기 전에 왜 공유하는지부터 본다.** 위 버그를 스코프 Jotai Provider로 막으려다 그 방식이 auth atom을 끊어 화면 전체를 죽인다는 것만 확인하고 한 라운드를 흘려보냈다(2026-08-06). 원인은 소유권이었고, 화면별 store·컴포넌트로 분리하니 증상이 함께 사라졌다(2026-08-11).
+- 같은 결론이 테이블 헤더 상수에서 먼저 나왔다 — [`docs/solutions/architecture-patterns/screen-owned-table-header-constants.md`](../../docs/solutions/architecture-patterns/screen-owned-table-header-constants.md), [`scoped-jotai-provider-breaks-auth-atoms.md`](../../docs/solutions/architecture-patterns/scoped-jotai-provider-breaks-auth-atoms.md).
+
 ## 검색 필터 섹션 (주문·상품·사용자 목록 페이지 공통)
 
 ```tsx

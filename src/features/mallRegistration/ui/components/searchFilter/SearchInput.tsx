@@ -1,13 +1,13 @@
 'use client';
 
-import { ChangeEventHandler } from 'react';
-import { Label } from '@/components/ui/label';
+import { ChangeEventHandler, KeyboardEvent } from 'react';
+import { useAtom } from 'jotai';
 import { Search } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAtom } from 'jotai';
-import { searchTypeAtom, searchValueAtom } from '@/features/products/store/search.store';
+import { searchTypeAtom, searchValueAtom } from '@/features/mallRegistration/store/search.store';
 import { PRODUCT_SEARCH_TYPE } from '@/features/products/constant/status.constants';
 import { ProductSearchType } from '@/features/products/types/product.types';
 
@@ -15,15 +15,15 @@ type Props = {
   onSearch: () => void;
 };
 
-export const ProductSearchInput = ({ onSearch }: Props) => {
+export const MallRegistrationSearchInput = ({ onSearch }: Props) => {
   const [searchType, setSearchType] = useAtom(searchTypeAtom);
-  const [getSearchValue, setSearchValue] = useAtom(searchValueAtom);
+  const [searchValue, setSearchValue] = useAtom(searchValueAtom);
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchValue(e.target.value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') onSearch();
   };
 
@@ -46,7 +46,7 @@ export const ProductSearchInput = ({ onSearch }: Props) => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="검색어를 입력하세요..."
-          value={getSearchValue}
+          value={searchValue}
           onChange={handleSearchInput}
           onKeyDown={handleKeyDown}
           className="pl-10"
