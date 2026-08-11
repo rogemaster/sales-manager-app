@@ -5,14 +5,18 @@ import { Label } from '@/components/ui/label';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAtom } from 'jotai';
-import { searchValueAtom } from '@/features/products/store/search.store';
+import { searchTypeAtom, searchValueAtom } from '@/features/products/store/search.store';
+import { PRODUCT_SEARCH_TYPE } from '@/features/products/constant/status.constants';
+import { ProductSearchType } from '@/features/products/types/product.types';
 
 type Props = {
   onSearch: () => void;
 };
 
 export const ProductSearchInput = ({ onSearch }: Props) => {
+  const [searchType, setSearchType] = useAtom(searchTypeAtom);
   const [getSearchValue, setSearchValue] = useAtom(searchValueAtom);
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -26,10 +30,22 @@ export const ProductSearchInput = ({ onSearch }: Props) => {
   return (
     <div className="flex items-center gap-4">
       <Label className="w-20 text-right">검색어</Label>
+      <Select value={searchType} onValueChange={(value) => setSearchType(value as ProductSearchType)}>
+        <SelectTrigger className="w-40">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PRODUCT_SEARCH_TYPE.map((item) => (
+            <SelectItem key={item.id} value={item.id}>
+              {item.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <div className="relative flex-1 max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="상품코드, 상품명 또는 카테고리로 검색..."
+          placeholder="검색어를 입력하세요..."
           value={getSearchValue}
           onChange={handleSearchInput}
           onKeyDown={handleKeyDown}

@@ -7,6 +7,7 @@ import { useAtomValue } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts, GetProductsResponse } from '../../api/getProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
+import { commitProductSearch } from '../../util/productSearch';
 
 export const ProductListLayout = () => {
   const currentFilter = useAtomValue(getSearchFilterAtom);
@@ -26,7 +27,7 @@ export const ProductListLayout = () => {
   const totalPages = data?.totalPages ?? 1;
 
   const handleSearch = () => {
-    setAppliedFilter(currentFilter);
+    setAppliedFilter(commitProductSearch(currentFilter));
     setCurrentPage(1);
     setSearchCount((prev) => prev + 1);
   };

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import type { Product } from '@/features/products/types/product.types';
+import type { Product, ProductSearch } from '@/features/products/types/product.types';
 
 const makeProduct = (overrides: Partial<Product>): Product => ({
   productId: 'smp000001',
@@ -23,8 +23,8 @@ const { PRODUCTS } = vi.hoisted(() => ({ PRODUCTS: [] as Product[] }));
 vi.mock('../data/MockProductsData', () => ({ MOCK_PRODUCT_DATA: PRODUCTS }));
 
 PRODUCTS.push(
-  makeProduct({ productId: 'smp000001', ownerId: 'owner-1', state: 'ON_SALE' }),
-  makeProduct({ productId: 'smp000002', ownerId: 'owner-1', state: 'SOLD_OUT' }),
+  makeProduct({ productId: 'smp000001', ownerId: 'owner-1', state: 'ON_SALE', name: '무선 이어폰' }),
+  makeProduct({ productId: 'smp000002', ownerId: 'owner-1', state: 'SOLD_OUT', name: '블루투스 키보드' }),
   makeProduct({ productId: 'smp000003', ownerId: 'owner-2', state: 'ON_SALE' }),
   makeProduct({ productId: 'smp000004', ownerId: 'owner-1', state: 'ON_SALE' }),
   makeProduct({ productId: 'smp000005', ownerId: 'owner-1', state: 'ON_SALE' }),
@@ -33,7 +33,15 @@ PRODUCTS.push(
 
 import { getMockProducts } from './getProducts';
 
-const defaultSearch = { dateType: '', startDate: '', endDate: '', saleType: 'ALL', categoryId: 'ALL', searchValue: '' };
+const defaultSearch: ProductSearch = {
+  dateType: '',
+  startDate: '',
+  endDate: '',
+  saleType: 'ALL',
+  categoryId: 'ALL',
+  searchType: 'productName',
+  searchValue: '',
+};
 
 describe('getMockProducts', () => {
   it('ownerId가 일치하는 상품만 반환한다', () => {
@@ -52,6 +60,45 @@ describe('getMockProducts', () => {
     const result = getMockProducts('owner-1', { ...defaultSearch, saleType: 'SOLD_OUT' }, 1, 10);
     expect(result.products).toHaveLength(1);
     expect(result.products[0].productId).toBe('smp000002');
+  });
+
+  describe('검색 타입', () => {
+    it('productName이면 상품명으로 매칭한다', () => {
+      const result = getMockProducts(
+        'owner-1',
+        { ...defaultSearch, searchType: 'productName', searchValue: '이어폰' },
+        1,
+        10,
+      );
+      expect(result.products).toHaveLength(1);
+      expect(result.products[0].productId).toBe('smp000001');
+    });
+
+    it('productCode면 상품코드로 매칭한다', () => {
+      const result = getMockProducts(
+        'owner-1',
+        { ...defaultSearch, searchType: 'productCode', searchValue: 'smp000002' },
+        1,
+        10,
+      );
+      expect(result.products).toHaveLength(1);
+      expect(result.products[0].productId).toBe('smp000002');
+    });
+
+    it('productCode로 검색하면 상품명이 일치해도 반환하지 않는다', () => {
+      const result = getMockProducts(
+        'owner-1',
+        { ...defaultSearch, searchType: 'productCode', searchValue: '이어폰' },
+        1,
+        10,
+      );
+      expect(result.products).toHaveLength(0);
+    });
+
+    it('searchValue가 빈 문자열이면 검색 타입과 무관하게 전체를 반환한다', () => {
+      const result = getMockProducts('owner-1', { ...defaultSearch, searchType: 'productCode', searchValue: '' }, 1, 10);
+      expect(result.products).toHaveLength(5);
+    });
   });
 
   describe('페이지네이션', () => {
