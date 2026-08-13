@@ -12,6 +12,7 @@ import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildM
 import { ProductBasicinfo } from '@/features/products/ui/components/form/ProductBasicInfo';
 import { ProductPriceAndQuantityInfo } from '@/features/products/ui/components/form/ProductPriceAndQuantityInfo';
 import { ProductComplianceSection } from '@/features/products/ui/components/form/ProductComplianceSection';
+import { ProductBrandModelSection } from '@/features/products/ui/components/form/ProductBrandModelSection';
 import { ProductOptionSection } from '@/features/products/ui/components/options/ProductOptionSection';
 import { ProductMainImageInfo } from '@/features/products/ui/components/form/ProductMainImageInfo';
 import { ProductDetailInfo } from '@/features/products/ui/components/form/ProductDetailInfo';
@@ -157,7 +158,10 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
             <ProductBasicinfo />
             <ProductPriceAndQuantityInfo />
           </div>
-          <ProductComplianceSection />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <ProductBrandModelSection />
+            <ProductComplianceSection />
+          </div>
           <ProductOptionSection />
           <div className="grid gap-6 lg:grid-cols-2">
             <ProductMainImageInfo />

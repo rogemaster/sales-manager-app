@@ -8,6 +8,7 @@ import { ProductMainImageInfo } from './form/ProductMainImageInfo';
 import { ProductDetailInfo } from './form/ProductDetailInfo';
 import { ProductInformationDisclosureSection } from './productDisclosure/ProductInformationDisclosureSection';
 import { ProductComplianceSection } from './form/ProductComplianceSection';
+import { ProductBrandModelSection } from './form/ProductBrandModelSection';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 
@@ -27,8 +28,12 @@ export const ProductForm = () => {
         <ProductPriceAndQuantityInfo />
       </div>
 
-      {/* 규정 정보 (원산지/부가세유형/성인상품여부) */}
-      <ProductComplianceSection />
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* 브랜드 및 모델 정보 */}
+        <ProductBrandModelSection />
+        {/* 규정 정보 (원산지/부가세유형/성인상품여부) */}
+        <ProductComplianceSection />
+      </div>
 
       {/* 옵션 정보 및 옵션 조합 관리 (섹션 내부 포함) */}
       <ProductOptionSection />

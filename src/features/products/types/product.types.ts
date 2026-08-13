@@ -25,6 +25,12 @@ export interface Product {
   originCountryEtc?: string; // originCountryCode === 'ETC'일 때만 사용하는 자유텍스트
   taxType?: TaxType;
   adultProductType?: AdultProductType;
+
+  /** 몰 카탈로그 매칭·검색 노출에 쓰이는 상품 공통 정보 */
+  brand?: string; // 폼 필수. 카카오는 giftBrandId 키로 전송하지만 프론트는 이 필드 하나만 갖는다
+  manufacturer?: string; // 폼 필수
+  modelName?: string;
+  modelId?: string;
 }
 
 export interface ProductSaleState {
