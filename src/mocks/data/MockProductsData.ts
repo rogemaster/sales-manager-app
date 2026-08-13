@@ -20,6 +20,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0001',
+    modelId: '10000001',
     informationDisclosure: {
       key: '',
       id: '',
@@ -43,6 +47,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0002',
+    modelId: '10000002',
     informationDisclosure: {
       key: '',
       id: '',
@@ -66,6 +74,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0003',
+    modelId: '10000003',
     informationDisclosure: {
       key: '',
       id: '',
@@ -89,6 +101,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0004',
+    modelId: '10000004',
     informationDisclosure: {
       key: '',
       id: '',
@@ -112,6 +128,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0005',
+    modelId: '10000005',
     informationDisclosure: {
       key: '',
       id: '',
@@ -135,6 +155,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0006',
+    modelId: '10000006',
     informationDisclosure: {
       key: '',
       id: '',
@@ -158,6 +182,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0007',
+    modelId: '10000007',
     informationDisclosure: {
       key: '',
       id: '',
@@ -181,6 +209,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0008',
+    modelId: '10000008',
     informationDisclosure: {
       key: '',
       id: '',
@@ -204,6 +236,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0009',
+    modelId: '10000009',
     informationDisclosure: {
       key: '',
       id: '',
@@ -227,6 +263,10 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
+    modelName: 'MD-0010',
+    modelId: '10000010',
     informationDisclosure: {
       key: '',
       id: '',
@@ -250,6 +290,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -273,6 +315,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -296,6 +340,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -319,6 +365,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -342,6 +390,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -365,6 +415,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -388,6 +440,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -411,6 +465,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -434,6 +490,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
@@ -457,6 +515,8 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     keyWords: [],
     createDate: new Date(),
     updateDate: new Date(),
+    brand: fakerKO.company.name(),
+    manufacturer: fakerKO.company.name(),
     informationDisclosure: {
       key: '',
       id: '',
