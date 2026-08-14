@@ -84,6 +84,8 @@ export interface Product {
 - 프로젝트 선례와도 맞는다 — `AccountUser.ownerId`를 `string | null`에서 `string`으로 좁힌 것은 실 DB 전수 조회로 null이 0건임을 검증한 **뒤**였다(2026-07-17). 같은 순서를 따르면 지금은 optional이 맞고, 엑셀까지 끝난 뒤 좁힌다.
 - 기존 규정 정보 필드 3개(`originCountryCode`/`taxType`/`adultProductType`)도 전부 optional이다.
 
+> **후속 정정 (2026-08-14, 같은 날 다음 라운드):** 위 optional 결정은 **엑셀 라운드가 끝나면서 해소됐다.** `brand`·`manufacturer`는 non-optional(`string`)로 좁혔고, `modelName`·`modelId`는 optional로 남는다. 좁히기의 전제였던 "모든 생성 경로가 값을 채운다"가 충족됐기 때문이다 — 생성 경로는 등록 폼(RHF `required`)과 엑셀(`req: true`) 둘뿐이고, 목 상품 20건도 전부 값을 갖고 있었다. 실제 파급 범위는 테스트 팩토리 3곳뿐이었고 프로덕션 코드는 컴파일 에러 0건이었다. 아래 "다음 라운드로 넘기는 오픈 이슈" 참고.
+
 `modelId`는 네이버가 숫자 ID를 쓰지만 프론트는 `string`으로 둔다. 계산에 쓰지 않고 그대로 전달만 하는 값이라 앞자리 0이나 자릿수 손실 위험이 없는 쪽이 안전하다.
 
 `CreateProductRequest`는 `Omit<Product, 'productId' | 'ownerId' | 'createDate' | 'updateDate'>` 파생이므로 자동 반영된다.
@@ -174,5 +176,10 @@ export interface Product {
 
 ## 다음 라운드로 넘기는 오픈 이슈
 
-- **상품대량등록 엑셀 반영** (사용자 요구 — 원문: *"엑셀쪽도 추가를 해야 하는데 범위가 넓어진다"*). `PRODUCT_BULK_EXCEL_TEMPLATE`에 컬럼 4개 추가 + `productExcelSaveStrategy` 매핑 추가. 엑셀 필수 컬럼(`req: true`) 지정을 폼 필수 2개와 맞출지 결정 필요
-- **필수 2개 non-optional 좁히기** (Claude 추정 — 미확인). 엑셀 라운드가 끝나고 기존 데이터가 전부 값을 가진 것이 확인된 뒤에 검토
+**2026-08-14 같은 날 후속 라운드에서 둘 다 해소됐다.** 브랜치 `feat/product-bulk-excel-brand-model`.
+
+- ~~**상품대량등록 엑셀 반영**~~ (사용자 요구 — 원문: *"엑셀쪽도 추가를 해야 하는데 범위가 넓어진다"*) — **완료.** `PRODUCT_BULK_EXCEL_TEMPLATE`에 컬럼 4개를 카테고리 뒤에 추가하고 `productExcelSaveStrategy`에 매핑을 넣었다. 미결이던 `req: true` 여부는 **폼 필수와 맞추는 쪽으로 사용자가 결정**했다 — 브랜드·제조업체를 `req: true`로 두면 값이 빈 행이 업로드 단계에서 걸러져 "빈 `brand`로 생성된 뒤 수정 화면에서 저장이 막히는 상품"이 애초에 생기지 않는다. 대가로 구 양식 파일은 `MISSING_FIELD`로 전체 거부되므로 양식 재다운로드가 필요하다.
+  - 모델명·모델번호는 시트에서 숫자로 파싱될 수 있어 매핑에서 `String()`으로 고정한다. `modelId`를 `string`으로 정한 위 결정이 여기서 실제로 걸린 지점이다.
+  - 이 라운드에서 `productExcelSaveStrategy.test.ts`를 신설했다. 위 "테스트" 절이 "신규 테스트 파일이 없다"고 적은 것은 그 라운드 기준이며, 전략 함수는 `mocks/utils/` 밖이지만 순수 로직이라 `features/products/util/Options.test.ts` 선례를 따랐다.
+- ~~**필수 2개 non-optional 좁히기**~~ (Claude 추정 — 미확인이었으나 사용자가 착수를 지시) — **완료.** `brand`·`manufacturer`를 `string`으로 좁혔다. 근거와 파급 범위는 위 "타입" 절의 후속 정정 참고.
+  - **남는 리스크:** API 응답은 `response.json()`이라 런타임 검증이 없다. 실제 백엔드가 `brand` 없는 상품을 내려주면 타입은 `string`이라 주장하지만 값은 `undefined`가 된다. `AccountUser.ownerId`를 좁혔을 때와 동일한 성격의 한계다.
