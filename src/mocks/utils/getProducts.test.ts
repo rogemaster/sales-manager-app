@@ -11,6 +11,8 @@ const makeProduct = (overrides: Partial<Product>): Product => ({
   deliveryPrice: 0,
   mainImage: '',
   detailPage: '',
+  brand: '테스트브랜드',
+  manufacturer: '테스트제조사',
   totalQuantity: 100,
   createDate: new Date('2024-01-10'),
   updateDate: new Date('2024-01-10'),

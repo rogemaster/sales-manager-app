@@ -20,6 +20,26 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       req: false,
     },
     {
+      key: 'brand',
+      name: '브랜드',
+      req: true,
+    },
+    {
+      key: 'manufacturer',
+      name: '제조업체',
+      req: true,
+    },
+    {
+      key: 'modelName',
+      name: '모델명',
+      req: false,
+    },
+    {
+      key: 'modelId',
+      name: '모델번호',
+      req: false,
+    },
+    {
       key: 'netPrice',
       name: '공급가',
       req: false,
