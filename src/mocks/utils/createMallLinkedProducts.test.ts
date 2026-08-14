@@ -18,6 +18,8 @@ const { PRODUCTS, SETTINGS, LINKED, resetMocks } = vi.hoisted(() => {
       deliveryPrice: 0,
       mainImage: '',
       detailPage: '',
+      brand: '테스트브랜드',
+      manufacturer: '테스트제조사',
       option: [],
       totalQuantity: 10,
       keyWords: [],
