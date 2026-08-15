@@ -83,3 +83,11 @@ export interface ActiveShoppingSettingOption {
 
 export type CreateShoppingSettingBody = Omit<ShoppingSetting, 'id' | 'ownerId' | 'createdAt' | 'updatedAt'>;
 export type UpdateShoppingSettingBody = Partial<CreateShoppingSettingBody>;
+
+/**
+ * 삭제 대상 설정들에서 파생된 연동 데이터 건수.
+ * 삭제 확인 창의 경고 문구에만 쓰인다 — 연동 데이터는 설정과 독립적이라 설정을 지워도 삭제되지 않는다.
+ */
+export interface LinkedProductCountResponse {
+  totalCount: number;
+}

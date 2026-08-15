@@ -8,6 +8,7 @@ import {
 import { getMockShoppingSettings } from '../utils/getShoppingSettings';
 import { updateMockShoppingSettingsStatus } from '../utils/updateShoppingSettingsStatus';
 import { deleteMockShoppingSettings } from '../utils/deleteShoppingSettings';
+import { countMockLinkedProductsBySettings } from '../utils/countLinkedProductsBySettings';
 import { getMockAvailableMallAccounts } from '../utils/getAvailableMallAccounts';
 import { getMockActiveShoppingSettings } from '../utils/getActiveShoppingSettings';
 import { ShoppingMalls } from '@/types/common.type';
@@ -47,6 +48,16 @@ export const shoppingSettingHandlers = [
     }
     deleteMockShoppingSettings(ids);
     return HttpResponse.json({ success: true });
+  }),
+
+  http.post(`${baseUrl}/api/shopping/settings/linked-count`, async ({ request }) => {
+    const ownerId = request.headers.get('X-Owner-Id');
+    const { ids } = (await request.json()) as { ids: string[] };
+    // ownerId를 함께 검사해 타입을 좁힌다 — ids가 빈 배열이면 allOwnedBy가 공허참이라 이것만으론 null을 못 거른다.
+    if (!ownerId || !allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
+      return new HttpResponse(null, { status: 403 });
+    }
+    return HttpResponse.json({ totalCount: countMockLinkedProductsBySettings(ownerId, ids) });
   }),
 
   http.post(`${baseUrl}/api/shopping/settings/available-accounts`, async ({ request }) => {
