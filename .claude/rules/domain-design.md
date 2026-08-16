@@ -116,6 +116,23 @@
 
 설계 근거: `docs/superpowers/specs/2026-08-03-mall-linked-product-edit-resend-design.md`
 
+### 연동 데이터에서 수정할 수 없는 것 — 쇼핑몰과 쇼핑몰계정
+
+이미 연동된 데이터의 **쇼핑몰(`mallCode`)과 쇼핑몰계정(`mallAccountId`·`mallId`)은 수정 대상이 아니다.** 연동 1건 = **특정 계정으로** 등록된 외부몰 상품 1개이므로, 계정이 바뀌면 그건 같은 상품의 수정이 아니라 **다른 상품**이다. 수정 화면에서 고칠 수 있는 것은 상품 값과 설정 값뿐이다.
+
+이 규칙은 문서만으로 지켜지지 않는다. 집행 지점이 두 곳이고, 둘 다 **폼이 돌려준 값에서 불변 필드(`id`·`ownerId`·`mallAccountId`·`mallId`·`mallCode`)를 원본 값으로 되돌리는** 방식이다.
+
+| 위치 | 역할 |
+|------|------|
+| `buildSnapshots` (`MallLinkedProductEditLayout`) | 폼 값에서 되돌린다. `mallCode`는 레코드, 나머지 넷은 원본 `settingSnapshot`이 정본 |
+| `updateMockMallLinkedProduct` (MSW) | 같은 필드를 기존 스냅샷 값으로 고정한다. **최종 방어선은 이쪽** |
+
+**왜 수정에만 이 장치가 필요한가 — 생성과 책임 분담이 다르다.** 생성(`createMockMallLinkedProducts`)은 클라이언트가 `{ productId, mallCode, shoppingSettingId }`만 보내고 **서버가 원본에서 읽어 스냅샷을 복사**하므로 어긋날 여지가 없다. 반면 수정은 **클라이언트가 완성된 스냅샷을 보내고 서버가 불변 필드를 지켜내는** 방식이라, 지켜내는 범위가 곧 이 규칙의 실효 범위다.
+
+**어긋나면 목록이 아니라 다른 곳이 깨진다.** 목록 검색은 전부 top-level(`ownerId`·`mallCode`·`sourceShoppingSettingId`·`status`)과 `productSnapshot`만 읽으므로 `settingSnapshot`이 틀어져도 화면상 증상이 없다. 실제 파급은 **재전송 payload가 다른 계정을 향하는 것**과 **수정 화면 주소록 조회(`watch('mallId')` 기준)가 틀어지는 것**이라, 늦게 발견되는 종류다.
+
+**주의 — 설정 폼 섹션 3개는 세 화면이 공유한다.** `ShoppingSettingBasicInfoSection`·`ShoppingSettingAddressSection`·`ShoppingSettingMallInfoSection`을 설정 등록/수정 화면(`ShoppingSettingForm` 경유)과 연동상품 수정 화면(래퍼 없이 직접 나열)이 함께 쓴다. 설정 화면 사정으로 이 섹션에 쇼핑몰계정 Select를 붙이면 **연동상품 수정 화면에도 그대로 딸려 들어간다.** 컴포넌트를 공유하면 의도하지 않은 화면까지 따라오는 전례는 [`ui-conventions.md`](ui-conventions.md)의 "검색 필터는 화면이 소유한다" 절 참고.
+
 ## 몰(mallCode)별 고유 필드 컴포넌트 분리 기준
 
 `ShoppingSettingMallInfoSection.tsx`는 현재 네이버·카카오 2개 몰의 필드 컴포넌트(`NaverMallSettingsFields`, `KakaoMallSettingsFields`)를 파일 내부에 함께 정의한다(공식 Open API 문서 근거가 확인된 몰만 우선 구현했고, 나머지 몰은 근거 확보 시 추가 예정). 몰 고유 필드 컴포넌트가 3개 이상으로 늘어나면 Excel 전략 패턴(`src/components/excel/strategies/`, `.claude/rules/excel.md` 참고)과 동일하게 `ui/components/form/mallFields/` 디렉토리로 분리하고, `ShoppingSettingMallInfoSection`은 `mallCode`에 맞는 컴포넌트를 선택하는 역할만 담당하도록 얇게 유지한다.
