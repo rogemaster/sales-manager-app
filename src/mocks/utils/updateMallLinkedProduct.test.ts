@@ -26,7 +26,14 @@ const { LINKED, resetMocks, OWNER_ID } = vi.hoisted(() => {
       status: 'success',
       externalProductId: 'ext_NSST_keep1',
       productSnapshot: { productId: 'p_001', name: '원본 상품명', price: 10000 },
-      settingSnapshot: { id: 'ss_001', mallCode: 'NSST', nickname: '원본 설정명' },
+      settingSnapshot: {
+        id: 'ss_001',
+        ownerId,
+        mallAccountId: 'sa_001',
+        mallId: 'naver_seller_01',
+        mallCode: 'NSST',
+        nickname: '원본 설정명',
+      },
       createdByEmail: 'seller@shop.com',
       createdAt: '2026-08-01T00:00:00.000Z',
       lastSentAt: '2026-08-01T00:00:00.000Z',
@@ -49,10 +56,13 @@ vi.mock('../data/MockMallLinkedProductsData', () => ({ MOCK_MALL_LINKED_PRODUCT_
 
 import { updateMockMallLinkedProduct } from './updateMallLinkedProduct';
 
+type SettingIdentityOverrides = Partial<Record<'id' | 'ownerId' | 'mallAccountId' | 'mallId', string>>;
+
 const makeBody = (overrides?: {
   productName?: string;
   nickname?: string;
   settingMallCode?: string;
+  settingIdentity?: SettingIdentityOverrides;
 }): UpdateMallLinkedProductBody => ({
   updatedByEmail: EDITOR_EMAIL,
   productSnapshot: {
@@ -62,7 +72,10 @@ const makeBody = (overrides?: {
     informationDisclosure: { key: '', id: '', name: '고시정보', fields: {} },
   } as unknown as Product,
   settingSnapshot: {
-    id: 'ss_001',
+    id: overrides?.settingIdentity?.id ?? 'ss_001',
+    ownerId: overrides?.settingIdentity?.ownerId ?? OWNER_ID,
+    mallAccountId: overrides?.settingIdentity?.mallAccountId ?? 'sa_001',
+    mallId: overrides?.settingIdentity?.mallId ?? 'naver_seller_01',
     mallCode: overrides?.settingMallCode ?? 'NSST',
     nickname: overrides?.nickname ?? '수정된 설정명',
   } as unknown as ShoppingSetting,
@@ -121,6 +134,32 @@ describe('updateMockMallLinkedProduct', () => {
 
     expect(LINKED[0].mallCode).toBe('NSST');
     expect(LINKED[0].settingSnapshot.mallCode).toBe('NSST');
+  });
+
+  it('설정 스냅샷의 쇼핑몰계정·식별 정보가 바뀌어 실려 와도 기존 값으로 고정한다', () => {
+    updateMockMallLinkedProduct(
+      'mlp_001',
+      OWNER_ID,
+      makeBody({
+        settingIdentity: { id: 'ss_999', ownerId: 'usr_999', mallAccountId: 'sa_999', mallId: 'kakao_seller_99' },
+      }),
+    );
+
+    expect(LINKED[0].settingSnapshot.id).toBe('ss_001');
+    expect(LINKED[0].settingSnapshot.ownerId).toBe(OWNER_ID);
+    expect(LINKED[0].settingSnapshot.mallAccountId).toBe('sa_001');
+    expect(LINKED[0].settingSnapshot.mallId).toBe('naver_seller_01');
+  });
+
+  it('식별 정보를 고정해도 수정 대상인 설정 값은 그대로 반영한다', () => {
+    updateMockMallLinkedProduct(
+      'mlp_001',
+      OWNER_ID,
+      makeBody({ nickname: '바뀐 별칭', settingIdentity: { mallAccountId: 'sa_999' } }),
+    );
+
+    expect(LINKED[0].settingSnapshot.nickname).toBe('바뀐 별칭');
+    expect(LINKED[0].settingSnapshot.mallAccountId).toBe('sa_001');
   });
 
   it('다른 소유자의 데이터는 수정하지 않고 null을 반환한다', () => {

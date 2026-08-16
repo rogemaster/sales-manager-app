@@ -59,8 +59,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
 
   const buildSnapshots = (record: MallLinkedProduct): MallLinkedProductSnapshots => {
     const settingValues = settingForm.getValues();
-    // 몰 코드는 레코드가 정본이다. 폼에 몰 선택 필드가 없어 정상 경로에선 바뀌지 않지만,
-    // 여기서도 레코드 값으로 고정해 스냅샷과 레코드가 갈라질 여지를 없앤다.
+    const { id: settingId, ownerId: settingOwnerId, mallAccountId, mallId } = record.settingSnapshot;
     const mallCode = record.mallCode;
 
     let mallSettings: ShoppingSetting['mallSettings'];
@@ -74,7 +73,15 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
 
     return {
       productSnapshot: productForm.getValues(),
-      settingSnapshot: { ...settingValues, mallCode, mallSettings } as ShoppingSetting,
+      settingSnapshot: {
+        ...settingValues,
+        id: settingId,
+        ownerId: settingOwnerId,
+        mallAccountId,
+        mallId,
+        mallCode,
+        mallSettings,
+      } as ShoppingSetting,
     };
   };
 

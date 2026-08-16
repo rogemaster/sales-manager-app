@@ -19,10 +19,13 @@ export const updateMockMallLinkedProduct = (
   const linked = MOCK_MALL_LINKED_PRODUCT_DATA.find((item) => item.id === id);
   if (!linked || !isOwnerMatch(linked.ownerId, ownerId)) return null;
 
-  // 몰 코드는 레코드가 정본이다. 스냅샷이 다른 몰로 실려 와도 레코드 값으로 고정한다 —
-  // 둘이 갈라지면 목록의 몰 필터와 쇼핑몰계정 필터가 서로 다른 답을 낸다.
+  const { id: settingId, ownerId: settingOwnerId, mallAccountId, mallId } = linked.settingSnapshot;
   const settingSnapshot = {
     ...structuredClone(body.settingSnapshot),
+    id: settingId,
+    ownerId: settingOwnerId,
+    mallAccountId,
+    mallId,
     mallCode: linked.mallCode,
   } as ShoppingSetting;
 
