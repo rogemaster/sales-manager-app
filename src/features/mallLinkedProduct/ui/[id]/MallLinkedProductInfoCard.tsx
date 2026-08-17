@@ -17,10 +17,6 @@ const InfoRow = ({ label, children }: { label: string; children: ReactNode }) =>
   </div>
 );
 
-/**
- * 연동 데이터의 불변 식별 정보를 보여주는 읽기 전용 카드.
- * 수정 폼 바깥에 두는 이유는 이 값들이 폼으로 흘러들어가면 원본 추적 정보까지 수정 대상이 되기 때문이다.
- */
 export const MallLinkedProductInfoCard = ({ linked }: Props) => {
   return (
     <Card className="overflow-hidden">
