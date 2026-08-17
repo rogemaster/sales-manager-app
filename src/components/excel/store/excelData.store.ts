@@ -26,8 +26,6 @@ export const setExcelDataAtom = atom(null, (_, set, data: ExcelDataState['data']
   });
 });
 
-// hook.js:608 Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
-
 // data atom을 미리 생성하여 참조 동일성 보장
 const dataAtom = selectAtom(excelDataAtom, (state) => state.data);
 

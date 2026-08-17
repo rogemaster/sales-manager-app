@@ -30,7 +30,6 @@ export const FilterSelect = ({
   labelClassName,
   triggerClassName,
 }: FilterSelectProps) => {
-  // 필터 옵션을 메모이제이션
   const filterOptions = useMemo(() => {
     if (allOption) {
       return [allOption, ...options];
@@ -39,7 +38,6 @@ export const FilterSelect = ({
     }
   }, [allOption, options]);
 
-  // 현재 선택된 옵션 정보를 메모이제이션
   const selectedOptionInfo = useMemo(() => {
     if (value === 'ALL') {
       return allOption;

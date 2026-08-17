@@ -10,7 +10,7 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
     categoryId: (r['카테고리'] as string) || '',
     brand: (r['브랜드'] as string) || '',
     manufacturer: (r['제조업체'] as string) || '',
-    // 모델명·모델번호는 시트에서 숫자로 파싱될 수 있어 String으로 고정한다(앞자리 0·자릿수 손실 방지)
+    // 시트에서 숫자로 파싱될 수 있어 String()으로 고정한다 (as string으로 바꾸면 앞자리 0·자릿수가 손실된다)
     modelName: r['모델명'] ? String(r['모델명']) : undefined,
     modelId: r['모델번호'] ? String(r['모델번호']) : undefined,
     netPrice: r['공급가'] ? Number(r['공급가']) : undefined,

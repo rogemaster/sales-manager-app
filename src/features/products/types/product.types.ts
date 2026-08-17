@@ -25,9 +25,7 @@ export interface Product {
   originCountryEtc?: string; // originCountryCode === 'ETC'일 때만 사용하는 자유텍스트
   taxType?: TaxType;
   adultProductType?: AdultProductType;
-
-  /** 몰 카탈로그 매칭·검색 노출에 쓰이는 상품 공통 정보 */
-  brand: string; // 카카오는 giftBrandId 키로 전송하지만 프론트는 이 필드 하나만 갖는다
+  brand: string;
   manufacturer: string;
   modelName?: string;
   modelId?: string;
@@ -43,11 +41,6 @@ export type ProductStateType = 'ON_SALE' | 'WAIT_SALE' | 'SOLD_OUT' | 'SALE_DIS'
 // 검색 관련 타입들
 export type ProductSearchType = 'productName' | 'productCode';
 
-/**
- * `POST /api/products/list` 요청 필터.
- * 상품목록(`/products/list`)과 쇼핑몰 상품등록(`/shopping/register`)이 같은 엔드포인트를 쓰므로
- * 두 화면의 검색 필터 store는 형태가 달라도 이 타입 하나로 수렴한다.
- */
 export interface ProductSearch {
   dateType: string;
   startDate: string;
