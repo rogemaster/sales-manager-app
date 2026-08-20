@@ -50,7 +50,6 @@ export const ProductModifyLayout = ({ productId }: Props) => {
 
   useEffect(() => {
     if (isSuccess && queryData) {
-      console.log('상품정보', queryData);
       formData.reset(queryData);
     }
   }, [isSuccess, queryData]);
