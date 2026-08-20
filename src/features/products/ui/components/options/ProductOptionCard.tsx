@@ -5,20 +5,22 @@ import { OptionCombination, ProductOption, ProductOptionDraft } from '@/features
 import { Card } from '@/components/ui/card';
 import { OptionHeader } from './components/OptionHeader';
 import { OptionContent } from './components/OptionContent';
-import { optionCombinations, validateOptions } from '@/features/products/util/Options';
+import { optionCombinations, toOptionDrafts, validateOptions } from '@/features/products/util/Options';
 import { useAlert } from '@/hooks/useAlert';
 import { generatorOptionId } from '@/utils/codeGenerator';
 
 type Props = {
   type: 'basic' | 'sub';
+  /** 폼에 이미 저장돼 있던 옵션. 부모가 remount 키로 갈아끼우므로 초기값으로만 읽는다 */
+  initialOptions?: ProductOption[];
   onConfirm: (combinations: OptionCombination[]) => void;
   onReset: () => void;
 };
 
-export const ProductOptionCard = ({ type, onConfirm, onReset }: Props) => {
-  const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(false);
-  const [options, setOptions] = useState<ProductOptionDraft[]>([]);
-  const [confirmedOptions, setConfirmedOptions] = useState<ProductOption[]>();
+export const ProductOptionCard = ({ type, initialOptions, onConfirm, onReset }: Props) => {
+  const [isOptionsConfirmed, setIsOptionsConfirmed] = useState(!!initialOptions?.length);
+  const [options, setOptions] = useState<ProductOptionDraft[]>(() => toOptionDrafts(initialOptions ?? []));
+  const [confirmedOptions, setConfirmedOptions] = useState<ProductOption[] | undefined>(initialOptions);
 
   const { showAlert } = useAlert();
 
@@ -36,9 +38,7 @@ export const ProductOptionCard = ({ type, onConfirm, onReset }: Props) => {
   };
 
   const handleOptionValueChange = (optionId: string, value: string) => {
-    setOptions((prev) =>
-      prev.map((opt) => (opt.id === optionId ? { ...opt, values: value } : opt)),
-    );
+    setOptions((prev) => prev.map((opt) => (opt.id === optionId ? { ...opt, values: value } : opt)));
   };
 
   const handleRemoveOption = (optionId: string) => {
