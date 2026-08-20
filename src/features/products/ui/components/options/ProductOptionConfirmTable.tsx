@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { formatCombinationLabel } from '@/features/products/util/Options';
 
 type Props = {
   name: 'option' | 'subOption';
@@ -42,7 +43,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
     if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity > 0) {
       const newOption: OptionCombination[] = fields.map((field) => ({
         id: field.id,
-        combination: field.combination,
         values: field.values,
         quantity: bulkQuantity,
         skuCode: field.skuCode,
@@ -63,7 +63,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   const handleOptionBatchSKUCode = () => {
     const newOption: OptionCombination[] = fields.map((field, index) => ({
       id: field.id,
-      combination: field.combination,
       values: field.values,
       quantity: field.quantity,
       skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
@@ -80,7 +79,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   const handleOptionReset = () => {
     const resetOption: OptionCombination[] = fields.map((field) => ({
       id: field.id,
-      combination: field.combination,
       values: field.values,
       quantity: 0,
       skuCode: '',
@@ -122,7 +120,7 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                         <div className="md:col-span-1">
                           <div className="font-medium text-sm mb-1">조합 {index + 1}</div>
-                          <div className="text-sm text-muted-foreground">{field.combination}</div>
+                          <div className="text-sm text-muted-foreground">{formatCombinationLabel(field.values)}</div>
                         </div>
 
                         <div className="space-y-1">

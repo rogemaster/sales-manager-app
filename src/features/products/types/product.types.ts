@@ -68,7 +68,6 @@ export interface ProductOptionDraft {
 // 옵션 조합
 export interface OptionCombination {
   id: string;
-  combination: string;
   values: { [key: string]: string };
   quantity: number;
   skuCode: string;
