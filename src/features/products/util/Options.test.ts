@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { validateOptions, optionCombinations } from './Options';
-import type { ProductOption } from '../types/product.types';
+import {
+  validateOptions,
+  optionCombinations,
+  deriveOptionsFromCombinations,
+  toOptionDrafts,
+  formatCombinationLabel,
+} from './Options';
+import type { OptionCombination, ProductOption } from '../types/product.types';
 
 const makeOption = (name: string, values: string[]): ProductOption => ({
   id: `opt-${name}`,
@@ -75,16 +81,16 @@ describe('optionCombinations', () => {
     expect(optionCombinations(options)).toHaveLength(8); // 2 * 2 * 2
   });
 
-  it('combination 문자열이 "옵션명: 값" 형식으로 생성된다', () => {
+  it('조합 라벨이 "옵션명: 값" 형식으로 만들어진다', () => {
     const options = [makeOption('색상', ['빨강'])];
     const result = optionCombinations(options);
-    expect(result[0].combination).toBe('색상: 빨강');
+    expect(formatCombinationLabel(result[0].values)).toBe('색상: 빨강');
   });
 
-  it('복수 옵션의 combination은 쉼표로 구분된다', () => {
+  it('복수 옵션의 조합 라벨은 쉼표로 구분된다', () => {
     const options = [makeOption('색상', ['빨강']), makeOption('사이즈', ['S'])];
     const result = optionCombinations(options);
-    expect(result[0].combination).toBe('색상: 빨강, 사이즈: S');
+    expect(formatCombinationLabel(result[0].values)).toBe('색상: 빨강, 사이즈: S');
   });
 
   it('각 조합의 초기값은 quantity=0, optionPrice=0, skuCode="" 이다', () => {
@@ -99,5 +105,88 @@ describe('optionCombinations', () => {
     const options = [makeOption('색상', ['빨강']), makeOption('사이즈', ['M'])];
     const result = optionCombinations(options);
     expect(result[0].values).toEqual({ 색상: '빨강', 사이즈: 'M' });
+  });
+});
+
+// ─── deriveOptionsFromCombinations ────────────────────────────────────────────
+
+const makeCombination = (values: { [key: string]: string }): OptionCombination => ({
+  id: `cmb-${Object.values(values).join('-')}`,
+  values,
+  quantity: 0,
+  skuCode: '',
+  optionPrice: 0,
+});
+
+describe('deriveOptionsFromCombinations', () => {
+  it('빈 배열을 받으면 빈 배열을 반환한다', () => {
+    expect(deriveOptionsFromCombinations([])).toEqual([]);
+  });
+
+  it('조합의 values 키에서 옵션명을 순서대로 복원한다', () => {
+    const combinations = [makeCombination({ 색상: '블랙', 사이즈: 'S' })];
+    const result = deriveOptionsFromCombinations(combinations);
+    expect(result.map((option) => option.name)).toEqual(['색상', '사이즈']);
+  });
+
+  it('옵션값은 전체 조합에서 중복 없이 수집한다', () => {
+    const combinations = [
+      makeCombination({ 색상: '블랙', 사이즈: 'S' }),
+      makeCombination({ 색상: '블랙', 사이즈: 'L' }),
+      makeCombination({ 색상: '화이트', 사이즈: 'S' }),
+      makeCombination({ 색상: '화이트', 사이즈: 'L' }),
+    ];
+    const result = deriveOptionsFromCombinations(combinations);
+    expect(result[0].values).toEqual(['블랙', '화이트']);
+    expect(result[1].values).toEqual(['S', 'L']);
+  });
+
+  it('optionCombinations로 만든 조합을 되돌리면 원래 옵션명·값이 나온다', () => {
+    const options = [makeOption('색상', ['블랙', '화이트']), makeOption('사이즈', ['S', 'L'])];
+    const result = deriveOptionsFromCombinations(optionCombinations(options));
+    expect(result.map(({ name, values }) => ({ name, values }))).toEqual([
+      { name: '색상', values: ['블랙', '화이트'] },
+      { name: '사이즈', values: ['S', 'L'] },
+    ]);
+  });
+
+  it('조합에는 옵션 id가 없으므로 새 id를 발급한다', () => {
+    const result = deriveOptionsFromCombinations([makeCombination({ 색상: '블랙' })]);
+    expect(result[0].id).toMatch(/^opt_/);
+  });
+
+  it('일부 조합에 값이 비어 있어도 그 값은 수집하지 않는다', () => {
+    const combinations = [makeCombination({ 색상: '블랙' }), makeCombination({ 색상: '' })];
+    const result = deriveOptionsFromCombinations(combinations);
+    expect(result[0].values).toEqual(['블랙']);
+  });
+});
+
+// ─── toOptionDrafts ───────────────────────────────────────────────────────────
+
+describe('toOptionDrafts', () => {
+  it('빈 배열을 받으면 빈 배열을 반환한다', () => {
+    expect(toOptionDrafts([])).toEqual([]);
+  });
+
+  it('values 배열을 입력창용 comma-separated 문자열로 바꾼다', () => {
+    const options: ProductOption[] = [makeOption('색상', ['블랙', '화이트'])];
+    expect(toOptionDrafts(options)).toEqual([{ id: 'opt-색상', name: '색상', values: '블랙, 화이트' }]);
+  });
+});
+
+// ─── formatCombinationLabel ───────────────────────────────────────────────────
+
+describe('formatCombinationLabel', () => {
+  it('빈 객체를 받으면 빈 문자열을 반환한다', () => {
+    expect(formatCombinationLabel({})).toBe('');
+  });
+
+  it('옵션이 하나면 쉼표 없이 만든다', () => {
+    expect(formatCombinationLabel({ 색상: '블랙' })).toBe('색상: 블랙');
+  });
+
+  it('values의 키 순서를 그대로 따른다', () => {
+    expect(formatCombinationLabel({ 사이즈: 'S', 색상: '블랙' })).toBe('사이즈: S, 색상: 블랙');
   });
 });
