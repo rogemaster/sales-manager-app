@@ -42,6 +42,22 @@
 
 관련: [`docs/solutions/architecture-patterns/product-vs-shoppingsetting-compliance-field-boundary.md`](../../docs/solutions/architecture-patterns/product-vs-shoppingsetting-compliance-field-boundary.md) — 필드를 어느 엔티티에 둘지의 하위 판단 기준
 
+### 값을 요구하는 주체가 사용자면 위 규칙이 적용되지 않는다 — `skuCode`
+
+위 "가장 엄격한 몰을 따른다"는 **외부몰이 요구하는 값**에 대한 규칙이다. 어느 몰도 요구하지 않고 **사용자가 자기 업무를 위해 관리하는 값**은 여기에 해당하지 않는다.
+
+`OptionCombination.skuCode`가 그런 필드다.
+
+- **선택값이다.** SKU를 관리하는 사용자와 관리하지 않는 사용자가 함께 존재하므로 필수로 둘 수 없다.
+- **중복 검증을 하지 않는다.** 중복 판정은 프로그램이 아니라 사용자가 직접 한다.
+- **연동 대상 판정과 무관하다.** 값이 비어 있어도 외부몰 연동에서 제외되지 않는다 — 연동 가능 여부는 사용자가 정하고 결과는 외부몰 응답이 판정한다.
+
+**Why:** 코드만 보면 "필수도 아니고 유니크 검증도 없다"가 **빠뜨린 것**으로 읽힌다. 2026-08-21 실제로 그렇게 읽고 필수·유니크·중복 검증 추가를 제안했다가 전부 기각됐다. 빠진 게 아니라 그렇게 설계된 것이다.
+
+**판별 질문:** 이 값을 요구하는 주체가 외부몰인가, 사용자 자신인가. 후자면 필수 여부와 검증 강도는 **사용자의 업무 방식**을 따르지, 몰 규칙을 따르지 않는다.
+
+관련: `docs/superpowers/specs/2026-08-22-product-option-id-field-reduction.md`
+
 ## 유저 계층 구조
 
 ### 핵심 원칙
