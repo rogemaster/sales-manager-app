@@ -51,23 +51,22 @@ export interface ProductSearch {
   searchValue: string;
 }
 
-// 기본옵션
+// 기본옵션 — 검증을 통과한 값. 화면 행이 아니므로 id를 갖지 않는다
 export interface ProductOption {
-  id: string;
   name: string;
   values: string[];
 }
 
 // 옵션 입력 상태 (확정 전 comma-separated string)
+// id는 사용자가 행 단위로 고치고 지우는 대상을 지목하기 위한 값이며, 폼에 저장되지 않는다
 export interface ProductOptionDraft {
   id: string;
   name: string;
   values: string;
 }
 
-// 옵션 조합
+// 옵션 조합 — 폼에 저장되는 값. 조합 수만큼 곱해지고 연동 스냅샷으로 복사되므로 필드를 늘리지 않는다
 export interface OptionCombination {
-  id: string;
   values: { [key: string]: string };
   quantity: number;
   skuCode: string;

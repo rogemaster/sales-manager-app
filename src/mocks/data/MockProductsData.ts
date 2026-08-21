@@ -16,28 +16,24 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     mainImage: faker.image.urlLoremFlickr({ width: 700, height: 700, category: 'cat' }),
     option: [
       {
-        id: 'option_2_a1b2c3d4',
         values: { 색상: '블랙', 사이즈: 'S' },
         quantity: 30,
         skuCode: 'SMP1-BLK-S',
         optionPrice: 0,
       },
       {
-        id: 'option_2_b2c3d4e5',
         values: { 색상: '블랙', 사이즈: 'L' },
         quantity: 25,
         skuCode: 'SMP1-BLK-L',
         optionPrice: 1000,
       },
       {
-        id: 'option_2_c3d4e5f6',
         values: { 색상: '화이트', 사이즈: 'S' },
         quantity: 25,
         skuCode: 'SMP1-WHT-S',
         optionPrice: 0,
       },
       {
-        id: 'option_2_d4e5f6a7',
         values: { 색상: '화이트', 사이즈: 'L' },
         quantity: 20,
         skuCode: 'SMP1-WHT-L',

@@ -8,11 +8,7 @@ import {
 } from './Options';
 import type { OptionCombination, ProductOption } from '../types/product.types';
 
-const makeOption = (name: string, values: string[]): ProductOption => ({
-  id: `opt-${name}`,
-  name,
-  values,
-});
+const makeOption = (name: string, values: string[]): ProductOption => ({ name, values });
 
 // ─── validateOptions ──────────────────────────────────────────────────────────
 
@@ -106,12 +102,16 @@ describe('optionCombinations', () => {
     const result = optionCombinations(options);
     expect(result[0].values).toEqual({ 색상: '빨강', 사이즈: 'M' });
   });
+
+  it('조합은 values·quantity·skuCode·optionPrice 네 필드만 갖는다', () => {
+    const result = optionCombinations([makeOption('색상', ['빨강'])]);
+    expect(Object.keys(result[0]).sort()).toEqual(['optionPrice', 'quantity', 'skuCode', 'values']);
+  });
 });
 
 // ─── deriveOptionsFromCombinations ────────────────────────────────────────────
 
 const makeCombination = (values: { [key: string]: string }): OptionCombination => ({
-  id: `cmb-${Object.values(values).join('-')}`,
   values,
   quantity: 0,
   skuCode: '',
@@ -144,15 +144,15 @@ describe('deriveOptionsFromCombinations', () => {
   it('optionCombinations로 만든 조합을 되돌리면 원래 옵션명·값이 나온다', () => {
     const options = [makeOption('색상', ['블랙', '화이트']), makeOption('사이즈', ['S', 'L'])];
     const result = deriveOptionsFromCombinations(optionCombinations(options));
-    expect(result.map(({ name, values }) => ({ name, values }))).toEqual([
+    expect(result).toEqual([
       { name: '색상', values: ['블랙', '화이트'] },
       { name: '사이즈', values: ['S', 'L'] },
     ]);
   });
 
-  it('조합에는 옵션 id가 없으므로 새 id를 발급한다', () => {
+  it('복원된 옵션은 name·values만 갖는다 (id 없음)', () => {
     const result = deriveOptionsFromCombinations([makeCombination({ 색상: '블랙' })]);
-    expect(result[0].id).toMatch(/^opt_/);
+    expect(result[0]).toEqual({ name: '색상', values: ['블랙'] });
   });
 
   it('일부 조합에 값이 비어 있어도 그 값은 수집하지 않는다', () => {
@@ -171,7 +171,13 @@ describe('toOptionDrafts', () => {
 
   it('values 배열을 입력창용 comma-separated 문자열로 바꾼다', () => {
     const options: ProductOption[] = [makeOption('색상', ['블랙', '화이트'])];
-    expect(toOptionDrafts(options)).toEqual([{ id: 'opt-색상', name: '색상', values: '블랙, 화이트' }]);
+    expect(toOptionDrafts(options)[0]).toMatchObject({ name: '색상', values: '블랙, 화이트' });
+  });
+
+  it('입력 행 식별용 id를 새로 발급한다', () => {
+    const drafts = toOptionDrafts([makeOption('색상', ['블랙']), makeOption('사이즈', ['S'])]);
+    expect(drafts[0].id).toMatch(/^opt_/);
+    expect(drafts[1].id).not.toBe(drafts[0].id);
   });
 });
 

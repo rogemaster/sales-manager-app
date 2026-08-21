@@ -47,7 +47,6 @@ export const ProductOptionCard = ({ type, initialOptions, onConfirm, onReset }: 
 
   const handleConfirmOptions = () => {
     const optionData: ProductOption[] = options.map((option) => ({
-      id: option.id,
       name: option.name,
       values: option.values.split(','),
     }));

@@ -21,11 +21,7 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   const { showAlert } = useAlert();
 
   const { register, setValue, control } = useFormContext<Product>();
-  const { replace, fields } = useFieldArray({
-    control,
-    name,
-    keyName: '_id',
-  });
+  const { replace, fields } = useFieldArray({ control, name });
 
   // 부모에서 전달된 옵션 조합을 폼 필드로 동기화
   useEffect(() => {
@@ -42,7 +38,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   const handleOptionBatchQuantity = () => {
     if (bulkQuantity && !isNaN(Number(bulkQuantity)) && bulkQuantity > 0) {
       const newOption: OptionCombination[] = fields.map((field) => ({
-        id: field.id,
         values: field.values,
         quantity: bulkQuantity,
         skuCode: field.skuCode,
@@ -62,7 +57,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   // SKU 일괄생성
   const handleOptionBatchSKUCode = () => {
     const newOption: OptionCombination[] = fields.map((field, index) => ({
-      id: field.id,
       values: field.values,
       quantity: field.quantity,
       skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
@@ -78,7 +72,6 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   // 전체 초기화
   const handleOptionReset = () => {
     const resetOption: OptionCombination[] = fields.map((field) => ({
-      id: field.id,
       values: field.values,
       quantity: 0,
       skuCode: '',
@@ -116,7 +109,7 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
                 <div className="bg-muted/50 px-4 py-2 font-medium text-sm border-b">옵션 조합 목록</div>
                 <div className="divide-y max-h-[25rem] overflow-y-auto">
                   {fields.map((field, index) => (
-                    <div key={field._id} className="p-4 hover:bg-muted/30">
+                    <div key={field.id} className="p-4 hover:bg-muted/30">
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                         <div className="md:col-span-1">
                           <div className="font-medium text-sm mb-1">조합 {index + 1}</div>

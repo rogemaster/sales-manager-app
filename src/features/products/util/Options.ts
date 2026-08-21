@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { generatorOptionId } from '@/utils/codeGenerator';
 import { OptionCombination, ProductOption, ProductOptionDraft } from '../types/product.types';
 
@@ -33,7 +32,6 @@ export const optionCombinations = (validOptions: ProductOption[]) => {
   const generateCombinations = (index: number, currentCombination: { [key: string]: string }) => {
     if (index === validOptions.length) {
       combinations.push({
-        id: `option_${index}_${uuidv4().split('-')[0]}`,
         values: { ...currentCombination },
         quantity: 0,
         skuCode: '',
@@ -58,7 +56,6 @@ export const optionCombinations = (validOptions: ProductOption[]) => {
  *
  * 폼(`Product.option`)에는 조합 결과만 저장되고 옵션 정의는 남지 않는다.
  * 수정 화면에서 옵션 카드를 채우려면 조합의 `values` 맵에서 옵션명·옵션값을 되짚어야 한다.
- * `id`는 저장되지 않으므로 새로 발급한다.
  *
  * @param combinations 저장된 옵션 조합
  * @returns options 복원된 옵션데이터
@@ -69,7 +66,6 @@ export const deriveOptionsFromCombinations = (combinations: OptionCombination[])
   const optionNames = Object.keys(combinations[0].values);
 
   return optionNames.map((name) => ({
-    id: generatorOptionId(),
     name,
     values: Array.from(new Set(combinations.map((combination) => combination.values[name]).filter(Boolean))),
   }));
@@ -77,12 +73,17 @@ export const deriveOptionsFromCombinations = (combinations: OptionCombination[])
 
 /**
  * 옵션 → 입력창 draft 변환
+ *
+ * draft의 `id`는 화면이 입력 행을 지목하기 위한 값이라 여기서 발급한다.
+ * 옵션 정의(`ProductOption`)도 조합(`OptionCombination`)도 id를 갖지 않으므로,
+ * 발급 지점은 draft가 태어나는 이 자리 하나뿐이다.
+ *
  * @param options 옵션데이터
  * @returns drafts 옵션값이 comma-separated 문자열인 입력 상태
  */
 export const toOptionDrafts = (options: ProductOption[]): ProductOptionDraft[] =>
   options.map((option) => ({
-    id: option.id,
+    id: generatorOptionId(),
     name: option.name,
     values: option.values.join(', '),
   }));
