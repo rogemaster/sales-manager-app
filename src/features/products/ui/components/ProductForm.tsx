@@ -12,7 +12,12 @@ import { ProductBrandModelSection } from './form/ProductBrandModelSection';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 
-export const ProductForm = () => {
+type Props = {
+  /** 제출 버튼 문구. 등록·수정 화면이 이 폼을 공유하므로 화면이 정한다 */
+  submitLabel: string;
+};
+
+export const ProductForm = ({ submitLabel }: Props) => {
   const router = useRouter();
 
   const onBack = () => {
@@ -56,7 +61,7 @@ export const ProductForm = () => {
         </Button>
         <Button type="submit">
           <Save className="h-4 w-4 mr-2" />
-          상품 등록
+          {submitLabel}
         </Button>
       </div>
     </>

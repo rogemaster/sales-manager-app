@@ -57,7 +57,7 @@ export const ProductCreateLayout = () => {
       </div>
       <FormProvider {...formData}>
         <form onSubmit={formData.handleSubmit(onSubmit)} className="space-y-6">
-          <ProductForm />
+          <ProductForm submitLabel="상품 등록" />
         </form>
       </FormProvider>
     </div>

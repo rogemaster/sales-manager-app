@@ -70,7 +70,7 @@ export const ProductModifyLayout = ({ productId }: Props) => {
       {formData && (
         <FormProvider {...formData}>
           <form onSubmit={formData.handleSubmit(onSubmit)} className="space-y-6">
-            <ProductForm />
+            <ProductForm submitLabel="상품 수정" />
           </form>
         </FormProvider>
       )}
