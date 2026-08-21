@@ -24,8 +24,12 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
   const { replace, fields } = useFieldArray({ control, name });
 
   // 부모에서 전달된 옵션 조합을 폼 필드로 동기화
+  //
+  // 이 컴포넌트는 재설정해도 언마운트되지 않고 내부 JSX만 숨겨진다.
+  // 그래서 조합이 갈릴 때(확정·재설정) 일괄수량 입력값을 함께 비워야 이전 값이 따라오지 않는다.
   useEffect(() => {
     replace(optionCombinations);
+    setBulkQuantity(undefined);
   }, [optionCombinations, replace]);
 
   // 수량확정 (기본옵션 전용)
@@ -152,8 +156,8 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
                   <Input
                     type="number"
                     placeholder="0"
-                    value={bulkQuantity}
-                    onChange={(e) => setBulkQuantity(Number(e.target.value))}
+                    value={bulkQuantity ?? ''}
+                    onChange={(e) => setBulkQuantity(e.target.value === '' ? undefined : Number(e.target.value))}
                     className="w-20 h-8"
                     min="0"
                   />
