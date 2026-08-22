@@ -11,6 +11,9 @@ export interface ExcelTemplateInfo {
   key: string;
   name: string;
   req: boolean;
+  // 다운로드 양식에서 텍스트 서식(numFmt '@')으로 만들 컬럼.
+  // 숫자로만 이뤄진 값이 시트에서 변형되는 것을 막는다 (예: '90,100,110' → 90100110)
+  text?: boolean;
 }
 
 // 엑셀 section header
@@ -33,6 +36,7 @@ export interface ExcelDownloaderProps {
   isTemplateInfo?: boolean;
   templateInfo?: ExcelTemplate;
   templateHeaders?: string[];
+  templateTextColumns?: string[];
   templateName?: string;
 }
 
