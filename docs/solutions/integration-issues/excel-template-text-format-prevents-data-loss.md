@@ -1,5 +1,5 @@
 ---
-title: 엑셀이 셀 값을 변형하는 손실은 검증으로 못 잡는다 — 양식 단계에서 텍스트 서식으로 막는다
+title: 엑셀 양식의 컬럼 서식은 도메인 타입을 따른다 — 텍스트가 기본, number 필드만 숫자
 date: 2026-08-23
 category: integration-issues
 module: components/excel, features/products
@@ -68,27 +68,31 @@ templateHeaders.forEach((header, index) => {
 
 기존 셀(헤더 행)의 `fill`·`font`·`border`는 덮어쓰지 않는다. `numFmt` 세터가 스타일 객체를 통째로 교체하지 않고 속성만 바꾸기 때문이다.
 
-## 대상 컬럼은 템플릿 정의에서 파생한다
+## 어느 컬럼이 텍스트인가 — 도메인 타입이 정한다
 
-어느 컬럼이 텍스트인지를 별도 배열로 관리하면 컬럼 정의와 어긋난다. 템플릿 항목에 플래그를 달고 거기서 뽑는다.
+처음엔 "값이 숫자로만 이뤄질 수 있어 보이는 컬럼"에만 텍스트 서식을 달았다(옵션값·SKU 5개). **판단 기준이 직관이라 틀렸다.**
+
+올바른 기준은 **그 컬럼이 매핑되는 도메인 타입의 필드 타입**이다. `Product.price`가 `number`면 판매가 컬럼은 숫자 서식이 맞고, `Product.modelId`가 `string`이면 모델번호는 텍스트가 맞다. 상품 템플릿 24컬럼 기준으로 **숫자 4개**(공급가·판매가·배송비·총수량), **나머지 20개는 텍스트**다.
 
 ```ts
-// ExcelTemplateInfo에 optional 플래그
-{ key: 'option1Value', name: '옵션값1', req: false, text: true }
+// ExcelTemplateInfo에 optional 플래그 — number 필드에만 붙인다
+{ key: 'price', name: '판매가', req: true, numeric: true }
 
 // 소비처에서 파생
-const templateTextColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template
-  .filter((item) => item.text)
+const templateNumericColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template
+  .filter((item) => item.numeric)
   .map((item) => item.name);
 ```
 
-실제로 일어날 회귀는 **"옵션 컬럼을 추가하면서 `text` 플래그를 빠뜨리는 것"**이다. `excelDownload`는 `file-saver`로 브라우저 다운로드를 해서 node 환경 단위 테스트가 어려우므로, 대신 **양식 정의 자체**를 테스트로 고정했다.
+**플래그를 텍스트가 아니라 숫자 쪽에 단 이유:** 빠뜨렸을 때의 결과가 다르다. 플래그를 잊으면 그 컬럼은 텍스트가 되는데, 텍스트 칸에 숫자를 적어도 `Number('10000')`은 정상 동작한다. 반대로 기본이 숫자였다면 잊은 컬럼에서 `90,100,110`이 조용히 병합된다. **안전한 쪽을 기본값으로 둔다.**
+
+`excelDownload`는 `file-saver`로 브라우저 다운로드를 해서 node 환경 단위 테스트가 어려우므로, 대신 **양식 정의 자체**를 테스트로 고정했다.
 
 ```ts
-it('값이 숫자로만 이뤄질 수 있는 컬럼을 텍스트 서식으로 표시한다', () => {
-  const textColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template.filter((item) => item.text).map((item) => item.name);
+it('Product 타입이 number인 필드만 숫자 서식으로 표시한다', () => {
+  const numericColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template.filter((item) => item.numeric).map((item) => item.name);
 
-  expect(textColumns).toEqual(['옵션값1', '옵션값2', '추가옵션값', 'SKU', '추가SKU']);
+  expect(numericColumns).toEqual(['공급가', '판매가', '배송비', '총수량']);
 });
 ```
 
@@ -99,17 +103,15 @@ it('값이 숫자로만 이뤄질 수 있는 컬럼을 텍스트 서식으로 �
 
 둘 다 코드로 막을 수 없다. 완전한 방어가 아니라 **정상 경로의 손실을 없애는 것**이 목표다.
 
-## 새 컬럼 추가 시 체크리스트
+## 새 컬럼 추가 시
 
-숫자로만 이뤄질 수 있는 값인가? 그렇다면 `text: true`를 단다. 판별 질문:
+**도메인 타입에서 그 필드의 타입을 확인한다.** `number`면 `numeric: true`를 달고, 아니면 아무것도 하지 않는다(텍스트가 기본).
 
-- 콤마로 구분된 목록인가 → 천 단위 구분자로 병합될 수 있다
-- 앞자리 0이 의미를 갖는 코드·번호인가 → 0이 날아간다
-- 사람이 읽는 식별자인가 → 대체로 텍스트여야 한다
+"이 값은 숫자처럼 보이는데?"로 판단하지 말 것 — 모델번호·고객상품코드·SKU는 전부 숫자로만 이뤄질 수 있지만 도메인 타입이 `string`이라 텍스트다. **숫자로 보이는 것과 숫자인 것은 다르다.** 앞자리 0이 의미를 갖거나 사람이 읽는 식별자면 대체로 `string`이고, 그 판단은 이미 타입에 내려져 있다.
 
-**미적용 대상 (2026-08-23 기준):** `모델번호`·`고객상품코드`도 같은 앞자리 0 손실 위험이 있으나 이번 라운드 범위 밖이라 제외했다. `productExcelSaveStrategy`가 `String()`으로 감싸고 있지만 그건 **런타임 타입 문제를 막을 뿐 이미 일어난 손실을 되돌리지 못한다.**
+`productExcelSaveStrategy`가 `modelName`·`modelId`를 `String()`으로 감싸는 것은 **런타임 타입 문제를 막을 뿐 이미 일어난 손실을 되돌리지 못한다.** 서식이 진짜 방어선이다.
 
-## 함께 고쳐진 오해
+## 함께 고쳐진 오해 — `String()`이 손실을 막아준다는 주석
 
 `String()`을 쓰는 이유를 코드 주석이 "`as string` 캐스팅은 앞자리 0과 자릿수를 잃으므로"라고 설명하고 있었는데 **틀렸다.**
 
