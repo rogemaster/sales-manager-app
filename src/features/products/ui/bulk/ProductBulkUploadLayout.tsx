@@ -21,6 +21,10 @@ export const ProductBulkUploadLayout = () => {
 
   // 템플릿에서 헤더 이름만 추출
   const templateHeaders = PRODUCT_BULK_EXCEL_TEMPLATE.template.map((item) => item.name);
+  // 텍스트 서식으로 만들 컬럼 (숫자로만 이뤄진 값이 시트에서 변형되는 것을 막는다)
+  const templateTextColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template
+    .filter((item) => item.text)
+    .map((item) => item.name);
 
   return (
     <div className="max-w-[90%] mx-auto space-y-6">
@@ -38,6 +42,7 @@ export const ProductBulkUploadLayout = () => {
           isTemplateInfo={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.isTemplateInfo}
           templateInfo={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.templateInfo}
           templateHeaders={templateHeaders}
+          templateTextColumns={templateTextColumns}
           templateName="상품등록"
         />
 

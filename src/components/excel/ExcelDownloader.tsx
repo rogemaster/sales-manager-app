@@ -12,9 +12,10 @@ export const ExcelDownloader = ({
   isTemplateInfo,
   templateInfo,
   templateHeaders,
+  templateTextColumns,
   templateName = '상품등록',
 }: ExcelDownloaderProps) => {
-  const { downloadTemplate } = excelDownload(templateHeaders || [], templateName);
+  const { downloadTemplate } = excelDownload(templateHeaders || [], templateName, templateTextColumns || []);
 
   return (
     <Card className="overflow-hidden">
