@@ -1,5 +1,10 @@
 import { ExcelDownloaderProps, ExcelUploaderProps, ExcelHeaderProps, ExcelTableColumnsType } from '@/types/excel.type';
 import { PRODUCT_BULK_EXCEL_TEMPLATE } from './bulkTemplate.constant';
+import {
+  formatExcelOptionSummary,
+  resolveExcelTotalQuantity,
+  toExcelOptionPairs,
+} from '@/features/products/util/excelOptions';
 
 // 엑셀 양식 다운로드
 export const PRODUCT_EXCEL_TEMPLATE_DOWNLOADER: ExcelDownloaderProps = {
@@ -63,9 +68,17 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
     accessor: (r) => !Array.isArray(r['판매가']) && r['판매가'],
   },
   {
+    key: 'options',
+    headerTitle: '옵션',
+    accessor: (r) => {
+      const { pairs, subPairs } = toExcelOptionPairs(r);
+      return formatExcelOptionSummary(pairs, subPairs);
+    },
+  },
+  {
     key: 'totalQuantity',
     headerTitle: '총수량',
-    accessor: (r) => !Array.isArray(r['총수량']) && r['총수량'],
+    accessor: (r) => resolveExcelTotalQuantity(r),
   },
   {
     key: 'error',

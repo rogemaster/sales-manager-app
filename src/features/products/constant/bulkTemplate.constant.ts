@@ -75,14 +75,37 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       req: true,
     },
     {
-      key: 'option1',
-      name: '옵션1',
+      key: 'option1Name',
+      name: '옵션명1',
       req: false,
     },
     {
-      key: 'option2',
-      name: '옵션2',
+      key: 'option1Value',
+      name: '옵션값1',
       req: false,
+      text: true,
+    },
+    {
+      key: 'option2Name',
+      name: '옵션명2',
+      req: false,
+    },
+    {
+      key: 'option2Value',
+      name: '옵션값2',
+      req: false,
+      text: true,
+    },
+    {
+      key: 'subOptionName',
+      name: '추가옵션명',
+      req: false,
+    },
+    {
+      key: 'subOptionValue',
+      name: '추가옵션값',
+      req: false,
+      text: true,
     },
     {
       key: 'totalQuantity',
@@ -90,9 +113,16 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       req: true,
     },
     {
-      key: 'subOption',
-      name: '추가옵션',
+      key: 'skuPrefix',
+      name: 'SKU',
       req: false,
+      text: true,
+    },
+    {
+      key: 'subSkuPrefix',
+      name: '추가SKU',
+      req: false,
+      text: true,
     },
     {
       key: 'keyWord',
