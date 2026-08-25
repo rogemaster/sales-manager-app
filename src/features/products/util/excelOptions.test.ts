@@ -55,16 +55,16 @@ describe('buildCombinationsFromExcel', () => {
     expect(result?.every((combination) => combination.quantity === 100)).toBe(true);
   });
 
-  it('skuPrefix가 있으면 001부터 3자리 zero-pad로 채번한다', () => {
+  it('skuPrefix가 있으면 접두사에 uuid 8자리를 붙여 채번한다', () => {
     const result = buildCombinationsFromExcel(pairs, 100, 'TSHIRT');
-    expect(result?.map((combination) => combination.skuCode)).toEqual([
-      'TSHIRT-001',
-      'TSHIRT-002',
-      'TSHIRT-003',
-      'TSHIRT-004',
-      'TSHIRT-005',
-      'TSHIRT-006',
-    ]);
+
+    expect(result?.every((combination) => /^TSHIRT-[0-9a-f]{8}$/.test(combination.skuCode))).toBe(true);
+  });
+
+  it('채번된 skuCode는 조합끼리 겹치지 않는다', () => {
+    const skuCodes = buildCombinationsFromExcel(pairs, 100, 'TSHIRT')?.map((combination) => combination.skuCode) ?? [];
+
+    expect(new Set(skuCodes).size).toBe(6);
   });
 
   it('skuPrefix가 빈 문자열이면 모든 skuCode가 빈 문자열이다', () => {

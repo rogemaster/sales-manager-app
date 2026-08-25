@@ -61,14 +61,7 @@ describe('productExcelSaveStrategy - 옵션 및 SKU', () => {
 
     expect(product.option).toHaveLength(6);
     expect(product.option?.[0].values).toEqual({ 색상: '블랙', 사이즈: 'S' });
-    expect(product.option?.map((combination) => combination.skuCode)).toEqual([
-      'TSHIRT-001',
-      'TSHIRT-002',
-      'TSHIRT-003',
-      'TSHIRT-004',
-      'TSHIRT-005',
-      'TSHIRT-006',
-    ]);
+    expect(product.option?.every((combination) => /^TSHIRT-[0-9a-f]{8}$/.test(combination.skuCode))).toBe(true);
   });
 
   it('추가옵션 컬럼은 subOption으로 가고 추가SKU 접두사를 쓴다', () => {
@@ -76,7 +69,14 @@ describe('productExcelSaveStrategy - 옵션 및 SKU', () => {
 
     expect(product.subOption).toHaveLength(2);
     expect(product.subOption?.[0].values).toEqual({ 각인: '유' });
-    expect(product.subOption?.map((combination) => combination.skuCode)).toEqual(['ENGRAVE-001', 'ENGRAVE-002']);
+    expect(product.subOption?.every((combination) => /^ENGRAVE-[0-9a-f]{8}$/.test(combination.skuCode))).toBe(true);
+  });
+
+  it('같은 접두사를 쓴 다른 상품끼리도 skuCode가 겹치지 않는다', () => {
+    const products = productExcelSaveStrategy([optionRow, optionRow]);
+    const skuCodes = products.flatMap((product) => product.option?.map((combination) => combination.skuCode) ?? []);
+
+    expect(new Set(skuCodes).size).toBe(12);
   });
 
   it('모든 조합의 수량에 총수량 값을 넣고 totalQuantity를 조합수만큼 곱해 다시 계산한다', () => {

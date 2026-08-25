@@ -11,6 +11,13 @@ export const generatorOptionId = () => {
   return `opt_${uuidv4().split('-')[0]}`;
 };
 
+// 옵션 SKU
+// 접두사를 인자로 받는 이유: 화면 일괄생성은 'SKU', 엑셀은 사용자가 시트에 적은 값을 쓴다.
+// 순번(index + 1)은 모든 상품이 001부터 시작해 상품 간 값이 겹친다.
+export const generatorSkuCode = (prefix: string) => {
+  return `${prefix}-${uuidv4().split('-')[0]}`;
+};
+
 // 주문
 export const generatorOrderCode = () => {
   const uuid = uuidv4().split('-');
