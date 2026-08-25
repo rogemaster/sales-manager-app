@@ -1,6 +1,7 @@
 import { OptionCombination, ProductOption } from '@/features/products/types/product.types';
 import { ExcelRowWithErrors } from '@/types/excel.type';
 import { optionCombinations, validateOptions } from './Options';
+import { generatorSkuCode } from '@/utils/codeGenerator';
 
 /** 엑셀에서 읽은 옵션명·옵션값 한 쌍. 시트 셀이라 타입을 특정할 수 없다 */
 export interface ExcelOptionPair {
@@ -33,7 +34,7 @@ const toOptionValues = (value: unknown): string[] =>
  *
  * 조합 생성은 화면과 같은 `validateOptions`·`optionCombinations`에 맡긴다.
  * 1행 = 1상품이라 조합별 수량·SKU를 개별 지정할 수 없어, 수량은 총수량 값을 그대로 넣고
- * SKU는 접두사에 순번을 붙여 채번한다. `optionPrice`는 지정 수단이 없어 0으로 남는다.
+ * SKU는 접두사에 uuid 8자리를 붙여 채번한다. `optionPrice`는 지정 수단이 없어 0으로 남는다.
  *
  * @param pairs 옵션명·옵션값 셀 쌍
  * @param quantity 모든 조합에 넣을 수량 (총수량 컬럼 값)
@@ -53,10 +54,10 @@ export const buildCombinationsFromExcel = (
   const validOptions = validateOptions(options);
   if (validOptions.length === 0) return undefined;
 
-  return optionCombinations(validOptions).map((combination, index) => ({
+  return optionCombinations(validOptions).map((combination) => ({
     ...combination,
     quantity,
-    skuCode: skuPrefix ? `${skuPrefix}-${String(index + 1).padStart(3, '0')}` : '',
+    skuCode: skuPrefix ? generatorSkuCode(skuPrefix) : '',
   }));
 };
 

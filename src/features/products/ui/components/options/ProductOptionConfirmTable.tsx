@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { formatCombinationLabel } from '@/features/products/util/Options';
+import { generatorSkuCode } from '@/utils/codeGenerator';
 
 type Props = {
   name: 'option' | 'subOption';
@@ -60,10 +61,10 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
 
   // SKU 일괄생성
   const handleOptionBatchSKUCode = () => {
-    const newOption: OptionCombination[] = fields.map((field, index) => ({
+    const newOption: OptionCombination[] = fields.map((field) => ({
       values: field.values,
       quantity: field.quantity,
-      skuCode: `SKU-${String(index + 1).padStart(3, '0')}`,
+      skuCode: generatorSkuCode('SKU'),
       optionPrice: field.optionPrice,
     }));
     replace(newOption);
