@@ -52,6 +52,12 @@ describe('getMockActiveShoppingSettings', () => {
 
   it('필요한 필드만 매핑해 반환한다', () => {
     const result = getMockActiveShoppingSettings('usr_001');
-    expect(result[0]).toEqual({ id: 'ss_001', mallCode: 'COUP', mallId: 'coupang_seller_001', nickname: '쿠팡 메인' });
+    expect(result[0]).toEqual({
+      id: 'ss_001',
+      mallAccountId: 'sa_001',
+      mallCode: 'COUP',
+      mallId: 'coupang_seller_001',
+      nickname: '쿠팡 메인',
+    });
   });
 });

@@ -76,6 +76,7 @@ export interface AvailableMallAccount {
 /** 활성(isActive) 설정만 추린 선택용 옵션 — 쇼핑몰 전송 대상 선택, 연동 목록 필터 등에서 쓴다. */
 export interface ActiveShoppingSettingOption {
   id: string; // ShoppingSetting.id
+  mallAccountId: string; // ShoppingAccount.id — 계정으로 설정 옵션을 좁힐 때 쓴다
   mallCode: ShoppingMalls;
   mallId: string;
   nickname: string;

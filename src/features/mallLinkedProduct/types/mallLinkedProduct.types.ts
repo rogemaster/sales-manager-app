@@ -47,6 +47,7 @@ export interface MallLinkedProductSearch {
   startDate: string;
   endDate: string;
   mallCode: ShoppingMalls | 'ALL';
+  mallAccountId: string; // 'ALL' 또는 ShoppingAccount.id
   shoppingSettingId: string; // 'ALL' 또는 ShoppingSetting.id
   linkStatus: MallLinkStatus | 'ALL';
   saleState: ProductStateType | 'ALL';

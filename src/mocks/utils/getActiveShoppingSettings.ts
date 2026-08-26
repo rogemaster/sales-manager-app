@@ -3,6 +3,6 @@ import { ActiveShoppingSettingOption } from '@/features/shoppingSetting/types/sh
 
 export const getMockActiveShoppingSettings = (ownerId: string): ActiveShoppingSettingOption[] => {
   return MOCK_SHOPPING_SETTINGS_DATA.filter((setting) => setting.ownerId === ownerId && setting.isActive).map(
-    ({ id, mallCode, mallId, nickname }) => ({ id, mallCode, mallId, nickname }),
+    ({ id, mallAccountId, mallCode, mallId, nickname }) => ({ id, mallAccountId, mallCode, mallId, nickname }),
   );
 };
