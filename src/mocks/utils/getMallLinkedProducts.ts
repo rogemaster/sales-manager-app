@@ -31,6 +31,15 @@ const filterByMallCode = (mallCode: MallLinkedProductSearch['mallCode'], data: M
   return data.filter((item) => item.mallCode === mallCode);
 };
 
+// 계정은 스냅샷에서 읽는다 — 연동 데이터는 오리지널 설정과 값이 동기화되지 않으므로,
+// 설정 id로 거슬러 올라가 지금의 계정을 보면 전송 당시와 다른 답이 나올 수 있다.
+const filterByMallAccount = (mallAccountId: string, data: MallLinkedProduct[]) => {
+  if (!mallAccountId || mallAccountId === 'ALL') return data;
+  return data.filter((item) => item.settingSnapshot.mallAccountId === mallAccountId);
+};
+
+// 설정은 top-level의 불변 식별 정보(sourceShoppingSettingId)로 거른다.
+// 계정만 스냅샷을 보는 이유는 top-level에 계정 필드가 없기 때문이다.
 const filterBySetting = (shoppingSettingId: string, data: MallLinkedProduct[]) => {
   if (!shoppingSettingId || shoppingSettingId === 'ALL') return data;
   return data.filter((item) => item.sourceShoppingSettingId === shoppingSettingId);
@@ -62,13 +71,24 @@ export const getMockMallLinkedProducts = (
   page: number,
   pageSize: number,
 ): GetMallLinkedProductsResponse => {
-  const { dateType, startDate, endDate, mallCode, shoppingSettingId, linkStatus, saleState, searchType, searchValue } =
-    searchParams;
+  const {
+    dateType,
+    startDate,
+    endDate,
+    mallCode,
+    mallAccountId,
+    shoppingSettingId,
+    linkStatus,
+    saleState,
+    searchType,
+    searchValue,
+  } = searchParams;
 
   const byOwner = MOCK_MALL_LINKED_PRODUCT_DATA.filter((item) => item.ownerId === ownerId);
   const byDate = filterByDate(dateType, startDate, endDate, byOwner);
   const byMall = filterByMallCode(mallCode, byDate);
-  const bySetting = filterBySetting(shoppingSettingId, byMall);
+  const byAccount = filterByMallAccount(mallAccountId, byMall);
+  const bySetting = filterBySetting(shoppingSettingId, byAccount);
   const byStatus = filterByLinkStatus(linkStatus, bySetting);
   const bySaleState = filterBySaleState(saleState, byStatus);
   const filtered = filterBySearchValue(searchType, searchValue, bySaleState);

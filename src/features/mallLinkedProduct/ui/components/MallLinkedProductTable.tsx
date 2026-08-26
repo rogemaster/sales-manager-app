@@ -79,6 +79,7 @@ export const MallLinkedProductTable = ({ linkedProducts }: Props) => {
                 </TableCell>
                 <TableCell className="font-medium">{linked.productSnapshot.name}</TableCell>
                 <TableCell className="text-center">{getShoppingMallName(linked.mallCode)}</TableCell>
+                <TableCell className="text-center">{linked.settingSnapshot.mallId}</TableCell>
                 <TableCell className="text-center">{linked.settingSnapshot.nickname}</TableCell>
                 <TableCell className="text-center font-mono text-sm text-muted-foreground">
                   {linked.externalProductId ?? '-'}

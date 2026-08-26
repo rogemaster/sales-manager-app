@@ -17,7 +17,7 @@ const { LINKED, resetLinked } = vi.hoisted(() => {
       status: 'success',
       externalProductId: 'ext_NSST_aaa111',
       productSnapshot: { productId: 'p_001', name: '기본상품', state: 'ON_SALE' } as Product,
-      settingSnapshot: { id: 'ss_001', nickname: '기본설정' } as ShoppingSetting,
+      settingSnapshot: { id: 'ss_001', mallAccountId: 'sa_001', mallId: 'naver_seller' } as ShoppingSetting,
       createdByEmail: 'seller@shop.com',
       createdAt: '2026-07-10T00:00:00.000Z',
       lastSentAt: '2026-07-10T00:00:00.000Z',
@@ -40,7 +40,7 @@ const { LINKED, resetLinked } = vi.hoisted(() => {
         externalProductId: undefined,
         errorMessage: '외부 쇼핑몰 전송 실패',
         productSnapshot: { productId: 'p_002', name: '품절상품', state: 'SOLD_OUT' } as Product,
-        settingSnapshot: { id: 'ss_002', nickname: '쿠팡설정' } as ShoppingSetting,
+        settingSnapshot: { id: 'ss_002', mallAccountId: 'sa_002', mallId: 'coupang_seller' } as ShoppingSetting,
         createdByEmail: 'staff@shop.com',
         updatedByEmail: 'boss@shop.com',
         lastSentAt: '2026-07-20T00:00:00.000Z',
@@ -69,6 +69,7 @@ const BASE_SEARCH: MallLinkedProductSearch = {
   startDate: '2026-01-01',
   endDate: '2026-12-31',
   mallCode: 'ALL',
+  mallAccountId: 'ALL',
   shoppingSettingId: 'ALL',
   linkStatus: 'ALL',
   saleState: 'ALL',
@@ -97,10 +98,27 @@ describe('getMockMallLinkedProducts', () => {
     expect(result.linkedProducts.map((item) => item.id)).toEqual(['mlp_002']);
   });
 
-  it('쇼핑몰 설정으로 필터링한다', () => {
+  it('쇼핑몰 계정으로 필터링한다 — 설정이 아니라 스냅샷의 mallAccountId를 본다', () => {
+    const result = getMockMallLinkedProducts('usr_001', search({ mallAccountId: 'sa_002' }), 1, 10);
+
+    expect(result.linkedProducts.map((item) => item.id)).toEqual(['mlp_002']);
+  });
+
+  it('쇼핑몰 정보설정으로 필터링한다', () => {
     const result = getMockMallLinkedProducts('usr_001', search({ shoppingSettingId: 'ss_002' }), 1, 10);
 
     expect(result.linkedProducts.map((item) => item.id)).toEqual(['mlp_002']);
+  });
+
+  it('계정과 설정을 함께 지정하면 둘 다 만족하는 건만 남는다', () => {
+    const result = getMockMallLinkedProducts(
+      'usr_001',
+      search({ mallAccountId: 'sa_001', shoppingSettingId: 'ss_002' }),
+      1,
+      10,
+    );
+
+    expect(result.total).toBe(0);
   });
 
   it('연동 상태로 필터링한다', () => {

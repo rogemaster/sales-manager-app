@@ -15,6 +15,7 @@ export const dateTypeAtom = atom<MallLinkedProductSearch['dateType']>(DEFAULT_DA
 export const startDateAtom = atom<string>(DEFAULT_START_DATE);
 export const endDateAtom = atom<string>(DEFAULT_END_DATE);
 export const mallCodeAtom = atom<ShoppingMalls | 'ALL'>('ALL');
+export const mallAccountIdAtom = atom<string>('ALL');
 export const shoppingSettingIdAtom = atom<string>('ALL');
 export const linkStatusAtom = atom<MallLinkStatus | 'ALL'>('ALL');
 export const saleStateAtom = atom<ProductStateType | 'ALL'>('ALL');
@@ -27,6 +28,7 @@ export const getMallLinkedSearchFilterAtom = atom<MallLinkedProductSearch>((get)
   startDate: get(startDateAtom),
   endDate: get(endDateAtom),
   mallCode: get(mallCodeAtom),
+  mallAccountId: get(mallAccountIdAtom),
   shoppingSettingId: get(shoppingSettingIdAtom),
   linkStatus: get(linkStatusAtom),
   saleState: get(saleStateAtom),
@@ -40,6 +42,7 @@ export const committedFiltersAtom = atom<MallLinkedProductSearch>({
   startDate: DEFAULT_START_DATE,
   endDate: DEFAULT_END_DATE,
   mallCode: 'ALL',
+  mallAccountId: 'ALL',
   shoppingSettingId: 'ALL',
   linkStatus: 'ALL',
   saleState: 'ALL',
