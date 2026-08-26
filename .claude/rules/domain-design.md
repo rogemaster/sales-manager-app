@@ -145,7 +145,11 @@
 
 **왜 수정에만 이 장치가 필요한가 — 생성과 책임 분담이 다르다.** 생성(`createMockMallLinkedProducts`)은 클라이언트가 `{ productId, mallCode, shoppingSettingId }`만 보내고 **서버가 원본에서 읽어 스냅샷을 복사**하므로 어긋날 여지가 없다. 반면 수정은 **클라이언트가 완성된 스냅샷을 보내고 서버가 불변 필드를 지켜내는** 방식이라, 지켜내는 범위가 곧 이 규칙의 실효 범위다.
 
-**어긋나면 목록이 아니라 다른 곳이 깨진다.** 목록 검색은 전부 top-level(`ownerId`·`mallCode`·`sourceShoppingSettingId`·`status`)과 `productSnapshot`만 읽으므로 `settingSnapshot`이 틀어져도 화면상 증상이 없다. 실제 파급은 **재전송 payload가 다른 계정을 향하는 것**과 **수정 화면 주소록 조회(`watch('mallId')` 기준)가 틀어지는 것**이라, 늦게 발견되는 종류다.
+**어긋나면 이제 목록에서 드러난다 (2026-08-27 변경).** 예전에는 목록이 top-level(`ownerId`·`mallCode`·`sourceShoppingSettingId`·`status`)과 `productSnapshot`만 읽어 `settingSnapshot`이 틀어져도 화면상 증상이 없었다. 지금은 목록이 `settingSnapshot`을 읽는 곳이 둘이다 — **쇼핑몰계정 필터**(`settingSnapshot.mallAccountId`)와 **테이블의 쇼핑몰계정·쇼핑몰정보설정 컬럼**(`mallId`·`nickname`). 불변 필드가 틀어지면 목록에서 바로 보이므로, 위 두 집행 지점의 실패가 조용히 묻히지는 않는다.
+
+다만 **늦게 발견되는 파급은 그대로 남는다** — **재전송 payload가 다른 계정을 향하는 것**과 **수정 화면 주소록 조회(`watch('mallId')` 기준)가 틀어지는 것**은 목록만 봐서는 알 수 없다.
+
+**목록 필터가 읽는 곳이 조건마다 다르다.** 설정 필터는 top-level `sourceShoppingSettingId`를, 계정 필터는 `settingSnapshot.mallAccountId`를 본다. 계정을 취향으로 스냅샷에서 읽는 게 아니라 **top-level에 계정 필드가 없어서** 생긴 비대칭이다. 새 필터를 붙일 때 top-level에 해당 필드가 있으면 그쪽을 쓰고, 없으면 스냅샷을 읽되 그 필드가 위 표의 불변 필드 목록에 들어 있는지 확인한다.
 
 **주의 — 설정 폼 섹션 3개는 세 화면이 공유한다.** `ShoppingSettingBasicInfoSection`·`ShoppingSettingAddressSection`·`ShoppingSettingMallInfoSection`을 설정 등록/수정 화면(`ShoppingSettingForm` 경유)과 연동상품 수정 화면(래퍼 없이 직접 나열)이 함께 쓴다. 설정 화면 사정으로 이 섹션에 쇼핑몰계정 Select를 붙이면 **연동상품 수정 화면에도 그대로 딸려 들어간다.** 컴포넌트를 공유하면 의도하지 않은 화면까지 따라오는 전례는 [`ui-conventions.md`](ui-conventions.md)의 "검색 필터는 화면이 소유한다" 절 참고.
 
