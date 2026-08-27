@@ -1,6 +1,7 @@
 import { http, HttpResponse, delay } from 'msw';
 import { baseUrl } from '../config';
 import {
+  BulkUpdateMallLinkedProductsBody,
   MallLinkedProductRequestItem,
   MallLinkedProductSearch,
   ResendMallLinkedProductsBody,
@@ -12,6 +13,7 @@ import { getMockMallLinkedProducts } from '../utils/getMallLinkedProducts';
 import { getMockMallLinkedProduct } from '../utils/getMallLinkedProduct';
 import { updateMockMallLinkedProduct } from '../utils/updateMallLinkedProduct';
 import { resendMockMallLinkedProducts } from '../utils/resendMallLinkedProducts';
+import { bulkUpdateMockMallLinkedProducts } from '../utils/bulkUpdateMallLinkedProducts';
 
 export const mallLinkedProductHandlers = [
   http.post(`${baseUrl}/api/shopping/linked-products/list`, async ({ request }) => {
@@ -49,6 +51,14 @@ export const mallLinkedProductHandlers = [
     }
 
     return HttpResponse.json(resendMockMallLinkedProducts(ids, ownerId));
+  }),
+
+  // 고정 경로이므로 `/:id` 핸들러보다 먼저 등록해야 한다 (msw-rules.md 경로 충돌 규칙).
+  http.patch(`${baseUrl}/api/shopping/linked-products/bulk`, async ({ request }) => {
+    const body = (await request.json()) as BulkUpdateMallLinkedProductsBody;
+    const result = bulkUpdateMockMallLinkedProducts(body);
+    if (!result) return new HttpResponse(null, { status: 400 });
+    return HttpResponse.json(result);
   }),
 
   http.get(`${baseUrl}/api/shopping/linked-products/:id`, ({ params, request }) => {
