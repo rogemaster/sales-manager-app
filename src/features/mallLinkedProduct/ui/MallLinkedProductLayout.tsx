@@ -4,9 +4,11 @@ import { useAtom, useSetAtom } from 'jotai';
 import { currentPageAtom } from '@/features/mallLinkedProduct/store/search.store';
 import { selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { useGetMallLinkedProducts } from '@/features/mallLinkedProduct/api/useGetMallLinkedProducts';
+import { MallLinkedProductActionSection } from './MallLinkedProductActionSection';
 import { MallLinkedProductHeaderSection } from './MallLinkedProductHeaderSection';
 import { MallLinkedProductSearchFilterSection } from './MallLinkedProductSearchFilterSection';
 import { MallLinkedProductTableSection } from './MallLinkedProductTableSection';
+import { ShoppingSettingApplyModal } from './components/ShoppingSettingApplyModal';
 
 export const MallLinkedProductLayout = () => {
   const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
@@ -23,6 +25,7 @@ export const MallLinkedProductLayout = () => {
     <>
       <MallLinkedProductHeaderSection />
       <MallLinkedProductSearchFilterSection />
+      <MallLinkedProductActionSection linkedProducts={data?.linkedProducts ?? []} />
       {isError ? (
         <p className="py-10 text-center text-sm text-destructive">연동 상품 목록을 불러오는데 실패했습니다.</p>
       ) : (
@@ -35,6 +38,7 @@ export const MallLinkedProductLayout = () => {
           isLoading={isLoading}
         />
       )}
+      <ShoppingSettingApplyModal linkedProducts={data?.linkedProducts ?? []} />
     </>
   );
 };

@@ -89,3 +89,29 @@ export interface ResendMallLinkedProductsResult {
   successCount: number;
   failCount: number;
 }
+
+/**
+ * 다건 부분수정 요청.
+ * productSnapshot은 보낸 키만 기존 스냅샷에 얕은 병합되고,
+ * shoppingSettingId는 서버가 오리지널 설정을 읽어 settingSnapshot을 통째 교체하는 데 쓴다.
+ * clearKeys는 스냅샷에서 지울 키다. 셋 다 없으면 400이다.
+ */
+export interface BulkUpdateMallLinkedProductsBody {
+  ownerId: string;
+  ids: string[];
+  updatedByEmail: string;
+  productSnapshot?: Partial<Product>;
+  shoppingSettingId?: string;
+  /**
+   * 값을 비우기로 체크된 키. JSON.stringify가 undefined 값을 가진 키를 통째로 지우기 때문에
+   * productSnapshot에 실어 보낼 수 없어 따로 나른다.
+   */
+  clearKeys?: (keyof Product)[];
+}
+
+/** Create/Resend 결과와 구조가 같지만 의미가 다르고 독립적으로 변할 수 있어 합치지 않는다. */
+export interface BulkUpdateMallLinkedProductsResult {
+  totalCount: number;
+  successCount: number;
+  failCount: number;
+}
