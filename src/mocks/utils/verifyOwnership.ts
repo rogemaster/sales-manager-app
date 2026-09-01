@@ -1,7 +1,7 @@
-import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
+import { Product } from '@/features/products/types/product.types';
 
 export const isOwnerMatch = (resourceOwnerId: string, requestOwnerId: string | null): boolean =>
   !!requestOwnerId && resourceOwnerId === requestOwnerId;
@@ -17,9 +17,10 @@ export const allOwnedBy = <T extends { id: string; ownerId: string }>(
   });
 
 // Product는 식별자 필드명이 `productId`라 allOwnedBy(제네릭 제약: `id`)를 그대로 쓸 수 없어 별도 헬퍼로 둔다.
-export const areProductsOwnedBy = (productIds: string[], requestOwnerId: string | null): boolean =>
+// 상품 목록은 호출자가 넘긴다 — 상품이 Neon에 있어 MSW가 직접 읽을 수 없다.
+export const areProductsOwnedBy = (productIds: string[], requestOwnerId: string | null, products: Product[]): boolean =>
   productIds.every((productId) => {
-    const product = MOCK_PRODUCT_DATA.find((p) => p.productId === productId);
+    const product = products.find((p) => p.productId === productId);
     return !!product && isOwnerMatch(product.ownerId, requestOwnerId);
   });
 
@@ -28,12 +29,13 @@ export const areProductsOwnedBy = (productIds: string[], requestOwnerId: string 
 export const areMallLinkRequestsOwnedBy = (
   items: MallLinkedProductRequestItem[],
   requestOwnerId: string | null,
+  products: Product[],
 ): boolean => {
   const productIds = [...new Set(items.map((item) => item.productId))];
   const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
 
   return (
-    areProductsOwnedBy(productIds, requestOwnerId) &&
+    areProductsOwnedBy(productIds, requestOwnerId, products) &&
     allOwnedBy(settingIds, requestOwnerId, MOCK_SHOPPING_SETTINGS_DATA)
   );
 };

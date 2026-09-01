@@ -1,9 +1,11 @@
 import dayjs from 'dayjs';
-import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
+import { Product } from '@/features/products/types/product.types';
 import { HomeStats, RecentProduct } from '@/features/home/types/home.types';
 
-export const getMockHomeStats = (ownerId: string): HomeStats => {
-  const owned = MOCK_PRODUCT_DATA.filter((p) => p.ownerId === ownerId);
+// 상품 목록은 호출자가 넘긴다 — 상품이 Neon에 있어 MSW가 직접 읽을 수 없다.
+
+export const getMockHomeStats = (products: Product[], ownerId: string): HomeStats => {
+  const owned = products.filter((p) => p.ownerId === ownerId);
   const total = owned.length;
   const onSale = owned.filter((p) => p.state === 'ON_SALE').length;
   const soldOut = owned.filter((p) => p.state === 'SOLD_OUT').length;
@@ -13,8 +15,9 @@ export const getMockHomeStats = (ownerId: string): HomeStats => {
   return { total, onSale, soldOut, saleDis, waitSale };
 };
 
-export const getMockRecentProducts = (ownerId: string): RecentProduct[] => {
-  return MOCK_PRODUCT_DATA.filter((p) => p.ownerId === ownerId)
+export const getMockRecentProducts = (products: Product[], ownerId: string): RecentProduct[] => {
+  return products
+    .filter((p) => p.ownerId === ownerId)
     .sort((a, b) => dayjs(b.createDate).valueOf() - dayjs(a.createDate).valueOf())
     .slice(0, 5)
     .map((p) => ({

@@ -65,7 +65,6 @@ const { PRODUCTS, SETTINGS, LINKED, resetMocks } = vi.hoisted(() => {
   return { PRODUCTS, SETTINGS, LINKED, resetMocks };
 });
 
-vi.mock('../data/MockProductsData', () => ({ MOCK_PRODUCT_DATA: PRODUCTS }));
 vi.mock('../data/MockShoppingSettingsData', () => ({ MOCK_SHOPPING_SETTINGS_DATA: SETTINGS }));
 vi.mock('../data/MockMallLinkedProductsData', () => ({ MOCK_MALL_LINKED_PRODUCT_DATA: LINKED }));
 
@@ -91,6 +90,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(result).toEqual({ totalCount: 1, successCount: 1, failCount: 0 });
@@ -114,6 +114,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     const { createdAt, lastSentAt, updatedAt } = LINKED[0];
@@ -128,6 +129,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     PRODUCTS[0].name = '수정된 상품명';
@@ -148,11 +150,13 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
     createMockMallLinkedProducts(
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(LINKED).toHaveLength(2);
@@ -171,6 +175,7 @@ describe('createMockMallLinkedProducts', () => {
       ],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(result).toEqual({ totalCount: 3, successCount: 0, failCount: 3 });
@@ -187,6 +192,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     vi.restoreAllMocks();
@@ -195,6 +201,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(LINKED).toHaveLength(2);
@@ -207,6 +214,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       'usr_other',
       EMAIL,
+      PRODUCTS,
     );
 
     vi.restoreAllMocks();
@@ -215,6 +223,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(result).toEqual({ totalCount: 1, successCount: 0, failCount: 1 });
@@ -230,6 +239,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'p_001', mallCode: 'KAKAOS', shoppingSettingId: 'ss_001' }], // ss_001은 NSST 설정
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(LINKED[0].mallCode).toBe('NSST');
@@ -244,6 +254,7 @@ describe('createMockMallLinkedProducts', () => {
       [{ productId: 'nope', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
+      PRODUCTS,
     );
 
     expect(result).toEqual({ totalCount: 0, successCount: 0, failCount: 0 });

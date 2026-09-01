@@ -3,9 +3,9 @@ import {
   MallLinkedProduct,
   MallLinkedProductRequestItem,
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
-import { MOCK_PRODUCT_DATA } from '../data/MockProductsData';
 import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
+import { Product } from '@/features/products/types/product.types';
 import {
   createExternalProductId,
   createLinkedProductId,
@@ -22,12 +22,13 @@ export const createMockMallLinkedProducts = (
   items: MallLinkedProductRequestItem[],
   ownerId: string,
   createdByEmail: string,
+  products: Product[],
 ): CreateMallLinkedProductsResult => {
   const now = new Date().toISOString();
   const result: CreateMallLinkedProductsResult = { totalCount: 0, successCount: 0, failCount: 0 };
 
   items.forEach((item) => {
-    const product = MOCK_PRODUCT_DATA.find((p) => p.productId === item.productId);
+    const product = products.find((p) => p.productId === item.productId);
     const setting = MOCK_SHOPPING_SETTINGS_DATA.find((s) => s.id === item.shoppingSettingId);
     if (!product || !setting) return;
 
