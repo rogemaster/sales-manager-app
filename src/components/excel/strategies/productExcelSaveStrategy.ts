@@ -19,6 +19,7 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
     const subOption = buildCombinationsFromExcel(subPairs, quantity, toText(r['추가SKU']));
 
     return {
+      // 이 값은 서버에서 버려진다 — /api/products/bulk가 교차 테넌트 PK 충돌을 막으려고 항상 재채번한다.
       productId: generatorProductCode(),
       customerCode: (r['고객상품코드'] as string) || undefined,
       name: r['상품명'] as string,

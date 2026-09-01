@@ -9,6 +9,7 @@ import {
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { areLinkedProductsOwnedBy, areMallLinkRequestsOwnedBy } from '../utils/verifyOwnership';
 import { createMockMallLinkedProducts } from '../utils/createMallLinkedProducts';
+import { fetchProductsForMock } from '../utils/fetchProducts';
 import { getMockMallLinkedProducts } from '../utils/getMallLinkedProducts';
 import { getMockMallLinkedProduct } from '../utils/getMallLinkedProduct';
 import { updateMockMallLinkedProduct } from '../utils/updateMallLinkedProduct';
@@ -34,11 +35,13 @@ export const mallLinkedProductHandlers = [
       items: MallLinkedProductRequestItem[];
     };
 
-    if (!areMallLinkRequestsOwnedBy(items, ownerId)) {
+    const products = await fetchProductsForMock();
+
+    if (!areMallLinkRequestsOwnedBy(items, ownerId, products)) {
       return new HttpResponse(null, { status: 403 });
     }
 
-    return HttpResponse.json(createMockMallLinkedProducts(items, ownerId, createdByEmail));
+    return HttpResponse.json(createMockMallLinkedProducts(items, ownerId, createdByEmail, products));
   }),
 
   http.post(`${baseUrl}/api/shopping/linked-products/resend`, async ({ request }) => {

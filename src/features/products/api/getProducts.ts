@@ -5,11 +5,12 @@ export interface GetProductsResponse extends PaginationMeta {
   products: Product[];
 }
 
-export const getProducts = async (ownerId: string, data: ProductSearch, page: number, pageSize: number = 10) => {
+// ownerId 인자는 시그니처에 남기되 body에서 뺀다. 소유권 판정은 서버 세션이 한다.
+export const getProducts = async (_ownerId: string, data: ProductSearch, page: number, pageSize: number = 10) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/list`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ownerId, ...data, page, pageSize }),
+    body: JSON.stringify({ ...data, page, pageSize }),
   });
 
   if (!response.ok) {

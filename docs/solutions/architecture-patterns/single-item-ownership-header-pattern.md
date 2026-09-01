@@ -7,6 +7,7 @@ problem_type: architecture_pattern
 component: development_workflow
 severity: high
 applies_when:
+  - MSW 핸들러로 처리하는 도메인일 때 (실제 route handler라면 requireSession 방식을 쓴다 — 2026-09-01 갱신 절 참고)
   - 목록 조회는 ownerId로 필터링되지만 단건 조회(:id)는 아무 검증 없이 리소스를 반환할 때
   - GET처럼 body가 없는 요청에 ownerId를 실어 보내야 할 때
   - PATCH의 업데이트 payload를 ownerId 같은 인증 정보로 오염시키고 싶지 않을 때
@@ -153,9 +154,22 @@ MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update, ownerId: MO
 - 404 통일은 리소스 존재 여부 자체가 다른 테넌트에게 유출되지 않게 막는다 — "없음"과 "네 것이 아님"을 구분해서 응답하면 그 자체로 정보 누출이다.
 - (2026-07-16 갱신) `trigger`의 옛 "필터링-not-거부" 예외를 별도 문서화 없이 묵시적 관행으로 남겨뒀더니, 이후 같은 카테고리(bulk id 액션)의 다른 엔드포인트 4곳(`shopping/accounts`/`shopping/settings`의 delete·status)이 아예 ownerId 검증 자체가 없는 채로 방치돼 있었다 — "예외를 문서화하지 않으면 다음 사람이 404를 복붙한다"던 우려가, 실제로는 "예외 자체가 뒤집혀야 했는데 아무도 재검토하지 않아 검증 누락이 반복됐다"는 정반대 형태로 나타난 것. 지금은 fail-closed로 통일해 이 예외 자체가 없어졌다.
 
+## (2026-09-01 갱신) 이 패턴은 **MSW에 남아 있는 도메인 전용**이다 — 상품은 세션 기반으로 넘어갔다
+
+상품 도메인이 `route.ts` + Neon으로 이전되면서(`docs/superpowers/plans/2026-09-01-product-image-r2-storage.md`), 상품 5개 엔드포인트는 `X-Owner-Id` 헤더를 **더 이상 쓰지 않는다.** `requireSession(req)`이 NextAuth JWT에서 꺼낸 `ownerId`를 그대로 `WHERE` 조건에 넣는다.
+
+이 문서의 설계 비교(A/B/C)에서 방식 C(세션에서 직접 추출)를 *"도메인을 전부 route.ts + Neon으로 옮겨야 하는 별개 프로젝트"*라며 기각했었는데, 상품에 한해 그 별개 프로젝트가 실제로 수행됐다. **헤더 패턴이 틀려서가 아니라 전제가 바뀐 것이다** — 서버에서 세션을 읽을 수 있게 되면 클라이언트가 보낸 값을 신뢰할 이유가 없어진다.
+
+**그래서 새 API를 설계할 때의 판단 순서는 이렇다.**
+
+1. 그 엔드포인트가 **실제 route handler**인가(DB·서버 전용 시크릿이 필요해서)? → `requireSession` / `requireSuperAdminSession`을 쓴다. 클라이언트가 보낸 `ownerId`는 body에 있어도 무시한다. `[[api-route-session-auth-guard]]` 참고.
+2. **MSW 핸들러**인가? → 이 문서의 `X-Owner-Id` 헤더 패턴을 그대로 쓴다. 서비스 워커는 세션을 읽을 수 없으므로 이게 여전히 최선이다.
+
+두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다.
+
 ## When to Apply
 
-- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → GET/PATCH 모두 `X-Owner-Id` 헤더 + `isOwnerMatch` 검증
+- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → **MSW로 처리하는 경우에 한해** GET/PATCH 모두 `X-Owner-Id` 헤더 + `isOwnerMatch` 검증 (실 route라면 위 갱신 절의 1번)
 - 여러 id를 한 번에 받는 액션(일괄 실행/일괄 삭제 등)을 설계할 때 → **기본값은 fail-closed**(`allOwnedBy`로 전부 소유 확인 후 진행, 하나라도 불일치 시 전체 거부). 필터링-후-진행으로 갈 정당한 이유가 있다면 그 이유를 문서에 명시할 것
 - 기존 API 함수 시그니처에 인자를 추가할 때 → 커밋 전에 반드시 전체 호출부 grep
 

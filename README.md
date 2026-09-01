@@ -21,7 +21,7 @@
 | 인증 | 이메일/비밀번호 로그인, 회원가입(사업자 정보·연락처·정산 정보 입력 및 이메일 중복 검증), JWT 세션, 미인증 라우트 자동 차단 |
 | 홈 대시보드 | 판매·주문·클레임·문의 현황 통계 카드, 최근 등록 상품 목록 |
 | 상품 목록 | 날짜·카테고리·판매 상태 복합 필터, 검색 타입(상품명·상품코드) 선택 검색, 페이지네이션 |
-| 상품 등록/수정 | 기본 정보, 가격/수량, 옵션 조합, 상품 고시 정보 등 전체 CRUD |
+| 상품 등록/수정 | 기본 정보, 가격/수량, 옵션 조합, 상품 고시 정보 등 전체 CRUD. 메인이미지는 Cloudflare R2에 업로드 |
 | 상품 대량 등록 | 엑셀 템플릿 다운로드 → 업로드 → 미리보기 → 일괄 제출 |
 | 주문 수집 | 쇼핑몰별 주문 수집 작업 실행 및 수집 이력 조회 |
 | 주문 목록 | 날짜·쇼핑몰·상태 필터, 일괄 상태변경 |
@@ -30,7 +30,7 @@
 | 쇼핑몰 계정 관리 | 쇼핑몰별 API 연동 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
 | 쇼핑몰 정보설정 | 몰별 판매 정보(별칭·상품상태·판매기간) 등록/수정, 출고지·반품지 주소록 연동, 네이버·카카오 등 몰 고유 항목(A/S 정보·구매평 노출 여부 등) 입력 |
 | 쇼핑몰 상품등록 | 등록할 상품과 대상 몰(쇼핑몰 정보설정)을 선택해 스테이징 후 일괄 전송, 전송 결과(성공·실패) 확인 |
-| 쇼핑몰 연동상품 | 전송된 연동 건 목록(몰·계정·연동상태·쇼핑몰 상품코드), 실패 사유 확인, 연동 건 단위 수정 및 단건·일괄 재전송 |
+| 쇼핑몰 연동상품 | 전송된 연동 건 목록(몰·계정·연동상태·쇼핑몰 상품코드), 실패 사유 확인, 연동 건 단위 수정 및 단건·일괄 재전송, 여러 연동 건의 상품정보 일괄수정 |
 | 사용자 관리 | 사용자 목록 조회, 등록, 삭제 (등급별 권한 분리) |
 | 프로필 수정 | 닉네임·연락처·소개·회사·지역 정보 수정 |
 
@@ -47,10 +47,11 @@
 | 서버 상태 | TanStack Query 5 | 캐싱·자동 동기화·뮤테이션 후 무효화를 선언적으로 처리 |
 | 폼 · 검증 | React Hook Form + Zod | 비제어 컴포넌트 기반 렌더링 최소화, 스키마 기반 유효성 검사 |
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
-| DB | Neon (PostgreSQL) + Drizzle ORM | 유저 정보 영속성 보장, 서버리스 환경에 최적화된 serverless driver |
-| API Mocking | MSW 2 | 비즈니스 데이터(상품·주문 등) 개발용 mock, 서비스 워커 레벨 인터셉트 |
+| DB | Neon (PostgreSQL) + Drizzle ORM | 유저·상품 영속성 보장, 서버리스 환경에 최적화된 serverless driver |
+| 파일 저장소 | Cloudflare R2 (S3 호환 API) | 상품 메인이미지 저장. egress 무료라 배포 환경에서 이미지 서빙 비용이 들지 않음 |
+| API Mocking | MSW 2 | 비즈니스 데이터(주문·쇼핑몰 연동 등) 개발용 mock, 서비스 워커 레벨 인터셉트 |
 | 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
-| 테스트 | Vitest | 순수 비즈니스 로직 단위 테스트 — MSW mock 유틸(도메인 조회·필터링, ownerId 테넌트 격리, 연동 전송·재전송), API 인증 가드, 도메인 유틸 (24개 파일 / 170건) |
+| 테스트 | Vitest | 순수 비즈니스 로직 단위 테스트 — MSW mock 유틸(도메인 조회·필터링, ownerId 테넌트 격리, 연동 전송·재전송), API 인증 가드, 도메인 유틸(이미지 키 판정·KST 날짜 범위 등) (32개 파일 / 278건) |
 
 <br />
 
@@ -81,9 +82,12 @@ src/features/
 
 ```
 src/shared/
-├── constant/   # 쇼핑몰 목록·필터 '전체' 옵션·배송 유형 등 공통 상수
-└── utils/      # 연락처 검증/포맷, API 인증 가드(apiAuth)
+├── api/        # 도메인에 속하지 않는 fetch 래퍼 (이미지 업로드 합성 등)
+├── constant/   # 쇼핑몰 목록·필터 '전체' 옵션·배송 유형·업로드 제한 등 공통 상수
+└── utils/      # 연락처 검증/포맷, API 인증 가드(apiAuth), KST 날짜 범위(date)
 ```
+
+서버 전용 모듈은 `src/lib/`에 둡니다 — `storage.ts`(R2 클라이언트·이미지 판정·키 조립)가 여기 있고, 최상단의 `import 'server-only'`가 클라이언트 번들로 새는 것을 빌드 시점에 막습니다.
 
 ### 3계층 상태 관리
 
@@ -97,14 +101,14 @@ src/shared/
 
 ### MSW / DB 경계 설계
 
-MSW의 구조적 한계(서비스 워커가 서버사이드 `authorize()` 실행에 관여 불가)로 인해 유저 관련 API는 실제 DB route handler로 전환했습니다.
+MSW의 구조적 한계(서비스 워커가 서버사이드 `authorize()` 실행에 관여 불가)로 인해 유저 관련 API는 실제 DB route handler로 전환했습니다. 같은 이유가 **서버 전용 시크릿**에도 적용됩니다 — 상품은 이미지 저장을 위해 R2 자격증명이, 데이터 영속화를 위해 `DATABASE_URL`이 필요해 브라우저에서 도는 MSW로는 처리할 수 없습니다.
 
 | 처리 방식 | 대상 엔드포인트 |
 |-----------|----------------|
-| **DB route handler** | 로그인, 회원가입, 이메일 중복 확인, 사용자 등록·목록·삭제, 프로필 수정 |
-| **MSW** | 상품, 주문, 쇼핑몰 계정, 홈 대시보드 등 비즈니스 데이터 전반 |
+| **DB route handler** | 로그인, 회원가입, 이메일 중복 확인, 사용자 등록·목록·삭제, 프로필 수정, **상품 목록·등록·수정·대량등록·이미지 업로드** |
+| **MSW** | 주문, 쇼핑몰 계정·정보설정, 쇼핑몰 연동 상품, 홈 대시보드 |
 
-판단 기준: **유저 인증·식별에 직접 연관되는 데이터**는 DB, 나머지 비즈니스 데이터는 MSW 유지.
+판단 기준: **유저 인증·식별에 직접 연관되거나 서버 전용 시크릿이 필요한 데이터**는 DB route, 나머지 비즈니스 데이터는 MSW 유지.
 
 ```
 src/app/api/                          # DB 연동 route handlers
@@ -112,18 +116,27 @@ src/app/api/                          # DB 연동 route handlers
 ├── register/route.ts                 # 회원가입
 ├── check-email/route.ts              # 이메일 중복 확인
 ├── profile/route.ts                  # 프로필 수정
-└── account/users/
-    ├── route.ts                      # 사용자 삭제 (DELETE)
-    ├── list/route.ts                 # 사용자 목록 조회 (POST)
-    └── create/route.ts               # 사용자 등록 (POST)
+├── account/users/
+│   ├── route.ts                      # 사용자 삭제 (DELETE)
+│   ├── list/route.ts                 # 사용자 목록 조회 (POST)
+│   └── create/route.ts               # 사용자 등록 (POST)
+└── products/
+    ├── list/route.ts                 # 상품 목록 조회 (POST)
+    ├── create/route.ts               # 상품 등록 (POST)
+    ├── bulk/route.ts                 # 상품 대량 등록 (POST)
+    ├── image/route.ts                # 메인이미지 R2 업로드 (POST)
+    └── [productId]/route.ts          # 상품 단건 조회·수정 (GET/PATCH)
 ```
+
+MSW가 남아 있는 도메인(홈 대시보드·쇼핑몰 연동)이 상품 데이터를 필요로 하는 경우, mock 유틸이 상품 배열을 **인자로 주입받고** 핸들러가 실제 route를 호출해 넘깁니다(`src/mocks/utils/fetchProducts.ts`). 해당 경로에 MSW 핸들러가 없어 요청이 bypass되고, 같은 오리진이라 세션 쿠키가 그대로 붙습니다.
 
 ### ownerId 기반 멀티 테넌시
 
 가입으로 생성되는 계정(`super_admin`)만 최상위 테넌트이며, 사용자 관리에서 등록되는 계정은 그 슈퍼계정에 종속됩니다. 모든 도메인 리소스(주문·상품·쇼핑몰 계정·쇼핑몰 정보설정 등)는 `ownerId` 필드로 테넌트를 구분합니다.
 
-- **목록/생성 API**: 로그인 계정의 `ownerId`(`workspaceOwnerIdAtom`)를 요청 body에 실어 보내고, 서버는 그 값으로 필터링/스탬핑합니다.
-- **단건 조회/수정 API**: `X-Owner-Id` 헤더로 `ownerId`를 전달하고, 서버는 리소스의 `ownerId`와 비교해 불일치·미존재 시 모두 `404`로 응답합니다(다른 테넌트 리소스의 존재 여부 자체를 노출하지 않기 위함). 여러 항목을 한 번에 처리하는 액션(주문수집 트리거 등)은 예외적으로 거부 대신 소유한 항목만 필터링해 실행합니다.
+- **세션 기반 (DB route handler)**: 상품처럼 실제 route로 옮긴 도메인은 클라이언트가 보낸 `ownerId`를 **아예 신뢰하지 않습니다.** NextAuth JWT에서 꺼낸 값을 `WHERE` 조건에 함께 넣어, 남의 리소스는 미존재와 구분되지 않는 `404`가 됩니다. 업로드한 이미지도 `images/<ownerId>/...` 네임스페이스로 격리해, 다른 테넌트의 객체 키를 자기 상품에 지정할 수 없습니다.
+- **목록/생성 API (MSW 잔존 도메인)**: 로그인 계정의 `ownerId`(`workspaceOwnerIdAtom`)를 요청 body에 실어 보내고, 서버는 그 값으로 필터링/스탬핑합니다.
+- **단건 조회/수정 API (MSW 잔존 도메인)**: `X-Owner-Id` 헤더로 `ownerId`를 전달하고, 서버는 리소스의 `ownerId`와 비교해 불일치·미존재 시 모두 `404`로 응답합니다. 여러 항목을 한 번에 처리하는 액션(주문수집 트리거 등)은 예외적으로 거부 대신 소유한 항목만 필터링해 실행합니다.
 
 ```
 ownerId === id  → 슈퍼계정 (super_admin, 자기참조)
@@ -186,9 +199,11 @@ interface MallLinkedProduct {
 
 ```
 components/excel/strategies/
-├── productExcelSaveStrategy.ts  # 상품 ID · 등록일 주입
+├── productExcelSaveStrategy.ts  # 엑셀 한글 헤더 → Product 필드 매핑, 옵션 조합 생성
 └── orderExcelSaveStrategy.ts    # 주문 번호 · 등록일 주입
 ```
+
+상품 대량등록은 route handler를 거치므로 `productId`·`ownerId`·등록일을 **서버가 채웁니다.** 클라이언트가 만든 상품코드는 교차 테넌트 PK 충돌을 막기 위해 서버에서 다시 채번됩니다.
 
 ### 몰(mallCode)별 고유 설정 — Discriminated Union
 
@@ -213,7 +228,6 @@ src/mocks/
 ├── handlers/                # 도메인별 핸들러
 │   ├── auth.ts              # logout
 │   ├── home.ts
-│   ├── products.ts
 │   ├── orders.ts
 │   ├── collection.ts        # 주문수집 작업/트리거
 │   ├── shoppingAccounts.ts
@@ -222,6 +236,8 @@ src/mocks/
 ├── data/                    # 정적 mock 원본 데이터
 └── utils/                   # 핸들러 비즈니스 로직
 ```
+
+상품 핸들러는 Neon 이전과 함께 제거됐습니다. **남은 핸들러가 상품을 필요로 할 때**(홈 통계, 연동 스냅샷 생성) mock 유틸은 상품 배열을 인자로 주입받고, 핸들러가 `fetchProducts.ts` 어댑터로 실제 route에서 가져와 넘깁니다 — 그 경로에 핸들러가 없어 요청이 bypass되고, 같은 오리진이라 세션 쿠키가 그대로 붙습니다.
 
 <br />
 
@@ -237,7 +253,7 @@ npm run dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-> 비즈니스 데이터(상품·주문 등)는 MSW가 처리하고, 유저 관련 API(로그인·회원가입·사용자 관리 등)는 Neon DB에 직접 연결됩니다.
+> 주문·쇼핑몰 연동 등 나머지 비즈니스 데이터는 MSW가 처리하고, 유저 관련 API(로그인·회원가입·사용자 관리 등)와 상품 API는 Neon DB에 직접 연결됩니다. 상품 메인이미지는 Cloudflare R2에 저장됩니다.
 
 ### 환경 변수
 
@@ -248,7 +264,35 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 DATABASE_URL=your-neon-database-url
+
+# Cloudflare R2 (상품 메인이미지) — 네 값 모두 서버 전용이다. NEXT_PUBLIC_ 접두사를 붙이면 번들에 노출된다
+R2_ACCOUNT_ID=your-cloudflare-account-id
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
+R2_BUCKET_NAME=your-bucket-name
 ```
+
+R2 값이 비어 있으면 이미지 업로드 요청이 `R2 환경변수가 설정되지 않았습니다: ...`로 실패합니다(어떤 변수가 비었는지 메시지에 나옵니다). Cloudflare 대시보드에서 버킷과 API 토큰을 먼저 만들어야 합니다.
+
+### DB 스키마 반영
+
+`users`·`products` 테이블을 새 Neon 데이터베이스에 만들려면:
+
+```bash
+npx drizzle-kit push
+```
+
+이 프로젝트는 마이그레이션 파일을 두지 않고 `push`로 스키마를 직접 반영합니다.
+
+### 상품 시드 데이터
+
+목록을 채워둘 샘플 상품 20건을 넣으려면:
+
+```bash
+npx tsx scripts/seedProducts.ts [ownerId]
+```
+
+`ownerId`를 생략하면 mock 픽스처에 적힌 값을 씁니다. 로그인한 계정의 `id`와 다르면 목록에 보이지 않으니, 직접 가입한 계정으로 보려면 그 계정의 `id`를 인자로 넘기세요. 같은 스크립트를 여러 번 실행해도 중복 없이 동작합니다.
 
 ### 테스트 계정
 
@@ -276,7 +320,7 @@ src/
 │   │   │   ├── accounts/       # 쇼핑몰 계정 목록, 등록, 수정
 │   │   │   ├── settings/       # 쇼핑몰 정보설정 목록, 등록, 수정
 │   │   │   ├── register/       # 쇼핑몰 상품등록 (전송)
-│   │   │   └── linked-products/ # 연동상품 목록, 연동 건 수정
+│   │   │   └── linked-products/ # 연동상품 목록, 연동 건 수정, 상품정보 일괄수정
 │   │   ├── account/            # 사용자관리
 │   │   └── profile/            # 프로필 수정
 │   └── api/                    # DB 연동 route handlers
@@ -284,11 +328,15 @@ src/
 │       ├── register/            # 회원가입
 │       ├── check-email/         # 이메일 중복 확인
 │       ├── profile/             # 프로필 수정
-│       └── account/users/       # 사용자 목록·등록·삭제
+│       ├── account/users/       # 사용자 목록·등록·삭제
+│       └── products/            # 상품 목록·등록·수정·대량등록, 메인이미지 R2 업로드
 ├── db/                         # Neon DB 연결 및 스키마
 │   ├── index.ts                # Drizzle 클라이언트
-│   ├── schema.ts               # users 테이블 정의
+│   ├── schema.ts               # users · products 테이블 정의
 │   └── password.ts             # bcrypt 해싱 유틸
+├── lib/                        # 서버 전용 모듈 · 공용 헬퍼
+│   ├── storage.ts              # R2 클라이언트, 이미지 판정·키 조립 (server-only)
+│   └── utils.ts                # cn() 등
 ├── features/                   # 도메인별 Feature 모듈
 │   ├── products/
 │   ├── order/
@@ -301,15 +349,16 @@ src/
 │   ├── home/
 │   └── auth/
 ├── shared/                     # 도메인 간 공유 상수·유틸
-│   ├── constant/               # 쇼핑몰·필터·배송 상수
-│   └── utils/                  # 연락처 검증/포맷, API 인증 가드
+│   ├── api/                    # 도메인에 속하지 않는 fetch 래퍼
+│   ├── constant/               # 쇼핑몰·필터·배송·업로드 제한 상수
+│   └── utils/                  # 연락처 검증/포맷, API 인증 가드, KST 날짜 범위
 ├── components/
 │   ├── common/                 # TablePagination, RangeDateFilter, FilterSelect, Alert(useAlert) 등
 │   ├── excel/                  # 엑셀 업로드/다운로드/미리보기 + 전략 패턴
 │   ├── layout/                 # 글로벌 헤더, 사이드바
 │   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider
 │   └── ui/                     # Radix UI 기반 기본 컴포넌트
-├── mocks/                      # MSW 핸들러 및 목업 데이터 (비즈니스 데이터)
+├── mocks/                      # MSW 핸들러 및 목업 데이터 (상품 제외 비즈니스 데이터)
 │   ├── handlers.ts
 │   ├── handlers/               # 도메인별 핸들러
 │   ├── data/                   # 정적 목업 데이터
@@ -327,4 +376,7 @@ npm run build        # 프로덕션 빌드
 npm run lint         # ESLint 실행
 npm test             # 단위 테스트 실행
 npm run test:watch   # 테스트 감시 모드 (파일 변경 시 자동 재실행)
+
+npx drizzle-kit push              # DB 스키마 반영
+npx tsx scripts/seedProducts.ts   # 샘플 상품 시드
 ```
