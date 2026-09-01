@@ -11,7 +11,11 @@ export interface Product {
   state: ProductStateType;
   deliveryType: string;
   deliveryPrice: number;
-  mainImage: string | File;
+  /**
+   * 메인이미지. R2 key(`images/<ownerId>/<uuid>.png`) 또는 절대 URL(엑셀·시드의 외부 이미지).
+   * 폼에서 File을 다루는 것은 ProductFormValues의 역할이다 — 도메인 타입에는 File이 들어오지 않는다.
+   */
+  mainImage: string;
   detailPage: string;
   option?: OptionCombination[];
   totalQuantity: number;
@@ -90,6 +94,15 @@ export interface InformationDisclosure {
 export type InformationDisclosureCategory = Pick<InformationDisclosure, 'id' | 'name'>;
 
 export type CreateProductRequest = Omit<Product, 'productId' | 'ownerId' | 'createDate' | 'updateDate'>;
+
+/**
+ * 상품 폼이 다루는 값. mainImage만 도메인 타입과 다르다.
+ * 등록 화면은 File을, 수정 화면은 서버에서 받은 기존 값(string)을 들고 있다가
+ * 사용자가 파일을 고르면 File로 바뀐다. 이 유니온은 폼에서만 정당하다.
+ */
+export type ProductFormValues = Omit<Product, 'mainImage'> & {
+  mainImage: File | string;
+};
 
 export type ProductInformationDisclosure = {
   key: string;

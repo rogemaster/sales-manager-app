@@ -6,7 +6,8 @@ import { Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFormContext } from 'react-hook-form';
-import { Product } from '@/features/products/types/product.types';
+import { ProductFormValues } from '@/features/products/types/product.types';
+import { MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
 
 export const ProductMainImageInfo = () => {
   const [mainImages, setMainImages] = useState<{ dataUrl: string; file: File } | null>(null);
@@ -17,10 +18,18 @@ export const ProductMainImageInfo = () => {
     setValue,
     formState: { errors },
     clearErrors,
-  } = useFormContext<Product>();
+    setError,
+  } = useFormContext<ProductFormValues>();
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) return;
+
+    // 4.5MB를 넘으면 Vercel이 route 도달 전에 413으로 끊어 사용자가 원인을 알 수 없다.
+    // 여기서 먼저 막아 의미 있는 메시지를 보여준다. 서버 검증은 그대로 유지된다.
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError('mainImage', { type: 'manual', message: '4MB 이하 이미지를 업로드해 주세요.' });
+      return;
+    }
 
     const reader = new FileReader();
     reader.onloadend = () => {

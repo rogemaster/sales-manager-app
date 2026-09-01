@@ -6,7 +6,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { useAlert } from '@/hooks/useAlert';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
-import { Product } from '@/features/products/types/product.types';
+import { ProductFormValues } from '@/features/products/types/product.types';
+import { resolveMainImageKey } from '@/shared/api/uploadImage';
 import { ShoppingSetting, ShoppingSettingFormValues } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ProductBasicinfo } from '@/features/products/ui/components/form/ProductBasicInfo';
@@ -41,7 +42,9 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
   const { mutateAsync: resend, isPending: isResending } = useResendMallLinkedProducts();
 
   // 상품 폼과 설정 폼을 따로 둔다. 두 폼의 값 타입이 다르고, 기존 섹션 컴포넌트들이 register('name') 같은 flat 경로를 쓰고 있어 하나로 합치려면 전 섹션을 고쳐야 한다.
-  const productForm = useForm<Product>();
+  // 상품 폼 타입이 ProductFormValues인 이유: ProductMainImageInfo가 새로 고른 이미지를 File로 써넣는데,
+  // Product(mainImage: string)로 두면 그 File이 타입에 보이지 않은 채 JSON.stringify에서 {}로 뭉개진다.
+  const productForm = useForm<ProductFormValues>();
   const settingForm = useForm<ShoppingSettingFormValues>();
 
   useEffect(() => {
@@ -52,8 +55,11 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
 
   const goList = () => router.push(LIST_PATH);
 
-  const buildSnapshots = (record: MallLinkedProduct): MallLinkedProductSnapshots => {
+  // 이미지를 새로 골랐으면 저장 직전에 업로드해 R2 key로 바꾼다.
+  const buildSnapshots = async (record: MallLinkedProduct): Promise<MallLinkedProductSnapshots> => {
     const settingValues = settingForm.getValues();
+    const productValues = productForm.getValues();
+    const mainImage = await resolveMainImageKey(productValues.mainImage);
     const { id: settingId, ownerId: settingOwnerId, mallAccountId, mallId } = record.settingSnapshot;
     const mallCode = record.mallCode;
 
@@ -67,7 +73,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
     }
 
     return {
-      productSnapshot: productForm.getValues(),
+      productSnapshot: { ...productValues, mainImage },
       settingSnapshot: {
         ...settingValues,
         id: settingId,
@@ -86,14 +92,17 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
     return isProductValid && isSettingValid;
   };
 
+  const saveErrorMessage = (error: unknown) =>
+    error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+
   const handleSave = async () => {
     if (!linked || !(await validateBothForms())) return;
 
     try {
-      await save(buildSnapshots(linked));
+      await save(await buildSnapshots(linked));
       showAlert({ message: '저장되었습니다.', type: 'success', onConfirm: goList });
-    } catch {
-      showAlert({ message: '저장 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });
+    } catch (error) {
+      showAlert({ message: saveErrorMessage(error), type: 'error' });
     }
   };
 
@@ -101,10 +110,10 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
     if (!linked || !(await validateBothForms())) return;
 
     try {
-      await save(buildSnapshots(linked));
-    } catch {
+      await save(await buildSnapshots(linked));
+    } catch (error) {
       // 저장이 실패하면 전송하지 않는다. 고치지 못한 값을 몰로 보내는 셈이 되기 때문이다.
-      showAlert({ message: '저장 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });
+      showAlert({ message: saveErrorMessage(error), type: 'error' });
       return;
     }
 

@@ -2,7 +2,7 @@
 
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { ProductForm } from '../components/ProductForm';
-import { Product } from '../../types/product.types';
+import { ProductFormValues } from '../../types/product.types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
@@ -11,6 +11,7 @@ import { updateProduct } from '../../api/updateProduct';
 import { useEffect } from 'react';
 import { useAlert } from '@/hooks/useAlert';
 import { useRouter } from 'next/navigation';
+import { resolveMainImageKey } from '@/shared/api/uploadImage';
 
 type Props = {
   productId: string;
@@ -19,7 +20,7 @@ type Props = {
 export const ProductModifyLayout = ({ productId }: Props) => {
   const router = useRouter();
 
-  const formData = useForm<Product>();
+  const formData = useForm<ProductFormValues>();
   const { showAlert } = useAlert();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
@@ -30,7 +31,10 @@ export const ProductModifyLayout = ({ productId }: Props) => {
   });
 
   const { mutate } = useMutation({
-    mutationFn: (data: Product) => updateProduct(productId, data, workspaceOwnerId),
+    mutationFn: async (data: ProductFormValues) => {
+      const mainImage = await resolveMainImageKey(data.mainImage);
+      return updateProduct(productId, { ...data, mainImage }, workspaceOwnerId);
+    },
     onSuccess: () => {
       showAlert({
         type: 'success',
@@ -40,10 +44,10 @@ export const ProductModifyLayout = ({ productId }: Props) => {
         },
       });
     },
-    onError: () => {
+    onError: (error) => {
       showAlert({
         type: 'error',
-        message: '상품수정 실패',
+        message: error instanceof Error && error.message ? error.message : '상품수정 실패',
       });
     },
   });
@@ -54,7 +58,15 @@ export const ProductModifyLayout = ({ productId }: Props) => {
     }
   }, [isSuccess, queryData]);
 
-  const onSubmit: SubmitHandler<Product> = (data) => {
+  // 등록 화면과 같은 가드. 삭제 버튼이 mainImage를 ''로 되돌리는데 DB는 notNull이라 빈 문자열로 통과한다.
+  const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
+    if (!data.mainImage) {
+      formData.setError('mainImage', {
+        type: 'manual',
+        message: '메인이미지를 선택해 주세요.',
+      });
+      return;
+    }
     mutate(data);
   };
 
