@@ -331,31 +331,31 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] 
 
 ---
 
-## MSW Mock API
+## bulk API — 도메인마다 처리 층이 다르다
 
-개발환경에서 bulk API를 가로챕니다.
+| 도메인 | 처리 층 | 위치 |
+|--------|---------|------|
+| 상품 (`/api/products/bulk`) | **실제 route handler** (Neon + R2) | `src/app/api/products/bulk/route.ts` |
+| 주문 (`/api/orders/bulk`) | MSW 핸들러 | `src/mocks/handlers/orders.ts` |
+
+상품은 2026-09-01에 Neon으로 이전되면서 MSW 핸들러가 제거됐습니다. **전략 함수와 `getExcelSaveStrategy`는 그대로입니다** — 바뀐 것은 api 함수가 도달하는 곳뿐입니다.
+
+상품 bulk route에서 엑셀 경로에 영향을 주는 두 가지:
+
+- **`productId`를 서버가 다시 채번합니다.** 전략이 만든 값은 버려집니다(교차 테넌트 PK 충돌 방지). 클라이언트 채번을 신뢰하는 코드를 쓰지 마세요.
+- **`mainImage`가 R2 key면 본인 네임스페이스여야 합니다.** 엑셀의 외부 절대 URL(`https://...`)은 그대로 통과합니다. 위반 시 `400`과 함께 **몇 번째 행인지** 알려주므로, api 함수와 `onError`에서 서버 메시지를 고정 문구로 덮지 마세요.
 
 ```ts
-// 상품 대량 등록
-http.post(`${baseUrl}/api/products/bulk`, async ({ request }) => {
-  await delay(500); // AlertProvider race condition 방지용 딜레이
-  const data = (await request.json()) as Product[];
-  MOCK_PRODUCT_DATA.push(...data);
-  return HttpResponse.json({ success: true, count: data.length });
-}),
-
-// 주문 대량 등록
+// 주문 대량 등록 (MSW 유지)
 http.post(`${baseUrl}/api/orders/bulk`, async ({ request }) => {
   await delay(500);
-  const data = (await request.json()) as Order[];
-  MOCK_ORDERS_DATA.push(...data);
-  return HttpResponse.json({ success: true, count: data.length });
+  const { ownerId, orders } = (await request.json()) as { ownerId: string; orders: Omit<Order, 'ownerId'>[] };
+  MOCK_ORDERS_DATA.push(...orders.map((o) => ({ ...o, ownerId })));
+  return HttpResponse.json({ success: true, count: orders.length });
 }),
 ```
 
-**delay(500) 이유**
-
-`AlertProvider`의 닫힘 애니메이션 처리에 200ms `setTimeout`이 있습니다. MSW가 즉시 응답하면 저장 확인 alert가 닫히는 200ms 사이에 성공 alert options가 설정됐다가 타이머에 의해 초기화되는 race condition이 발생합니다. 500ms 딜레이로 타이머가 만료된 이후에 `onSuccess`가 실행되도록 보장합니다.
+**delay(500)은 이제 race condition 회피용이 아닙니다.** 예전에는 `AlertProvider`의 200ms 닫힘 타이머가 성공 alert의 options를 지워버려 MSW의 즉시 응답과 충돌했지만, 지금은 `AlertProvider.tsx`가 `clearTimerRef`로 `showAlert` 시점에 타이머를 취소해 근본 해결된 상태입니다. 남은 `delay`는 네트워크 지연을 흉내내는 용도일 뿐이므로, 새 핸들러에 이 값을 "필수"라고 여겨 복붙하지 마세요.
 
 ---
 
@@ -381,4 +381,4 @@ http.post(`${baseUrl}/api/orders/bulk`, async ({ request }) => {
 
 - 필요 시 세션/로컬스토리지 또는 URL 파라미터로 얕은 영속화 제공
 - 페이지별 독립 Store를 사용해 서로 다른 업로드 세션 병행 가능
-- AlertProvider의 `setTimeout` race condition은 `useRef`로 타이머를 관리하는 방식으로 근본 해결 가능 (현재는 MSW delay로 우회)
+- ~~AlertProvider의 `setTimeout` race condition~~ → `useRef`(`clearTimerRef`)로 타이머를 관리하는 방식으로 **해결 완료**
