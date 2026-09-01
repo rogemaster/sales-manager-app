@@ -38,10 +38,12 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
         onConfirm: resetExcelData,
       });
     },
-    onError: () => {
+    // 서버가 이유를 담아 보낸 경우(예: 몇 번째 행의 이미지가 잘못됐는지) 그대로 보여준다.
+    onError: (error) => {
       showAlert({
         type: 'error',
-        message: '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
+        message:
+          error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
       });
     },
   });
