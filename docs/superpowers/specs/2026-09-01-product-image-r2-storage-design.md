@@ -459,6 +459,37 @@ export const toKstDateRange = (startDate: string, endDate: string): { start: Dat
 | DB `null` ↔ 도메인 타입 `undefined` 경계를 route 응답 직전 매핑 함수 한 곳으로 정규화 (nullable 컬럼 11개. `netPrice`만 `== null` 가드로 개별 대응한 상태) | 코드 리뷰(2026-09-01) 지적 — 사용자 미확인 |
 | `products` 테이블에 `(owner_id, create_date desc)` 인덱스 (데이터가 늘면 목록·`fetchProductsForMock`이 먼저 체감된다) | 코드 리뷰(2026-09-01) 지적 — 사용자 미확인 |
 | 시드 픽스처가 faker 런타임 값이라 `/products/list`(Neon에 굳은 값)와 `/shopping/linked-products`(로드마다 새 faker 값) 상품명이 다르게 보인다. 고정값 픽스처로 교체 검토 | 코드 리뷰(2026-09-01) 지적 — 사용자 미확인 |
+| **`next/image` 도입 시 `images.remotePatterns`를 호스트 화이트리스트로 둘 것** (아래 9.1) | 보안 점검(2026-09-01) — **사용자 질문**에서 출발 |
+| **bulk route에 행 단위 스키마 검증(Zod)을 넣고 위반 시 "N번째 행" 400으로 돌려줄 것** (아래 9.1) | 보안 점검(2026-09-01) — **사용자 질문**에서 출발 |
+
+### 9.1 엑셀 대량등록 값에 대한 보안 점검 (2026-09-01)
+
+**사용자 질문:** *"엑셀로 대량 상품등록을 진행하는데 메인이미지에 이미지 url을 넣어서 등록하는데 문제되는 url을 넣어서 등록하게 되었을때 db 보안상 문제가 없을까?"* → 이어서 *"어떤 필드든 url로 입력을 할 수 있으니 다른곳에는 문제가 없을까?"*
+
+dev 서버의 실제 route에 악성 값을 넣어 확인했다(테스트 행은 삭제 완료). **아래는 추정이 아니라 실측 결과다.**
+
+**뚫린 곳 없음 — 저장 시점의 보안은 성립한다.**
+
+| 시도 | 결과 |
+|---|---|
+| `javascript:` · `data:text/html` · `../` · 남의 R2 key · `'; DROP TABLE products;--` | **전부 400** — `isMainImageOwnedBy`가 `^https?://`(소문자)이거나 본인 key 네임스페이스만 통과시킨다 |
+| `ownerId`·`productId`·`createDate` 위조 | **무시됨** — `{ ...p, productId, ownerId, createDate, updateDate }`에서 신뢰 필드를 **뒤에** 덮어쓴다 |
+| 스키마에 없는 키(`hackedColumn`)·`__proto__` 주입 | **무시됨** — 컬럼 생성 없음 |
+| `<script>` 포함 문자열 저장 | 저장되지만 React가 이스케이프. `dangerouslySetInnerHTML`은 차트 한 곳뿐이고 상품과 무관 |
+| SQL 인젝션 | Drizzle 파라미터 바인딩. `DROP TABLE` 문자열 투입 후에도 테이블 정상 |
+
+**위험은 저장이 아니라 "그 값을 나중에 어떻게 쓰느냐"에 있다** — 서버가 URL을 fetch하거나(`next/image` 최적화가 그렇다), HTML로 렌더하거나, 엑셀로 내보낼 때. 상품 데이터 엑셀 내보내기 기능은 현재 없어 수식 인젝션은 해당 없음.
+
+**무결성 구멍 6건(보안 아님, 실측):**
+
+1. 숫자 필드에 글자 → `Number('abc')` = `NaN` → **배치 전체가 500**, 몇 번째 행인지 알 수 없음. 소수점 판매가·21억 초과도 같은 500
+2. 음수 가격(`-50000`) 저장됨
+3. `판매상태`에 임의 문자열 저장됨(`text` 컬럼, enum 제약 없음) → **목록 필터·홈 통계에서 조용히 누락되는 유령 상품**
+4. `키워드`가 배열이 아니어도 jsonb에 그대로 들어감 → 나중에 `.map()` 쓰는 코드가 생기면 런타임 오류
+5. 길이·개수 상한 없음(10만 자 상품명, 옵션 1만 개 통과). 실질 제동은 Vercel 본문 4.5MB뿐
+6. `informationDisclosure: null`이면 notNull 위반으로 500
+
+엑셀 업로드 검증(`validateExcelData`)은 **필수 누락·빈 값만** 보고 자료형은 보지 않는다. 위 6건은 **bulk route의 행 단위 Zod 검증 한 곳**으로 함께 닫히며, 이미지와 같은 "N번째 행" 400 형식을 쓰면 메시지 형태도 일관된다.
 
 ## 10. 기각한 대안과 근거
 
