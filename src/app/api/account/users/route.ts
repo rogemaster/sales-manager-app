@@ -11,6 +11,13 @@ export async function DELETE(req: NextRequest) {
   try {
     const { ids } = await req.json();
     const uniqueIds = [...new Set(ids)] as string[];
+
+    // 슈퍼계정은 ownerId === id(자기참조)라 자기 자신도 아래 소유권 검사를 통과한다.
+    // 지우면 그 테넌트의 상품·연동 데이터가 주인 없는 상태로 남고 로그인 수단도 사라진다.
+    if (uniqueIds.includes(session.id)) {
+      return NextResponse.json({ error: '본인 계정은 삭제할 수 없습니다.' }, { status: 400 });
+    }
+
     const owned = await db
       .select({ id: users.id })
       .from(users)
