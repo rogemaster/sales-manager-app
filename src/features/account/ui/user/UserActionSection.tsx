@@ -38,6 +38,13 @@ export const UserActionSection = () => {
             setSelectedUsers([]);
             showAlert({ message: `${count}명의 사용자가 삭제되었습니다.`, type: 'success' });
           },
+          // onError가 없으면 서버가 거절해도 화면에 아무 변화가 없어 삭제된 것처럼 보인다.
+          onError: (error) => {
+            showAlert({
+              message: error instanceof Error && error.message ? error.message : '사용자 삭제에 실패했습니다.',
+              type: 'error',
+            });
+          },
         });
       },
     });

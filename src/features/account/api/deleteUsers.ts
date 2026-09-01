@@ -4,5 +4,9 @@ export const deleteUsers = async (ids: string[]): Promise<void> => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ids }),
   });
-  if (!response.ok) throw new Error('사용자 삭제 실패');
+  // 서버가 거절 사유(본인 계정·권한 없는 사용자 포함)를 담아 보낸다. 고정 문구로 덮지 않는다.
+  if (!response.ok) {
+    const { error } = await response.json().catch(() => ({ error: '' }));
+    throw new Error(error || '사용자 삭제 실패');
+  }
 };
