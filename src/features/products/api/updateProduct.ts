@@ -1,9 +1,11 @@
 import { Product } from '../types/product.types';
 
-export const updateProduct = async (productId: string, data: Product, ownerId: string) => {
+// ownerId 인자는 시그니처에 남기되 헤더에서 뺀다. 소유권 판정은 서버 세션이 한다.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const updateProduct = async (productId: string, data: Product, _ownerId: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${productId}`, {
     method: 'PATCH',
-    headers: { 'X-Owner-Id': ownerId },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 

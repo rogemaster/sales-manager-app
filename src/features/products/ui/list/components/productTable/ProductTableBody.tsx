@@ -53,7 +53,10 @@ export const ProductTableBody = ({ products }: Props) => {
       </TableHeader>
       <TableBody>
         {products.map((product) => (
-          <TableRow key={product.productId} className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30">
+          <TableRow
+            key={product.productId}
+            className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
+          >
             <TableCell>
               <Checkbox
                 checked={selectedSet.has(product.productId)}
@@ -66,10 +69,14 @@ export const ProductTableBody = ({ products }: Props) => {
             </TableCell>
             <TableCell className="text-center">{getCategoryName(product.categoryId)}</TableCell>
             <TableCell className="text-center">
-              {product.netPrice === undefined ? '-' : `${product.netPrice.toLocaleString()}원`}
+              {/* DB(Neon)는 값이 없는 nullable 컬럼을 null로 반환하지만 도메인 타입은 undefined로 선언돼 있다.
+                  `=== undefined`만으로는 null을 걸러내지 못해 `.toLocaleString()`이 터진다. */}
+              {product.netPrice == null ? '-' : `${product.netPrice.toLocaleString()}원`}
             </TableCell>
             <TableCell className="text-center">{product.price.toLocaleString()}원</TableCell>
-            <TableCell className="text-center"><ProductStatusBadge status={product.state} /></TableCell>
+            <TableCell className="text-center">
+              <ProductStatusBadge status={product.state} />
+            </TableCell>
             <TableCell className="text-center">{dayjs(product.createDate).format('YYYY-MM-DD')}</TableCell>
             <TableCell className="text-center">{dayjs(product.updateDate).format('YYYY-MM-DD')}</TableCell>
           </TableRow>

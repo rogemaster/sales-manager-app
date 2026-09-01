@@ -1,3 +1,9 @@
+/**
+ * 연동상품 mock 시드 전용 픽스처. 상품의 정본은 Neon의 products 테이블이다.
+ * 이 배열이 남은 이유는 MockMallLinkedProductsData가 모듈 로드 시점에 동기로 스냅샷을
+ * 복사해야 하기 때문이다 — 그 시점에는 fetch를 쓸 수 없다.
+ * 상품 목록·검색·등록은 이 배열을 보지 않는다. 여기에 추가해도 화면에 나오지 않는다.
+ */
 import { Product } from '@/features/products/types/product.types';
 import { faker, fakerKO } from '@faker-js/faker';
 
