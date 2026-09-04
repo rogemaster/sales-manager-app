@@ -131,6 +131,6 @@ const handleProfile = () => {
 ## Related
 
 - `docs/superpowers/specs/2026-06-09-profile-detail-design.md` — authoritative design document for this feature
-- `docs/solutions/conventions/typescript-type-design-patterns.md` — type design patterns for feature modules
+- `docs/solutions/architecture-patterns/typescript-type-design-patterns.md` — type design patterns for feature modules
 - `src/features/auth/store/auth.store.ts` — Jotai atoms read by profile page
 - `src/features/account/constant/user.constants.ts` — `USER_GRADE_OPTIONS` shared between profile and user management

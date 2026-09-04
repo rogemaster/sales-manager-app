@@ -137,8 +137,12 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
 - **작업 중 git 명령 절대 금지:** `git add`, `git commit`, `git push`, 브랜치 생성 등 모든 git 작업은 사용자가 명시적으로 요청할 때만 실행한다. 코드 작성·파일 저장 후 자동으로 commit하지 않는다. 모든 작업이 완료된 후 사용자가 직접 검토하고 git 작업을 진행한다.
 - **이 규칙은 서브에이전트/스킬 위임 시에도 동일하게 적용된다.** `workflow.md`의 TDD 사이클이나 `subagent-driven-development` 등 워크플로우 스킬의 기본 템플릿이 "Task 완료 후 커밋"을 표준 스텝으로 포함하고 있어도, 서브에이전트 디스패치 프롬프트에 git commit 지시를 넣지 않는다. 커밋이 필요해 보이는 시점마다 매번 사용자에게 먼저 확인한다 — 과거 이 규칙을 스킬 기본 템플릿을 그대로 따르다 어긴 전례가 반복됐다.
 - **작업은 항상 새 브랜치에서 진행:** `main`에 직접 커밋하지 않는다. git 작업 요청 시 현재 브랜치를 먼저 확인하고, `main`이면 사용자에게 안내하여 `feat/<작업명>` 브랜치를 먼저 생성한 뒤 진행한다.
-- **AI 협업 문서는 전부 커밋 대상이다.** `CLAUDE.md`, `.claude/rules/`, `docs/solutions/`, `docs/superpowers/`(specs·plans), `docs/research/` 모두 git에 추적된다 — 2026-07-23 커밋 `cb0ac97`로 취업용 포트폴리오 자료로 공개 전환했다. 스테이징에서 제외하지 말 것.
-- **`.gitignore`가 실제로 무시하는 것은 `.claude/settings.json`, `.claude/settings.local.json`, `/.superpowers/` 뿐이다.** 커밋 전 확신이 안 서면 규칙 문구가 아니라 `git ls-tree -r --name-only HEAD -- <경로>`로 실측할 것.
+- **AI 협업 문서 중 커밋 대상은 일부다 (2026-09-04 범위 축소).** `CLAUDE.md`와 `.claude/rules/`는 전부 커밋한다. `docs/` 아래는 **`docs/solutions/architecture-patterns/`만** 커밋하고, `docs/superpowers/`(specs·plans), `docs/research/`, 나머지 `docs/solutions/` 카테고리(`conventions`·`logic-errors`·`ui-bugs`·`integration-issues`)는 `.gitignore`로 제외해 로컬에만 보관한다.
+  - **판단 기준:** 재사용 가능한 **설계 결론**은 커밋하고, 특정 작업의 **진행 기록**은 커밋하지 않는다. 새 문서를 어디에 쓸지 정할 때 이 기준으로 디렉토리를 고른다 — 디렉토리가 곧 커밋 여부를 결정한다.
+  - **Why:** 2026-07-23 `cb0ac97`로 `docs/` 전체를 취업용 포트폴리오 자료로 공개했으나, 2026-09-04 시점에 117개 중 56개가 specs·plans여서 제3자가 읽을 동기가 없는 진행 기록이 대부분을 차지했다. 정제된 설계 패턴만 남기는 쪽이 신호 대 잡음 면에서 낫다고 판단해 범위를 좁혔다.
+  - **이미 공개된 것은 되돌아가지 않는다.** 제외 처리는 현재 트리에만 적용되며, `cb0ac97` 이후 32개 커밋의 히스토리와 머지된 PR 페이지에는 그대로 남아 있다. 이 조치의 목적은 노출 차단이 아니라 **큐레이션**이므로 히스토리 재작성은 하지 않기로 했다 — "완전히 지워달라"는 요청이 아닌 한 `filter-repo`·force push를 제안하지 말 것.
+  - `docs/solutions/architecture-patterns/`의 문서가 제외 대상 문서를 참조할 때는 **마크다운 링크를 쓰지 않는다**(GitHub에서 404가 난다). 백틱 텍스트로만 경로를 적으면 로컬에서는 그대로 유효하고 외부에서는 내부 참조 표기로 읽힌다.
+- **`.gitignore`가 실제로 무시하는 것은 `.claude/settings.json`, `.claude/settings.local.json`, `/.superpowers/`, `.gstack/`, 그리고 위 `docs/` 제외 규칙이다.** 커밋 전 확신이 안 서면 규칙 문구가 아니라 `git ls-tree -r --name-only HEAD -- <경로>` 또는 `git check-ignore <경로>`로 실측할 것.
 - **`gh` CLI가 이 환경에 설치되어 있지 않다.** PR 생성은 GitHub 웹에서 직접 진행하거나, 사용자에게 URL을 안내하는 것으로 마무리할 것.
 - **소프트웨어 설치 절대 금지:** `winget`, `npm install -g`, `choco` 등 시스템에 영구적인 변경을 주는 명령은 사용자가 명시적으로 요청한 경우에만 실행할 것. 도구가 없다고 해서 자동으로 설치를 시도하지 말 것.
 - push 후 GitHub가 출력하는 PR 생성 URL을 사용자에게 안내하면 충분하다:

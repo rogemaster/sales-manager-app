@@ -39,8 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# claude (rules/docs are intentionally committed as portfolio material)
+# claude (CLAUDE.md and .claude/rules/ are intentionally committed as portfolio material)
 .claude/settings.json
 .claude/settings.local.json
 /.superpowers/
 .gstack/
+
+# docs — 재사용 가능한 설계 패턴(docs/solutions/architecture-patterns/)만 커밋한다.
+# specs·plans·research와 나머지 solutions 카테고리는 특정 작업의 진행 기록이라
+# 로컬에만 보관한다. 부모 디렉토리가 제외되면 하위를 다시 포함할 수 없으므로
+# 아래 4줄의 순서를 바꾸지 말 것.
+/docs/*
+!/docs/solutions/
+/docs/solutions/*
+!/docs/solutions/architecture-patterns/

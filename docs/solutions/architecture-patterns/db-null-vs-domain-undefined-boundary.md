@@ -69,6 +69,6 @@ tags:
 
 ## Related
 
-- [`json-stringify-drops-undefined-breaks-field-clearing.md`](../logic-errors/json-stringify-drops-undefined-breaks-field-clearing.md) — 같은 경계의 다른 구간(`undefined` 키가 직렬화에서 사라진다)
-- [`typescript-type-design-patterns.md`](../conventions/typescript-type-design-patterns.md) — 도메인 타입 설계 관례
+- `docs/solutions/logic-errors/json-stringify-drops-undefined-breaks-field-clearing.md` — 같은 경계의 다른 구간(`undefined` 키가 직렬화에서 사라진다)
+- [`typescript-type-design-patterns.md`](typescript-type-design-patterns.md) — 도메인 타입 설계 관례
 - `docs/superpowers/specs/2026-09-01-product-image-r2-storage-design.md` §9 — 매핑 함수 도입이 오픈 이슈로 기록돼 있다
