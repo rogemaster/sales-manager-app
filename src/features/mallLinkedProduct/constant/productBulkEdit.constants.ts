@@ -38,7 +38,14 @@ export type ProductBulkEditGroupKey = keyof typeof PRODUCT_BULK_EDIT_GROUPS;
 
 export type ProductBulkEditChecked = Partial<Record<ProductBulkEditGroupKey, boolean>>;
 
-/** 체크했으면 값이 반드시 있어야 하는 그룹 — Product 타입에서 optional(?)이 아닌 필드를 커버한다. */
+/**
+ * 체크했으면 값이 반드시 있어야 하는 그룹.
+ *
+ * 판정 기준은 도메인 타입의 optional 여부가 아니라 **상품 폼이 필수로 받는 값**이다
+ * (규정 정보는 하위호환 때문에 Product에서 여전히 optional이다).
+ * 이 화면만 자체 Bulk* 섹션을 써서 공유 섹션의 required가 닿지 않으므로,
+ * 상품 폼에 필수 필드를 늘리면 이 배열도 함께 늘려야 세 화면이 어긋나지 않는다.
+ */
 export const REQUIRED_BULK_EDIT_GROUPS: ProductBulkEditGroupKey[] = [
   'name',
   'categoryId',
@@ -50,4 +57,7 @@ export const REQUIRED_BULK_EDIT_GROUPS: ProductBulkEditGroupKey[] = [
   'brand',
   'manufacturer',
   'informationDisclosure',
+  'originCountry',
+  'taxType',
+  'adultProductType',
 ];
