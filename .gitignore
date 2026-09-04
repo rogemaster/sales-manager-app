@@ -53,3 +53,6 @@ yarn-error.log*
 !/docs/solutions/
 /docs/solutions/*
 !/docs/solutions/architecture-patterns/
+
+# scripts — DB 시드 등 로컬 운영용 스크립트. 앱 빌드·실행에 관여하지 않아 로컬에만 보관한다.
+/scripts/
