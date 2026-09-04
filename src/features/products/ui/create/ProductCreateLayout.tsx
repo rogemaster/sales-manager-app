@@ -13,7 +13,13 @@ import { resolveMainImageKey } from '@/shared/api/uploadImage';
 
 export const ProductCreateLayout = () => {
   const { showAlert } = useAlert();
-  const formData = useForm<ProductFormValues>();
+  // 원산지는 상품마다 달라 기본값을 두지 않는다.
+  const formData = useForm<ProductFormValues>({
+    defaultValues: {
+      taxType: 'TAXABLE',
+      adultProductType: 'GENERAL',
+    },
+  });
   const router = useRouter();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
