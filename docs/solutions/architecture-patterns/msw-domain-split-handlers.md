@@ -134,7 +134,7 @@ export const shoppingAccountHandlers = [
 ];
 ```
 
-이 순서 규칙의 상세한 작동 원리는 [msw-patch-route-ordering-conflict.md](../integration-issues/msw-patch-route-ordering-conflict.md) 참고.
+이 순서 규칙의 상세한 작동 원리는 `docs/solutions/integration-issues/msw-patch-route-ordering-conflict.md` 참고.
 
 ### 새 핸들러 추가 절차
 
@@ -234,5 +234,5 @@ export const handlers = [
 
 ## Related
 
-- [msw-patch-route-ordering-conflict.md](../integration-issues/msw-patch-route-ordering-conflict.md) — 고정/동적 경로 충돌의 상세 작동 원리
-- [msw-request-body-empty-before-delay.md](../integration-issues/msw-request-body-empty-before-delay.md) — 핸들러 내부 async 타이밍 주의사항
+- `docs/solutions/integration-issues/msw-patch-route-ordering-conflict.md` — 고정/동적 경로 충돌의 상세 작동 원리
+- `docs/solutions/integration-issues/msw-request-body-empty-before-delay.md` — 핸들러 내부 async 타이밍 주의사항

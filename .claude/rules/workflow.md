@@ -65,6 +65,8 @@ Task 완료 후 `requesting-code-review` 스킬로 코드 리뷰:
 비자명한 결정·버그·설계 패턴을 `docs/solutions/<category>/<filename>.md`에 문서화한다.
 단순 작업이거나 코드만으로 맥락이 충분하면 생략 가능.
 
+**카테고리 선택이 곧 커밋 여부 결정이다.** `architecture-patterns/`만 git에 추적되고 나머지 카테고리(`conventions`·`logic-errors`·`ui-bugs`·`integration-issues`)는 로컬 보관이다. 재사용 가능한 설계 결론이면 `architecture-patterns/`에, 특정 작업의 진행 기록이면 나머지에 쓴다 (CLAUDE.md Git/PR 규칙 참조).
+
 ## PHASE 5. 브랜치 마무리
 
 `finishing-a-development-branch` 스킬로 완료 처리한다:

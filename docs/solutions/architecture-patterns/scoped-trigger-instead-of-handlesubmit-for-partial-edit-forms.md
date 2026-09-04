@@ -94,4 +94,4 @@ const hasEmptyRequired = REQUIRED_BULK_EDIT_GROUPS.some(
 2. **컴포넌트를 몇 화면이 공유하는가?** → 둘 이상이면 모드 플래그는 답이 아니다
 3. **바인딩 경로가 같은가?** → 값 폼을 원본과 같은 flat 구조로 두면 재사용이 성립한다. 체크 상태 같은 부가 정보는 폼 밖(별도 state·context)으로 뺀다
 
-관련: [`docs/superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md`](../../superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md)
+관련: `docs/superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md`

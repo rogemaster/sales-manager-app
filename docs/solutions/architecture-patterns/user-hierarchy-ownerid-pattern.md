@@ -211,4 +211,4 @@ interface PurchaseSource {
 - `src/app/api/register/route.ts` — 회원가입 시 `ownerId` 자기참조 저장
 - `src/app/api/account/users/list/route.ts`, `create/route.ts` — Neon DB 기반 사용자 목록/등록
 - `src/mocks/data/MockShoppingAccountsData.ts`, `MockShoppingSettingsData.ts` — 실제 계정 id로 동기화된 mock 데이터 예시
-- `docs/solutions/conventions/typescript-type-design-patterns.md` — `Exclude<>` 기반 SubUserGrade 패턴 (Pattern 5)
+- `docs/solutions/architecture-patterns/typescript-type-design-patterns.md` — `Exclude<>` 기반 SubUserGrade 패턴 (Pattern 5)

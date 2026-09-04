@@ -91,4 +91,4 @@ expect(resolveExcelTotalQuantity(row)).toBe(product.totalQuantity);
 
 - 설계 근거: `docs/superpowers/specs/2026-08-22-product-bulk-excel-option-sku.md`
 - 엑셀 구조 전반: [`.claude/rules/excel.md`](../../../.claude/rules/excel.md)
-- 같은 셀 값이 조용히 손상되는 다른 경로: [`excel-template-text-format-prevents-data-loss.md`](../integration-issues/excel-template-text-format-prevents-data-loss.md)
+- 같은 셀 값이 조용히 손상되는 다른 경로: `docs/solutions/integration-issues/excel-template-text-format-prevents-data-loss.md`

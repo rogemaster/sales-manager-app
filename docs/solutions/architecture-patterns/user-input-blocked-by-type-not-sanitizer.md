@@ -99,6 +99,6 @@ export const isMainImageOwnedBy = (mainImage: string, ownerId: string): boolean 
 ## Related
 
 - [`api-route-session-auth-guard.md`](api-route-session-auth-guard.md) — 이 route들이 쓰는 세션 가드
-- [`form-generic-split-hides-file-in-snapshot.md`](../logic-errors/form-generic-split-hides-file-in-snapshot.md) — 같은 라운드의 반대 방향 사례(타입이 갈라져 File이 새어나간 쪽)
+- `docs/solutions/logic-errors/form-generic-split-hides-file-in-snapshot.md` — 같은 라운드의 반대 방향 사례(타입이 갈라져 File이 새어나간 쪽)
 - `src/lib/storage.ts`, `src/lib/storage.test.ts` — 구현과 경계 테스트
 - `docs/superpowers/specs/2026-09-01-product-image-r2-storage-design.md` — 설계 문서(§9에 공개 URL 우회로 오픈 이슈)

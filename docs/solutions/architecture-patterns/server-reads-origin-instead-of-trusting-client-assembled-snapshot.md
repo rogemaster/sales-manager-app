@@ -84,4 +84,4 @@ const isApplicableSetting = (linked, setting) =>
 2. **교체 대상에 불변 필드가 섞여 있는가?** → 섞여 있으면 서버 검사는 필수다. UI 가드로 대신할 수 없다
 3. **top-level에 그 스냅샷을 가리키는 참조가 있는가?** → 있으면 함께 갱신해야 필터와 표시가 어긋나지 않는다
 
-관련: [`docs/superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md`](../../superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md), [`2026-08-03-mall-linked-product-edit-resend-design.md`](../../superpowers/specs/2026-08-03-mall-linked-product-edit-resend-design.md)
+관련: `docs/superpowers/specs/2026-08-27-mall-linked-product-bulk-edit-design.md`, `docs/superpowers/specs/2026-08-03-mall-linked-product-edit-resend-design.md`
