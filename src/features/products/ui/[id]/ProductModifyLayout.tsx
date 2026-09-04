@@ -58,15 +58,8 @@ export const ProductModifyLayout = ({ productId }: Props) => {
     }
   }, [isSuccess, queryData]);
 
-  // 등록 화면과 같은 가드. 삭제 버튼이 mainImage를 ''로 되돌리는데 DB는 notNull이라 빈 문자열로 통과한다.
+  // mainImage 필수는 ProductMainImageInfo가 useController로 등록해 handleSubmit이 막는다 — 화면별 수동 가드를 두지 않는다.
   const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
-    if (!data.mainImage) {
-      formData.setError('mainImage', {
-        type: 'manual',
-        message: '메인이미지를 선택해 주세요.',
-      });
-      return;
-    }
     mutate(data);
   };
 

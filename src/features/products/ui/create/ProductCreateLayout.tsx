@@ -13,7 +13,13 @@ import { resolveMainImageKey } from '@/shared/api/uploadImage';
 
 export const ProductCreateLayout = () => {
   const { showAlert } = useAlert();
-  const formData = useForm<ProductFormValues>();
+  // 원산지는 상품마다 달라 기본값을 두지 않는다.
+  const formData = useForm<ProductFormValues>({
+    defaultValues: {
+      taxType: 'TAXABLE',
+      adultProductType: 'GENERAL',
+    },
+  });
   const router = useRouter();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
@@ -42,15 +48,9 @@ export const ProductCreateLayout = () => {
     },
   });
 
+  // mainImage 필수는 ProductMainImageInfo가 useController로 등록해 handleSubmit이 막는다 — 화면별 수동 가드를 두지 않는다.
   const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
-    if (!data.mainImage) {
-      formData.setError('mainImage', {
-        type: 'manual',
-        message: '메인이미지를 선택해 주세요.',
-      });
-    } else {
-      mutate(data);
-    }
+    mutate(data);
   };
 
   return (

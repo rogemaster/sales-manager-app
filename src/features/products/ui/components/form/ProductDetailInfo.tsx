@@ -17,7 +17,7 @@ export const ProductDetailInfo = () => {
         <div className="flex items-center gap-2.5">
           <div className="h-4 w-[3px] rounded-full bg-primary" />
           <div>
-            <CardTitle className="text-sm">상품상세설명</CardTitle>
+            <CardTitle className="text-sm">상품상세설명 *</CardTitle>
             <CardDescription className="mt-0.5">상품에 대한 자세한 설명을 입력하세요.</CardDescription>
           </div>
         </div>
