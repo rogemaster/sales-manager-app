@@ -218,7 +218,7 @@ type ShoppingSetting =
   | (ShoppingSettingBase & { mallCode: Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never });
 ```
 
-React Hook Form은 `keyof`가 유니온 타입에서 공통 키만 남기는 특성 때문에 discriminated union을 폼 상태로 직접 다루기 어려워, RHF 쪽은 느슨한 flat 타입(`ShoppingSettingFormValues`)으로 관리하고 제출 시점에만 `buildMallSettingsPayload`로 도메인 타입으로 변환합니다 — 폼 상태 타입과 도메인 타입을 분리해 타입 안전성이 필요한 경계에서만 좁히는 전략입니다. 설계 배경과 트레이드오프는 [`docs/solutions/conventions/typescript-type-design-patterns.md`](docs/solutions/conventions/typescript-type-design-patterns.md), 확장 시 체크리스트는 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)에 정리했습니다.
+React Hook Form은 `keyof`가 유니온 타입에서 공통 키만 남기는 특성 때문에 discriminated union을 폼 상태로 직접 다루기 어려워, RHF 쪽은 느슨한 flat 타입(`ShoppingSettingFormValues`)으로 관리하고 제출 시점에만 `buildMallSettingsPayload`로 도메인 타입으로 변환합니다 — 폼 상태 타입과 도메인 타입을 분리해 타입 안전성이 필요한 경계에서만 좁히는 전략입니다. 설계 배경과 트레이드오프는 [`docs/solutions/architecture-patterns/typescript-type-design-patterns.md`](docs/solutions/architecture-patterns/typescript-type-design-patterns.md), 확장 시 체크리스트는 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)에 정리했습니다.
 
 ### MSW 핸들러 구조
 
