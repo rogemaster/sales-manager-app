@@ -48,15 +48,9 @@ export const ProductCreateLayout = () => {
     },
   });
 
+  // mainImage 필수는 ProductMainImageInfo가 useController로 등록해 handleSubmit이 막는다 — 화면별 수동 가드를 두지 않는다.
   const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
-    if (!data.mainImage) {
-      formData.setError('mainImage', {
-        type: 'manual',
-        message: '메인이미지를 선택해 주세요.',
-      });
-    } else {
-      mutate(data);
-    }
+    mutate(data);
   };
 
   return (

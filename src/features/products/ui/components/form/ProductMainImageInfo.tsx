@@ -5,7 +5,7 @@ import { acceptImage } from '@/constant/accept.content';
 import { Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useFormContext } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 import { ProductFormValues } from '@/features/products/types/product.types';
 import { MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
 
@@ -14,12 +14,18 @@ export const ProductMainImageInfo = () => {
   const [isDragging, setIsDragging] = useState(false);
   const handleFileInputRef = useRef<HTMLInputElement>(null);
 
+  const { control, setError } = useFormContext<ProductFormValues>();
+
+  // File|string을 직접 들고 있어 register()로는 검증이 붙지 않는다. useController로 등록해야
+  // handleSubmit(등록·수정)과 trigger()(연동상품 수정) 양쪽이 같은 규칙을 본다.
   const {
-    setValue,
-    formState: { errors },
-    clearErrors,
-    setError,
-  } = useFormContext<ProductFormValues>();
+    field,
+    fieldState: { error },
+  } = useController({
+    control,
+    name: 'mainImage',
+    rules: { required: '메인이미지를 선택해 주세요.' },
+  });
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -36,8 +42,7 @@ export const ProductMainImageInfo = () => {
       setMainImages({ dataUrl: reader.result as string, file });
     };
     reader.readAsDataURL(file);
-    setValue('mainImage', file);
-    clearErrors('mainImage');
+    field.onChange(file);
   };
 
   const handleClick = () => {
@@ -68,7 +73,7 @@ export const ProductMainImageInfo = () => {
 
   const handleRemoveImage = () => {
     setMainImages(null);
-    setValue('mainImage', '');
+    field.onChange('');
   };
 
   return (
@@ -77,7 +82,7 @@ export const ProductMainImageInfo = () => {
         <div className="flex items-center gap-2.5">
           <div className="h-4 w-[3px] rounded-full bg-primary" />
           <div>
-            <CardTitle className="text-sm">메인이미지</CardTitle>
+            <CardTitle className="text-sm">메인이미지 *</CardTitle>
             <CardDescription className="mt-0.5">상품의 메인 이미지를 업로드하세요.</CardDescription>
           </div>
         </div>
@@ -123,7 +128,7 @@ export const ProductMainImageInfo = () => {
             </div>
           )}
         </div>
-        {errors.mainImage && <p className="text-red-500 text-sm">{errors.mainImage.message}</p>}
+        {error && <p className="text-red-500 text-sm">{error.message}</p>}
       </CardContent>
     </Card>
   );
