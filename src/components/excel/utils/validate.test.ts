@@ -83,3 +83,67 @@ describe('validateExcelData - 기존 필수값 검사', () => {
     expect(errors[0]).toMatchObject({ row: 2, header: '상품명', code: 'EMPTY_VALUE' });
   });
 });
+
+describe('validateExcelData - 숫자 검사', () => {
+  const numericTemplate: ExcelTemplateInfo[] = [
+    { key: 'name', name: '상품명', req: true },
+    { key: 'price', name: '판매가', req: true, numeric: true },
+    { key: 'netPrice', name: '공급가', req: false, numeric: true },
+  ];
+
+  const numericRow = (over: Record<string, string | number> = {}) => ({
+    상품명: '상품',
+    판매가: 10000,
+    공급가: '',
+    ...over,
+  });
+
+  it('숫자가 아니면 INVALID_NUMBER 오류를 만든다', () => {
+    const { errors } = validateExcelData([numericRow({ 판매가: 'abc' })], numericTemplate);
+
+    expect(errors).toContainEqual({ row: 1, header: '판매가', code: 'INVALID_NUMBER', value: 'abc' });
+  });
+
+  it('음수를 잡는다', () => {
+    const { errors } = validateExcelData([numericRow({ 판매가: -1 })], numericTemplate);
+
+    expect(errors[0]).toMatchObject({ header: '판매가', code: 'INVALID_NUMBER' });
+  });
+
+  it('소수점을 잡는다', () => {
+    const { errors } = validateExcelData([numericRow({ 판매가: 1000.5 })], numericTemplate);
+
+    expect(errors[0]).toMatchObject({ header: '판매가', code: 'INVALID_NUMBER' });
+  });
+
+  it('숫자 오류만 있으면 미리보기가 가능하도록 success로 판정한다', () => {
+    const { result } = validateExcelData([numericRow({ 판매가: 'abc' })], numericTemplate);
+
+    expect(result).toBe('success');
+  });
+
+  it('정상 숫자는 통과한다', () => {
+    const { errors } = validateExcelData([numericRow()], numericTemplate);
+
+    expect(errors).toHaveLength(0);
+  });
+
+  it('문자열로 적힌 숫자도 통과한다', () => {
+    const { errors } = validateExcelData([numericRow({ 판매가: ' 10000 ' })], numericTemplate);
+
+    expect(errors).toHaveLength(0);
+  });
+
+  it('선택 컬럼이 비어 있으면 검사를 건너뛴다', () => {
+    const { errors } = validateExcelData([numericRow({ 공급가: '' })], numericTemplate);
+
+    expect(errors).toHaveLength(0);
+  });
+
+  it('필수 컬럼이 비어 있으면 EMPTY_VALUE만 붙이고 숫자 오류를 겹쳐 붙이지 않는다', () => {
+    const { errors } = validateExcelData([numericRow({ 판매가: '' })], numericTemplate);
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe('EMPTY_VALUE');
+  });
+});

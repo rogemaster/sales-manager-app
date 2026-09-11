@@ -75,15 +75,16 @@ export type ExcelRowWithErrors = { [key: string]: string | number | boolean | nu
 export interface ValidationError {
   row: number;
   header: string;
-  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE';
+  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER';
   message?: string;
-  // INVALID_VALUE에서만 채워진다 — 메시지가 적은 값과 적을 수 있었던 값을 함께 알려주기 위한 것
+  // INVALID_VALUE와 INVALID_NUMBER에서 채워진다. 사용자가 어떤 값을 적었고 무엇을 적을 수 있었는지
+  // 오류 메시지가 함께 알려주기 위한 값이라, 메시지 조립은 message.ts가 맡는다.
   value?: string;
   allowed?: string[];
 }
 
 export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'FILE_TOO_LARGE' | 'PROCESSING_ERROR';
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE';
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER';
 
 // processExcelUpload 반환 타입
 export type UploadResult =
@@ -198,6 +199,8 @@ src/features/products/constant/
   // ...
 ]
 ```
+
+**`numeric`은 두 가지 의미를 갖는다.** 다운로드 양식에서 숫자 서식으로 만들고, **업로드 검증에서 0 이상 정수인지 검사한다.** 현재 양식의 숫자 컬럼(공급가·판매가·배송비·총수량)이 전부 같은 규칙이라 표시 하나로 충분하다. 다른 규칙이 필요한 숫자 컬럼이 생기면 그때 표현을 늘린다.
 
 미리보기 테이블 컬럼 정의 예시:
 

@@ -60,7 +60,7 @@ TypeError: Cannot destructure property 'name' of 'PRODUCT_STATUS.find(...)' as i
 |---|---|---|
 | 입력 검증 | 어느 행의 어느 값이 잘못됐는지 **사용자에게 알린다** | `src/components/excel/utils/validate.ts` |
 | 쓰기 경계 | 표시명을 코드로 **바꾼다**. 못 바꾼 값은 통과시키지 않는다 | `src/components/excel/strategies/productExcelSaveStrategy.ts` |
-| API | 코드가 아닌 값을 **거부한다** | `src/features/products/util/productCodes.ts` |
+| API | 저장 전에 값을 **거부한다** — 코드값, 숫자 범위, 길이·개수 상한, 필수 여부 | `src/features/products/util/productWriteSchema.ts` |
 
 **허용 목록은 화면 Select가 쓰는 상수에서 파생시킨다.** 목록을 따로 적으면 코드를 하나 추가할 때 양식과 화면이 갈라진다.
 
@@ -74,18 +74,28 @@ allowed: PRODUCT_STATUS.map(({ name }) => name),
 **API 검증을 생략하지 않는다.** 업로드 검증은 브라우저에서만 돈다. 저장을 막는 마지막 자리는 서버다. 컬럼이 `text`인 한 DB는 아무것도 막아주지 않는다.
 
 ```ts
-// src/features/products/util/productCodes.ts
-export const findInvalidProductCode = (product: Partial<Product>): ProductCodeViolation | null => {
-  for (const { key, label, options } of CODE_FIELDS) {
-    const value = product[key];
-    if (value === undefined) continue; // PATCH는 바꾸려는 필드만 보낸다
-    if (!options.some((option) => option.id === value)) return { label, value: String(value) };
+// src/features/products/util/productWriteSchema.ts
+export const findProductWriteViolation = (product: unknown, mode: 'full' | 'partial' = 'full'): string | null => {
+  if (typeof product !== 'object' || product === null) return '상품 데이터의 형식이 올바르지 않습니다';
+
+  const record = product as Record<string, unknown>;
+
+  for (const field of FIELDS) {
+    const value = record[field.key];
+
+    if (value === undefined) {
+      if (mode === 'partial' || !field.required) continue; // PATCH는 바꾸려는 필드만 보낸다
+      return `${subject(field.label)} 없습니다`;
+    }
+
+    if (!field.schema.safeParse(value).success) return violationOf(field, value);
   }
+
   return null;
 };
 ```
 
-등록·수정·대량등록 세 route가 같은 검사를 쓴다. 대량등록은 전체 행을 먼저 보고 몇 번째 행인지 알려준다 — 일부만 넣고 나머지를 거부하면 어디까지 반영됐는지 알 수 없는 절반짜리 상태가 된다.
+이 함수는 등록·수정·대량등록 세 쓰기 경로에 모두 쓰이고, 수정 경로는 `'partial'` 모드를 넘겨 건드리지 않은 필드는 검사하지 않는다. 대량등록은 전체 행을 먼저 보고 몇 번째 행인지 알려준다 — 일부만 넣고 나머지를 거부하면 어디까지 반영됐는지 알 수 없는 절반짜리 상태가 된다.
 
 **표시 층에서는 디폴트 값으로 메우지 않는다.** 상수에서 못 찾은 값은 원문을 그대로 보여준다.
 
