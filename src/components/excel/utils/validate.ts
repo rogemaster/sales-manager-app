@@ -17,11 +17,17 @@ export function invalidValue(row: ExcelRowType, header: string, allowed: string[
   return !allowed.includes(String(row[header]).trim());
 }
 
+// 0 이상 정수가 아닌 경우. numeric 컬럼에만 적용한다.
+export function invalidNumber(row: ExcelRowType, header: string) {
+  const parsed = Number(String(row[header]).trim());
+  return !Number.isInteger(parsed) || parsed < 0;
+}
+
 export function validateExcelData(rowsData: ExcelRowType[], templateInfo: ExcelTemplateInfo[]): ValidationResult {
   const errors: ValidationError[] = [];
 
   rowsData.forEach((row, index) => {
-    templateInfo.forEach(({ name: header, req, allowed }) => {
+    templateInfo.forEach(({ name: header, req, allowed, numeric }) => {
       if (req && missingField(row, header)) {
         errors.push({ row: index + 1, header, code: 'MISSING_FIELD' });
         return;
@@ -36,6 +42,11 @@ export function validateExcelData(rowsData: ExcelRowType[], templateInfo: ExcelT
       // 선택 컬럼이 비어 있는 것은 오류가 아니다.
       if (allowed && !emptyValue(row, header) && invalidValue(row, header, allowed)) {
         errors.push({ row: index + 1, header, code: 'INVALID_VALUE', value: String(row[header]).trim(), allowed });
+      }
+
+      // 빈 값에는 숫자 오류를 겹쳐 붙이지 않는다. 허용값 검사와 같은 이유다.
+      if (numeric && !emptyValue(row, header) && invalidNumber(row, header)) {
+        errors.push({ row: index + 1, header, code: 'INVALID_NUMBER', value: String(row[header]).trim() });
       }
     });
   });

@@ -26,6 +26,9 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
         message: `[${item.header}] '${item.value}'는 사용할 수 없는 값입니다. (사용 가능: ${item.allowed?.join(', ')})`,
       };
     }
+    if (item.code === 'INVALID_NUMBER') {
+      return { ...item, message: `[${item.header}] '${item.value}'는 0 이상의 정수여야 합니다.` };
+    }
     return item;
   });
 }
