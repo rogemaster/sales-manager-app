@@ -10,7 +10,9 @@ export const updateProduct = async (productId: string, data: Product, _ownerId: 
   });
 
   if (!response.ok) {
-    throw new Error('상품 데이터 호출 실패');
+    // 서버가 어느 값이 왜 거부됐는지 알려준다 — 고정 문구로 덮으면 그 정보가 사라진다.
+    const { error } = await response.json().catch(() => ({ error: '' }));
+    throw new Error(error || '상품 수정 실패');
   }
 
   return response.json();

@@ -12,6 +12,7 @@ type Props = {
   onChangePage: (page: number) => void;
   isLoading?: boolean;
   searchCount: number;
+  showThumbnail: boolean;
 };
 
 export const ProductListTableSection = ({
@@ -22,6 +23,7 @@ export const ProductListTableSection = ({
   onChangePage,
   isLoading,
   searchCount,
+  showThumbnail,
 }: Props) => {
   return (
     <Card>
@@ -33,7 +35,7 @@ export const ProductListTableSection = ({
           <p className="py-10 text-center text-sm text-muted-foreground">불러오는 중...</p>
         ) : (
           <>
-            <ProductTableBody key={searchCount} products={products} />
+            <ProductTableBody key={searchCount} products={products} showThumbnail={showThumbnail} />
             <TablePagination currentPage={currentPage} totalPages={totalPages} onChangePage={onChangePage} />
           </>
         )}

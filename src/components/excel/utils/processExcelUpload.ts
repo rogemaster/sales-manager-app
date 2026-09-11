@@ -55,11 +55,9 @@ export async function processExcelUpload(
     // 엑셀을 이중배열이 아닌 배열 안의 객체 형태(Array of Objects) 로 변형
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-    // 필수값 헤더 추출
-    const requiredHeaders = fileTemplateInfo.filter((data) => data.req).map((data) => data.name);
-
-    // validateSheet 함수 호출 - 필수값 검증
-    const validationResult = validateExcelData(jsonData as ExcelRowType[], requiredHeaders);
+    // 필수값 검증 + 허용값 검증. 필수 여부(req)와 허용 목록(allowed)이 모두 양식 정의에 있으므로
+    // 헤더만 추려 넘기지 않고 양식 전체를 넘긴다.
+    const validationResult = validateExcelData(jsonData as ExcelRowType[], fileTemplateInfo);
 
     const success = validationResult.result === 'success';
 

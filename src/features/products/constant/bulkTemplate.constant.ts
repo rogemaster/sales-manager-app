@@ -1,4 +1,6 @@
 import { ExcelTemplate } from '@/types/excel.type';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
+import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 
 // 엑셀 양식 템플릿
 export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
@@ -55,11 +57,14 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       key: 'state',
       name: '판매상태',
       req: true,
+      // 사용자가 시트에 적는 값은 코드가 아니라 표시명이다. 정본은 화면 Select와 같은 상수를 쓴다.
+      allowed: PRODUCT_STATUS.map(({ name }) => name),
     },
     {
       key: 'deliveryType',
       name: '배송정책',
       req: true,
+      allowed: DELIVERY_TYPE_OPTION.map(({ name }) => name),
     },
     {
       key: 'deliveryPrice',

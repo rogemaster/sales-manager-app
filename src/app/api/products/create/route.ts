@@ -5,6 +5,7 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { CreateProductRequest } from '@/features/products/types/product.types';
+import { findInvalidProductCode, invalidProductCodeMessage } from '@/features/products/util/productCodes';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -16,6 +17,12 @@ export async function POST(req: NextRequest) {
     // key 형태라면 본인 네임스페이스여야 한다 — 아니면 다른 테넌트의 R2 객체를 가리키는 key가 그대로 저장된다.
     if (data.mainImage && !isMainImageOwnedBy(data.mainImage, session.ownerId)) {
       return NextResponse.json({ error: '본인이 업로드한 이미지만 사용할 수 있습니다.' }, { status: 400 });
+    }
+
+    // 판매상태·배송정책은 코드값만 저장한다. 컬럼이 text라 DB는 막아주지 않는다.
+    const violation = findInvalidProductCode(data);
+    if (violation) {
+      return NextResponse.json({ error: invalidProductCodeMessage(violation) }, { status: 400 });
     }
 
     const now = new Date();

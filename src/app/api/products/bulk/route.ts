@@ -5,6 +5,7 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { Product } from '@/features/products/types/product.types';
+import { findInvalidProductCode, invalidProductCodeMessage } from '@/features/products/util/productCodes';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -26,6 +27,15 @@ export async function POST(req: NextRequest) {
         { error: `${invalidIndex + 1}번째 행의 이미지는 본인이 업로드한 것이 아닙니다.` },
         { status: 400 },
       );
+    }
+
+    // 판매상태·배송정책도 같은 이유로 전체 행을 먼저 본다. 엑셀 업로드 검증이 앞에서 걸러주지만
+    // 그 검증은 브라우저에서만 돈다.
+    for (const [index, product] of rows.entries()) {
+      const violation = findInvalidProductCode(product);
+      if (violation) {
+        return NextResponse.json({ error: invalidProductCodeMessage(violation, index + 1) }, { status: 400 });
+      }
     }
 
     const now = new Date();
