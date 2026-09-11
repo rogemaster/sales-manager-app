@@ -1,12 +1,23 @@
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { ExcelRowWithErrors } from '@/types/excel.type';
+import { FilterOption } from '@/types/common.type';
 import { Product } from '@/features/products/types/product.types';
+import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
+import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 import {
   buildCombinationsFromExcel,
   resolveTotalQuantity,
   toExcelOptionPairs,
   toText,
 } from '@/features/products/util/excelOptions';
+
+/**
+ * 시트의 한글 표시명을 도메인 코드로 바꾼다. 목록에 없으면 undefined를 돌려주고 호출부가 기본값으로 떨어진다.
+ * 값을 그대로 통과시키면 코드값이 아닌 문자열이 DB까지 내려가고, 표시 단계(ProductStatusBadge 등)에서야
+ * 터진다 — 업로드 검증(양식의 allowed)이 앞에서 막지만 그 검증에만 기대지 않는다.
+ */
+const toCode = (options: FilterOption[], value: unknown): string | undefined =>
+  options.find((option) => option.name === toText(value))?.id;
 
 export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Product, 'ownerId'>[] => {
   return rows.map((r) => {
@@ -31,8 +42,8 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
       modelId: r['모델번호'] ? String(r['모델번호']) : undefined,
       netPrice: r['공급가'] ? Number(r['공급가']) : undefined,
       price: Number(r['판매가']),
-      state: (r['판매상태'] as Product['state']) || 'WAIT_SALE',
-      deliveryType: (r['배송정책'] as string) || '',
+      state: (toCode(PRODUCT_STATUS, r['판매상태']) as Product['state']) || 'WAIT_SALE',
+      deliveryType: toCode(DELIVERY_TYPE_OPTION, r['배송정책']) || '',
       deliveryPrice: Number(r['배송비']),
       mainImage: (r['메인이미지'] as string) || '',
       detailPage: (r['상세설명'] as string) || '',

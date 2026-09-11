@@ -6,7 +6,7 @@ const baseRow: ExcelRowWithErrors = {
   상품명: '테스트 상품',
   카테고리: 'CAT-001',
   판매가: 10000,
-  판매상태: 'ON_SALE',
+  판매상태: '판매중',
   배송정책: '무료배송',
   배송비: 0,
   메인이미지: 'https://example.com/main.png',
@@ -111,5 +111,50 @@ describe('productExcelSaveStrategy - 옵션 및 SKU', () => {
 
     expect(product.option).toHaveLength(2);
     expect(product.option?.every((combination) => combination.skuCode === '')).toBe(true);
+  });
+});
+
+describe('productExcelSaveStrategy - 표시명을 코드로 치환', () => {
+  it('판매상태 한글 표시명을 코드로 바꾼다', () => {
+    const rows = ['판매중', '판매대기', '품절', '판매중지'].map((state) => ({ ...baseRow, 판매상태: state }));
+
+    expect(productExcelSaveStrategy(rows).map((p) => p.state)).toEqual([
+      'ON_SALE',
+      'WAIT_SALE',
+      'SOLD_OUT',
+      'SALE_DIS',
+    ]);
+  });
+
+  it('배송정책 한글 표시명을 코드로 바꾼다', () => {
+    const rows = ['무료배송', '유료배송', '착불', '조건부 무료배송'].map((type) => ({ ...baseRow, 배송정책: type }));
+
+    expect(productExcelSaveStrategy(rows).map((p) => p.deliveryType)).toEqual([
+      'FREE',
+      'NOT_FREE',
+      'CHARGE_RECEIVED',
+      'CONDITIONAL_FREE',
+    ]);
+  });
+
+  it('앞뒤 공백이 붙은 표시명도 코드로 바꾼다', () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 판매상태: ' 판매중 ', 배송정책: ' 무료배송 ' }]);
+
+    expect(product.state).toBe('ON_SALE');
+    expect(product.deliveryType).toBe('FREE');
+  });
+
+  it('표시명이 아닌 값은 코드로 새어 나가지 않는다', () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 판매상태: '판매중임', 배송정책: '무료' }]);
+
+    expect(product.state).toBe('WAIT_SALE');
+    expect(product.deliveryType).toBe('');
+  });
+
+  it('이미 코드값으로 적힌 값도 표시명이 아니므로 통과시키지 않는다', () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 판매상태: 'ON_SALE', 배송정책: 'FREE' }]);
+
+    expect(product.state).toBe('WAIT_SALE');
+    expect(product.deliveryType).toBe('');
   });
 });

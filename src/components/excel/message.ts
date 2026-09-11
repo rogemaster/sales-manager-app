@@ -20,6 +20,12 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
     if (item.code === 'EMPTY_VALUE') {
       return { ...item, message: `[${item.header}] 값이 비어 있습니다.` };
     }
+    if (item.code === 'INVALID_VALUE') {
+      return {
+        ...item,
+        message: `[${item.header}] '${item.value}'는 사용할 수 없는 값입니다. (사용 가능: ${item.allowed?.join(', ')})`,
+      };
+    }
     return item;
   });
 }
