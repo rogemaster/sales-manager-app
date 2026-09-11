@@ -8,13 +8,16 @@ import { getCategoryName } from '@/lib/utils';
 import { LIST_TABLE_HEAD } from '@/features/products/constant/table.constants';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';
+import { toProductImageUrl } from '@/features/products/util/productImage';
 import Link from 'next/link';
+import { ProductThumbnail } from './ProductThumbnail';
 
 type Props = {
   products: Product[];
+  showThumbnail: boolean;
 };
 
-export const ProductTableBody = ({ products }: Props) => {
+export const ProductTableBody = ({ products, showThumbnail }: Props) => {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const selectedSet = useMemo(() => new Set(selectedProducts), [selectedProducts]);
 
@@ -65,7 +68,10 @@ export const ProductTableBody = ({ products }: Props) => {
             </TableCell>
             <TableCell className="text-center font-mono text-sm text-muted-foreground">{product.productId}</TableCell>
             <TableCell className="font-medium">
-              <Link href={`/products/${product.productId}`}>{product.name}</Link>
+              <div className="flex items-center gap-3">
+                {showThumbnail && <ProductThumbnail src={toProductImageUrl(product.mainImage)} />}
+                <Link href={`/products/${product.productId}`}>{product.name}</Link>
+              </div>
             </TableCell>
             <TableCell className="text-center">{getCategoryName(product.categoryId)}</TableCell>
             <TableCell className="text-center">
