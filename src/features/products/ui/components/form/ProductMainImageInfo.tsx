@@ -1,17 +1,19 @@
 'use client';
 
-import React, { ChangeEvent, DragEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, DragEvent, useEffect, useRef, useState } from 'react';
 import { acceptImage } from '@/constant/accept.content';
-import { Upload, X } from 'lucide-react';
+import { ImageIcon, Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useController, useFormContext } from 'react-hook-form';
 import { ProductFormValues } from '@/features/products/types/product.types';
 import { MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
+import { toProductImageUrl } from '@/features/products/util/productImage';
 
 export const ProductMainImageInfo = () => {
   const [mainImages, setMainImages] = useState<{ dataUrl: string; file: File } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const handleFileInputRef = useRef<HTMLInputElement>(null);
 
   const { control, setError } = useFormContext<ProductFormValues>();
@@ -26,6 +28,16 @@ export const ProductMainImageInfo = () => {
     name: 'mainImage',
     rules: { required: '메인이미지를 선택해 주세요.' },
   });
+
+  // 새로 고른 파일이 있으면 그 데이터 URL을, 없으면 폼에 들어 있는 저장된 값을 그린다.
+  // 수정 화면은 저장된 값(R2 key 또는 외부 절대 URL)으로 시작하므로 이 두 번째 경로가 없으면
+  // 이미지가 있는 상품인데도 빈 업로드 박스만 보인다.
+  const previewUrl = mainImages?.dataUrl ?? (typeof field.value === 'string' ? toProductImageUrl(field.value) : '');
+
+  // 주소가 바뀌면 앞선 실패를 지운다. 실패한 채로 남으면 새로 고른 이미지까지 회색 박스가 된다.
+  useEffect(() => {
+    setHasLoadError(false);
+  }, [previewUrl]);
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -111,10 +123,17 @@ export const ProductMainImageInfo = () => {
             </Button>
           </div>
 
-          {mainImages && (
+          {previewUrl && (
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <img src={mainImages.dataUrl} alt="메인 이미지 미리보기" />
+                {/* 버킷에 25일 수명주기 규칙이 걸려 있어 "key는 있는데 객체가 없는" 상태가 일상적으로 생긴다. */}
+                {hasLoadError ? (
+                  <div className="flex aspect-square w-full items-center justify-center rounded border border-border/60 bg-muted">
+                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                ) : (
+                  <img src={previewUrl} alt="메인 이미지 미리보기" onError={() => setHasLoadError(true)} />
+                )}
                 <Button
                   type="button"
                   variant="destructive"
