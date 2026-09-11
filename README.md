@@ -267,14 +267,21 @@ NEXTAUTH_SECRET=your-secret-key
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 DATABASE_URL=your-neon-database-url
 
-# Cloudflare R2 (상품 메인이미지) — 네 값 모두 서버 전용이다. NEXT_PUBLIC_ 접두사를 붙이면 번들에 노출된다
+# Cloudflare R2 자격증명 (상품 메인이미지 업로드) — 네 값 모두 서버 전용이다. NEXT_PUBLIC_ 접두사를 붙이면 번들에 노출된다
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 R2_BUCKET_NAME=your-bucket-name
+
+# R2 버킷의 공개 읽기 주소 (상품 이미지 표시용) — 이 값만 공개이며 번들에 들어가도 무방하다
+NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-xxxxxxxx.r2.dev
 ```
 
 R2 값이 비어 있으면 이미지 업로드 요청이 `R2 환경변수가 설정되지 않았습니다: ...`로 실패합니다(어떤 변수가 비었는지 메시지에 나옵니다). Cloudflare 대시보드에서 버킷과 API 토큰을 먼저 만들어야 합니다.
+
+`NEXT_PUBLIC_R2_PUBLIC_URL`은 Cloudflare 대시보드에서 버킷의 공개 읽기를 켜면 발급되는 주소입니다. 이 값이 비어 있으면 업로드는 그대로 동작하지만 목록의 메인이미지가 회색 대체 박스로 표시됩니다. 공개 읽기를 켜도 쓰기·삭제·버킷 목록 조회는 여전히 API 토큰이 필요하며, 공개되는 것은 정확한 key를 아는 사람이 그 파일 하나를 받는 것뿐입니다.
+
+`NEXT_` 접두사가 붙은 변수는 빌드 시점에 값이 번들에 치환됩니다. Vercel 환경변수에 값을 추가만 하고 재배포하지 않으면 반영되지 않으니, 값을 추가·변경한 뒤에는 반드시 재배포하세요.
 
 > 라이브 데모 버킷에는 **25일 수명주기 규칙**이 걸려 있습니다. 공개 계정이라 업로드가 무제한으로 쌓이는 것을 막기 위한 설정이며, 그 결과 오래된 이미지 key는 실제 객체가 없는 상태가 됩니다. 자체 운영 환경에서는 이 규칙 없이 쓰시면 됩니다.
 
