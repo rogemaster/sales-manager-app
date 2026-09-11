@@ -40,7 +40,7 @@
 
 - 유틸리티: `src/components/excel/utils/`
   - `processExcelUpload(event, fileTemplateInfo)`: XLSX 파싱, 파일 검증, 필드 검증 → `UploadResult` 반환
-  - `validateExcelData(rowsData, requiredHeaders)`: 필수 필드/빈 값 검증 → `ValidationResult` 반환
+  - `validateExcelData(rowsData, templateInfo)`: 필수 필드/빈 값/허용값 검증 → `ValidationResult` 반환. 헤더만 추리지 않고 양식 전체(`ExcelTemplateInfo[]`)를 받는다 — `req`와 `allowed`가 모두 양식 정의에 있기 때문
   - `excelDownload(templateHeaders, templateName)`: ExcelJS로 템플릿 생성 후 file-saver로 다운로드
   - `getExcelSaveStrategy(type)`: 전략 + API 합성 함수 반환
 
@@ -75,12 +75,15 @@ export type ExcelRowWithErrors = { [key: string]: string | number | boolean | nu
 export interface ValidationError {
   row: number;
   header: string;
-  code: 'MISSING_FIELD' | 'EMPTY_VALUE';
+  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE';
   message?: string;
+  // INVALID_VALUE에서만 채워진다 — 메시지가 적은 값과 적을 수 있었던 값을 함께 알려주기 위한 것
+  value?: string;
+  allowed?: string[];
 }
 
 export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'FILE_TOO_LARGE' | 'PROCESSING_ERROR';
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE';
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE';
 
 // processExcelUpload 반환 타입
 export type UploadResult =
@@ -189,7 +192,8 @@ src/features/products/constant/
 [
   { name: '상품명', req: true },
   { name: '판매가', req: true },
-  { name: '판매상태', req: true },
+  // 코드값만 허용되는 컬럼은 allowed를 붙인다. 목록은 화면 Select가 쓰는 상수에서 파생시킨다
+  { name: '판매상태', req: true, allowed: PRODUCT_STATUS.map(({ name }) => name) },
   { name: '카테고리', req: false },
   // ...
 ]
@@ -320,7 +324,8 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] 
     name: r['상품명'] as string,
     categoryId: (r['카테고리'] as string) || '',
     price: Number(r['판매가']),
-    state: (r['판매상태'] as Product['state']) || 'WAIT_SALE',
+    // 표시명 → 코드. as 캐스팅으로 통과시키지 않는다 (아래 주의 참고)
+    state: (toCode(PRODUCT_STATUS, r['판매상태']) as Product['state']) || 'WAIT_SALE',
     // ... 전체 Product 필드 매핑
   }));
 };
@@ -328,6 +333,8 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] 
 
 - 새 도메인 추가 시: `src/components/excel/strategies/`에 전략 함수 추가 후 `getExcelSaveStrategy`에 `case` 분기만 추가
 - 전략 함수 시그니처: `(rows: ExcelRowWithErrors[]) => DomainType[]`
+
+**주의 — 표시명을 `as`로 통과시키지 않는다.** 시트에는 사용자가 '판매중' 같은 표시명을 적는다. `as`는 컴파일 타임 캐스팅이라 런타임에는 한글이 그대로 남고, 저장 컬럼이 `text`라 DB도 거부하지 않는다. 증상은 한참 뒤 목록 화면의 렌더 예외로 나타난다. 코드값만 허용되는 필드는 **양식에 `allowed`를 붙이고(검증), 전략에서 코드로 바꾸고(변환), route에서 한 번 더 거부한다(강제).** 세 층의 역할 분담과 표시 층에서 디폴트로 메우면 안 되는 이유는 [`display-label-to-domain-code-boundary.md`](../../docs/solutions/architecture-patterns/display-label-to-domain-code-boundary.md) 참고.
 
 ---
 
