@@ -5,6 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { Product } from '@/features/products/types/product.types';
+import { findInvalidProductCode, invalidProductCodeMessage } from '@/features/products/util/productCodes';
 
 type Context = { params: Promise<{ productId: string }> };
 
@@ -48,6 +49,12 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // R2 객체를 자기 상품에 걸 수 있다.
     if (patch.mainImage && !isMainImageOwnedBy(patch.mainImage, session.ownerId)) {
       return NextResponse.json({ error: '본인이 업로드한 이미지만 사용할 수 있습니다.' }, { status: 400 });
+    }
+
+    // 판매상태·배송정책은 코드값만 저장한다. 보내지 않은 필드는 검사하지 않는다.
+    const violation = findInvalidProductCode(patch);
+    if (violation) {
+      return NextResponse.json({ error: invalidProductCodeMessage(violation) }, { status: 400 });
     }
 
     const [updated] = await db
