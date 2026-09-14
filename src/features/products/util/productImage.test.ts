@@ -13,12 +13,6 @@ describe('toProductImageUrl', () => {
     expect(toProductImageUrl('images/usr_2f20748f/abc.png')).toBe(`${PUBLIC_URL}/images/usr_2f20748f/abc.png`);
   });
 
-  it('외부 절대 URL은 그대로 돌려준다 — 엑셀 대량등록·시드 데이터의 계약이다', () => {
-    vi.stubEnv('NEXT_PUBLIC_R2_PUBLIC_URL', PUBLIC_URL);
-    expect(toProductImageUrl('https://picsum.photos/seed/a/700/700')).toBe('https://picsum.photos/seed/a/700/700');
-    expect(toProductImageUrl('http://example.com/a.png')).toBe('http://example.com/a.png');
-  });
-
   it('접두사 끝의 슬래시가 중복되지 않는다', () => {
     vi.stubEnv('NEXT_PUBLIC_R2_PUBLIC_URL', `${PUBLIC_URL}/`);
     expect(toProductImageUrl('images/usr_2f20748f/abc.png')).toBe(`${PUBLIC_URL}/images/usr_2f20748f/abc.png`);

@@ -30,7 +30,7 @@ export const ProductMainImageInfo = () => {
   });
 
   // 새로 고른 파일이 있으면 그 데이터 URL을, 없으면 폼에 들어 있는 저장된 값을 그린다.
-  // 수정 화면은 저장된 값(R2 key 또는 외부 절대 URL)으로 시작하므로 이 두 번째 경로가 없으면
+  // 수정 화면은 저장된 값(R2 key)으로 시작하므로 이 두 번째 경로가 없으면
   // 이미지가 있는 상품인데도 빈 업로드 박스만 보인다.
   const previewUrl = mainImages?.dataUrl ?? (typeof field.value === 'string' ? toProductImageUrl(field.value) : '');
 

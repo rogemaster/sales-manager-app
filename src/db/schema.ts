@@ -52,9 +52,9 @@ export const products = pgTable('products', {
   totalQuantity: integer('total_quantity').notNull(),
 
   /**
-   * R2 key(`images/<ownerId>/<uuid>.png`)와 절대 URL(엑셀·시드의 외부 이미지)이 함께 들어온다.
-   * 이 합집합은 실수가 아니라 선택된 계약이다(스펙 4.2) — key로 통일하려 하지 말 것.
-   * 표시 기능을 붙일 때는 두 형태를 가르는 URL 조립 함수를 반드시 거친다.
+   * R2 key(`images/<ownerId>/<uuid>.<png|jpg>`)만 담는다. 화면 업로드는 /api/products/image, 엑셀의 외부 이미지
+   * 주소는 /api/products/image/import를 거쳐 key가 된다. 표시할 때는 toProductImageUrl로 공개 주소를 붙인다.
+   * 2026-09-13 이전에는 절대 URL과의 합집합이었고, 남아 있던 값은 일회성 스크립트로 이전했다.
    */
   mainImage: text('main_image').notNull(),
 
