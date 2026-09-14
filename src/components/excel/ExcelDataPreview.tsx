@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { ExcelHeaderProps, ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
+import { formatExcelFailureSummary } from './utils/formatExcelFailureSummary';
 import { Card, CardContent } from '../ui/card';
 import { ExcelDataPreviewHeader } from './components/ExcelDataPreviewHeader';
 import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
@@ -21,6 +23,7 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
   const resetExcelData = useResetExcelData();
   const { showAlert } = useAlert();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
+  const [saveProgress, setSaveProgress] = useState<{ done: number; total: number } | null>(null);
 
   const saveFn = getExcelSaveStrategy(saveType, workspaceOwnerId);
 
@@ -29,16 +32,19 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
   const validCount = totalCount - errorDatas.length;
   const errorCount = errorDatas.length;
 
-  const { mutate: saveExcelData } = useMutation({
-    mutationFn: (validData: ExcelRowWithErrors[]) => saveFn(validData),
-    onSuccess: (_, validData) => {
+  const { mutate: saveExcelData, isPending: isSaving } = useMutation({
+    mutationFn: (validData: ExcelRowWithErrors[]) =>
+      saveFn(validData, { onProgress: (done, total) => setSaveProgress({ done, total }) }),
+    onSuccess: ({ savedCount, failures }) => {
+      const savedMessage = `${savedCount}개의 엑셀 데이터가 저장되었습니다.`;
+      // 이미지를 가져오지 못한 행은 빼고 저장했다. 첫 오류와 나머지 건수만 알린다.
       showAlert({
-        type: 'success',
-        message: `${validData.length}개의 엑셀 데이터가 저장되었습니다.`,
+        type: failures.length > 0 ? 'warning' : 'success',
+        message: failures.length > 0 ? `${savedMessage} ${formatExcelFailureSummary(failures)}` : savedMessage,
         onConfirm: resetExcelData,
       });
     },
-    // 서버가 이유를 담아 보낸 경우(예: 몇 번째 행의 이미지가 잘못됐는지) 그대로 보여준다.
+    // 서버가 이유를 담아 보낸 경우(예: 몇 번째 행의 값이 잘못됐는지) 그대로 보여준다. 미리보기는 초기화하지 않는다.
     onError: (error) => {
       showAlert({
         type: 'error',
@@ -46,6 +52,7 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
           error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
       });
     },
+    onSettled: () => setSaveProgress(null),
   });
 
   const handleExcelSaveData = () => {
@@ -60,6 +67,8 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
         headerDescription={excelHeader.headerDescription}
         validCount={validCount}
         onSaveConfirm={handleExcelSaveData}
+        isSaving={isSaving}
+        saveProgress={saveProgress}
       />
 
       <CardContent className="pt-6">
