@@ -39,7 +39,8 @@
   - `getExcelSaveStrategy(type)`: 타입(`'PRODUCT'` | `'ORDER'`)에 따라 **전략 + API 호출을 합성한 함수** 반환
 
 - 유틸리티: `src/components/excel/utils/`
-  - `processExcelUpload(event, fileTemplateInfo)`: XLSX 파싱, 파일 검증, 필드 검증 → `UploadResult` 반환
+  - `processExcelUpload(event, fileTemplateInfo, maxRows?)`: XLSX 파싱, 시트 행 번호 부여, 행 수 제한, 파일 검증, 필드 검증 → `UploadResult` 반환
+  - `checkExcelImageColumns(rows, templateInfo, checkFn, options)`: `remoteImage` 컬럼의 주소를 서버에 확인시켜 `INVALID_IMAGE` 오류 반환
   - `validateExcelData(rowsData, templateInfo)`: 필수 필드/빈 값/허용값 검증 → `ValidationResult` 반환. 헤더만 추리지 않고 양식 전체(`ExcelTemplateInfo[]`)를 받는다 — `req`와 `allowed`가 모두 양식 정의에 있기 때문
   - `excelDownload(templateHeaders, templateName)`: ExcelJS로 템플릿 생성 후 file-saver로 다운로드
   - `getExcelSaveStrategy(type)`: 전략 + API 합성 함수 반환
@@ -75,22 +76,37 @@ export type ExcelRowWithErrors = { [key: string]: string | number | boolean | nu
 export interface ValidationError {
   row: number;
   header: string;
-  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER';
+  row: number; // 엑셀 시트 행 번호 (아래 "행 번호" 절)
+  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
   message?: string;
   // INVALID_VALUE와 INVALID_NUMBER에서 채워진다. 사용자가 어떤 값을 적었고 무엇을 적을 수 있었는지
   // 오류 메시지가 함께 알려주기 위한 값이라, 메시지 조립은 message.ts가 맡는다.
   value?: string;
   allowed?: string[];
+  reason?: string; // INVALID_IMAGE — 서버가 알려준 사유
 }
 
-export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'FILE_TOO_LARGE' | 'PROCESSING_ERROR';
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER';
+export type UploadErrorCode =
+  | 'NO_FILE_SELECTED'
+  | 'INVALID_FILE_TYPE'
+  | 'FILE_TOO_LARGE'
+  | 'TOO_MANY_ROWS'
+  | 'PROCESSING_ERROR';
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
 
 // processExcelUpload 반환 타입
 export type UploadResult =
   | { success: true; data: ExcelRowWithErrors[] }
   | { success: false; errorType: 'UPLOAD_ERROR'; uploadError: UploadErrorCode }
   | { success: false; errorType: 'VALIDATE_ERROR'; validationResult: ValidationResult };
+
+// 저장 결과. 이미지를 가져오지 못한 행은 빼고 저장하므로 "일부 성공"이 정상 결과에 포함된다
+export type ExcelRowFailure = { rowNumber: number; message: string };
+export type ExcelSaveResult = { savedCount: number; failures: ExcelRowFailure[] };
+export type ExcelSaveFn = (
+  rows: ExcelRowWithErrors[],
+  context?: { onProgress?: (done: number, total: number) => void },
+) => Promise<ExcelSaveResult>;
 ```
 
 ---
@@ -202,11 +218,23 @@ src/features/products/constant/
 
 **`numeric`은 두 가지 의미를 갖는다.** 다운로드 양식에서 숫자 서식으로 만들고, **업로드 검증에서 0 이상 정수인지 검사한다.** 현재 양식의 숫자 컬럼(공급가·판매가·배송비·총수량)이 전부 같은 규칙이라 표시 하나로 충분하다. 다른 규칙이 필요한 숫자 컬럼이 생기면 그때 표현을 늘린다.
 
+**`remoteImage`는 외부 이미지 주소 컬럼이다.** 붙이면 업로드 시 `checkExcelImageColumns`가 서버(`/api/products/image/check`)에 주소를 확인시켜 실패한 행을 `INVALID_IMAGE` 오류로 잡는다. 확인만 하고 R2에는 저장하지 않는다 — 사용자가 저장하지 않고 초기화하면 파일만 남기 때문이다. 실제로 R2에 가져오는 것은 저장 전략이다(아래 전략 패턴 절). 빈 값은 확인하지 않고, 필드 오류가 있는 행도 확인한다.
+
+**`maxRows`(업로더 prop)를 넘기면 파일 행 수를 제한한다.** 넘으면 `TOO_MANY_ROWS`로 파일 자체를 거부한다. 상품은 `PRODUCT_BULK_MAX_ROWS`(50)를 넘기고, bulk route도 같은 상수로 한 번 더 거부한다. 넘기지 않은 화면은 제한이 없다.
+
+### 행 번호 — 엑셀 시트 행으로 통일
+
+미리보기 '행' 컬럼, 업로드 검증 오류의 `row`, 저장 결과 알림, bulk route 오류가 **전부 엑셀 시트 행 번호**를 쓴다. 사용자가 파일에서 그 행을 바로 찾을 수 있어야 하기 때문이다.
+
+- 파싱 직후 `attachSheetRowNumbers`가 각 행에 `EXCEL_SHEET_ROW_KEY`로 번호를 붙이고, 이후 모든 층은 `getSheetRow(row)`로 읽는다. **index로 계산하지 않는다.**
+- **함정:** `sheet_to_json`은 빈 행을 건너뛰어 `index + 2`가 틀린다. SheetJS가 넣어주는 `__rowNum__`은 열거 불가 속성이라 `{ ...row }`에서 사라진다 — 반드시 **펼치기 전에** 복사한다.
+- bulk route는 시트 개념을 모른다. 오류를 `{ error, rowIndex }`(요청 배열 기준)로 돌려주고, `bulkCreateProducts`가 `formatBulkRowError`로 `[4행] 사유`를 만든다.
+
 미리보기 테이블 컬럼 정의 예시:
 
 ```ts
 [
-  { key: 'row', headerTitle: '행', accessor: (_, index) => index + 1 },
+  { key: 'row', headerTitle: '행', accessor: (r) => getSheetRow(r) },
   { key: 'state', headerTitle: '상태', accessor: (r) => Array.isArray(r.error) && r.error.length > 0 ? '오류' : '정상' },
   { key: 'name', headerTitle: '상품명', accessor: (r) => !Array.isArray(r['상품명']) && r['상품명'] },
   // ...
@@ -301,21 +329,31 @@ ExcelRowWithErrors[]
 
 ```ts
 // src/components/excel/utils/getExcelSaveStrategy.ts
-export const getExcelSaveStrategy = (type: SaveType) => {
+export const getExcelSaveStrategy = (type: SaveType, ownerId: string): ExcelSaveFn => {
   switch (type) {
     case 'PRODUCT':
-      return (rows: ExcelRowWithErrors[]) => {
+      return async (rows, context) => {
         const products = productExcelSaveStrategy(rows);
-        return bulkCreateProducts(products);
+        // 외부 이미지 주소를 R2로 가져와 key로 바꾼다. 실패한 행은 빼고 failures로 모은다
+        const { resolved, failures } = await resolveExcelMainImages(products, rows.map(getSheetRow), importProductImage, {
+          concurrency: REMOTE_IMAGE_CONCURRENCY,
+          onProgress: context?.onProgress,
+        });
+        if (resolved.length === 0) throw new Error(formatExcelFailureSummary(failures));
+        await bulkCreateProducts(resolved.map(({ product }) => product), ownerId, resolved.map(({ rowNumber }) => rowNumber));
+        return { savedCount: resolved.length, failures };
       };
     case 'ORDER':
-      return (rows: ExcelRowWithErrors[]) => {
-        const orders = orderExcelSaveStrategy(rows);
-        return bulkCreateOrders(orders);
+      return async (rows) => {
+        await bulkCreateOrders(orderExcelSaveStrategy(rows), ownerId);
+        return { savedCount: rows.length, failures: [] };
       };
   }
 };
 ```
+
+- 저장 결과 알림은 `formatExcelFailureSummary`로 **첫 번째 오류(시트 행이 가장 작은 것) + `(외 N건 오류)`**만 보여준다. 일부 실패는 `warning` 알림 후 초기화, 전부 실패는 오류로 올려 미리보기를 유지한다.
+- 저장 중에는 미리보기 헤더의 저장·초기화 버튼을 비활성화한다(이미지 가져오기로 수 초 이상 걸려 중복 등록 위험).
 
 ### 전략 함수 — 한글 키 → 도메인 모델 완전 변환
 
@@ -353,7 +391,9 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] 
 상품 bulk route에서 엑셀 경로에 영향을 주는 두 가지:
 
 - **`productId`를 서버가 다시 채번합니다.** 전략이 만든 값은 버려집니다(교차 테넌트 PK 충돌 방지). 클라이언트 채번을 신뢰하는 코드를 쓰지 마세요.
-- **`mainImage`가 R2 key면 본인 네임스페이스여야 합니다.** 엑셀의 외부 절대 URL(`https://...`)은 그대로 통과합니다. 위반 시 `400`과 함께 **몇 번째 행인지** 알려주므로, api 함수와 `onError`에서 서버 메시지를 고정 문구로 덮지 마세요.
+- **`mainImage`는 본인 네임스페이스의 R2 key여야 합니다.** 엑셀의 외부 이미지 주소는 저장 전략이 `/api/products/image/import`로 가져와 key로 바꾼 뒤 보냅니다 — 절대 URL은 거부됩니다.
+- **오류 응답은 `{ error, rowIndex }`입니다.** `rowIndex`는 요청 배열 기준 0부터이고, `bulkCreateProducts`가 시트 행 번호로 바꿔 `[4행] 사유`를 만듭니다. api 함수와 `onError`에서 서버 메시지를 고정 문구로 덮지 마세요.
+- **한 번에 최대 50건**(`PRODUCT_BULK_MAX_ROWS`)입니다. 넘으면 `400`입니다.
 
 ```ts
 // 주문 대량 등록 (MSW 유지)
