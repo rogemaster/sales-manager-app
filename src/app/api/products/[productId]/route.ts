@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { Product } from '@/features/products/types/product.types';
-import { findProductWriteViolation, productWriteViolationMessage } from '@/features/products/util/productWriteSchema';
+import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
 
 type Context = { params: Promise<{ productId: string }> };
 
@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // 보내지 않은 필드는 검사하지 않는다 — PATCH는 바꾸려는 필드만 보낸다.
     const violation = findProductWriteViolation(patch, 'partial');
     if (violation) {
-      return NextResponse.json({ error: productWriteViolationMessage(violation) }, { status: 400 });
+      return NextResponse.json({ error: violation }, { status: 400 });
     }
 
     const [updated] = await db

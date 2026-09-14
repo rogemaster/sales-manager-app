@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findProductWriteViolation, productWriteViolationMessage } from './productWriteSchema';
+import { findProductWriteViolation } from './productWriteSchema';
 
 const valid = {
   name: '테스트 상품',
@@ -212,20 +212,6 @@ describe('findProductWriteViolation - null 처리', () => {
     expect(findProductWriteViolation({ ...valid, option: [{ ...combo, quantity: null }] })).toBeNull();
     expect(findProductWriteViolation({ ...valid, option: [{ ...combo, quantity: -1 }] })).toBe(
       '옵션의 형식이 올바르지 않습니다',
-    );
-  });
-});
-
-describe('productWriteViolationMessage', () => {
-  it('행 번호가 없으면 위반 문구를 그대로 돌려준다', () => {
-    expect(productWriteViolationMessage("판매가는 0 이상의 정수여야 합니다: '-1'")).toBe(
-      "판매가는 0 이상의 정수여야 합니다: '-1'",
-    );
-  });
-
-  it('행 번호를 주면 앞에 붙인다', () => {
-    expect(productWriteViolationMessage("판매가는 0 이상의 정수여야 합니다: '-1'", 3)).toBe(
-      "3번째 행의 판매가는 0 이상의 정수여야 합니다: '-1'",
     );
   });
 });
