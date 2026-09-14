@@ -1,6 +1,7 @@
 ---
 title: 업로드 키 조립 — 사용자 입력을 소독하지 말고 타입으로 도달 경로를 없앤다
 date: 2026-09-01
+last_updated: 2026-09-14
 category: architecture-patterns
 module: lib/storage, app/api/products
 problem_type: architecture_pattern
@@ -74,6 +75,7 @@ await putImage(key, buffer, detected.contentType); // file.type이 아니라 감
 `images/<ownerId>/<uuid>.<ext>` 구조 덕분에 "이 키가 내 것인가"를 문자열만 보고 판정할 수 있다. 상품 생성·수정·대량등록 세 경로 모두 저장 전에 이 검사를 통과시켜, 남이 올린 객체 키를 자기 레코드에 거는 것을 막는다.
 
 ```ts
+// 2026-09-01 작성 당시의 형태. 현재 코드는 아래 "해소됨" 참고
 export const isMainImageOwnedBy = (mainImage: string, ownerId: string): boolean => {
   if (/^https?:\/\//.test(mainImage)) return true; // 외부 절대 URL은 계약상 허용
   return mainImage.startsWith(`${PRODUCT_IMAGE_PREFIX}/${ownerId}/`);
@@ -83,6 +85,8 @@ export const isMainImageOwnedBy = (mainImage: string, ownerId: string): boolean 
 **끝의 `/`가 검사의 핵심이다.** 빼면 `usr_ab`가 `usr_abcd`의 네임스페이스를 통과한다. 접두사 비교는 항상 경계 문자까지 포함해서 한다.
 
 **남아 있는 우회로도 함께 기록한다** — 절대 URL을 무조건 통과시키므로, 우리 버킷 공개 도메인을 가리키는 URL 형태로는 남의 객체를 지정할 수 있다. 표시 코드가 없는 동안은 무해하지만 공개 URL을 도입하는 순간 실효 위험이 된다. 테스트에 `[알려진 우회로]`로 고정해두고(`storage.test.ts`), 공개 URL 도입 시 그 접두사를 key로 정규화해 같은 검사를 태운 뒤 기대값을 뒤집는다.
+
+> **해소됨 (2026-09-14).** 위 우회로는 두 단계로 닫혔다. 2026-09-10 공개 URL 도입 때 예고대로 공개 주소를 key로 되돌리는 정규화(`normalizePublicUrl`)를 넣었고, 2026-09-13 엑셀 외부 이미지도 가져오기 route를 거쳐 key가 되면서 **절대 URL 분기와 그 정규화를 함께 삭제**했다. 지금 `isMainImageOwnedBy`는 절대 URL을 전부 거부하고, 소유자 접두사 뒤 단일 세그먼트만 허용하는 화이트리스트다(`src/lib/storage.ts` JSDoc). 정규화까지 지운 이유는 [`narrowed-contract-makes-defensive-normalization-harmful.md`](narrowed-contract-makes-defensive-normalization-harmful.md) 참고.
 
 ## Why This Matters
 
@@ -101,4 +105,5 @@ export const isMainImageOwnedBy = (mainImage: string, ownerId: string): boolean 
 - [`api-route-session-auth-guard.md`](api-route-session-auth-guard.md) — 이 route들이 쓰는 세션 가드
 - `docs/solutions/logic-errors/form-generic-split-hides-file-in-snapshot.md` — 같은 라운드의 반대 방향 사례(타입이 갈라져 File이 새어나간 쪽)
 - `src/lib/storage.ts`, `src/lib/storage.test.ts` — 구현과 경계 테스트
-- `docs/superpowers/specs/2026-09-01-product-image-r2-storage-design.md` — 설계 문서(§9에 공개 URL 우회로 오픈 이슈)
+- `docs/superpowers/specs/2026-09-01-product-image-r2-storage-design.md` — 설계 문서(§9의 공개 URL 우회로 오픈 이슈는 2026-09-13에 해소)
+- [`server-side-remote-fetch-ssrf-connect-time-validation.md`](server-side-remote-fetch-ssrf-connect-time-validation.md) — 같은 매직넘버 판정·key 조립을 외부 URL 가져오기에 재사용한 사례
