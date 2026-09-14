@@ -1,9 +1,7 @@
 # Sales Manager App
 
-여러 외부 쇼핑몰에서 각각 관리해야 하는 **관리 포인트(상품 · 주문 · 클레임 등)를 한 곳에서 일괄 처리**하는 판매자용 웹 애플리케이션입니다.  
-판매자가 몰마다 따로 들어가 하던 일을 여기서 한 번에 합니다 — 상품을 한 번 등록해 여러 몰로 전송하고, 흩어진 주문을 수집해 통합 조회합니다. `ownerId` 기반으로 슈퍼계정별 데이터가 격리되는 멀티 테넌트 구조입니다.
-
-영역마다 데이터가 흐르는 방향이 다릅니다.
+여러 외부 쇼핑몰에서 각각 관리해야 하는 **관리 포인트(상품 · 주문 · 클레임 등)를 한 곳에서 일괄 처리**하는 판매자용 웹 애플리케이션입니다.
+판매자가 몰마다 따로 들어가 하던 일을 여기서 한 번에 합니다 — 상품을 한 번 등록해 여러 몰로 전송하고, 흩어진 주문을 수집해 통합 조회합니다.
 
 | 영역 | 방향 | 내용 |
 |------|------|------|
@@ -12,7 +10,10 @@
 
 **[라이브 데모 →](https://sales-manager-app-nine.vercel.app/)** | 공개 테스트 계정: `admin@example.com` / `admin123@`
 
-> 공개 계정의 데모 데이터는 주기적으로 초기화됩니다.
+> - 샘플 데이터는 이 공개 계정에만 들어 있습니다. 데모에서 새로 가입한 계정은 빈 상태로 시작합니다.
+> - 방문자 누구나 쓰는 계정이라 등록·수정한 내용이 다른 방문자에게도 보입니다. 민감한 정보는 입력하지 마세요.
+> - 업로드한 이미지는 25일 후 자동 삭제됩니다.
+> - 테스트 계정의 데이터는 언제든 초기화될 수 있습니다.
 
 <br />
 
@@ -20,21 +21,14 @@
 
 | 기능 | 설명 |
 |------|------|
-| 인증 | 이메일/비밀번호 로그인, 회원가입(사업자 정보·연락처·정산 정보 입력 및 이메일 중복 검증), JWT 세션, 미인증 라우트 자동 차단 |
-| 홈 대시보드 | 판매·주문·클레임·문의 현황 통계 카드, 최근 등록 상품 목록 |
-| 상품 목록 | 날짜·카테고리·판매 상태 복합 필터, 검색 타입(상품명·상품코드) 선택 검색, 페이지네이션 |
-| 상품 등록/수정 | 기본 정보, 가격/수량, 옵션 조합, 상품 고시 정보 등 전체 CRUD. 메인이미지는 Cloudflare R2에 업로드 |
-| 상품 대량 등록 | 엑셀 템플릿 다운로드 → 업로드 → 미리보기 → 일괄 제출 |
-| 주문 수집 | 쇼핑몰별 주문 수집 작업 실행 및 수집 이력 조회 |
-| 주문 목록 | 날짜·쇼핑몰·상태 필터, 일괄 상태변경 |
-| 주문 상세 | 주문 정보, 클레임, 코멘트, 수정이력, 배송 처리 |
-| 주문 등록 | 수동 주문 생성 |
-| 쇼핑몰 계정 관리 | 쇼핑몰별 API 연동 계정 목록/등록/수정/삭제, 사용 여부 일괄 변경, 등급별 권한 분리 |
-| 쇼핑몰 정보설정 | 몰별 판매 정보(별칭·상품상태·판매기간) 등록/수정, 출고지·반품지 주소록 연동, 네이버·카카오 등 몰 고유 항목(A/S 정보·구매평 노출 여부 등) 입력 |
-| 쇼핑몰 상품등록 | 등록할 상품과 대상 몰(쇼핑몰 정보설정)을 선택해 스테이징 후 일괄 전송, 전송 결과(성공·실패) 확인 |
-| 쇼핑몰 연동상품 | 전송된 연동 건 목록(몰·계정·연동상태·쇼핑몰 상품코드), 실패 사유 확인, 연동 건 단위 수정 및 단건·일괄 재전송, 여러 연동 건의 상품정보 일괄수정 |
-| 사용자 관리 | 사용자 목록 조회, 등록, 삭제 (등급별 권한 분리) |
-| 프로필 수정 | 닉네임·연락처·소개·회사·지역 정보 수정 |
+| 인증 | 이메일/비밀번호 로그인, 사업자 정보를 포함한 회원가입 |
+| 홈 대시보드 | 판매·주문·클레임 현황 통계, 최근 등록 상품 |
+| 상품 | 목록(복합 필터·썸네일), 등록/수정(옵션 조합·상품정보고시), 메인이미지 R2 업로드 |
+| 상품 대량 등록 | 엑셀 양식 다운로드 → 업로드 → 미리보기(행별 오류 표시) → 저장. 외부 이미지 주소는 R2로 가져와 저장 |
+| 주문 | 쇼핑몰별 주문 수집, 통합 목록·일괄 상태변경, 상세(클레임·코멘트·수정이력) |
+| 쇼핑몰 계정 · 정보설정 | 몰별 API 연동 계정 관리, 몰별 판매 정보와 네이버·카카오 고유 항목 설정 |
+| 쇼핑몰 상품등록 · 연동상품 | 상품과 대상 몰을 골라 일괄 전송, 연동 건별 실패 사유 확인·수정·재전송 |
+| 사용자 관리 | 슈퍼계정 아래 서브 사용자 등록·삭제, 등급별 권한 |
 
 <br />
 
@@ -49,217 +43,46 @@
 | 서버 상태 | TanStack Query 5 | 캐싱·자동 동기화·뮤테이션 후 무효화를 선언적으로 처리 |
 | 폼 · 검증 | React Hook Form + Zod | 비제어 컴포넌트 기반 렌더링 최소화, 스키마 기반 유효성 검사 |
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
-| DB | Neon (PostgreSQL) + Drizzle ORM | 유저·상품 영속성 보장, 서버리스 환경에 최적화된 serverless driver |
-| 파일 저장소 | Cloudflare R2 (S3 호환 API) | 상품 메인이미지 저장. egress 무료라 배포 환경에서 이미지 서빙 비용이 들지 않음 |
-| API Mocking | MSW 2 | 비즈니스 데이터(주문·쇼핑몰 연동 등) 개발용 mock, 서비스 워커 레벨 인터셉트 |
-| 엑셀 | ExcelJS + XLSX | 템플릿 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
-| 테스트 | Vitest | 순수 비즈니스 로직 단위 테스트 — MSW mock 유틸(도메인 조회·필터링, ownerId 테넌트 격리, 연동 전송·재전송), API 인증 가드, 도메인 유틸(이미지 키 판정·KST 날짜 범위 등) (32개 파일 / 278건) |
+| DB | Neon (PostgreSQL) + Drizzle ORM | 유저·상품 영속성 보장, 서버리스 환경에 맞는 serverless driver |
+| 파일 저장소 | Cloudflare R2 | 상품 메인이미지 저장. S3 호환 API, egress 무료 |
+| API Mocking | MSW 2 | 아직 DB로 옮기지 않은 비즈니스 데이터(주문·쇼핑몰 연동 등)를 서비스 워커에서 mock |
+| 엑셀 | ExcelJS + XLSX | 양식 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
+| 테스트 | Vitest | 순수 비즈니스 로직 단위 테스트 (UI·fetch 래퍼 제외) |
 
 <br />
 
-## 아키텍처 설계 포인트
+## 설계 포인트
 
-### Feature-driven 모듈 구조
+**공통 정보는 오리진에 모으고, 몰 고유값만 분리한다.** 몰마다 요구하는 상품정보가 겹치기도 갈리기도 합니다. 공통 정보는 오리진 상품(`Product`)에, 몰 고유값은 쇼핑몰 정보설정(`ShoppingSetting`)에 두고 전송 시점에 결합합니다. 전송 결과인 연동 데이터는 그 시점 값을 스냅샷으로 복사한 독립 엔티티라, 오리진을 고쳐도 이미 연동된 건은 바뀌지 않습니다.
+→ [`snapshot-entity-source-link-break-is-by-design.md`](docs/solutions/architecture-patterns/snapshot-entity-source-link-break-is-by-design.md), [`product-vs-shoppingsetting-compliance-field-boundary.md`](docs/solutions/architecture-patterns/product-vs-shoppingsetting-compliance-field-boundary.md)
 
-도메인별로 `api / store / types / ui / util / constant`를 각 feature 폴더에 응집시켰습니다.  
-기능이 추가될 때 기존 코드를 수정하지 않고 새 feature 폴더를 추가하는 방식으로 확장합니다.
+**`ownerId` 기반 멀티 테넌시.** 가입한 계정이 최상위 테넌트(슈퍼계정)이고, 사용자 관리에서 만든 계정은 그 아래에 종속됩니다. 모든 리소스는 `ownerId`로 격리되며, DB로 옮긴 API는 클라이언트가 보낸 값을 믿지 않고 세션에서 꺼낸 값으로 조회합니다.
+→ [`user-hierarchy-ownerid-pattern.md`](docs/solutions/architecture-patterns/user-hierarchy-ownerid-pattern.md), [`api-route-session-auth-guard.md`](docs/solutions/architecture-patterns/api-route-session-auth-guard.md)
 
-```
-src/features/
-├── products/          # 상품 관련 api, store, types, ui, util
-├── order/             # 주문·주문수집 api, store, types, ui, util
-├── account/           # 사용자 관리 api, store, types, ui
-├── shoppingAccount/   # 쇼핑몰 계정(API 연동 계정) 관리
-├── shoppingSetting/   # 쇼핑몰 정보설정(판매 정보) 관리
-├── mallRegistration/  # 쇼핑몰 상품등록 — 대상 선택·스테이징·전송
-├── mallLinkedProduct/ # 쇼핑몰 연동상품 — 연동 건 목록·수정·재전송
-├── profile/           # 프로필 수정 api, ui
-├── home/              # 홈 대시보드
-└── auth/              # 인증
-```
+**MSW와 실제 DB의 경계.** 개발 초기에는 모든 API를 MSW로 mock했습니다. 서버에서 실행돼야 하는 인증과, 서버 전용 시크릿(DB 접속·R2 자격증명)이 필요한 유저·상품 API만 실제 route handler + Neon으로 옮겼고, 나머지 비즈니스 데이터는 MSW에 남아 있습니다.
+→ [`auth-db-msw-boundary.md`](docs/solutions/architecture-patterns/auth-db-msw-boundary.md)
 
-**화면이 소유하는 것과 도메인이 소유하는 것을 구분합니다.** 검색 필터 컴포넌트와 그 store는 화면마다 자기 것을 갖고, 다른 도메인 것을 가져다 쓰지 않습니다 — 전역 atom에 바인딩된 컴포넌트를 재사용하면 store까지 딸려와 화면 간 상태가 새기 때문입니다. 반대로 요청 타입·조회 API·표시용 상수는 공유합니다(같은 엔드포인트를 호출하면 요청 타입은 하나여야 합니다).
+**몰별 설정은 discriminated union으로.** 네이버·카카오처럼 몰마다 다른 설정 필드를 `mallCode` 기준 union 타입으로 표현합니다. 폼은 느슨한 flat 타입으로 다루고 제출 시점에만 도메인 타입으로 좁힙니다.
+→ [`typescript-type-design-patterns.md`](docs/solutions/architecture-patterns/typescript-type-design-patterns.md)
 
-여러 도메인이 공유하는 상수·유틸은 `src/shared/`로 분리합니다.
+**외부 이미지 가져오기의 SSRF 방어.** 엑셀에 적힌 외부 이미지 주소를 서버가 받아와 R2에 저장합니다. 서버가 내부망을 대신 요청하지 않도록 주소는 연결 시점에 검사하고, 리다이렉트는 단계마다 다시 검사합니다.
+→ [`server-side-remote-fetch-ssrf-connect-time-validation.md`](docs/solutions/architecture-patterns/server-side-remote-fetch-ssrf-connect-time-validation.md)
 
-```
-src/shared/
-├── api/        # 도메인에 속하지 않는 fetch 래퍼 (이미지 업로드 합성 등)
-├── constant/   # 쇼핑몰 목록·필터 '전체' 옵션·배송 유형·업로드 제한 등 공통 상수
-└── utils/      # 연락처 검증/포맷, API 인증 가드(apiAuth), KST 날짜 범위(date)
-```
+**포트폴리오 규모 전제.** 인프라는 전부 무료 요금제(Vercel Hobby · Neon · R2)입니다. 긴 작업을 백그라운드 큐로 풀지 않고 처리 한도를 제품 정책으로 둡니다 — 예: 엑셀 대량등록은 1회 최대 50건.
+→ [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)
 
-서버 전용 모듈은 `src/lib/`에 둡니다 — `storage.ts`(R2 클라이언트·이미지 판정·키 조립)가 여기 있고, 최상단의 `import 'server-only'`가 클라이언트 번들로 새는 것을 빌드 시점에 막습니다.
-
-### 3계층 상태 관리
-
-| 레이어 | 도구 | 담당 |
-|--------|------|------|
-| 서버 상태 | TanStack Query | API 데이터 캐싱 · 동기화 |
-| UI 상태 | Jotai atoms | 검색 필터, 페이지네이션, 선택 항목 등 |
-| 폼 상태 | React Hook Form | 입력값, 유효성 검사 |
-
-각 상태를 하나의 도구로만 관리해 책임 범위를 명확히 분리했습니다.
-
-### MSW / DB 경계 설계
-
-MSW의 구조적 한계(서비스 워커가 서버사이드 `authorize()` 실행에 관여 불가)로 인해 유저 관련 API는 실제 DB route handler로 전환했습니다. 같은 이유가 **서버 전용 시크릿**에도 적용됩니다 — 상품은 이미지 저장을 위해 R2 자격증명이, 데이터 영속화를 위해 `DATABASE_URL`이 필요해 브라우저에서 도는 MSW로는 처리할 수 없습니다.
-
-| 처리 방식 | 대상 엔드포인트 |
-|-----------|----------------|
-| **DB route handler** | 로그인, 회원가입, 이메일 중복 확인, 사용자 등록·목록·삭제, 프로필 수정, **상품 목록·등록·수정·대량등록·이미지 업로드** |
-| **MSW** | 주문, 쇼핑몰 계정·정보설정, 쇼핑몰 연동 상품, 홈 대시보드 |
-
-판단 기준: **유저 인증·식별에 직접 연관되거나 서버 전용 시크릿이 필요한 데이터**는 DB route, 나머지 비즈니스 데이터는 MSW 유지.
-
-```
-src/app/api/                          # DB 연동 route handlers
-├── auth/[...nextauth]/route.ts       # NextAuth
-├── register/route.ts                 # 회원가입
-├── check-email/route.ts              # 이메일 중복 확인
-├── profile/route.ts                  # 프로필 수정
-├── account/users/
-│   ├── route.ts                      # 사용자 삭제 (DELETE)
-│   ├── list/route.ts                 # 사용자 목록 조회 (POST)
-│   └── create/route.ts               # 사용자 등록 (POST)
-└── products/
-    ├── list/route.ts                 # 상품 목록 조회 (POST)
-    ├── create/route.ts               # 상품 등록 (POST)
-    ├── bulk/route.ts                 # 상품 대량 등록 (POST)
-    ├── image/route.ts                # 메인이미지 R2 업로드 (POST)
-    └── [productId]/route.ts          # 상품 단건 조회·수정 (GET/PATCH)
-```
-
-MSW가 남아 있는 도메인(홈 대시보드·쇼핑몰 연동)이 상품 데이터를 필요로 하는 경우, mock 유틸이 상품 배열을 **인자로 주입받고** 핸들러가 실제 route를 호출해 넘깁니다(`src/mocks/utils/fetchProducts.ts`). 해당 경로에 MSW 핸들러가 없어 요청이 bypass되고, 같은 오리진이라 세션 쿠키가 그대로 붙습니다.
-
-### ownerId 기반 멀티 테넌시
-
-가입으로 생성되는 계정(`super_admin`)만 최상위 테넌트이며, 사용자 관리에서 등록되는 계정은 그 슈퍼계정에 종속됩니다. 모든 도메인 리소스(주문·상품·쇼핑몰 계정·쇼핑몰 정보설정 등)는 `ownerId` 필드로 테넌트를 구분합니다.
-
-- **세션 기반 (DB route handler)**: 상품처럼 실제 route로 옮긴 도메인은 클라이언트가 보낸 `ownerId`를 **아예 신뢰하지 않습니다.** NextAuth JWT에서 꺼낸 값을 `WHERE` 조건에 함께 넣어, 남의 리소스는 미존재와 구분되지 않는 `404`가 됩니다. 업로드한 이미지도 `images/<ownerId>/...` 네임스페이스로 격리해, 다른 테넌트의 객체 키를 자기 상품에 지정할 수 없습니다.
-- **목록/생성 API (MSW 잔존 도메인)**: 로그인 계정의 `ownerId`(`workspaceOwnerIdAtom`)를 요청 body에 실어 보내고, 서버는 그 값으로 필터링/스탬핑합니다.
-- **단건 조회/수정 API (MSW 잔존 도메인)**: `X-Owner-Id` 헤더로 `ownerId`를 전달하고, 서버는 리소스의 `ownerId`와 비교해 불일치·미존재 시 모두 `404`로 응답합니다. 여러 항목을 한 번에 처리하는 액션(주문수집 트리거 등)은 예외적으로 거부 대신 소유한 항목만 필터링해 실행합니다.
-
-```
-ownerId === id  → 슈퍼계정 (super_admin, 자기참조)
-ownerId === X   → X 슈퍼계정에 종속된 서브유저 (admin, operator)
-```
-
-### 등급 기반 권한 제어
-
-사용자 등급(`UserGrade`)에 따라 UI 레벨에서 기능 접근을 제한합니다.
-
-| 등급 | 사용자 등록 | 사용자 삭제 |
-|------|------------|------------|
-| `super_admin` | ✅ | ✅ |
-| `admin` | ✅ | ❌ |
-| `operator` | ❌ | ❌ |
-
-쇼핑몰 계정 관리 화면의 일괄 액션도 동일한 등급 체계를 따릅니다.
-
-| 등급 | 계정 삭제 | 사용 여부 변경 |
-|------|----------|--------------|
-| `super_admin` | ✅ | ✅ |
-| `admin` | ❌ | ✅ |
-| `operator` | ❌ | ❌ |
-
-### 오리진 데이터와 쇼핑몰 연동 데이터 분리
-
-몰마다 요구하는 상품정보가 겹치기도 하고 갈리기도 합니다. **공통 정보는 최대한 오리진 상품(`Product`)에 모으고, 몰 고유값만 쇼핑몰 정보설정(`ShoppingSetting`)으로 뺍니다.** 전송 시점에 둘이 결합해 하나의 상품 데이터가 되고, 각 몰이 요구하는 key에 value를 채워 보냅니다.
-
-전송으로 만들어지는 **연동 데이터(`MallLinkedProduct`)는 오리진과 별개의 독립 엔티티**이며, 생성 시점의 상품·설정 값을 스냅샷으로 복사해 보유합니다.
-
-```ts
-interface MallLinkedProduct {
-  // 불변 식별 정보 — 어디서 파생됐는지 (값 동기화 없음, 추적용)
-  sourceProductId: string;
-  sourceShoppingSettingId: string;
-  mallCode: ShoppingMalls;
-
-  // 가변 스냅샷 — 이 연동 건의 실제 값
-  productSnapshot: Product;
-  settingSnapshot: ShoppingSetting;
-
-  status: 'success' | 'failed';
-  externalProductId?: string; // 외부몰이 부여한 상품코드
-}
-```
-
-- **오리진을 수정해도 연동 데이터는 바뀌지 않습니다.** 연동 건은 각각을 직접 고쳐 해당 몰로 재전송합니다.
-- **연동 데이터 1건 = 외부몰 상품 1개.** 같은 상품을 같은 몰로 여러 번 보낼 수 있고, 그때마다 별도 연동 건이 생깁니다.
-- **저장과 재전송은 별개 액션**입니다. 저장은 스냅샷과 `updatedAt`만, 재전송은 `status`와 `lastSentAt`만 건드립니다.
-- `externalProductId`의 유무가 **"외부몰에 이 상품이 존재하는가"의 단일 판정 기준**입니다. 값이 있으면 신규 등록이 아니라 기존 상품의 수정 전송이므로 중복 판정을 하지 않고, 재전송이 실패해도 이 값은 지우지 않습니다(외부몰 상품은 이전 값으로 살아있기 때문).
-
-전송값의 최종 검증 책임은 각 외부몰에 있습니다. 프론트가 몰별 규칙을 미리 재현해 전송을 막지 않고, 실패하면 연동상품 목록에서 사유를 확인 → 수정 → 재전송하는 흐름으로 처리합니다. 다만 입력 단계의 필수 여부는 **몰들 중 가장 엄격한 쪽**을 따릅니다(A몰 필수·B몰 선택이면 필수).
-
-설계 배경은 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)에 정리했습니다.
-
-### 엑셀 전략 패턴 (Strategy Pattern)
-
-도메인마다 저장 전처리 로직이 달라 Strategy Pattern으로 분리했습니다.  
-새 도메인이 추가되면 전략 함수 하나와 `switch` 분기 한 줄만 추가하면 됩니다.
-
-```
-components/excel/strategies/
-├── productExcelSaveStrategy.ts  # 엑셀 한글 헤더 → Product 필드 매핑, 옵션 조합 생성
-└── orderExcelSaveStrategy.ts    # 주문 번호 · 등록일 주입
-```
-
-상품 대량등록은 route handler를 거치므로 `productId`·`ownerId`·등록일을 **서버가 채웁니다.** 클라이언트가 만든 상품코드는 교차 테넌트 PK 충돌을 막기 위해 서버에서 다시 채번됩니다.
-
-### 몰(mallCode)별 고유 설정 — Discriminated Union
-
-쇼핑몰마다 고유 설정 필드가 다릅니다(네이버: A/S 정보·풀필먼트 물류센터 ID, 카카오: 인증정보·쇼핑하우 전시여부 등). `ShoppingSetting`을 `mallCode` 기준 discriminated union으로 설계해 몰별로 다른 필드 셋을 타입 레벨에서 표현합니다.
-
-```ts
-type ShoppingSetting =
-  | (ShoppingSettingBase & { mallCode: 'NSST'; mallSettings?: NaverSettingAttributes })
-  | (ShoppingSettingBase & { mallCode: 'KAKAOS'; mallSettings?: KakaoSettingAttributes })
-  | (ShoppingSettingBase & { mallCode: Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never });
-```
-
-React Hook Form은 `keyof`가 유니온 타입에서 공통 키만 남기는 특성 때문에 discriminated union을 폼 상태로 직접 다루기 어려워, RHF 쪽은 느슨한 flat 타입(`ShoppingSettingFormValues`)으로 관리하고 제출 시점에만 `buildMallSettingsPayload`로 도메인 타입으로 변환합니다 — 폼 상태 타입과 도메인 타입을 분리해 타입 안전성이 필요한 경계에서만 좁히는 전략입니다. 설계 배경과 트레이드오프는 [`docs/solutions/architecture-patterns/typescript-type-design-patterns.md`](docs/solutions/architecture-patterns/typescript-type-design-patterns.md), 확장 시 체크리스트는 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)에 정리했습니다.
-
-### MSW 핸들러 구조
-
-`src/mocks/handlers.ts`는 라우팅과 request/response 처리만 담당하고, 비즈니스 로직은 `src/mocks/utils/`로 위임합니다.
-
-```
-src/mocks/
-├── handlers.ts              # 인덱스 — 도메인 핸들러 spread
-├── handlers/                # 도메인별 핸들러
-│   ├── auth.ts              # logout
-│   ├── home.ts
-│   ├── orders.ts
-│   ├── collection.ts        # 주문수집 작업/트리거
-│   ├── shoppingAccounts.ts
-│   ├── shoppingSettings.ts
-│   └── mallLinkedProducts.ts # 연동 전송·조회·수정·재전송
-├── data/                    # 정적 mock 원본 데이터
-└── utils/                   # 핸들러 비즈니스 로직
-```
-
-상품 핸들러는 Neon 이전과 함께 제거됐습니다. **남은 핸들러가 상품을 필요로 할 때**(홈 통계, 연동 스냅샷 생성) mock 유틸은 상품 배열을 인자로 주입받고, 핸들러가 `fetchProducts.ts` 어댑터로 실제 route에서 가져와 넘깁니다 — 그 경로에 핸들러가 없어 요청이 bypass되고, 같은 오리진이라 세션 쿠키가 그대로 붙습니다.
+그 밖의 설계 결정과 트레이드오프는 [`docs/solutions/architecture-patterns/`](docs/solutions/architecture-patterns/)에 정리돼 있습니다.
 
 <br />
 
 ## 로컬 실행
 
 ```bash
-# 패키지 설치
 npm install
-
-# 개발 서버 실행 (MSW 자동 활성화)
-npm run dev
+npm run dev   # MSW 자동 활성화
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
-
-> 주문·쇼핑몰 연동 등 나머지 비즈니스 데이터는 MSW가 처리하고, 유저 관련 API(로그인·회원가입·사용자 관리 등)와 상품 API는 Neon DB에 직접 연결됩니다. 상품 메인이미지는 Cloudflare R2에 저장됩니다.
-
-### 환경 변수
-
-프로젝트 루트에 `.env.local` 파일을 생성하세요.
+프로젝트 루트에 `.env.local`을 만듭니다.
 
 ```env
 NEXTAUTH_URL=http://localhost:3000
@@ -267,59 +90,35 @@ NEXTAUTH_SECRET=your-secret-key
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 DATABASE_URL=your-neon-database-url
 
-# Cloudflare R2 자격증명 (상품 메인이미지 업로드) — 네 값 모두 서버 전용이다. NEXT_PUBLIC_ 접두사를 붙이면 번들에 노출된다
+# Cloudflare R2 — 서버 전용 자격증명
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 R2_BUCKET_NAME=your-bucket-name
 
-# R2 버킷의 공개 읽기 주소 (상품 이미지 표시용) — 이 값만 공개이며 번들에 들어가도 무방하다
-NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-xxxxxxxx.r2.dev
+# R2 버킷의 공개 읽기 주소 — 이미지 표시용, 브라우저에 공개되는 값
+NEXT_PUBLIC_R2_PUBLIC_URL=your-r2-dev-url
 ```
 
-R2 값이 비어 있으면 이미지 업로드 요청이 `R2 환경변수가 설정되지 않았습니다: ...`로 실패합니다(어떤 변수가 비었는지 메시지에 나옵니다). Cloudflare 대시보드에서 버킷과 API 토큰을 먼저 만들어야 합니다.
-
-`NEXT_PUBLIC_R2_PUBLIC_URL`은 Cloudflare 대시보드에서 버킷의 공개 읽기를 켜면 발급되는 주소입니다. 이 값이 비어 있으면 업로드는 그대로 동작하지만 목록의 메인이미지가 회색 대체 박스로 표시됩니다. 공개 읽기를 켜도 쓰기·삭제·버킷 목록 조회는 여전히 API 토큰이 필요하며, 공개되는 것은 정확한 key를 아는 사람이 그 파일 하나를 받는 것뿐입니다.
-
-`NEXT_` 접두사가 붙은 변수는 빌드 시점에 값이 번들에 치환됩니다. Vercel 환경변수에 값을 추가만 하고 재배포하지 않으면 반영되지 않으니, 값을 추가·변경한 뒤에는 반드시 재배포하세요.
-
-> 라이브 데모 버킷에는 **25일 수명주기 규칙**이 걸려 있습니다. 공개 계정이라 업로드가 무제한으로 쌓이는 것을 막기 위한 설정이며, 그 결과 오래된 이미지 key는 실제 객체가 없는 상태가 됩니다. 자체 운영 환경에서는 이 규칙 없이 쓰시면 됩니다.
-
-### DB 스키마 반영
-
-`users`·`products` 테이블을 새 Neon 데이터베이스에 만들려면:
+새 Neon 데이터베이스에 스키마를 반영합니다(마이그레이션 파일 없이 `push`로 직접 반영).
 
 ```bash
 npx drizzle-kit push
 ```
 
-이 프로젝트는 마이그레이션 파일을 두지 않고 `push`로 스키마를 직접 반영합니다.
+`/register`에서 가입한 뒤 사용합니다. **새 환경에는 샘플 데이터가 없어 목록이 비어 있습니다** — 상품은 직접 등록하거나 엑셀 대량등록으로 채울 수 있고, 주문·쇼핑몰 연동 등 MSW mock 데이터는 데모 계정 소유라 새 계정에는 보이지 않습니다. 데이터가 채워진 화면은 라이브 데모에서 확인할 수 있습니다.
 
-### 상품 시드 데이터
+<br />
 
-목록을 채워둘 샘플 상품 20건을 넣으려면:
+## 스크립트
 
 ```bash
-npx tsx scripts/seedProducts.ts [ownerId]
+npm run dev          # 개발 서버
+npm run build        # 프로덕션 빌드
+npm run lint         # ESLint
+npm test             # 단위 테스트
+npm run test:watch   # 테스트 감시 모드
 ```
-
-`ownerId`를 생략하면 mock 픽스처에 적힌 값을 씁니다. 로그인한 계정의 `id`와 다르면 목록에 보이지 않으니, 직접 가입한 계정으로 보려면 그 계정의 `id`를 인자로 넘기세요. 같은 스크립트를 여러 번 실행해도 중복 없이 동작합니다.
-
-### 테스트 계정
-
-유저 정보는 Neon DB에 저장됩니다. 라이브 데모 환경의 테스트 계정은 아래와 같습니다.
-
-| 이메일 | 비밀번호 |
-|--------|----------|
-| `admin@example.com` | `admin123@` |
-
-**이 계정은 방문자 누구나 쓰는 공개 계정입니다.** 기능을 마음껏 눌러보셔도 되지만, 아래는 알고 계시는 편이 좋습니다.
-
-- 등록·수정한 상품은 **다른 방문자에게도 그대로 보입니다.** 민감한 정보를 입력하지 마세요.
-- **업로드한 이미지는 25일 후 자동 삭제됩니다** — R2 버킷에 수명주기 규칙을 걸어 저장량을 묶어두고 있습니다. 그 이후에는 상품에 남은 이미지 주소가 실제 파일을 가리키지 않습니다.
-- 데모 데이터는 주기적으로 초기화될 수 있습니다(`scripts/seedProducts.ts`로 샘플 상품을 다시 채웁니다).
-
-로컬 환경에서는 `/register`에서 직접 회원가입 후 사용하세요. 단, 새로 가입한 계정은 자기 테넌트만 보므로 목록이 비어 있습니다 — 위 시드 스크립트에 그 계정의 `id`를 넘겨 샘플 데이터를 채우면 됩니다.
 
 <br />
 
@@ -327,73 +126,17 @@ npx tsx scripts/seedProducts.ts [ownerId]
 
 ```
 src/
-├── app/                        # Next.js App Router 페이지
-│   ├── (auth)/                 # 로그인, 회원가입
-│   ├── (authenticated)/        # 인증 필요 페이지
-│   │   ├── home/               # 홈 대시보드
-│   │   ├── products/           # 상품목록, 등록, 수정, 대량등록
-│   │   ├── order/              # 주문수집, 목록, 상세, 등록
-│   │   ├── shopping/           # 쇼핑몰 관리
-│   │   │   ├── accounts/       # 쇼핑몰 계정 목록, 등록, 수정
-│   │   │   ├── settings/       # 쇼핑몰 정보설정 목록, 등록, 수정
-│   │   │   ├── register/       # 쇼핑몰 상품등록 (전송)
-│   │   │   └── linked-products/ # 연동상품 목록, 연동 건 수정, 상품정보 일괄수정
-│   │   ├── account/            # 사용자관리
-│   │   └── profile/            # 프로필 수정
-│   └── api/                    # DB 연동 route handlers
-│       ├── auth/[...nextauth]/  # NextAuth
-│       ├── register/            # 회원가입
-│       ├── check-email/         # 이메일 중복 확인
-│       ├── profile/             # 프로필 수정
-│       ├── account/users/       # 사용자 목록·등록·삭제
-│       └── products/            # 상품 목록·등록·수정·대량등록, 메인이미지 R2 업로드
-├── db/                         # Neon DB 연결 및 스키마
-│   ├── index.ts                # Drizzle 클라이언트
-│   ├── schema.ts               # users · products 테이블 정의
-│   └── password.ts             # bcrypt 해싱 유틸
-├── lib/                        # 서버 전용 모듈 · 공용 헬퍼
-│   ├── storage.ts              # R2 클라이언트, 이미지 판정·키 조립 (server-only)
-│   └── utils.ts                # cn() 등
-├── features/                   # 도메인별 Feature 모듈
-│   ├── products/
-│   ├── order/
-│   ├── account/
-│   ├── shoppingAccount/
-│   ├── shoppingSetting/
-│   ├── mallRegistration/
-│   ├── mallLinkedProduct/
-│   ├── profile/
-│   ├── home/
-│   └── auth/
-├── shared/                     # 도메인 간 공유 상수·유틸
-│   ├── api/                    # 도메인에 속하지 않는 fetch 래퍼
-│   ├── constant/               # 쇼핑몰·필터·배송·업로드 제한 상수
-│   └── utils/                  # 연락처 검증/포맷, API 인증 가드, KST 날짜 범위
-├── components/
-│   ├── common/                 # TablePagination, RangeDateFilter, FilterSelect, Alert(useAlert) 등
-│   ├── excel/                  # 엑셀 업로드/다운로드/미리보기 + 전략 패턴
-│   ├── layout/                 # 글로벌 헤더, 사이드바
-│   ├── providers/              # SessionProvider, MSWProvider, ExcelProvider
-│   └── ui/                     # Radix UI 기반 기본 컴포넌트
-├── mocks/                      # MSW 핸들러 및 목업 데이터 (상품 제외 비즈니스 데이터)
-│   ├── handlers.ts
-│   ├── handlers/               # 도메인별 핸들러
-│   ├── data/                   # 정적 목업 데이터
-│   └── utils/                  # 핸들러 비즈니스 로직
-├── constant/                   # 사이드바 메뉴 등 앱 전역 상수
-├── types/                      # 공통 타입 정의
-└── middleware.ts               # 인증 라우트 보호
-```
-
-## 스크립트
-
-```bash
-npm run dev          # 개발 서버 실행
-npm run build        # 프로덕션 빌드
-npm run lint         # ESLint 실행
-npm test             # 단위 테스트 실행
-npm run test:watch   # 테스트 감시 모드 (파일 변경 시 자동 재실행)
-
-npx drizzle-kit push              # DB 스키마 반영
-npx tsx scripts/seedProducts.ts   # 샘플 상품 시드
+├── app/               # App Router — (auth)·(authenticated) 페이지, api/ route handlers
+├── features/          # 도메인별 모듈 (api · store · types · ui · util · constant)
+├── components/        # 공용 UI(ui · common · layout), 엑셀 업로드/다운로드, providers
+├── shared/            # 도메인 간 공유 상수 · 유틸
+├── hooks/             # 공용 훅 (알림, 주소 검색 등)
+├── constant/          # 사이드바 메뉴 등 앱 전역 상수
+├── utils/             # 코드 · 번호 생성기
+├── lib/               # R2 저장소 · 원격 이미지 가져오기(서버 전용), cn() 등 헬퍼
+├── db/                # Drizzle 클라이언트와 스키마
+├── mocks/             # MSW 핸들러 · mock 데이터 (DB로 옮기지 않은 도메인)
+├── types/             # 공통 타입
+├── instrumentation.ts # 서버 측 MSW 시작
+└── middleware.ts      # 인증 라우트 보호
 ```
