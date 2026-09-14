@@ -5,7 +5,12 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { Product } from '@/features/products/types/product.types';
-import { findProductWriteViolation, productWriteViolationMessage } from '@/features/products/util/productWriteSchema';
+import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
+import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constant';
+
+// 오류 응답의 rowIndex는 요청 배열 기준 0부터다. 시트 행 번호는 요청을 만든 클라이언트만 알고 있어서
+// 서버는 index만 돌려주고 번호는 클라이언트가 붙인다(formatBulkRowError).
+const rowError = (error: string, rowIndex: number) => NextResponse.json({ error, rowIndex }, { status: 400 });
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -18,24 +23,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, count: 0 });
     }
 
-    // insert 전에 전체 행을 먼저 검증한다. 일부만 넣고 나머지를 거부하면
-    // "몇 번째 줄까지 반영됐는지 알 수 없는" 절반짜리 상태가 되어 재시도가 더 어려워진다.
-    // create·PATCH와 같은 규칙: mainImage가 없으면 통과, 절대 URL이면 통과, key라면 본인 네임스페이스여야 한다.
-    const invalidIndex = rows.findIndex((p) => p.mainImage && !isMainImageOwnedBy(p.mainImage, session.ownerId));
-    if (invalidIndex !== -1) {
+    // 엑셀 업로드가 앞에서 막지만 그 검사는 브라우저에서만 돈다.
+    if (rows.length > PRODUCT_BULK_MAX_ROWS) {
       return NextResponse.json(
-        { error: `${invalidIndex + 1}번째 행의 이미지는 본인이 업로드한 것이 아닙니다.` },
+        { error: `한 번에 최대 ${PRODUCT_BULK_MAX_ROWS}건까지 등록할 수 있습니다.` },
         { status: 400 },
       );
     }
 
-    // 전체 행을 먼저 본다. 일부만 넣으면 어디까지 반영됐는지 알 수 없는 절반짜리 상태가 된다.
-    // 엑셀 업로드 검증이 앞에서 걸러주지만 그 검증은 브라우저에서만 돈다.
+    // insert 전에 전체 행을 먼저 검증한다. 일부만 넣고 나머지를 거부하면
+    // "몇 번째 줄까지 반영됐는지 알 수 없는" 절반짜리 상태가 되어 재시도가 더 어려워진다.
+    // create·PATCH와 같은 규칙: mainImage가 없으면 통과, 있으면 본인 네임스페이스의 key여야 한다.
+    const invalidIndex = rows.findIndex((p) => p.mainImage && !isMainImageOwnedBy(p.mainImage, session.ownerId));
+    if (invalidIndex !== -1) {
+      return rowError('본인이 업로드한 이미지만 사용할 수 있습니다.', invalidIndex);
+    }
+
     for (const [index, product] of rows.entries()) {
       const violation = findProductWriteViolation(product);
-      if (violation) {
-        return NextResponse.json({ error: productWriteViolationMessage(violation, index + 1) }, { status: 400 });
-      }
+      if (violation) return rowError(violation, index);
     }
 
     const now = new Date();

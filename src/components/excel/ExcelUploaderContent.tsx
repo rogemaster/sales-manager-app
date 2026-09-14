@@ -5,20 +5,28 @@ import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { processExcelUpload } from '@/components/excel/utils/processExcelUpload';
+import { checkExcelImageColumns } from '@/components/excel/utils/checkExcelImageColumns';
+import { getSheetRow } from '@/components/excel/utils/sheetRows';
 import { ExcelTemplateInfo } from '@/types/excel.type';
 import { useAlert } from '@/hooks/useAlert';
 import { useSetAtom } from 'jotai';
 import { setExcelDataAtom } from '@/components/excel/store/excelData.store';
+import { checkProductImage } from '@/features/products/api/checkProductImage';
+import { REMOTE_IMAGE_CONCURRENCY } from '@/shared/constant/upload.constant';
 import { excelUploadErrorCodeToMessage, excelValidErrorsCodeToMessages } from './message';
 
 type Props = {
   contentDescription: string;
   fileTemplateInfo: ExcelTemplateInfo[];
+  maxRows?: number;
 };
 
-export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: Props) => {
+type ImageProgress = { done: number; total: number };
+
+export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo, maxRows }: Props) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageProgress, setImageProgress] = useState<ImageProgress | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { showAlert } = useAlert();
@@ -48,22 +56,18 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
         });
       }, 100);
 
-      const result = await processExcelUpload(event, fileTemplateInfo);
+      const result = await processExcelUpload(event, fileTemplateInfo, maxRows);
 
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
 
       // 파일 자체 오류 - 100% 없이 즉시 에러 표시
       if (!result.success && result.errorType === 'UPLOAD_ERROR') {
-        const message = excelUploadErrorCodeToMessage(result.uploadError!);
-        showAlert({
-          type: 'error',
-          message,
-        });
+        showAlert({ type: 'error', message: excelUploadErrorCodeToMessage(result.uploadError!, maxRows) });
         return;
       }
 
-      // 잘못된 양식 - 필수 컬럼이 없는 경우, 미리보기 불가
+      // 잘못된 양식 - 필수 컬럼이 없는 경우, 미리보기 불가. 이미지 확인도 하지 않는다.
       if (!result.success && result.errorType === 'VALIDATE_ERROR') {
         showAlert({
           type: 'error',
@@ -72,39 +76,35 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
         return;
       }
 
+      if (!result.data) return;
+      const rows = result.data;
+
+      // 이미지 확인은 필드 검사 뒤에 한다. 필드 오류가 있는 행도 확인해 모든 오류를 한 번에 보여준다.
+      // 필드 검사 결과가 "오류 없음"이어도 이미지 오류가 생길 수 있으므로, 둘을 합친 뒤 한 경로에서 처리한다.
+      const imageErrors = await checkExcelImageColumns(rows, fileTemplateInfo, checkProductImage, {
+        concurrency: REMOTE_IMAGE_CONCURRENCY,
+        onProgress: (done, total) => setImageProgress({ done, total }),
+      });
+
       setUploadProgress(100);
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // 결과에 따른 alert 표시 및 상태 업데이트
-      // 정상적 엑셀업로드
-      if (result.success && !result.errorType && result.data) {
-        showAlert({
-          type: 'success',
-          message: '업로드가 완료되었습니다.',
-        });
+      const errors = excelValidErrorsCodeToMessages([...(result.validationResult?.errors ?? []), ...imageErrors]);
 
-        setExcelData(result.data);
+      if (errors.length === 0) {
+        showAlert({ type: 'success', message: '업로드가 완료되었습니다.' });
+        setExcelData(rows);
+        return;
       }
 
-      // 필수값이 없는 엑셀 미리보기는 가능. 최종 저장 불가
-      if (result.success && result.errorType === 'VALIDATE_ERROR' && result.data) {
-        const mergedErrorsData = excelValidErrorsCodeToMessages(result.validationResult!.errors!);
-        const errorRowCount = new Set(mergedErrorsData.map((e) => e.row)).size;
-        showAlert({
-          type: 'error',
-          message: `${errorRowCount}개 행에 유효성 오류가 있습니다. 오류 내용을 확인하세요.`,
-        });
+      // 오류가 있는 엑셀도 미리보기는 가능하다. 오류 행은 저장 대상에서 빠진다.
+      const errorRowCount = new Set(errors.map((e) => e.row)).size;
+      showAlert({
+        type: 'error',
+        message: `${errorRowCount}개 행에 유효성 오류가 있습니다. 오류 내용을 확인하세요.`,
+      });
 
-        const mergedExcelData = result.data.map((item, index) => {
-          const rowError = mergedErrorsData.filter((value) => value!.row - 1 === index);
-          return {
-            ...item,
-            error: rowError,
-          };
-        });
-
-        setExcelData(mergedExcelData);
-      }
+      setExcelData(rows.map((item) => ({ ...item, error: errors.filter((value) => value.row === getSheetRow(item)) })));
     } catch {
       showAlert({
         type: 'error',
@@ -113,12 +113,17 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
+      setImageProgress(null);
       // 파일 입력 초기화
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
+
+  const progressLabel = imageProgress ? '이미지 확인 중...' : '파일 처리 중...';
+  const progressCount = imageProgress ? `${imageProgress.done} / ${imageProgress.total}` : `${uploadProgress}%`;
+  const progressValue = imageProgress ? Math.round((imageProgress.done / imageProgress.total) * 100) : uploadProgress;
 
   return (
     <div className="space-y-4">
@@ -134,10 +139,10 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo }: P
       {isUploading && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span>파일 처리 중...</span>
-            <span>{uploadProgress}%</span>
+            <span>{progressLabel}</span>
+            <span>{progressCount}</span>
           </div>
-          <Progress value={uploadProgress} className="w-full" />
+          <Progress value={progressValue} className="w-full" />
         </div>
       )}
     </div>

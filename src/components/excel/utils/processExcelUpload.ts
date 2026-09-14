@@ -4,10 +4,12 @@ import * as XLSX from 'xlsx';
 import { ExcelRowType, ExcelTemplateInfo, UploadResult } from '@/types/excel.type';
 import { ChangeEvent } from 'react';
 import { validateExcelData } from '@/components/excel/utils/validate';
+import { attachSheetRowNumbers, exceedsMaxRows } from '@/components/excel/utils/sheetRows';
 
 export async function processExcelUpload(
   event: ChangeEvent<HTMLInputElement>,
   fileTemplateInfo: ExcelTemplateInfo[],
+  maxRows?: number,
 ): Promise<UploadResult> {
   if (!event.target.files) {
     return {
@@ -52,28 +54,23 @@ export async function processExcelUpload(
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    // 엑셀을 이중배열이 아닌 배열 안의 객체 형태(Array of Objects) 로 변형
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+    // 시트 행 번호는 행을 펼치기 전에 붙여야 한다(sheetRows.ts 참고).
+    const rows = attachSheetRowNumbers(XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRowType[]);
+
+    if (exceedsMaxRows(rows.length, maxRows)) {
+      return { success: false, errorType: 'UPLOAD_ERROR', uploadError: 'TOO_MANY_ROWS' };
+    }
 
     // 필수값 검증 + 허용값 검증. 필수 여부(req)와 허용 목록(allowed)이 모두 양식 정의에 있으므로
     // 헤더만 추려 넘기지 않고 양식 전체를 넘긴다.
-    const validationResult = validateExcelData(jsonData as ExcelRowType[], fileTemplateInfo);
+    const validationResult = validateExcelData(rows, fileTemplateInfo);
 
     const success = validationResult.result === 'success';
 
     if (success && validationResult.errors.length === 0) {
-      return {
-        success,
-        data: jsonData as ExcelRowType[],
-      };
-    } else {
-      return {
-        success,
-        errorType: 'VALIDATE_ERROR',
-        validationResult,
-        data: jsonData as ExcelRowType[],
-      };
+      return { success, data: rows };
     }
+    return { success, errorType: 'VALIDATE_ERROR', validationResult, data: rows };
   } catch (error) {
     console.error(error);
     return {

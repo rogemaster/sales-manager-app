@@ -4,3 +4,6 @@ export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 // 기존 `acceptImage`(src/constant/accept.content.ts)와 같은 목록이어야 한다.
 export const ALLOWED_IMAGE_MIME = ['image/png', 'image/jpeg', 'image/jpg'] as const;
+
+// 엑셀 이미지 확인·가져오기의 동시 요청 수. 업로드와 저장이 같은 값을 쓴다.
+export const REMOTE_IMAGE_CONCURRENCY = 4;

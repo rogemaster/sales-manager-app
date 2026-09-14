@@ -17,6 +17,9 @@ export interface ExcelTemplateInfo {
   // 이 컬럼에 적을 수 있는 값의 전체 목록. 코드값이 아니라 사용자가 시트에 적는 표시명을 담는다.
   // 붙이면 업로드 검증이 목록 밖의 값을 오류 행으로 잡는다. 붙이지 않은 컬럼은 자유 입력이다.
   allowed?: string[];
+  // 외부 이미지 주소를 적는 컬럼. 붙이면 업로드 시 서버가 그 주소를 내려받아 쓸 수 있는 이미지인지 확인하고,
+  // 실패한 행을 INVALID_IMAGE 오류로 잡는다. 저장 시 실제로 R2에 가져오는 것은 저장 전략의 몫이다.
+  remoteImage?: boolean;
 }
 
 // 엑셀 section header
@@ -31,6 +34,8 @@ export interface ExcelUploaderProps {
   excelHeader: ExcelHeaderProps;
   contentDescription: string;
   fileTemplateInfo: ExcelTemplateInfo[];
+  // 한 파일의 최대 데이터 행 수. 넘으면 파일 자체를 거부한다. 넘기지 않으면 제한이 없다.
+  maxRows?: number;
 }
 
 // 엑셀 다운로드
@@ -55,9 +60,14 @@ export type ExcelRowType = { [key: string]: string | number | boolean | null | u
 
 export type ExcelRowWithErrors = { [key: string]: string | number | boolean | null | undefined | ValidationError[] };
 
-export type UploadErrorCode = 'NO_FILE_SELECTED' | 'INVALID_FILE_TYPE' | 'FILE_TOO_LARGE' | 'PROCESSING_ERROR';
+export type UploadErrorCode =
+  | 'NO_FILE_SELECTED'
+  | 'INVALID_FILE_TYPE'
+  | 'FILE_TOO_LARGE'
+  | 'TOO_MANY_ROWS'
+  | 'PROCESSING_ERROR';
 
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER';
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
 
 export type ErrorTypeCode = 'UPLOAD_ERROR' | 'VALIDATE_ERROR';
 
@@ -70,6 +80,8 @@ export type ValidationError = {
   // 오류 메시지가 함께 알려주기 위한 값이라, 메시지 조립은 message.ts가 맡는다.
   value?: string;
   allowed?: string[];
+  // INVALID_IMAGE에서 채워진다. 서버가 알려준 사유(예: '이미지를 불러올 수 없습니다(HTTP 404).')다.
+  reason?: string;
 };
 
 export type UploadResult = {
@@ -84,3 +96,17 @@ export type ValidationResult = {
   result: 'success' | 'error';
   errors: ValidationError[] | [];
 };
+
+// 업로드 시 이미지 주소 하나를 확인하는 함수. ok: false는 이미지 자체의 문제이고, 확인 요청이 실패하면 throw한다.
+export type ExcelImageCheckFn = (url: string) => Promise<{ ok: true } | { ok: false; reason: string }>;
+
+// 저장 단계에서 제외된 행. rowNumber는 엑셀 시트 행 번호다.
+export type ExcelRowFailure = { rowNumber: number; message: string };
+
+// 저장 결과. 이미지를 가져오지 못한 행은 빼고 저장하므로 "일부 성공"이 정상 결과에 포함된다.
+export type ExcelSaveResult = { savedCount: number; failures: ExcelRowFailure[] };
+
+export type ExcelSaveFn = (
+  rows: ExcelRowWithErrors[],
+  context?: { onProgress?: (done: number, total: number) => void },
+) => Promise<ExcelSaveResult>;

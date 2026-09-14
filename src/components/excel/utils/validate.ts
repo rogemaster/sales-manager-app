@@ -1,4 +1,5 @@
 import { ExcelRowType, ExcelTemplateInfo, ValidationError, ValidationResult } from '@/types/excel.type';
+import { getSheetRow } from './sheetRows';
 
 // 필수 필드가 없는 경우
 export function missingField(row: ExcelRowType, requiredField: string) {
@@ -23,30 +24,37 @@ export function invalidNumber(row: ExcelRowType, header: string) {
   return !Number.isInteger(parsed) || parsed < 0;
 }
 
+// 오류의 row는 엑셀 시트 행 번호다. 파싱 직후 attachSheetRowNumbers가 붙인 값을 쓴다.
 export function validateExcelData(rowsData: ExcelRowType[], templateInfo: ExcelTemplateInfo[]): ValidationResult {
   const errors: ValidationError[] = [];
 
-  rowsData.forEach((row, index) => {
+  rowsData.forEach((row) => {
     templateInfo.forEach(({ name: header, req, allowed, numeric }) => {
       if (req && missingField(row, header)) {
-        errors.push({ row: index + 1, header, code: 'MISSING_FIELD' });
+        errors.push({ row: getSheetRow(row), header, code: 'MISSING_FIELD' });
         return;
       }
 
       if (req && emptyValue(row, header)) {
-        errors.push({ row: index + 1, header, code: 'EMPTY_VALUE' });
+        errors.push({ row: getSheetRow(row), header, code: 'EMPTY_VALUE' });
         return;
       }
 
       // 빈 값에는 허용값 오류를 겹쳐 붙이지 않는다. 필수면 위에서 이미 잡혔고,
       // 선택 컬럼이 비어 있는 것은 오류가 아니다.
       if (allowed && !emptyValue(row, header) && invalidValue(row, header, allowed)) {
-        errors.push({ row: index + 1, header, code: 'INVALID_VALUE', value: String(row[header]).trim(), allowed });
+        errors.push({
+          row: getSheetRow(row),
+          header,
+          code: 'INVALID_VALUE',
+          value: String(row[header]).trim(),
+          allowed,
+        });
       }
 
       // 빈 값에는 숫자 오류를 겹쳐 붙이지 않는다. 허용값 검사와 같은 이유다.
       if (numeric && !emptyValue(row, header) && invalidNumber(row, header)) {
-        errors.push({ row: index + 1, header, code: 'INVALID_NUMBER', value: String(row[header]).trim() });
+        errors.push({ row: getSheetRow(row), header, code: 'INVALID_NUMBER', value: String(row[header]).trim() });
       }
     });
   });

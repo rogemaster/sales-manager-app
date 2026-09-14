@@ -5,13 +5,22 @@ import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, FileSpreadsheet, X } from 'lucide-react';
 import { useResetExcelData } from '@/components/excel/store/excelData.store';
 
-type Props = { validCount: number; onSaveConfirm: () => void };
+type SaveProgress = { done: number; total: number };
+type Props = {
+  validCount: number;
+  onSaveConfirm: () => void;
+  // 저장은 이미지 가져오기 때문에 수 초 이상 걸린다. 그동안 다시 누르면 같은 상품이 두 번 등록된다.
+  isSaving: boolean;
+  saveProgress: SaveProgress | null;
+};
 
 export const ExcelDataPreviewHeader = ({
   headerTitle,
   headerDescription,
   validCount,
   onSaveConfirm,
+  isSaving,
+  saveProgress,
 }: ExcelHeaderProps & Props) => {
   const { showAlert } = useAlert();
   const resetExcel = useResetExcelData();
@@ -38,6 +47,12 @@ export const ExcelDataPreviewHeader = ({
     });
   };
 
+  const saveLabel = !isSaving
+    ? `저장 (${validCount}개)`
+    : saveProgress
+      ? `이미지 저장 중 ${saveProgress.done}/${saveProgress.total}`
+      : '저장 중...';
+
   return (
     <CardHeader className="border-b border-border/50 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -52,13 +67,14 @@ export const ExcelDataPreviewHeader = ({
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleClearData}>
+          {/* 저장 중에 초기화하면 진행 중인 저장과 화면 데이터가 어긋난다 */}
+          <Button variant="outline" onClick={handleClearData} disabled={isSaving}>
             <X className="h-4 w-4 mr-2" />
             초기화
           </Button>
-          <Button onClick={handleSaveData} disabled={validCount === 0}>
+          <Button onClick={handleSaveData} disabled={validCount === 0 || isSaving}>
             <CheckCircle className="h-4 w-4 mr-2" />
-            저장 ({validCount}개)
+            {saveLabel}
           </Button>
         </div>
       </div>

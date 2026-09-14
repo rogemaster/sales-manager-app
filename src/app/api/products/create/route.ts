@@ -5,7 +5,7 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { CreateProductRequest } from '@/features/products/types/product.types';
-import { findProductWriteViolation, productWriteViolationMessage } from '@/features/products/util/productWriteSchema';
+import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     // 컬럼이 text·integer라 DB가 값을 걸러주지 않는다. 폼을 거치지 않는 요청을 여기서 막는다.
     const violation = findProductWriteViolation(data);
     if (violation) {
-      return NextResponse.json({ error: productWriteViolationMessage(violation) }, { status: 400 });
+      return NextResponse.json({ error: violation }, { status: 400 });
     }
 
     const now = new Date();

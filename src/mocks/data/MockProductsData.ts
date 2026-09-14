@@ -34,7 +34,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'FREE',
     deliveryPrice: 0,
     totalQuantity: 250,
-    mainImage: 'https://picsum.photos/seed/tws900-earbuds/700/700',
+    mainImage: 'images/usr_2f20748f/aa2ccf2b-6bbb-459c-9804-813b29b38cbf.jpg',
     detailPage:
       '블루투스 5.3 칩셋과 -35dB 액티브 노이즈캔슬링을 지원하는 완전무선 이어폰입니다.\n케이스 포함 최대 32시간 재생, IPX5 생활방수, 저지연 게임모드를 지원합니다.',
     brand: '사운드코어',
@@ -112,7 +112,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CONDITIONAL_FREE',
     deliveryPrice: 3000,
     totalQuantity: 330,
-    mainImage: 'https://picsum.photos/seed/mens-overfit-tee/700/700',
+    mainImage: 'images/usr_2f20748f/c4a85f21-42e9-441d-bf35-687f663a1c64.jpg',
     detailPage:
       '20수 싱글 코튼 100% 원단으로 제작한 오버핏 반팔 티셔츠입니다.\n목 늘어남을 잡아주는 넥라인 바이어스 처리, 무형광 원단으로 사계절 데일리로 착용하기 좋습니다.',
     brand: '데일리핏',
@@ -207,7 +207,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'FREE',
     deliveryPrice: 0,
     totalQuantity: 260,
-    mainImage: 'https://picsum.photos/seed/vacuum-tumbler-500/700/700',
+    mainImage: 'images/usr_2f20748f/c279075c-cdad-4f6b-a0a2-cd1db74ab1cb.jpg',
     detailPage:
       '304 스테인리스 이중 진공 구조로 6시간 보온 / 12시간 보냉을 유지합니다.\n분리 세척이 가능한 뚜껑과 실리콘 패킹, 빨대 2종(스트레이트 / 벤딩)이 함께 들어 있습니다.',
     brand: '킵쿨',
@@ -275,7 +275,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CONDITIONAL_FREE',
     deliveryPrice: 3000,
     totalQuantity: 120,
-    mainImage: 'https://picsum.photos/seed/microfiber-bedding-set/700/700',
+    mainImage: 'images/usr_2f20748f/b23db939-8e97-43a5-8694-384d39eb729e.jpg',
     detailPage:
       '3중 기모 극세사 원단으로 만든 사계절용 차렵이불 세트입니다.\n구성: 차렵이불 1 + 베개커버 (싱글 1 / 퀸·킹 2). 사각 누빔으로 솜 쏠림을 잡았습니다.',
     brand: '슬립앤',
@@ -340,7 +340,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CONDITIONAL_FREE',
     deliveryPrice: 3000,
     totalQuantity: 110,
-    mainImage: 'https://picsum.photos/seed/women-knit-onepiece/700/700',
+    mainImage: 'images/usr_2f20748f/efe97b9b-62a1-4b4f-baef-c711af231981.jpg',
     detailPage:
       '부드러운 아크릴 혼방 니트로 만든 루즈핏 롱 원피스입니다.\n비침이 적은 두께감, 프리 사이즈(55~66 호환), 이너 없이 단독 착용 가능.',
     brand: '무드레이어',
@@ -405,7 +405,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CONDITIONAL_FREE',
     deliveryPrice: 3500,
     totalQuantity: 0,
-    mainImage: 'https://picsum.photos/seed/folding-camping-chair/700/700',
+    mainImage: 'images/usr_2f20748f/41a292de-da31-49e4-be68-ccf5abe9fbdb.jpg',
     detailPage:
       '무게 1.9kg의 초경량 접이식 캠핑 체어입니다.\n알루미늄 프레임 + 600D 옥스포드 원단, 최대 하중 150kg, 전용 수납 파우치 포함.',
     brand: '아웃도어랩',
@@ -474,7 +474,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CHARGE_RECEIVED',
     deliveryPrice: 3000,
     totalQuantity: 60,
-    mainImage: 'https://picsum.photos/seed/silicone-oven-mitts/700/700',
+    mainImage: 'images/usr_2f20748f/5eb040fe-40aa-4b2b-8607-7e407bbbcefa.jpg',
     detailPage:
       '내열 220℃ 실리콘 방열 주방장갑 2P 세트입니다.\n미끄럼 방지 돌기, 손목까지 덮는 길이, 식기세척기 사용 가능.',
     brand: '킵쿨',
@@ -515,7 +515,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'CONDITIONAL_FREE',
     deliveryPrice: 3000,
     totalQuantity: 220,
-    mainImage: 'https://picsum.photos/seed/2027-weekly-diary/700/700',
+    mainImage: 'images/usr_2f20748f/ce82bf73-0696-4041-802e-b269c5f64291.jpg',
     detailPage:
       '2027년 1월 ~ 12월 위클리 구성 A5 스프링 다이어리입니다.\n100g 미색 내지로 뒷비침이 적고, 먼슬리 12장 + 위클리 53장 + 메모 20장 구성.',
     brand: '페이퍼데이',
@@ -551,7 +551,7 @@ const RAW_PRODUCTS: Omit<Product, 'ownerId'>[] = [
     deliveryType: 'FREE',
     deliveryPrice: 0,
     totalQuantity: 40,
-    mainImage: 'https://picsum.photos/seed/air-purifier-20pyeong/700/700',
+    mainImage: 'images/usr_2f20748f/37dc0aa4-ad1a-47fd-bb49-4c580df0e033.jpg',
     detailPage:
       '사용면적 66㎡(20평형) 공기청정기입니다.\nH13 등급 헤파필터 + 활성탄 탈취필터 일체형, 미세먼지 센서 4단계 표시, 취침모드 23dB.',
     brand: '에어프레쉬',

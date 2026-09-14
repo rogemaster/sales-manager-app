@@ -51,6 +51,7 @@ export const ProductBulkUploadLayout = () => {
           excelHeader={PRODUCT_EXCEL_TEMPLATE_UPLOADER.excelHeader}
           contentDescription={PRODUCT_EXCEL_TEMPLATE_UPLOADER.contentDescription}
           fileTemplateInfo={PRODUCT_BULK_EXCEL_TEMPLATE.template}
+          maxRows={PRODUCT_EXCEL_TEMPLATE_UPLOADER.maxRows}
         />
       </div>
 

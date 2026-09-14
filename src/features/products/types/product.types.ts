@@ -12,7 +12,7 @@ export interface Product {
   deliveryType: string;
   deliveryPrice: number;
   /**
-   * 메인이미지. R2 key(`images/<ownerId>/<uuid>.png`) 또는 절대 URL(엑셀·시드의 외부 이미지).
+   * 메인이미지. R2 key(`images/<ownerId>/<uuid>.<png|jpg>`)만 담는다. 엑셀의 외부 이미지 주소도 가져오기를 거쳐 key가 된다.
    * 폼에서 File을 다루는 것은 ProductFormValues의 역할이다 — 도메인 타입에는 File이 들어오지 않는다.
    */
   mainImage: string;

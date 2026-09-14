@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/card';
 import { ExcelHeader } from './components/ExcelHeader';
 import { ExcelUploaderContent } from './ExcelUploaderContent';
 
-export const ExcelUploader = ({ excelHeader, contentDescription, fileTemplateInfo }: ExcelUploaderProps) => {
+export const ExcelUploader = ({ excelHeader, contentDescription, fileTemplateInfo, maxRows }: ExcelUploaderProps) => {
   return (
     <Card className="overflow-hidden">
       <ExcelHeader
@@ -12,7 +12,11 @@ export const ExcelUploader = ({ excelHeader, contentDescription, fileTemplateInf
         headerDescription={excelHeader.headerDescription}
       />
       <CardContent className="pt-6">
-        <ExcelUploaderContent contentDescription={contentDescription} fileTemplateInfo={fileTemplateInfo} />
+        <ExcelUploaderContent
+          contentDescription={contentDescription}
+          fileTemplateInfo={fileTemplateInfo}
+          maxRows={maxRows}
+        />
       </CardContent>
     </Card>
   );

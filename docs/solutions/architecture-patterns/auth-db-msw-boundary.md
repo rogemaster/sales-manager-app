@@ -1,6 +1,7 @@
 ---
 title: MSW/DB 경계 설계 — 인증·유저 정보는 DB, 비즈니스 데이터는 MSW
 date: 2026-06-24
+last_updated: 2026-09-14
 category: architecture-patterns
 module: auth, account
 problem_type: architecture_pattern
@@ -68,6 +69,7 @@ tags:
 - **인증 흐름 (가입/이메일 중복)** → DB (login 일관성)
 - **유저 목록·프로필** → DB (DB에 저장된 실제 유저와 화면이 일치해야 함)
 - **외부 스토리지·서드파티 API 키가 필요한 기능 (R2 업로드 등)** → DB route (2026-09-01 추가)
+- **시크릿은 없어도 서버가 외부로 요청해야 하는 기능 (엑셀 이미지 확인 `/api/products/image/check`)** → route (2026-09-13 추가). 브라우저에서 도는 MSW는 SSRF 방어가 걸린 서버 측 요청을 대신할 수 없다 — [`server-side-remote-fetch-ssrf-connect-time-validation.md`](server-side-remote-fetch-ssrf-connect-time-validation.md)
 - **그 데이터를 영속화해야 배포 환경에서 의미가 있는 기능** → DB route (상품이 이 경우다. 포트폴리오 특성상 배포 URL에서 등록한 상품이 남아야 한다)
 - **나머지 비즈니스 데이터 (주문/쇼핑몰 계정·정보설정/연동상품/홈)** → MSW 유지
 
@@ -122,6 +124,8 @@ src/app/api/
     ├── create/route.ts                ← 상품 등록 (POST)
     ├── bulk/route.ts                  ← 상품 대량 등록 (POST)
     ├── image/route.ts                 ← 메인이미지 R2 업로드 (POST)
+    ├── image/check/route.ts           ← 엑셀 외부 이미지 확인만 (POST, 2026-09-13)
+    ├── image/import/route.ts          ← 엑셀 외부 이미지 R2 가져오기 (POST, 2026-09-13)
     └── [productId]/route.ts           ← 단건 조회·수정 (GET/PATCH)
 ```
 

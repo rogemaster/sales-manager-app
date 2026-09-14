@@ -76,6 +76,8 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       key: 'mainImage',
       name: '메인이미지',
       req: true,
+      // 외부 이미지 주소를 받는다. 업로드 시 확인하고, 저장 시 R2로 가져와 key로 저장한다.
+      remoteImage: true,
     },
     {
       key: 'detailPage',

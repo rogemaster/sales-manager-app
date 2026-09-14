@@ -5,6 +5,8 @@ import {
   resolveExcelTotalQuantity,
   toExcelOptionPairs,
 } from '@/features/products/util/excelOptions';
+import { PRODUCT_BULK_MAX_ROWS } from './bulk.constant';
+import { getSheetRow } from '@/components/excel/utils/sheetRows';
 
 // 엑셀 양식 다운로드
 export const PRODUCT_EXCEL_TEMPLATE_DOWNLOADER: ExcelDownloaderProps = {
@@ -26,6 +28,7 @@ export const PRODUCT_EXCEL_TEMPLATE_UPLOADER: ExcelUploaderProps = {
   },
   contentDescription: '엑셀 파일을 드래그하거나 클릭하여 업로드하세요',
   fileTemplateInfo: PRODUCT_BULK_EXCEL_TEMPLATE.template,
+  maxRows: PRODUCT_BULK_MAX_ROWS,
 };
 
 // 엑셀 데이터 미리보기
@@ -39,7 +42,8 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   {
     key: 'row',
     headerTitle: '행',
-    accessor: (_, index) => (index !== undefined ? index + 1 : ''),
+    // 엑셀 시트의 행 번호. 사용자가 파일에서 그 행을 바로 찾을 수 있게 index가 아니라 시트 행을 보여준다.
+    accessor: (r) => getSheetRow(r),
   },
   {
     key: 'state',
