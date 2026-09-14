@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { validateExcelData } from './validate';
 import { ExcelTemplateInfo } from '@/types/excel.type';
+import { EXCEL_SHEET_ROW_KEY } from './sheetRows';
 
 const template: ExcelTemplateInfo[] = [
   { key: 'name', name: '상품명', req: true },
@@ -8,14 +9,20 @@ const template: ExcelTemplateInfo[] = [
   { key: 'memo', name: '메모', req: false, allowed: ['A', 'B'] },
 ];
 
-const row = (over: Record<string, string | number> = {}) => ({ 상품명: '상품', 판매상태: '판매중', 메모: '', ...over });
+const row = (over: Record<string, string | number> = {}) => ({
+  상품명: '상품',
+  판매상태: '판매중',
+  메모: '',
+  [EXCEL_SHEET_ROW_KEY]: 2,
+  ...over,
+});
 
 describe('validateExcelData - 허용값 검사', () => {
   it('허용 목록에 없는 값이면 INVALID_VALUE 오류를 만든다', () => {
     const { errors } = validateExcelData([row({ 판매상태: '판매중지' })], template);
 
     expect(errors).toContainEqual({
-      row: 1,
+      row: 2,
       header: '판매상태',
       code: 'INVALID_VALUE',
       value: '판매중지',
@@ -44,7 +51,7 @@ describe('validateExcelData - 허용값 검사', () => {
   it('시트에서 숫자로 파싱된 값도 문자열로 비교한다', () => {
     const numericTemplate: ExcelTemplateInfo[] = [{ key: 'code', name: '코드', req: true, allowed: ['1', '2'] }];
 
-    const { errors } = validateExcelData([{ 코드: 1 }], numericTemplate);
+    const { errors } = validateExcelData([{ 코드: 1, [EXCEL_SHEET_ROW_KEY]: 2 }], numericTemplate);
 
     expect(errors).toHaveLength(0);
   });
@@ -71,16 +78,16 @@ describe('validateExcelData - 허용값 검사', () => {
 
 describe('validateExcelData - 기존 필수값 검사', () => {
   it('컬럼 자체가 없으면 MISSING_FIELD이고 미리보기 불가로 판정한다', () => {
-    const { result, errors } = validateExcelData([{ 상품명: '상품', 메모: '' }], template);
+    const { result, errors } = validateExcelData([{ 상품명: '상품', 메모: '', [EXCEL_SHEET_ROW_KEY]: 2 }], template);
 
     expect(result).toBe('error');
-    expect(errors).toContainEqual({ row: 1, header: '판매상태', code: 'MISSING_FIELD' });
+    expect(errors).toContainEqual({ row: 2, header: '판매상태', code: 'MISSING_FIELD' });
   });
 
-  it('행 번호는 1부터 센다', () => {
-    const { errors } = validateExcelData([row(), row({ 상품명: '' })], template);
+  it('행 번호는 index가 아니라 행에 붙은 시트 행 번호를 쓴다', () => {
+    const { errors } = validateExcelData([row(), row({ 상품명: '', [EXCEL_SHEET_ROW_KEY]: 5 })], template);
 
-    expect(errors[0]).toMatchObject({ row: 2, header: '상품명', code: 'EMPTY_VALUE' });
+    expect(errors[0]).toMatchObject({ row: 5, header: '상품명', code: 'EMPTY_VALUE' });
   });
 });
 
@@ -95,13 +102,14 @@ describe('validateExcelData - 숫자 검사', () => {
     상품명: '상품',
     판매가: 10000,
     공급가: '',
+    [EXCEL_SHEET_ROW_KEY]: 2,
     ...over,
   });
 
   it('숫자가 아니면 INVALID_NUMBER 오류를 만든다', () => {
     const { errors } = validateExcelData([numericRow({ 판매가: 'abc' })], numericTemplate);
 
-    expect(errors).toContainEqual({ row: 1, header: '판매가', code: 'INVALID_NUMBER', value: 'abc' });
+    expect(errors).toContainEqual({ row: 2, header: '판매가', code: 'INVALID_NUMBER', value: 'abc' });
   });
 
   it('음수를 잡는다', () => {
