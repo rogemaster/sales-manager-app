@@ -1,6 +1,6 @@
 import { UploadErrorCode, ValidationError } from '@/types/excel.type';
 
-export function excelUploadErrorCodeToMessage(code: UploadErrorCode) {
+export function excelUploadErrorCodeToMessage(code: UploadErrorCode, maxRows?: number) {
   switch (code) {
     case 'NO_FILE_SELECTED':
       return '파일을 선택해 주세요.';
@@ -8,6 +8,8 @@ export function excelUploadErrorCodeToMessage(code: UploadErrorCode) {
       return '엑셀 파일(.xlsx, .xls) 또는 CSV 파일만 업로드 가능합니다.';
     case 'FILE_TOO_LARGE':
       return '파일 크기가 10MB를 초과합니다. 더 작은 파일을 업로드해 주세요.';
+    case 'TOO_MANY_ROWS':
+      return `한 번에 최대 ${maxRows}건까지 업로드할 수 있습니다.`;
     case 'PROCESSING_ERROR':
       return '파일 처리 중 오류가 발생했습니다.';
     default:
@@ -28,6 +30,9 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
     }
     if (item.code === 'INVALID_NUMBER') {
       return { ...item, message: `[${item.header}] '${item.value}'는 0 이상의 정수여야 합니다.` };
+    }
+    if (item.code === 'INVALID_IMAGE') {
+      return { ...item, message: `[${item.header}] ${item.reason}` };
     }
     return item;
   });
