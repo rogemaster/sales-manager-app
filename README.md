@@ -53,34 +53,35 @@
 
 ## 설계 포인트
 
-**공통 정보는 오리진에 모으고, 몰 고유값만 분리한다.**
-상품의 공통 정보는 오리진 상품(`Product`)에, 외부 쇼핑몰 고유값은 쇼핑몰 정보설정(`ShoppingSetting`)에 두고 전송 시점에 결합합니다. 
-전송 결과인 연동 데이터는 그 시점 값을 스냅샷으로 복사한 독립 엔티티라, 오리진을 고쳐도 이미 연동된 건은 바뀌지 않습니다.
-→ [`snapshot-entity-source-link-break-is-by-design.md`](docs/solutions/architecture-patterns/snapshot-entity-source-link-break-is-by-design.md), 
+**공통 정보는 오리진에 모으고, 몰 고유값만 분리한다.** <br />
+상품의 공통 정보는 오리진 상품(`Product`)에, 외부 쇼핑몰 고유값은 쇼핑몰 정보설정(`ShoppingSetting`)에 두고 전송 시점에 결합합니다. <br />
+전송 결과인 연동 데이터는 그 시점 값을 스냅샷으로 복사한 독립 엔티티라, 오리진을 고쳐도 이미 연동된 건은 바뀌지 않습니다. <br />
+→ [`snapshot-entity-source-link-break-is-by-design.md`](docs/solutions/architecture-patterns/snapshot-entity-source-link-break-is-by-design.md), <br />
 → [`product-vs-shoppingsetting-compliance-field-boundary.md`](docs/solutions/architecture-patterns/product-vs-shoppingsetting-compliance-field-boundary.md)
 
-**`ownerId` 기반 멀티 테넌시.**
-가입한 계정이 최상위 테넌트(슈퍼계정)이고, 사용자 관리에서 만든 계정은 그 아래에 종속됩니다. 
-모든 리소스는 `ownerId`로 격리되며, DB로 옮긴 API는 클라이언트가 보낸 값을 믿지 않고 세션에서 꺼낸 값으로 조회합니다.
-→ [`user-hierarchy-ownerid-pattern.md`](docs/solutions/architecture-patterns/user-hierarchy-ownerid-pattern.md), 
+**`ownerId` 기반 멀티 테넌시.** <br />
+가입한 계정이 최상위 테넌트(슈퍼계정)이고, 사용자 관리에서 만든 계정은 그 아래에 종속됩니다. <br />
+모든 리소스는 `ownerId`로 격리되며, DB로 옮긴 API는 클라이언트가 보낸 값을 믿지 않고 세션에서 꺼낸 값으로 조회합니다. <br />
+→ [`user-hierarchy-ownerid-pattern.md`](docs/solutions/architecture-patterns/user-hierarchy-ownerid-pattern.md), <br />
 → [`api-route-session-auth-guard.md`](docs/solutions/architecture-patterns/api-route-session-auth-guard.md)
 
-**MSW와 실제 DB의 경계.**
-개발 초기에는 모든 API를 MSW로 데이터는 mock data로 처리 했습니다. 
-서버에서 실행돼야 하는 인증과, 서버 전용 시크릿(DB 접속·R2 자격증명)이 필요한 유저·상품 API만 실제 route handler + Neon으로 옮겼고, 나머지 비즈니스 데이터는 MSW에 남아 있습니다.
+**MSW와 실제 DB의 경계.** <br />
+개발 초기에는 모든 API를 MSW로 데이터는 mock data로 처리 했습니다. <br />
+서버에서 실행돼야 하는 인증과, 서버 전용 시크릿(DB 접속·R2 자격증명)이 필요한 유저·상품 API만 실제 route handler + Neon으로 옮겼고, <br />
+나머지 비즈니스 데이터는 MSW에 남아 있습니다. <br />
 → [`auth-db-msw-boundary.md`](docs/solutions/architecture-patterns/auth-db-msw-boundary.md)
 
-**몰별 설정은 discriminated union으로.**
-네이버·카카오처럼 몰마다 다른 설정 필드를 `mallCode` 기준 union 타입으로 표현합니다. 폼은 느슨한 flat 타입으로 다루고 제출 시점에만 도메인 타입으로 좁힙니다.
+**몰별 설정은 discriminated union으로.** <br />
+네이버·카카오처럼 몰마다 다른 설정 필드를 `mallCode` 기준 union 타입으로 표현합니다. 폼은 느슨한 flat 타입으로 다루고 제출 시점에만 도메인 타입으로 좁힙니다. <br />
 → [`typescript-type-design-patterns.md`](docs/solutions/architecture-patterns/typescript-type-design-patterns.md)
 
-**외부 이미지 가져오기의 SSRF 방어.**
-엑셀에 적힌 외부 이미지 주소를 서버가 받아와 R2에 저장합니다. 
-서버가 내부망을 대신 요청하지 않도록 주소는 연결 시점에 검사하고, 리다이렉트는 단계마다 다시 검사합니다.
+**외부 이미지 가져오기의 SSRF 방어.** <br />
+엑셀에 적힌 외부 이미지 주소를 서버가 받아와 R2에 저장합니다. <br />
+서버가 내부망을 대신 요청하지 않도록 주소는 연결 시점에 검사하고, 리다이렉트는 단계마다 다시 검사합니다. <br />
 → [`server-side-remote-fetch-ssrf-connect-time-validation.md`](docs/solutions/architecture-patterns/server-side-remote-fetch-ssrf-connect-time-validation.md)
 
-**포트폴리오 규모 전제.**
-인프라는 Vercel Hobby · Neon · R2 로 구성되었습니다.
+**포트폴리오 규모 전제.** <br />
+인프라는 Vercel Hobby · Neon · R2 로 구성되었습니다. <br />
 → [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md)
 
 그 밖의 설계 결정과 트레이드오프는 [`docs/solutions/architecture-patterns/`](docs/solutions/architecture-patterns/)에 정리돼 있습니다.
