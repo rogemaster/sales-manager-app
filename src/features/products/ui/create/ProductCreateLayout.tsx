@@ -10,6 +10,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { ProductForm } from '../components/ProductForm';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { resolveMainImageKey } from '@/shared/api/uploadImage';
+import { useCustomerCodeAvailability } from '../hooks/useCustomerCodeAvailability';
 
 export const ProductCreateLayout = () => {
   const { showAlert } = useAlert();
@@ -22,6 +23,7 @@ export const ProductCreateLayout = () => {
   });
   const router = useRouter();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
+  const ensureCustomerCodeAvailable = useCustomerCodeAvailability(formData);
 
   const { mutate } = useMutation({
     mutationFn: async (data: ProductFormValues) => {
@@ -49,7 +51,8 @@ export const ProductCreateLayout = () => {
   });
 
   // mainImage 필수는 ProductMainImageInfo가 useController로 등록해 handleSubmit이 막는다 — 화면별 수동 가드를 두지 않는다.
-  const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+    if (!(await ensureCustomerCodeAvailable(data.customerCode))) return;
     mutate(data);
   };
 

@@ -113,3 +113,4 @@ it('같은 접두사를 쓴 다른 상품끼리도 skuCode가 겹치지 않는�
 - `.claude/rules/domain-design.md` — "값을 요구하는 주체가 사용자면 위 규칙이 적용되지 않는다 — skuCode"
 - [`flat-excel-row-to-nested-domain-structure.md`](flat-excel-row-to-nested-domain-structure.md) — 엑셀 1행=1상품 전제와 SKU 접두사 채번의 유래
 - [`snapshot-entity-source-link-break-is-by-design.md`](snapshot-entity-source-link-break-is-by-design.md) — "이 참조가 무엇을 위한 것인가"를 먼저 물어야 했던 같은 유형의 판단
+- [`customer-code-duplicate-block-is-not-a-reversal-of-sku-rule.md`](customer-code-duplicate-block-is-not-a-reversal-of-sku-rule.md) — 같은 "사용자 책임" 규칙에서 사용자가 **막아달라고** 한 예외(`customerCode`, 2026-09-16). 이 문서 작성 이후에 생겼다

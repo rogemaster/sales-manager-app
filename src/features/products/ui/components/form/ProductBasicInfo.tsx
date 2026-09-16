@@ -59,6 +59,8 @@ export const ProductBasicinfo = () => {
         <div className="space-y-2">
           <Label htmlFor="customerProductCode">고객사 상품코드</Label>
           <Input {...register('customerCode')} />
+          {/* 중복 오류는 상품 등록·수정 레이아웃만 넣는다. 이 섹션을 함께 쓰는 연동상품 수정 화면에는 넣는 곳이 없다. */}
+          {errors.customerCode && <p className="text-red-500 text-sm">{errors.customerCode.message}</p>}
         </div>
 
         <div className="space-y-2">

@@ -34,6 +34,16 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
     if (item.code === 'INVALID_IMAGE') {
       return { ...item, message: `[${item.header}] ${item.reason}` };
     }
+    if (item.code === 'DUPLICATE_IN_FILE') {
+      return { ...item, message: `[${item.header}] '${item.value}'이 파일 안에서 중복됩니다. (${item.rows?.join('·')}행)` };
+    }
+    if (item.code === 'DUPLICATE_EXISTING') {
+      const registered = item.existingCode && item.existingCode !== item.value ? ` (등록된 코드: ${item.existingCode})` : '';
+      return { ...item, message: `[${item.header}] '${item.value}'은 이미 등록된 코드입니다.${registered}` };
+    }
+    if (item.code === 'CODE_CHECK_FAILED') {
+      return { ...item, message: `[${item.header}] 중복 여부를 확인하지 못했습니다.` };
+    }
     return item;
   });
 }

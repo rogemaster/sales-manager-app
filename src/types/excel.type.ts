@@ -20,6 +20,9 @@ export interface ExcelTemplateInfo {
   // 외부 이미지 주소를 적는 컬럼. 붙이면 업로드 시 서버가 그 주소를 내려받아 쓸 수 있는 이미지인지 확인하고,
   // 실패한 행을 INVALID_IMAGE 오류로 잡는다. 저장 시 실제로 R2에 가져오는 것은 저장 전략의 몫이다.
   remoteImage?: boolean;
+  // 워크스페이스 안에서 겹치면 안 되는 코드 컬럼(고객사 상품코드). 붙이면 업로드 시 파일 안 중복과
+  // 이미 등록된 코드와의 중복을 오류 행으로 잡는다. 비교는 공백·대소문자를 무시한다.
+  uniqueCode?: boolean;
 }
 
 // 엑셀 section header
@@ -67,7 +70,15 @@ export type UploadErrorCode =
   | 'TOO_MANY_ROWS'
   | 'PROCESSING_ERROR';
 
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
+export type ValidationErrorCode =
+  | 'MISSING_FIELD'
+  | 'EMPTY_VALUE'
+  | 'INVALID_VALUE'
+  | 'INVALID_NUMBER'
+  | 'INVALID_IMAGE'
+  | 'DUPLICATE_IN_FILE'
+  | 'DUPLICATE_EXISTING'
+  | 'CODE_CHECK_FAILED';
 
 export type ErrorTypeCode = 'UPLOAD_ERROR' | 'VALIDATE_ERROR';
 
@@ -82,6 +93,10 @@ export type ValidationError = {
   allowed?: string[];
   // INVALID_IMAGE에서 채워진다. 서버가 알려준 사유(예: '이미지를 불러올 수 없습니다(HTTP 404).')다.
   reason?: string;
+  // DUPLICATE_IN_FILE에서 채워진다. 같은 코드를 가진 행 전체의 시트 행 번호(오름차순, 자기 행 포함)다.
+  rows?: number[];
+  // DUPLICATE_EXISTING에서 채워진다. 이미 등록된 쪽의 실제 표기 — 사용자가 목록에서 찾을 수 있게 한다.
+  existingCode?: string;
 };
 
 export type UploadResult = {
@@ -99,6 +114,9 @@ export type ValidationResult = {
 
 // 업로드 시 이미지 주소 하나를 확인하는 함수. ok: false는 이미지 자체의 문제이고, 확인 요청이 실패하면 throw한다.
 export type ExcelImageCheckFn = (url: string) => Promise<{ ok: true } | { ok: false; reason: string }>;
+
+// 업로드 시 코드 목록을 한 번에 확인하는 함수. 이미 등록된 코드만 돌려주고, 확인 요청이 실패하면 throw한다.
+export type ExcelCodeCheckFn = (codes: string[]) => Promise<{ code: string; existingCode: string }[]>;
 
 // 저장 단계에서 제외된 행. rowNumber는 엑셀 시트 행 번호다.
 export type ExcelRowFailure = { rowNumber: number; message: string };
