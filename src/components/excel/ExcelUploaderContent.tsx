@@ -6,6 +6,8 @@ import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { processExcelUpload } from '@/components/excel/utils/processExcelUpload';
 import { checkExcelImageColumns } from '@/components/excel/utils/checkExcelImageColumns';
+import { checkExcelUniqueCodeColumns } from '@/components/excel/utils/checkExcelUniqueCodeColumns';
+import { checkCustomerCodes } from '@/features/products/api/checkCustomerCodes';
 import { getSheetRow } from '@/components/excel/utils/sheetRows';
 import { ExcelTemplateInfo } from '@/types/excel.type';
 import { useAlert } from '@/hooks/useAlert';
@@ -79,6 +81,9 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo, max
       if (!result.data) return;
       const rows = result.data;
 
+      // 코드 중복 확인은 요청 하나라 진행률을 따로 두지 않는다. 필드 오류가 있는 행도 확인한다.
+      const codeErrors = await checkExcelUniqueCodeColumns(rows, fileTemplateInfo, checkCustomerCodes);
+
       // 이미지 확인은 필드 검사 뒤에 한다. 필드 오류가 있는 행도 확인해 모든 오류를 한 번에 보여준다.
       // 필드 검사 결과가 "오류 없음"이어도 이미지 오류가 생길 수 있으므로, 둘을 합친 뒤 한 경로에서 처리한다.
       const imageErrors = await checkExcelImageColumns(rows, fileTemplateInfo, checkProductImage, {
@@ -89,7 +94,11 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo, max
       setUploadProgress(100);
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const errors = excelValidErrorsCodeToMessages([...(result.validationResult?.errors ?? []), ...imageErrors]);
+      const errors = excelValidErrorsCodeToMessages([
+        ...(result.validationResult?.errors ?? []),
+        ...codeErrors,
+        ...imageErrors,
+      ]);
 
       if (errors.length === 0) {
         showAlert({ type: 'success', message: '업로드가 완료되었습니다.' });

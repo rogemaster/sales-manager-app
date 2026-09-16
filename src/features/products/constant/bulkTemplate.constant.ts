@@ -10,6 +10,7 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       key: 'customerCode',
       name: '고객상품코드',
       req: false,
+      uniqueCode: true,
     },
     {
       key: 'name',
