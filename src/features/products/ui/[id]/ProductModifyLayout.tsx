@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useAlert } from '@/hooks/useAlert';
 import { useRouter } from 'next/navigation';
 import { resolveMainImageKey } from '@/shared/api/uploadImage';
+import { useCustomerCodeAvailability } from '../hooks/useCustomerCodeAvailability';
 
 type Props = {
   productId: string;
@@ -23,6 +24,8 @@ export const ProductModifyLayout = ({ productId }: Props) => {
   const formData = useForm<ProductFormValues>();
   const { showAlert } = useAlert();
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
+  // 자기 자신은 비교에서 뺀다 — 코드를 그대로 두고 다른 필드만 고쳐도 통과해야 한다.
+  const ensureCustomerCodeAvailable = useCustomerCodeAvailability(formData, productId);
 
   const { data: queryData, isSuccess } = useQuery({
     queryKey: ['productId', productId, workspaceOwnerId],
@@ -59,7 +62,8 @@ export const ProductModifyLayout = ({ productId }: Props) => {
   }, [isSuccess, queryData]);
 
   // mainImage 필수는 ProductMainImageInfo가 useController로 등록해 handleSubmit이 막는다 — 화면별 수동 가드를 두지 않는다.
-  const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+    if (!(await ensureCustomerCodeAvailable(data.customerCode))) return;
     mutate(data);
   };
 
