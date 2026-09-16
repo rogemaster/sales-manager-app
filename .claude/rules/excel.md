@@ -41,6 +41,7 @@
 - 유틸리티: `src/components/excel/utils/`
   - `processExcelUpload(event, fileTemplateInfo, maxRows?)`: XLSX 파싱, 시트 행 번호 부여, 행 수 제한, 파일 검증, 필드 검증 → `UploadResult` 반환
   - `checkExcelImageColumns(rows, templateInfo, checkFn, options)`: `remoteImage` 컬럼의 주소를 서버에 확인시켜 `INVALID_IMAGE` 오류 반환
+  - `checkExcelUniqueCodeColumns(rows, templateInfo, checkFn)`: `uniqueCode` 컬럼의 파일 안 중복과 이미 등록된 코드와의 중복을 `DUPLICATE_IN_FILE`·`DUPLICATE_EXISTING` 오류로, 확인 실패를 `CODE_CHECK_FAILED`로 반환
   - `validateExcelData(rowsData, templateInfo)`: 필수 필드/빈 값/허용값 검증 → `ValidationResult` 반환. 헤더만 추리지 않고 양식 전체(`ExcelTemplateInfo[]`)를 받는다 — `req`와 `allowed`가 모두 양식 정의에 있기 때문
   - `excelDownload(templateHeaders, templateName)`: ExcelJS로 템플릿 생성 후 file-saver로 다운로드
   - `getExcelSaveStrategy(type)`: 전략 + API 합성 함수 반환
@@ -74,16 +75,23 @@ export type ExcelRowType = { [key: string]: string | number | boolean | null | u
 export type ExcelRowWithErrors = { [key: string]: string | number | boolean | null | undefined | ValidationError[] };
 
 export interface ValidationError {
-  row: number;
-  header: string;
   row: number; // 엑셀 시트 행 번호 (아래 "행 번호" 절)
-  code: 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
+  header: string;
+  code:
+    | 'MISSING_FIELD'
+    | 'EMPTY_VALUE'
+    | 'INVALID_VALUE'
+    | 'INVALID_NUMBER'
+    | 'INVALID_IMAGE'
+    | 'DUPLICATE_IN_FILE'
+    | 'DUPLICATE_EXISTING'
+    | 'CODE_CHECK_FAILED';
   message?: string;
-  // INVALID_VALUE와 INVALID_NUMBER에서 채워진다. 사용자가 어떤 값을 적었고 무엇을 적을 수 있었는지
-  // 오류 메시지가 함께 알려주기 위한 값이라, 메시지 조립은 message.ts가 맡는다.
-  value?: string;
+  value?: string; // INVALID_VALUE·INVALID_NUMBER·DUPLICATE_* — 사용자가 적은 값
   allowed?: string[];
   reason?: string; // INVALID_IMAGE — 서버가 알려준 사유
+  rows?: number[]; // DUPLICATE_IN_FILE — 같은 코드를 가진 시트 행 전체
+  existingCode?: string; // DUPLICATE_EXISTING — 이미 등록된 쪽의 실제 표기
 }
 
 export type UploadErrorCode =
@@ -92,7 +100,7 @@ export type UploadErrorCode =
   | 'FILE_TOO_LARGE'
   | 'TOO_MANY_ROWS'
   | 'PROCESSING_ERROR';
-export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE';
+export type ValidationErrorCode = 'MISSING_FIELD' | 'EMPTY_VALUE' | 'INVALID_VALUE' | 'INVALID_NUMBER' | 'INVALID_IMAGE' | 'DUPLICATE_IN_FILE' | 'DUPLICATE_EXISTING' | 'CODE_CHECK_FAILED';
 
 // processExcelUpload 반환 타입
 export type UploadResult =
@@ -219,6 +227,8 @@ src/features/products/constant/
 **`numeric`은 두 가지 의미를 갖는다.** 다운로드 양식에서 숫자 서식으로 만들고, **업로드 검증에서 0 이상 정수인지 검사한다.** 현재 양식의 숫자 컬럼(공급가·판매가·배송비·총수량)이 전부 같은 규칙이라 표시 하나로 충분하다. 다른 규칙이 필요한 숫자 컬럼이 생기면 그때 표현을 늘린다.
 
 **`remoteImage`는 외부 이미지 주소 컬럼이다.** 붙이면 업로드 시 `checkExcelImageColumns`가 서버(`/api/products/image/check`)에 주소를 확인시켜 실패한 행을 `INVALID_IMAGE` 오류로 잡는다. 확인만 하고 R2에는 저장하지 않는다 — 사용자가 저장하지 않고 초기화하면 파일만 남기 때문이다. 실제로 R2에 가져오는 것은 저장 전략이다(아래 전략 패턴 절). 빈 값은 확인하지 않고, 필드 오류가 있는 행도 확인한다.
+
+**`uniqueCode`는 워크스페이스 안에서 겹치면 안 되는 코드 컬럼이다(현재 `고객상품코드`뿐).** 붙이면 업로드 시 `checkExcelUniqueCodeColumns`가 파일 안 중복(묶음의 **모든 행**을 오류로)과 이미 등록된 코드와의 중복(`/api/products/customer-code/check` 1회 호출)을 잡는다. 비교는 공백·대소문자를 무시한다. 저장 단계가 아니라 업로드에서 거르는 이유는 이미지를 R2에 받기 전에 빼야 고아 파일이 생기지 않기 때문이다. 순서는 필드 검사 → 코드 중복 확인 → 이미지 확인이다.
 
 **`maxRows`(업로더 prop)를 넘기면 파일 행 수를 제한한다.** 넘으면 `TOO_MANY_ROWS`로 파일 자체를 거부한다. 상품은 `PRODUCT_BULK_MAX_ROWS`(50)를 넘기고, bulk route도 같은 상수로 한 번 더 거부한다. 넘기지 않은 화면은 제한이 없다.
 
@@ -394,6 +404,7 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Product[] 
 - **`mainImage`는 본인 네임스페이스의 R2 key여야 합니다.** 엑셀의 외부 이미지 주소는 저장 전략이 `/api/products/image/import`로 가져와 key로 바꾼 뒤 보냅니다 — 절대 URL은 거부됩니다.
 - **오류 응답은 `{ error, rowIndex }`입니다.** `rowIndex`는 요청 배열 기준 0부터이고, `bulkCreateProducts`가 시트 행 번호로 바꿔 `[4행] 사유`를 만듭니다. api 함수와 `onError`에서 서버 메시지를 고정 문구로 덮지 마세요.
 - **한 번에 최대 50건**(`PRODUCT_BULK_MAX_ROWS`)입니다. 넘으면 `400`입니다.
+- **`customerCode`를 정규화하고 중복을 거부합니다.** 요청 안 중복과 기존 데이터 중복 모두 첫 위반 행의 `{ error, rowIndex }`로 400입니다. 검사 뒤 동시 저장으로 DB 인덱스에 걸리면 `rowIndex` 없이 400입니다.
 
 ```ts
 // 주문 대량 등록 (MSW 유지)
