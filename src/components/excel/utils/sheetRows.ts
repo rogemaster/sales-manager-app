@@ -1,4 +1,5 @@
-import { ExcelRowType, ExcelRowWithErrors } from '@/types/excel.type';
+import * as XLSX from 'xlsx';
+import { ExcelRowType, ExcelRowWithErrors, ExcelTemplateInfo } from '@/types/excel.type';
 
 /**
  * 각 행의 엑셀 시트 행 번호를 담는 필드. 미리보기 '행' 컬럼, 업로드 검증 오류, 저장 결과 알림이
@@ -20,6 +21,28 @@ export const attachSheetRowNumbers = (rows: ExcelRowType[]): ExcelRowType[] =>
     const rowNum = (row as { __rowNum__?: unknown }).__rowNum__;
     return { ...row, [EXCEL_SHEET_ROW_KEY]: typeof rowNum === 'number' ? rowNum + 1 : index + 2 };
   });
+
+/**
+ * 첫 시트를 행 목록으로 읽는다. 숫자 컬럼(`numeric`)만 셀의 원래 값(v)을, 나머지는 **화면에 보이는 글자**(w)를 쓴다.
+ *
+ * - 원래 값을 그대로 쓰면 셀 타입이 새어 들어온다. 서식이 "일반"인 칸이나 CSV에서 `TRUE`는 불리언이 되고,
+ *   CSV의 `00123`은 숫자 123이 되어 앞의 0이 조용히 사라진다. 사용자가 적은 것은 글자다.
+ * - 숫자 컬럼까지 보이는 글자로 읽으면 쉼표 서식이 `"1,000"`이 되어 숫자 검증에서 걸린다.
+ * - 날짜 서식 셀은 글자 컬럼에서 표시 글자(예: `9/17/26`)로 들어온다. 원래 값(일련번호)보다 나빠지지 않아 그대로 둔다.
+ */
+export const readSheetRows = (worksheet: XLSX.WorkSheet, templateInfo: ExcelTemplateInfo[]): ExcelRowType[] => {
+  const numericHeaders = templateInfo.filter(({ numeric }) => numeric).map(({ name }) => name);
+  const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRowType[];
+  const textRows = XLSX.utils.sheet_to_json(worksheet, { defval: '', raw: false }) as ExcelRowType[];
+
+  // 두 결과는 같은 시트를 같은 규칙(빈 행 건너뛰기)으로 읽어 순서가 같다. 행 번호는 펼치기 전인 textRows에서 붙인다.
+  return attachSheetRowNumbers(textRows).map((row, index) => {
+    const numericValues = Object.fromEntries(
+      numericHeaders.filter((header) => header in rawRows[index]).map((header) => [header, rawRows[index][header]]),
+    );
+    return { ...row, ...numericValues };
+  });
+};
 
 export const getSheetRow = (row: ExcelRowType | ExcelRowWithErrors): number => Number(row[EXCEL_SHEET_ROW_KEY]);
 

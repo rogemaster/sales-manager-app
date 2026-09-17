@@ -1,10 +1,10 @@
 'use client';
 
 import * as XLSX from 'xlsx';
-import { ExcelRowType, ExcelTemplateInfo, UploadResult } from '@/types/excel.type';
+import { ExcelTemplateInfo, UploadResult } from '@/types/excel.type';
 import { ChangeEvent } from 'react';
 import { validateExcelData } from '@/components/excel/utils/validate';
-import { attachSheetRowNumbers, exceedsMaxRows } from '@/components/excel/utils/sheetRows';
+import { exceedsMaxRows, readSheetRows } from '@/components/excel/utils/sheetRows';
 
 export async function processExcelUpload(
   event: ChangeEvent<HTMLInputElement>,
@@ -54,8 +54,8 @@ export async function processExcelUpload(
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    // 시트 행 번호는 행을 펼치기 전에 붙여야 한다(sheetRows.ts 참고).
-    const rows = attachSheetRowNumbers(XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRowType[]);
+    // 글자 컬럼은 보이는 글자로, 숫자 컬럼은 원래 값으로 읽고 시트 행 번호를 붙인다(sheetRows.ts 참고).
+    const rows = readSheetRows(worksheet, fileTemplateInfo);
 
     if (exceedsMaxRows(rows.length, maxRows)) {
       return { success: false, errorType: 'UPLOAD_ERROR', uploadError: 'TOO_MANY_ROWS' };
