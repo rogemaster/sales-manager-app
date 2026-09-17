@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { ExcelHeaderProps, ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
@@ -11,6 +11,7 @@ import { ExcelDataSummaryInfo } from './components/ExcelDataSummaryInfo';
 import { ExcelDataTable } from './components/ExcelDataTable';
 import { useExcelData, useResetExcelData } from '@/components/excel/store/excelData.store';
 import { ExcelDataErrorAlert } from './components/ExcelDataErrorAlert';
+import { ExcelSaveProgressDialog } from './components/ExcelSaveProgressDialog';
 import { useMutation } from '@tanstack/react-query';
 import { useAlert } from '@/hooks/useAlert';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
@@ -55,6 +56,14 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
     onSettled: () => setSaveProgress(null),
   });
 
+  // 모달은 탭 닫기·새로고침을 막지 못한다. 이미지를 반쯤 받고 떠나면 상품 없는 R2 파일이 남는다.
+  useEffect(() => {
+    if (!isSaving) return;
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isSaving]);
+
   const handleExcelSaveData = () => {
     const validData = uploadedData.filter((row) => !Array.isArray(row['error']) || row['error'].length === 0);
     saveExcelData(validData);
@@ -68,8 +77,8 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
         validCount={validCount}
         onSaveConfirm={handleExcelSaveData}
         isSaving={isSaving}
-        saveProgress={saveProgress}
       />
+      <ExcelSaveProgressDialog open={isSaving} progress={saveProgress} />
 
       <CardContent className="pt-6">
         {/* 요약 정보 */}

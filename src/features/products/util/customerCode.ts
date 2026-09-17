@@ -9,8 +9,23 @@ import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constan
 export type CustomerCodeDuplicate = { code: string; existingCode: string };
 export type ExistingCustomerCode = { key: string; existingCode: string };
 
+export const CUSTOMER_CODE_MAX_LENGTH = 100;
+
 export const CUSTOMER_CODE_CONFLICT_MESSAGE = '이미 등록된 고객사 상품코드입니다.';
 export const CUSTOMER_CODE_CHECK_FAILED_MESSAGE = '고객사 상품코드 중복 확인에 실패했습니다. 다시 시도해 주세요.';
+
+export const CUSTOMER_CODE_TYPE_MESSAGE = '고객사 상품코드는 글자로 입력해야 합니다.';
+
+/**
+ * 정규화 전에 입력값의 모양을 본다. 정규화는 문자열·숫자가 아닌 값을 null("코드 없음")로 바꾸므로,
+ * 이 검사 없이 정규화하면 엑셀의 TRUE 셀은 코드 없이 저장되고 PATCH의 `customerCode: true`는 기존 코드를 지운다.
+ */
+export const findCustomerCodeInputProblem = (value: unknown): 'TYPE' | 'LENGTH' | null => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === 'number' && !Number.isFinite(value)) return 'TYPE';
+  if (typeof value !== 'string' && typeof value !== 'number') return 'TYPE';
+  return String(value).trim().length > CUSTOMER_CODE_MAX_LENGTH ? 'LENGTH' : null;
+};
 
 /** 저장용. 비었으면 null — ''로 저장하면 "코드 없음"이 두 모양이 된다. 엑셀 숫자 셀은 문자열로 받는다. */
 export const normalizeCustomerCode = (value: unknown): string | null => {
@@ -65,6 +80,9 @@ export const readCustomerCodeCheckRequest = (body: unknown): { codes: string[]; 
   if (!Array.isArray(codes) || codes.length > PRODUCT_BULK_MAX_ROWS) return null;
   if (!codes.every((code) => typeof code === 'string')) return null;
   if (excludeProductId !== undefined && typeof excludeProductId !== 'string') return null;
+
+  // 쓰기 스키마와 같은 상한. 넘는 코드는 어차피 저장되지 않으므로 조회하지 않는다.
+  if (codes.some((code) => findCustomerCodeInputProblem(code) !== null)) return null;
 
   const seen = new Set<string>();
   const unique = codes.flatMap((raw) => {

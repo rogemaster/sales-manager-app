@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constant';
 import {
+  CUSTOMER_CODE_MAX_LENGTH,
+  findCustomerCodeInputProblem,
   findDuplicateCustomerCodeGroups,
   findFirstRepeatedCustomerCodeIndex,
   formatCustomerCodeDuplicateMessage,
@@ -34,6 +36,30 @@ describe('normalizeCustomerCode', () => {
     expect(normalizeCustomerCode(Number.NaN)).toBeNull();
     expect(normalizeCustomerCode(true)).toBeNull();
     expect(normalizeCustomerCode({})).toBeNull();
+  });
+});
+
+describe('findCustomerCodeInputProblem', () => {
+  it('값 없음·문자열·유한한 숫자는 문제없다', () => {
+    expect(findCustomerCodeInputProblem(undefined)).toBeNull();
+    expect(findCustomerCodeInputProblem(null)).toBeNull();
+    expect(findCustomerCodeInputProblem('')).toBeNull();
+    expect(findCustomerCodeInputProblem('CS-001')).toBeNull();
+    expect(findCustomerCodeInputProblem(1001)).toBeNull();
+  });
+
+  it('불리언·객체·배열·유한하지 않은 숫자는 TYPE — 정규화가 조용히 null로 바꿔 코드가 사라지던 값이다', () => {
+    expect(findCustomerCodeInputProblem(true)).toBe('TYPE');
+    expect(findCustomerCodeInputProblem(false)).toBe('TYPE');
+    expect(findCustomerCodeInputProblem({})).toBe('TYPE');
+    expect(findCustomerCodeInputProblem(['A'])).toBe('TYPE');
+    expect(findCustomerCodeInputProblem(Number.NaN)).toBe('TYPE');
+  });
+
+  it(`앞뒤 공백을 지운 길이가 ${CUSTOMER_CODE_MAX_LENGTH}자를 넘으면 LENGTH`, () => {
+    const max = 'A'.repeat(CUSTOMER_CODE_MAX_LENGTH);
+    expect(findCustomerCodeInputProblem(` ${max} `)).toBeNull();
+    expect(findCustomerCodeInputProblem(`${max}A`)).toBe('LENGTH');
   });
 });
 
@@ -92,6 +118,11 @@ describe('readCustomerCodeCheckRequest', () => {
     expect(readCustomerCodeCheckRequest({ codes: 'A' })).toBeNull();
     expect(readCustomerCodeCheckRequest({ codes: [1] })).toBeNull();
     expect(readCustomerCodeCheckRequest({ codes: ['A'], excludeProductId: 3 })).toBeNull();
+  });
+
+  it(`정규화한 코드가 ${CUSTOMER_CODE_MAX_LENGTH}자를 넘으면 null`, () => {
+    expect(readCustomerCodeCheckRequest({ codes: [` ${'A'.repeat(CUSTOMER_CODE_MAX_LENGTH)} `] })).not.toBeNull();
+    expect(readCustomerCodeCheckRequest({ codes: ['A'.repeat(CUSTOMER_CODE_MAX_LENGTH + 1)] })).toBeNull();
   });
 
   it(`개수가 ${PRODUCT_BULK_MAX_ROWS}를 넘으면 null`, () => {

@@ -6,7 +6,12 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { Product } from '@/features/products/types/product.types';
 import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
-import { CUSTOMER_CODE_CONFLICT_MESSAGE, normalizeCustomerCode } from '@/features/products/util/customerCode';
+import {
+  CUSTOMER_CODE_CONFLICT_MESSAGE,
+  CUSTOMER_CODE_TYPE_MESSAGE,
+  findCustomerCodeInputProblem,
+  normalizeCustomerCode,
+} from '@/features/products/util/customerCode';
 import { findCustomerCodeConflictMessage } from '@/lib/customerCodeDuplicates';
 import { isCustomerCodeUniqueViolation } from '@/lib/customerCodeUniqueViolation';
 
@@ -47,6 +52,11 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // productId·ownerId·createDate는 수정 대상이 아니다. 요청에 섞여 와도 무시한다.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { productId: _pid, ownerId: _oid, createDate: _cd, ...patch } = update;
+
+    // 이 검사가 없으면 `customerCode: true`가 정규화에서 null이 되어 기존 코드가 지워진다.
+    if (findCustomerCodeInputProblem(patch.customerCode) === 'TYPE') {
+      return NextResponse.json({ error: CUSTOMER_CODE_TYPE_MESSAGE }, { status: 400 });
+    }
 
     // PATCH는 바꿀 필드만 보낸다. customerCode 키가 없으면 건드리지 않고, 있으면 정규화한다('' → null은 코드 삭제).
     const values =

@@ -61,6 +61,7 @@
 **예외 — `Product.customerCode`(고객사 상품코드)는 중복을 막는다.** 이것도 사용자가 관리하는 선택값이지만, 사용자가 **명시적으로 차단을 요구했다**(2026-09-13: *"고객사 상품코드(customerCode) 가 중복되는 경우에는 중복을 막아야 하는데"*). 위 판별 질문의 결론 "사용자의 업무 방식을 따른다"가 여기서는 "막는다"로 나온 것이지 규칙이 뒤집힌 게 아니다. 상품 자체의 중복 등록은 여전히 막지 않는다.
 
 - 범위는 워크스페이스(`ownerId`), 비교는 앞뒤 공백·대소문자 무시, 빈 값은 비교하지 않는다. 저장은 공백만 지운 원래 표기다.
+- **정규화 전에 입력 모양을 거부한다**(`findCustomerCodeInputProblem`). 정규화는 문자열·숫자가 아닌 값을 "코드 없음"으로 바꾸므로, 이 검사가 없으면 엑셀 `TRUE` 셀은 코드 없이 저장되고 PATCH의 `customerCode: true`는 기존 코드를 지운다. 길이 상한은 `CUSTOMER_CODE_MAX_LENGTH`(100) 하나를 쓰기 스키마·확인 API·엑셀 미리보기가 공유한다.
 - 규칙은 앱(`src/features/products/util/customerCode.ts`, 확인 API, 쓰기 route 세 곳)과 DB 부분 유니크 식 인덱스 `products_owner_customer_code_unique` 양쪽에 있다. 둘의 비교 기준이 어긋나지 않게 함께 고친다.
 - 연동상품 `productSnapshot.customerCode`는 검사하지 않는다 — 스냅샷은 오리지널과 별개이고 같은 상품을 여러 번 전송할 수 있다.
 

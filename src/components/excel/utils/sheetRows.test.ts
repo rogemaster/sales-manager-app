@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
-import { ExcelRowType } from '@/types/excel.type';
-import { attachSheetRowNumbers, EXCEL_SHEET_ROW_KEY, exceedsMaxRows, getSheetRow } from './sheetRows';
+import { ExcelRowType, ExcelTemplateInfo } from '@/types/excel.type';
+import { attachSheetRowNumbers, EXCEL_SHEET_ROW_KEY, exceedsMaxRows, getSheetRow, readSheetRows } from './sheetRows';
 
 const parse = (aoa: (string | number)[][]): ExcelRowType[] =>
   XLSX.utils.sheet_to_json(XLSX.utils.aoa_to_sheet(aoa), { defval: '' }) as ExcelRowType[];
@@ -47,5 +47,56 @@ describe('exceedsMaxRows', () => {
   it('한도를 넘기지 않으면 제한이 없다', () => {
     expect(exceedsMaxRows(10_000)).toBe(false);
     expect(exceedsMaxRows(10_000, undefined)).toBe(false);
+  });
+});
+
+describe('readSheetRows', () => {
+  const template: ExcelTemplateInfo[] = [
+    { key: 'customerCode', name: '고객상품코드', req: false },
+    { key: 'price', name: '판매가', req: true, numeric: true },
+  ];
+
+  // 서식이 "일반"인 칸이나 직접 만든 파일에서 TRUE는 불리언 셀이 된다. 사용자가 적은 글자로 받아야 한다.
+  it('글자 컬럼의 불리언 셀은 화면에 보이는 글자로 읽는다', () => {
+    const [row] = readSheetRows(
+      XLSX.utils.aoa_to_sheet([
+        ['고객상품코드', '판매가'],
+        [true, 1000],
+      ]),
+      template,
+    );
+
+    expect(row['고객상품코드']).toBe('TRUE');
+  });
+
+  // CSV는 00123을 숫자 123으로 해석한다. 원래 값(v)을 읽으면 앞의 0이 조용히 사라진다.
+  it('CSV의 앞자리 0은 글자 컬럼에서 그대로 남는다', () => {
+    const workbook = XLSX.read('고객상품코드,판매가\n00123,1000', { type: 'string' });
+    const [row] = readSheetRows(workbook.Sheets[workbook.SheetNames[0]], template);
+
+    expect(row['고객상품코드']).toBe('00123');
+  });
+
+  // 숫자 컬럼까지 글자로 읽으면 쉼표 서식이 "1,000"이 되어 숫자 검증에서 오류가 난다.
+  it('숫자 컬럼은 서식과 상관없이 원래 값으로 읽는다', () => {
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ['고객상품코드', '판매가'],
+      ['A', 1000],
+    ]);
+    sheet['B2'].z = '#,##0';
+
+    const [row] = readSheetRows(sheet, template);
+
+    expect(row['판매가']).toBe(1000);
+  });
+
+  it('빈 칸은 빈 문자열이고 시트 행 번호가 붙는다', () => {
+    const rows = readSheetRows(
+      XLSX.utils.aoa_to_sheet([['고객상품코드', '판매가'], ['', 1000], [], ['B', 2000]]),
+      template,
+    );
+
+    expect(rows.map((row) => row['고객상품코드'])).toEqual(['', 'B']);
+    expect(rows.map(getSheetRow)).toEqual([2, 4]);
   });
 });

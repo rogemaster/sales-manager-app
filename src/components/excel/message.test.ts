@@ -40,6 +40,14 @@ describe('excelValidErrorsCodeToMessages', () => {
     expect(error.message).toBe("[고객상품코드] 'CS-001'은 이미 등록된 코드입니다.");
   });
 
+  it('INVALID_CODE는 사유를 그대로 붙인다', () => {
+    const [error] = excelValidErrorsCodeToMessages([
+      { row: 4, header: '고객상품코드', code: 'INVALID_CODE', reason: '100자 이하로 입력해야 합니다. (현재 101자)' },
+    ]);
+
+    expect(error.message).toBe('[고객상품코드] 100자 이하로 입력해야 합니다. (현재 101자)');
+  });
+
   it('CODE_CHECK_FAILED는 확인하지 못했다고 알린다', () => {
     const [error] = excelValidErrorsCodeToMessages([{ row: 4, header: '고객상품코드', code: 'CODE_CHECK_FAILED' }]);
 

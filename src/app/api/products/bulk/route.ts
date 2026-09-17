@@ -12,6 +12,8 @@ import {
   findFirstRepeatedCustomerCodeIndex,
   formatCustomerCodeDuplicateMessage,
   formatCustomerCodeInRequestMessage,
+  CUSTOMER_CODE_TYPE_MESSAGE,
+  findCustomerCodeInputProblem,
   normalizeCustomerCode,
   toCustomerCodeKey,
 } from '@/features/products/util/customerCode';
@@ -40,6 +42,10 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // 정규화는 글자가 아닌 값(엑셀의 TRUE 셀 등)을 "코드 없음"으로 바꿔 조용히 버린다. 그 전에 거부한다.
+    const invalidCodeIndex = rows.findIndex((p) => findCustomerCodeInputProblem(p.customerCode) === 'TYPE');
+    if (invalidCodeIndex !== -1) return rowError(CUSTOMER_CODE_TYPE_MESSAGE, invalidCodeIndex);
 
     // 검증보다 먼저 정규화한다 — 길이 검사와 중복 비교가 저장될 값 기준으로 돌아야 한다.
     const normalized = rows.map((p) => ({ ...p, customerCode: normalizeCustomerCode(p.customerCode) }));

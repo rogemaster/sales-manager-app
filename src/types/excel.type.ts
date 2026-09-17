@@ -76,6 +76,7 @@ export type ValidationErrorCode =
   | 'INVALID_VALUE'
   | 'INVALID_NUMBER'
   | 'INVALID_IMAGE'
+  | 'INVALID_CODE'
   | 'DUPLICATE_IN_FILE'
   | 'DUPLICATE_EXISTING'
   | 'CODE_CHECK_FAILED';
@@ -92,6 +93,7 @@ export type ValidationError = {
   value?: string;
   allowed?: string[];
   // INVALID_IMAGE에서 채워진다. 서버가 알려준 사유(예: '이미지를 불러올 수 없습니다(HTTP 404).')다.
+  // INVALID_CODE에서도 채워진다. 코드 칸의 모양이 틀린 이유(글자가 아님·길이 초과)다.
   reason?: string;
   // DUPLICATE_IN_FILE에서 채워진다. 같은 코드를 가진 행 전체의 시트 행 번호(오름차순, 자기 행 포함)다.
   rows?: number[];

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ExcelRowWithErrors, ExcelTemplateInfo } from '@/types/excel.type';
 import { checkExcelUniqueCodeColumns } from './checkExcelUniqueCodeColumns';
 import { EXCEL_SHEET_ROW_KEY } from './sheetRows';
+import { CUSTOMER_CODE_MAX_LENGTH } from '@/features/products/util/customerCode';
 
 const HEADER = '고객상품코드';
 
@@ -74,6 +75,31 @@ describe('checkExcelUniqueCodeColumns', () => {
 
     expect(checkFn).not.toHaveBeenCalled();
     expect(errors).toEqual([]);
+  });
+
+  it(`${CUSTOMER_CODE_MAX_LENGTH}자를 넘는 코드는 INVALID_CODE이고 중복 확인에서 뺀다 — 확인 API가 요청 전체를 거부하지 않게`, async () => {
+    const checkFn = vi.fn().mockResolvedValue([]);
+    const long = 'A'.repeat(CUSTOMER_CODE_MAX_LENGTH + 1);
+
+    const errors = await checkExcelUniqueCodeColumns([row(2, long), row(3, 'B')], template, checkFn);
+
+    expect(checkFn).toHaveBeenCalledWith(['B']);
+    expect(errors).toEqual([
+      {
+        row: 2,
+        header: HEADER,
+        code: 'INVALID_CODE',
+        reason: `${CUSTOMER_CODE_MAX_LENGTH}자 이하로 입력해야 합니다. (현재 ${CUSTOMER_CODE_MAX_LENGTH + 1}자)`,
+      },
+    ]);
+  });
+
+  it('길이 초과만 있으면 확인 함수를 부르지 않는다', async () => {
+    const checkFn = vi.fn().mockResolvedValue([]);
+
+    await checkExcelUniqueCodeColumns([row(2, 'A'.repeat(CUSTOMER_CODE_MAX_LENGTH + 1))], template, checkFn);
+
+    expect(checkFn).not.toHaveBeenCalled();
   });
 
   it('숫자 셀은 문자열로 비교한다', async () => {
