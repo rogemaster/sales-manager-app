@@ -31,7 +31,7 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
     if (item.code === 'INVALID_NUMBER') {
       return { ...item, message: `[${item.header}] '${item.value}'는 0 이상의 정수여야 합니다.` };
     }
-    if (item.code === 'INVALID_IMAGE') {
+    if (item.code === 'INVALID_IMAGE' || item.code === 'INVALID_CODE') {
       return { ...item, message: `[${item.header}] ${item.reason}` };
     }
     if (item.code === 'DUPLICATE_IN_FILE') {

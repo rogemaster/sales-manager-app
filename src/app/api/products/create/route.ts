@@ -6,7 +6,12 @@ import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
 import { CreateProductRequest } from '@/features/products/types/product.types';
 import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
-import { CUSTOMER_CODE_CONFLICT_MESSAGE, normalizeCustomerCode } from '@/features/products/util/customerCode';
+import {
+  CUSTOMER_CODE_CONFLICT_MESSAGE,
+  CUSTOMER_CODE_TYPE_MESSAGE,
+  findCustomerCodeInputProblem,
+  normalizeCustomerCode,
+} from '@/features/products/util/customerCode';
 import { findCustomerCodeConflictMessage } from '@/lib/customerCodeDuplicates';
 import { isCustomerCodeUniqueViolation } from '@/lib/customerCodeUniqueViolation';
 
@@ -16,6 +21,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const data = (await req.json()) as CreateProductRequest;
+
+    // 정규화는 글자가 아닌 값을 "코드 없음"으로 바꾸므로, 그 전에 모양을 본다. 길이는 아래 쓰기 스키마가 본다.
+    if (findCustomerCodeInputProblem(data.customerCode) === 'TYPE') {
+      return NextResponse.json({ error: CUSTOMER_CODE_TYPE_MESSAGE }, { status: 400 });
+    }
 
     // 검증보다 먼저 정규화한다 — 길이 검사가 저장될 값 기준으로 돌아야 한다.
     const values = { ...data, customerCode: normalizeCustomerCode(data.customerCode) };
