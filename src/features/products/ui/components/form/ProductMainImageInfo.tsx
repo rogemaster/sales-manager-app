@@ -11,7 +11,8 @@ import { MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
 import { toProductImageUrl } from '@/features/products/util/productImage';
 
 export const ProductMainImageInfo = () => {
-  const [mainImages, setMainImages] = useState<{ dataUrl: string; file: File } | null>(null);
+  // 새로 고른 파일의 미리보기 주소. 파일 자체는 폼(field.value)이 들고 있다.
+  const [selectedDataUrl, setSelectedDataUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hasLoadError, setHasLoadError] = useState(false);
   const handleFileInputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +33,7 @@ export const ProductMainImageInfo = () => {
   // 새로 고른 파일이 있으면 그 데이터 URL을, 없으면 폼에 들어 있는 저장된 값을 그린다.
   // 수정 화면은 저장된 값(R2 key)으로 시작하므로 이 두 번째 경로가 없으면
   // 이미지가 있는 상품인데도 빈 업로드 박스만 보인다.
-  const previewUrl = mainImages?.dataUrl ?? (typeof field.value === 'string' ? toProductImageUrl(field.value) : '');
+  const previewUrl = selectedDataUrl ?? (typeof field.value === 'string' ? toProductImageUrl(field.value) : '');
 
   // 주소가 바뀌면 앞선 실패를 지운다. 실패한 채로 남으면 새로 고른 이미지까지 회색 박스가 된다.
   useEffect(() => {
@@ -51,7 +52,7 @@ export const ProductMainImageInfo = () => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setMainImages({ dataUrl: reader.result as string, file });
+      setSelectedDataUrl(reader.result as string);
     };
     reader.readAsDataURL(file);
     field.onChange(file);
@@ -84,7 +85,7 @@ export const ProductMainImageInfo = () => {
   };
 
   const handleRemoveImage = () => {
-    setMainImages(null);
+    setSelectedDataUrl(null);
     field.onChange('');
   };
 
