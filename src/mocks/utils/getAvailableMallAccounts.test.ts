@@ -7,7 +7,6 @@ const makeAccount = (overrides: Partial<ShoppingAccount>): ShoppingAccount => ({
   ownerId: 'usr_001',
   mallCode: 'COUP',
   mallId: 'coupang_seller_001',
-  password: 'pass',
   isActive: true,
   nickname: '',
   managerMd: '',
@@ -15,25 +14,15 @@ const makeAccount = (overrides: Partial<ShoppingAccount>): ShoppingAccount => ({
   email: '',
   domain: '',
   category: '',
-  apiKey: '',
-  createdAt: '2025-01-01',
-  updatedAt: '2025-01-01',
+  createdAt: new Date('2025-01-01T00:00:00+09:00'),
+  updatedAt: new Date('2025-01-01T00:00:00+09:00'),
   ...overrides,
 });
 
-const { ACCOUNTS, SETTINGS } = vi.hoisted(() => ({
-  ACCOUNTS: [] as ShoppingAccount[],
-  SETTINGS: [] as ShoppingSetting[],
-}));
+const { SETTINGS } = vi.hoisted(() => ({ SETTINGS: [] as ShoppingSetting[] }));
 
-vi.mock('../data/MockShoppingAccountsData', () => ({ MOCK_SHOPPING_ACCOUNTS_DATA: ACCOUNTS }));
 vi.mock('../data/MockShoppingSettingsData', () => ({ MOCK_SHOPPING_SETTINGS_DATA: SETTINGS }));
 
-ACCOUNTS.push(
-  makeAccount({ id: 'sa_001', ownerId: 'usr_001', mallCode: 'COUP', mallId: 'coupang_seller_001' }),
-  makeAccount({ id: 'sa_002', ownerId: 'usr_001', mallCode: 'NSST', mallId: 'naver_store_002' }),
-  makeAccount({ id: 'sa_006', ownerId: 'usr_005', mallCode: 'COUP', mallId: 'coupang_seller_006' }),
-);
 SETTINGS.push(
   {
     id: 'ss_001',
@@ -70,19 +59,27 @@ SETTINGS.push(
 import { getMockAvailableMallAccounts } from './getAvailableMallAccounts';
 
 describe('getMockAvailableMallAccounts', () => {
-  it('ownerId가 일치하는 계정만 반환한다', () => {
-    const result = getMockAvailableMallAccounts('usr_001');
+  it('넘겨받은 계정을 그대로 옵션으로 만든다', () => {
+    const result = getMockAvailableMallAccounts([
+      makeAccount({ id: 'sa_001' }),
+      makeAccount({ id: 'sa_002', mallCode: 'NSST', mallId: 'naver_store_002' }),
+    ]);
+
     expect(result).toHaveLength(2);
+    expect(result[1]).toMatchObject({ id: 'sa_002', mallCode: 'NSST', mallId: 'naver_store_002' });
   });
 
   it('설정 건수를 정확히 집계한다', () => {
-    const result = getMockAvailableMallAccounts('usr_001');
+    const result = getMockAvailableMallAccounts([
+      makeAccount({ id: 'sa_001' }),
+      makeAccount({ id: 'sa_002', mallCode: 'NSST', mallId: 'naver_store_002' }),
+    ]);
+
     expect(result.find((a) => a.id === 'sa_001')?.settingCount).toBe(2);
     expect(result.find((a) => a.id === 'sa_002')?.settingCount).toBe(0);
   });
 
-  it('다른 owner의 계정은 제외한다', () => {
-    const result = getMockAvailableMallAccounts('usr_001');
-    expect(result.find((a) => a.id === 'sa_006')).toBeUndefined();
+  it('계정이 없으면 빈 배열이다', () => {
+    expect(getMockAvailableMallAccounts([])).toEqual([]);
   });
 });

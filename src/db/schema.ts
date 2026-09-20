@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, integer, jsonb, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, jsonb, timestamp, uniqueIndex, boolean } from 'drizzle-orm/pg-core';
 import type { OptionCombination, ProductInformationDisclosure } from '@/features/products/types/product.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
@@ -88,3 +88,26 @@ export const products = pgTable(
       .where(sql`btrim(${table.customerCode}) <> ''`),
   ],
 );
+
+export const shoppingAccounts = pgTable('shopping_accounts', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull(),
+
+  mallCode: text('mall_code').notNull(),
+  mallId: text('mall_id').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  nickname: text('nickname').notNull().default(''),
+  managerMd: text('manager_md').notNull().default(''),
+  phone: text('phone').notNull().default(''),
+  email: text('email').notNull().default(''),
+  domain: text('domain').notNull().default(''),
+  category: text('category').notNull().default(''),
+
+  // 브라우저로 내려보내지 않는다. 외부몰 전송(실행 순서 4)에서 서버가 읽어 쓴다.
+  // 읽기 경로는 SHOPPING_ACCOUNT_PUBLIC_COLUMNS만 통과하므로 여기 있는 것만으로는 새지 않는다.
+  password: text('password').notNull(),
+  apiKey: text('api_key').notNull(),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+});
