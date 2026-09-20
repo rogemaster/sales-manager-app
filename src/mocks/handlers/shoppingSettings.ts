@@ -18,6 +18,7 @@ import { createMockShoppingSetting } from '../utils/createShoppingSetting';
 import { updateMockShoppingSetting } from '../utils/updateShoppingSetting';
 import { isOwnerMatch, allOwnedBy } from '../utils/verifyOwnership';
 import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
+import { fetchShoppingAccountsForMock } from '../utils/fetchShoppingAccounts';
 
 export const shoppingSettingHandlers = [
   http.post(`${baseUrl}/api/shopping/settings/list`, async ({ request }) => {
@@ -60,9 +61,10 @@ export const shoppingSettingHandlers = [
     return HttpResponse.json({ totalCount: countMockLinkedProductsBySettings(ownerId, ids) });
   }),
 
-  http.post(`${baseUrl}/api/shopping/settings/available-accounts`, async ({ request }) => {
-    const { ownerId } = (await request.json()) as { ownerId: string };
-    return HttpResponse.json(getMockAvailableMallAccounts(ownerId));
+  http.post(`${baseUrl}/api/shopping/settings/available-accounts`, async () => {
+    // ownerId는 body에서 읽지 않는다 — 어댑터 요청에 세션 쿠키가 붙어 실제 route가 판정한다.
+    const accounts = await fetchShoppingAccountsForMock();
+    return HttpResponse.json(getMockAvailableMallAccounts(accounts));
   }),
 
   http.post(`${baseUrl}/api/shopping/settings/active`, async ({ request }) => {

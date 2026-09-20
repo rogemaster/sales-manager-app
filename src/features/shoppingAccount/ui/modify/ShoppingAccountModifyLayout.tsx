@@ -27,7 +27,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
       managerMd: data.managerMd,
       phone: data.phone ?? '',
       email: data.email ?? '',
-      domain: data.domain,
+      domain: data.domain ?? '',
       category: data.category,
       apiKey: data.apiKey,
     };
@@ -55,7 +55,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
   const defaultValues: ShoppingAccountFormData = {
     mallCode: account.mallCode,
     mallId: account.mallId,
-    password: account.password,
+    password: '', // 응답에 없다. 빈 칸 = 변경 안 함
     isActive: account.isActive,
     nickname: account.nickname,
     managerMd: account.managerMd,
@@ -63,7 +63,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
     email: account.email,
     domain: account.domain,
     category: account.category,
-    apiKey: account.apiKey,
+    apiKey: '',
   };
 
   return (

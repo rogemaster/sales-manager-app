@@ -23,7 +23,7 @@ export const ShoppingAccountCreateLayout = () => {
       email: data.email ?? '',
       domain: data.domain ?? '',
       category: data.category,
-      apiKey: data.apiKey ?? '',
+      apiKey: data.apiKey,
     };
     createAccount(body, {
       onSuccess: () => {

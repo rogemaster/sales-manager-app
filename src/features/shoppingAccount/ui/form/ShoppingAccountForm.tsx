@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,37 +17,40 @@ import { ShoppingMalls } from '@/types/common.type';
 
 const MALL_CODES: string[] = SHOPPING_MALLS.map((mall) => mall.code);
 
-const shoppingAccountSchema = z.object({
-  mallCode: z
-    .string()
-    .min(1, '쇼핑몰을 선택해주세요.')
-    .refine((val): val is ShoppingMalls => MALL_CODES.includes(val), {
-      message: '유효하지 않은 쇼핑몰입니다.',
-    }),
-  mallId: z.string().min(1, '쇼핑몰 ID를 입력해주세요.'),
-  password: z.string().min(1, '패스워드를 입력해주세요.'),
-  isActive: z.boolean(),
-  nickname: z.string().optional(),
-  managerMd: z.string().min(1, '담당MD를 입력해주세요.'),
-  phone: z
-    .string()
-    .optional()
-    .refine((val) => !val || PHONE_REGEX.test(val), {
-      message: '올바른 연락처 형식을 입력해주세요. (예: 010-1234-5678)',
-    }),
-  email: z
-    .string()
-    .optional()
-    .refine((val) => !val || z.string().email().safeParse(val).success, {
-      message: '올바른 이메일 형식을 입력해주세요.',
-    }),
-  domain: z.string().optional(),
-  category: z.string().min(1, '카테고리를 선택해주세요.'),
-  apiKey: z.string().optional(),
-});
+const buildShoppingAccountSchema = (mode: 'create' | 'edit') =>
+  z.object({
+    mallCode: z
+      .string()
+      .min(1, '쇼핑몰을 선택해주세요.')
+      .refine((val): val is ShoppingMalls => MALL_CODES.includes(val), {
+        message: '유효하지 않은 쇼핑몰입니다.',
+      }),
+    mallId: z.string().min(1, '쇼핑몰 ID를 입력해주세요.'),
+    // 수정은 빈 칸을 허용한다 — 빈 값은 "변경 안 함"이고 서버가 기존 값을 유지한다.
+    password: mode === 'create' ? z.string().min(1, '패스워드를 입력해주세요.') : z.string(),
+    isActive: z.boolean(),
+    nickname: z.string().optional(),
+    managerMd: z.string().min(1, '담당MD를 입력해주세요.'),
+    phone: z
+      .string()
+      .optional()
+      .refine((val) => !val || PHONE_REGEX.test(val), {
+        message: '올바른 연락처 형식을 입력해주세요. (예: 010-1234-5678)',
+      }),
+    email: z
+      .string()
+      .optional()
+      .refine((val) => !val || z.string().email().safeParse(val).success, {
+        message: '올바른 이메일 형식을 입력해주세요.',
+      }),
+    domain: z.string().optional(),
+    category: z.string().min(1, '카테고리를 선택해주세요.'),
+    apiKey: mode === 'create' ? z.string().min(1, 'API Key를 입력해주세요.') : z.string(),
+  });
 
-export type ShoppingAccountFormInput = z.input<typeof shoppingAccountSchema>;
-export type ShoppingAccountFormData = z.output<typeof shoppingAccountSchema>;
+type ShoppingAccountSchema = ReturnType<typeof buildShoppingAccountSchema>;
+export type ShoppingAccountFormInput = z.input<ShoppingAccountSchema>;
+export type ShoppingAccountFormData = z.output<ShoppingAccountSchema>;
 
 interface ShoppingAccountFormProps {
   defaultValues?: Partial<ShoppingAccountFormData>;
@@ -63,8 +67,10 @@ const IS_ACTIVE_OPTIONS = [
 export const ShoppingAccountForm = ({ defaultValues, onSubmit, isSubmitting, mode }: ShoppingAccountFormProps) => {
   const router = useRouter();
 
+  const schema = useMemo(() => buildShoppingAccountSchema(mode), [mode]);
+
   const form = useForm<ShoppingAccountFormInput, unknown, ShoppingAccountFormData>({
-    resolver: zodResolver(shoppingAccountSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       mallCode: '',
       mallId: '',
@@ -140,9 +146,15 @@ export const ShoppingAccountForm = ({ defaultValues, onSubmit, isSubmitting, mod
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>패스워드 *</FormLabel>
+                    <FormLabel>{mode === 'create' ? '패스워드 *' : '패스워드'}</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="패스워드를 입력하세요." {...field} />
+                      <Input
+                        type="password"
+                        // 수정 화면의 별표는 placeholder다 — 값이 아니라서 그대로 저장하면 "변경 안 함"이 유지된다.
+                        // 실제 값으로 넣으면 손대지 않고 저장했을 때 별표 문자열이 키를 덮어쓴다.
+                        placeholder={mode === 'create' ? '패스워드를 입력하세요.' : '**********  변경 시에만 입력'}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -285,9 +297,12 @@ export const ShoppingAccountForm = ({ defaultValues, onSubmit, isSubmitting, mod
                 name="apiKey"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>연동API</FormLabel>
+                    <FormLabel>{mode === 'create' ? '연동API *' : '연동API'}</FormLabel>
                     <FormControl>
-                      <Input placeholder="연동 API를 입력하세요." {...field} />
+                      <Input
+                        placeholder={mode === 'create' ? '연동 API를 입력하세요.' : '**********  변경 시에만 입력'}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

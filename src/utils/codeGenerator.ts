@@ -23,3 +23,8 @@ export const generatorOrderCode = () => {
   const uuid = uuidv4().split('-');
   return `order_${uuid[0]}${uuid[1]}`;
 };
+
+// 쇼핑몰계정 — 서버가 채번한다(클라이언트 채번을 신뢰하지 않는다)
+export const generatorShoppingAccountCode = () => {
+  return `sa_${uuidv4().split('-')[0]}`;
+};
