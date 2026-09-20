@@ -4,19 +4,12 @@ import { products } from '@/db/schema';
 import { and, desc, eq, gte, ilike, lt, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { isYmd, toKstDateRange } from '@/shared/utils/date';
+import { clampPositiveInt } from '@/shared/utils/pagination';
 import { ProductSearch } from '@/features/products/types/product.types';
 
 // 상한 1000은 MSW 어댑터(mocks/utils/fetchProducts.ts)가 "사실상 전체"로 보내는 값이다.
 const MAX_PAGE_SIZE = 1000;
 const DEFAULT_PAGE_SIZE = 10;
-
-// 그대로 limit/offset에 넣으면 테넌트 전체를 한 번에 긁거나(큰 pageSize),
-// offset이 음수가 되어 원인 불명의 500이 된다(page 0).
-const clampPositiveInt = (value: unknown, fallback: number, max: number): number => {
-  const parsed = Math.floor(Number(value));
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
-  return Math.min(parsed, max);
-};
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
