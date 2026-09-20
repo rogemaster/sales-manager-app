@@ -2,6 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -81,8 +82,8 @@ export const ShoppingAccountTable = ({ accounts }: ShoppingAccountTableProps) =>
                   {account.isActive ? '사용' : '미사용'}
                 </Badge>
               </TableCell>
-              <TableCell className="text-center">{account.createdAt}</TableCell>
-              <TableCell className="text-center">{account.updatedAt}</TableCell>
+              <TableCell className="text-center">{dayjs(account.createdAt).format('YYYY-MM-DD')}</TableCell>
+              <TableCell className="text-center">{dayjs(account.updatedAt).format('YYYY-MM-DD')}</TableCell>
             </TableRow>
           ))
         )}

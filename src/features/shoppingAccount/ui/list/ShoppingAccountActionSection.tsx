@@ -10,6 +10,7 @@ import { selectedAccountsAtom } from '@/features/shoppingAccount/store/search.st
 import { useDeleteShoppingAccounts } from '@/features/shoppingAccount/api/useDeleteShoppingAccounts';
 import { useUpdateShoppingAccountsStatus } from '@/features/shoppingAccount/api/useUpdateShoppingAccountsStatus';
 import { ACCOUNT_STATUS_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
+import { buildBulkAccountAlert } from '@/features/shoppingAccount/util/bulkResultMessage';
 import { useAlert } from '@/hooks/useAlert';
 
 export const ShoppingAccountActionSection = () => {
@@ -38,9 +39,9 @@ export const ShoppingAccountActionSection = () => {
       showCancel: true,
       onConfirm: () => {
         deleteAccounts(snapshotIds, {
-          onSuccess: () => {
+          onSuccess: ({ successCount, failures }) => {
             setSelectedAccounts([]);
-            showAlert({ message: `${count}개의 계정이 삭제되었습니다.`, type: 'success' });
+            showAlert(buildBulkAccountAlert('삭제', successCount, failures));
           },
         });
       },
@@ -56,9 +57,9 @@ export const ShoppingAccountActionSection = () => {
     updateStatus(
       { ids: snapshotIds, isActive: statusValue === 'true' },
       {
-        onSuccess: () => {
+        onSuccess: ({ successCount, failures }) => {
           setSelectedAccounts([]);
-          showAlert({ message: '사용여부가 변경되었습니다.', type: 'success' });
+          showAlert(buildBulkAccountAlert('변경', successCount, failures));
         },
       },
     );
