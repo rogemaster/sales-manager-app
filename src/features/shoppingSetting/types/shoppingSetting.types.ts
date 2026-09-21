@@ -1,4 +1,5 @@
 import { PaginationMeta, ShoppingMalls } from '@/types/common.type';
+import { BulkFailure } from '@/shared/utils/bulkResultAlert';
 
 export type ProductCondition = 'NEW' | 'USED'; // 신상품 / 중고상품
 export type SalesPeriod = 7 | 15 | 30 | 60 | 90;
@@ -22,8 +23,10 @@ interface ShoppingSettingBase {
   shippingAddress: MallAddress | null;
   returnAddress: MallAddress | null;
   ownerId: string;
-  createdAt: string;
-  updatedAt: string;
+  // DB의 timestamp가 JSON에서 ISO 문자열로 오지만, 계정 타입과 같은 표기를 쓴다.
+  // 화면은 dayjs(...).format('YYYY-MM-DD')로 찍는다.
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface NaverSettingAttributes {
@@ -91,4 +94,15 @@ export type UpdateShoppingSettingBody = Partial<CreateShoppingSettingBody>;
  */
 export interface LinkedProductCountResponse {
   totalCount: number;
+}
+
+/**
+ * 설정 대량 삭제·사용여부 변경 결과.
+ *
+ * 구조가 BulkAccountResult와 같지만 합치지 않는다 — 호출 경로가 다르고 독립적으로 변할 수 있다.
+ * neon-http에 트랜잭션이 없어 "전부 아니면 전무"를 약속할 수 없으므로 건별 결과가 정상 계약이다.
+ */
+export interface BulkSettingResult {
+  successCount: number;
+  failures: BulkFailure[];
 }

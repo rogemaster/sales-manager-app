@@ -6,19 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { AddressSelectModal } from '../address/AddressSelectModal';
+import { MallAddressType } from '@/features/shoppingSetting/api/getAddressBook';
 import { ShoppingSettingFormValues, MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 interface AddressPickerFieldProps {
   name: 'shippingAddress' | 'returnAddress';
   label: string;
-  mallCode: ShoppingSettingFormValues['mallCode'];
-  mallId: string;
+  mallAccountId: string;
+  addressType: MallAddressType;
 }
 
 const formatAddress = (address: MallAddress) =>
   `${address.name} (${address.zipCode}) ${address.address} ${address.addressDetail}`;
 
-const AddressPickerField = ({ name, label, mallCode, mallId }: AddressPickerFieldProps) => {
+const AddressPickerField = ({ name, label, mallAccountId, addressType }: AddressPickerFieldProps) => {
   const { control } = useFormContext<ShoppingSettingFormValues>();
   const [open, setOpen] = useState(false);
 
@@ -44,8 +45,8 @@ const AddressPickerField = ({ name, label, mallCode, mallId }: AddressPickerFiel
             onOpenChange={setOpen}
             title={`${label} 선택`}
             nameColumnLabel={`${label}명`}
-            mallCode={mallCode}
-            mallId={mallId}
+            mallAccountId={mallAccountId}
+            addressType={addressType}
             value={field.value}
             onApply={field.onChange}
           />
@@ -57,8 +58,7 @@ const AddressPickerField = ({ name, label, mallCode, mallId }: AddressPickerFiel
 
 export const ShoppingSettingAddressSection = () => {
   const { watch } = useFormContext<ShoppingSettingFormValues>();
-  const mallCode = watch('mallCode');
-  const mallId = watch('mallId');
+  const mallAccountId = watch('mallAccountId');
 
   return (
     <Card className="overflow-hidden">
@@ -69,8 +69,13 @@ export const ShoppingSettingAddressSection = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
-        <AddressPickerField name="shippingAddress" label="출고지" mallCode={mallCode} mallId={mallId} />
-        <AddressPickerField name="returnAddress" label="반품지" mallCode={mallCode} mallId={mallId} />
+        <AddressPickerField
+          name="shippingAddress"
+          label="출고지"
+          mallAccountId={mallAccountId}
+          addressType="SHIPPING"
+        />
+        <AddressPickerField name="returnAddress" label="반품지" mallAccountId={mallAccountId} addressType="RETURN" />
       </CardContent>
     </Card>
   );

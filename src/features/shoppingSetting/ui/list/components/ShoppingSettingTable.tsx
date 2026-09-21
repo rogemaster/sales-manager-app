@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -84,8 +85,8 @@ export const ShoppingSettingTable = ({ settings }: ShoppingSettingTableProps) =>
                   {setting.isActive ? '사용' : '미사용'}
                 </Badge>
               </TableCell>
-              <TableCell className="text-center">{setting.createdAt}</TableCell>
-              <TableCell className="text-center">{setting.updatedAt}</TableCell>
+              <TableCell className="text-center">{dayjs(setting.createdAt).format('YYYY-MM-DD')}</TableCell>
+              <TableCell className="text-center">{dayjs(setting.updatedAt).format('YYYY-MM-DD')}</TableCell>
               <TableCell className="text-center">
                 <Button variant="outline" size="sm" onClick={() => router.push(`/shopping/settings/${setting.id}`)}>
                   수정

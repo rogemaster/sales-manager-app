@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGetAddressBook } from '@/features/shoppingSetting/api/useGetAddressBook';
+import { MallAddressType } from '@/features/shoppingSetting/api/getAddressBook';
 import { MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { ShoppingMalls } from '@/types/common.type';
 import { useAlert } from '@/hooks/useAlert';
 
 interface AddressSelectModalProps {
@@ -15,8 +15,8 @@ interface AddressSelectModalProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   nameColumnLabel: string;
-  mallCode: ShoppingMalls;
-  mallId: string;
+  mallAccountId: string;
+  addressType: MallAddressType;
   value: MallAddress | null;
   onApply: (address: MallAddress) => void;
 }
@@ -26,12 +26,12 @@ export const AddressSelectModal = ({
   onOpenChange,
   title,
   nameColumnLabel,
-  mallCode,
-  mallId,
+  mallAccountId,
+  addressType,
   value,
   onApply,
 }: AddressSelectModalProps) => {
-  const { data: addresses = [], isLoading } = useGetAddressBook(mallCode, mallId, open);
+  const { data: addresses = [], isLoading, error } = useGetAddressBook(mallAccountId, addressType, open);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const { showAlert } = useAlert();
 
@@ -71,7 +71,7 @@ export const AddressSelectModal = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {addresses.length === 0 ? (
+                {addresses.length === 0 && !error ? (
                   <TableRow>
                     <TableCell colSpan={4} className="h-24 text-center text-muted-foreground text-sm">
                       등록된 주소가 없습니다.
@@ -98,6 +98,7 @@ export const AddressSelectModal = ({
             </Table>
           </RadioGroup>
         )}
+        {error && <p className="text-sm text-red-500">{(error as Error).message}</p>}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             취소
