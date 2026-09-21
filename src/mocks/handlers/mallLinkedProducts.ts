@@ -10,6 +10,7 @@ import {
 import { areLinkedProductsOwnedBy, areMallLinkRequestsOwnedBy } from '../utils/verifyOwnership';
 import { createMockMallLinkedProducts } from '../utils/createMallLinkedProducts';
 import { fetchProductsForMock } from '../utils/fetchProducts';
+import { fetchShoppingSettingsForMock } from '../utils/fetchShoppingSettings';
 import { getMockMallLinkedProducts } from '../utils/getMallLinkedProducts';
 import { getMockMallLinkedProduct } from '../utils/getMallLinkedProduct';
 import { updateMockMallLinkedProduct } from '../utils/updateMallLinkedProduct';
@@ -35,13 +36,13 @@ export const mallLinkedProductHandlers = [
       items: MallLinkedProductRequestItem[];
     };
 
-    const products = await fetchProductsForMock();
+    const [products, settings] = await Promise.all([fetchProductsForMock(), fetchShoppingSettingsForMock()]);
 
-    if (!areMallLinkRequestsOwnedBy(items, ownerId, products)) {
+    if (!areMallLinkRequestsOwnedBy(items, ownerId, products, settings)) {
       return new HttpResponse(null, { status: 403 });
     }
 
-    return HttpResponse.json(createMockMallLinkedProducts(items, ownerId, createdByEmail, products));
+    return HttpResponse.json(createMockMallLinkedProducts(items, ownerId, createdByEmail, products, settings));
   }),
 
   http.post(`${baseUrl}/api/shopping/linked-products/resend`, async ({ request }) => {
@@ -59,7 +60,8 @@ export const mallLinkedProductHandlers = [
   // 고정 경로이므로 `/:id` 핸들러보다 먼저 등록해야 한다 (msw-rules.md 경로 충돌 규칙).
   http.patch(`${baseUrl}/api/shopping/linked-products/bulk`, async ({ request }) => {
     const body = (await request.json()) as BulkUpdateMallLinkedProductsBody;
-    const result = bulkUpdateMockMallLinkedProducts(body);
+    const settings = await fetchShoppingSettingsForMock();
+    const result = bulkUpdateMockMallLinkedProducts(body, settings);
     if (!result) return new HttpResponse(null, { status: 400 });
     return HttpResponse.json(result);
   }),

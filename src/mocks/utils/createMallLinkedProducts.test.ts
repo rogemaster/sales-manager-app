@@ -42,8 +42,8 @@ const { PRODUCTS, SETTINGS, LINKED, resetMocks } = vi.hoisted(() => {
       shippingAddress: null,
       returnAddress: null,
       ownerId: 'usr_001',
-      createdAt: '2026-01-01',
-      updatedAt: '2026-01-01',
+      createdAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-01'),
     }) as ShoppingSetting;
 
   const PRODUCTS: Product[] = [];
@@ -65,7 +65,6 @@ const { PRODUCTS, SETTINGS, LINKED, resetMocks } = vi.hoisted(() => {
   return { PRODUCTS, SETTINGS, LINKED, resetMocks };
 });
 
-vi.mock('../data/MockShoppingSettingsData', () => ({ MOCK_SHOPPING_SETTINGS_DATA: SETTINGS }));
 vi.mock('../data/MockMallLinkedProductsData', () => ({ MOCK_MALL_LINKED_PRODUCT_DATA: LINKED }));
 
 import { createMockMallLinkedProducts } from './createMallLinkedProducts';
@@ -91,6 +90,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(result).toEqual({ totalCount: 1, successCount: 1, failCount: 0 });
@@ -115,6 +115,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     const { createdAt, lastSentAt, updatedAt } = LINKED[0];
@@ -130,6 +131,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     PRODUCTS[0].name = '수정된 상품명';
@@ -151,12 +153,14 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
     createMockMallLinkedProducts(
       [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(LINKED).toHaveLength(2);
@@ -176,6 +180,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(result).toEqual({ totalCount: 3, successCount: 0, failCount: 3 });
@@ -193,6 +198,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     vi.restoreAllMocks();
@@ -202,6 +208,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(LINKED).toHaveLength(2);
@@ -215,6 +222,7 @@ describe('createMockMallLinkedProducts', () => {
       'usr_other',
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     vi.restoreAllMocks();
@@ -224,6 +232,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(result).toEqual({ totalCount: 1, successCount: 0, failCount: 1 });
@@ -240,6 +249,7 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
     );
 
     expect(LINKED[0].mallCode).toBe('NSST');
@@ -255,6 +265,22 @@ describe('createMockMallLinkedProducts', () => {
       OWNER_ID,
       EMAIL,
       PRODUCTS,
+      SETTINGS,
+    );
+
+    expect(result).toEqual({ totalCount: 0, successCount: 0, failCount: 0 });
+    expect(LINKED).toHaveLength(0);
+  });
+
+  it('주입된 설정 목록에 없는 설정 id는 건너뛴다', () => {
+    stubRandom(0.9);
+
+    const result = createMockMallLinkedProducts(
+      [{ productId: 'p_001', mallCode: 'NSST', shoppingSettingId: 'ss_001' }],
+      OWNER_ID,
+      EMAIL,
+      PRODUCTS,
+      [], // 설정 목록이 비어 있다
     );
 
     expect(result).toEqual({ totalCount: 0, successCount: 0, failCount: 0 });

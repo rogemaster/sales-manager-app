@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import type { Product } from '@/features/products/types/product.types';
+import type { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 const PRODUCTS = [
   { productId: 'p1', ownerId: 'own_1' },
@@ -8,21 +9,21 @@ const PRODUCTS = [
   { productId: 'p3', ownerId: 'own_2' },
 ] as Product[];
 
-const { SETTINGS, LINKED_PRODUCTS } = vi.hoisted(() => {
-  const SETTINGS = [
-    { id: 's1', ownerId: 'own_1' },
-    { id: 's2', ownerId: 'own_2' },
-  ];
+const SETTINGS = [
+  { id: 's1', ownerId: 'own_1' },
+  { id: 's2', ownerId: 'own_2' },
+] as ShoppingSetting[];
+
+const { LINKED_PRODUCTS } = vi.hoisted(() => {
   const LINKED_PRODUCTS = [
     { id: 'l1', ownerId: 'own_1' },
     { id: 'l2', ownerId: 'own_2' },
   ];
-  return { SETTINGS, LINKED_PRODUCTS };
+  return { LINKED_PRODUCTS };
 });
 
-vi.mock('../data/MockShoppingSettingsData', () => ({ MOCK_SHOPPING_SETTINGS_DATA: SETTINGS }));
 // verifyOwnership.ts가 MOCK_MALL_LINKED_PRODUCT_DATA를 import한다. 목킹하지 않으면 실제 시드 파일이 로드되면서
-// 이 파일이 목킹한 축소된 SETTINGS를 참조해 "시드 데이터 참조 오류"로 실패한다.
+// 이 파일이 목킹한 축소된 LINKED_PRODUCTS를 참조해 "시드 데이터 참조 오류"로 실패한다.
 vi.mock('../data/MockMallLinkedProductsData', () => ({ MOCK_MALL_LINKED_PRODUCT_DATA: LINKED_PRODUCTS }));
 
 import {
@@ -109,19 +110,19 @@ describe('areMallLinkRequestsOwnedBy', () => {
   });
 
   it('상품·설정 모두 소유 시 true를 반환한다', () => {
-    expect(areMallLinkRequestsOwnedBy([item('p1', 's1')], 'own_1', PRODUCTS)).toBe(true);
+    expect(areMallLinkRequestsOwnedBy([item('p1', 's1')], 'own_1', PRODUCTS, SETTINGS)).toBe(true);
   });
 
   it('설정이 남의 것이면 false를 반환한다', () => {
-    expect(areMallLinkRequestsOwnedBy([item('p1', 's2')], 'own_1', PRODUCTS)).toBe(false);
+    expect(areMallLinkRequestsOwnedBy([item('p1', 's2')], 'own_1', PRODUCTS, SETTINGS)).toBe(false);
   });
 
   it('상품이 남의 것이면 false를 반환한다', () => {
-    expect(areMallLinkRequestsOwnedBy([item('p3', 's1')], 'own_1', PRODUCTS)).toBe(false);
+    expect(areMallLinkRequestsOwnedBy([item('p3', 's1')], 'own_1', PRODUCTS, SETTINGS)).toBe(false);
   });
 
   it('존재하지 않는 설정 id면 false를 반환한다', () => {
-    expect(areMallLinkRequestsOwnedBy([item('p1', 'nope')], 'own_1', PRODUCTS)).toBe(false);
+    expect(areMallLinkRequestsOwnedBy([item('p1', 'nope')], 'own_1', PRODUCTS, SETTINGS)).toBe(false);
   });
 });
 

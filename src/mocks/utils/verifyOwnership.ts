@@ -1,7 +1,7 @@
-import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { Product } from '@/features/products/types/product.types';
+import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 export const isOwnerMatch = (resourceOwnerId: string, requestOwnerId: string | null): boolean =>
   !!requestOwnerId && resourceOwnerId === requestOwnerId;
@@ -25,18 +25,18 @@ export const areProductsOwnedBy = (productIds: string[], requestOwnerId: string 
   });
 
 // 몰 연동 전송 요청은 상품(productId)·설정(shoppingSettingId) 두 리소스의 소유권을 함께 검증해야 한다.
-// id 추출(dedup) + 검증을 이 헬퍼 하나로 모아 핸들러가 데이터를 직접 다루지 않도록 한다 (msw-rules.md).
+// 상품·설정 모두 호출자가 넘긴다 — 둘 다 Neon에 있어 MSW가 직접 읽을 수 없다.
 export const areMallLinkRequestsOwnedBy = (
   items: MallLinkedProductRequestItem[],
   requestOwnerId: string | null,
   products: Product[],
+  settings: ShoppingSetting[],
 ): boolean => {
   const productIds = [...new Set(items.map((item) => item.productId))];
   const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
 
   return (
-    areProductsOwnedBy(productIds, requestOwnerId, products) &&
-    allOwnedBy(settingIds, requestOwnerId, MOCK_SHOPPING_SETTINGS_DATA)
+    areProductsOwnedBy(productIds, requestOwnerId, products) && allOwnedBy(settingIds, requestOwnerId, settings)
   );
 };
 
