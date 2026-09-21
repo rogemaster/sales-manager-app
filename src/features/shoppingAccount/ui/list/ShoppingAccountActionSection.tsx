@@ -10,7 +10,7 @@ import { selectedAccountsAtom } from '@/features/shoppingAccount/store/search.st
 import { useDeleteShoppingAccounts } from '@/features/shoppingAccount/api/useDeleteShoppingAccounts';
 import { useUpdateShoppingAccountsStatus } from '@/features/shoppingAccount/api/useUpdateShoppingAccountsStatus';
 import { ACCOUNT_STATUS_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
-import { buildBulkAccountAlert } from '@/features/shoppingAccount/util/bulkResultMessage';
+import { buildBulkResultAlert } from '@/shared/utils/bulkResultAlert';
 import { useAlert } from '@/hooks/useAlert';
 
 export const ShoppingAccountActionSection = () => {
@@ -41,7 +41,7 @@ export const ShoppingAccountActionSection = () => {
         deleteAccounts(snapshotIds, {
           onSuccess: ({ successCount, failures }) => {
             setSelectedAccounts([]);
-            showAlert(buildBulkAccountAlert('삭제', successCount, failures));
+            showAlert(buildBulkResultAlert('삭제', successCount, failures));
           },
         });
       },
@@ -59,7 +59,7 @@ export const ShoppingAccountActionSection = () => {
       {
         onSuccess: ({ successCount, failures }) => {
           setSelectedAccounts([]);
-          showAlert(buildBulkAccountAlert('변경', successCount, failures));
+          showAlert(buildBulkResultAlert('변경', successCount, failures));
         },
       },
     );

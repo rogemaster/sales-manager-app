@@ -4,7 +4,7 @@ import { shoppingAccounts } from '@/db/schema';
 import { and, eq, inArray } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { BulkAccountResult } from '@/features/shoppingAccount/types/shoppingAccount.types';
-import { ACCOUNT_NOT_FOUND_MESSAGE } from '@/features/shoppingAccount/util/bulkResultMessage';
+import { ACCOUNT_NOT_FOUND_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
