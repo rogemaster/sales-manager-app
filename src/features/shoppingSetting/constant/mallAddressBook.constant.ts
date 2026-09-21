@@ -1,7 +1,14 @@
 import { ShoppingMalls } from '@/types/common.type';
 import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
-import { MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import { MallAddress } from '../types/shoppingSetting.types';
 
+/**
+ * 시뮬레이터가 없는 몰의 주소록. 서버 route가 읽는다.
+ *
+ * 원래 외부몰이 소유하는 데이터라 우리 DB에 정본을 두지 않는다 — 몰마다 시뮬레이터가 생기면
+ * 하나씩 지워질 임시 데이터다. 네이버는 이미 지워졌다(실조회로 대체).
+ * addressType과 무관하게 같은 목록을 준다. MSW 시절과 같은 동작이다.
+ */
 const BASE_ADDRESSES: Omit<MallAddress, 'code'>[] = [
   {
     name: '본사 물류센터',
@@ -17,7 +24,7 @@ const BASE_ADDRESSES: Omit<MallAddress, 'code'>[] = [
   },
 ];
 
-export const MOCK_MALL_ADDRESS_BOOK: Record<ShoppingMalls, MallAddress[]> = SHOPPING_MALLS.reduce(
+export const STATIC_MALL_ADDRESS_BOOK: Record<ShoppingMalls, MallAddress[]> = SHOPPING_MALLS.reduce(
   (acc, mall) => {
     const mallCode = mall.code as ShoppingMalls;
     acc[mallCode] = BASE_ADDRESSES.map((base, index) => ({

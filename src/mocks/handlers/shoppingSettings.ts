@@ -1,101 +1,19 @@
 import { http, HttpResponse } from 'msw';
 import { baseUrl } from '../config';
-import {
-  ShoppingSettingSearchType,
-  CreateShoppingSettingBody,
-  UpdateShoppingSettingBody,
-} from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { getMockShoppingSettings } from '../utils/getShoppingSettings';
-import { updateMockShoppingSettingsStatus } from '../utils/updateShoppingSettingsStatus';
-import { deleteMockShoppingSettings } from '../utils/deleteShoppingSettings';
 import { countMockLinkedProductsBySettings } from '../utils/countLinkedProductsBySettings';
-import { getMockAvailableMallAccounts } from '../utils/getAvailableMallAccounts';
-import { getMockActiveShoppingSettings } from '../utils/getActiveShoppingSettings';
-import { ShoppingMalls } from '@/types/common.type';
-import { getMockAddressBook } from '../utils/getAddressBook';
-import { getMockShoppingSetting } from '../utils/getShoppingSetting';
-import { createMockShoppingSetting } from '../utils/createShoppingSetting';
-import { updateMockShoppingSetting } from '../utils/updateShoppingSetting';
-import { isOwnerMatch, allOwnedBy } from '../utils/verifyOwnership';
-import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
-import { fetchShoppingAccountsForMock } from '../utils/fetchShoppingAccounts';
 
+/**
+ * 설정은 Neon으로 이전됐다(실행 순서 3). 남은 하나는 경로만 설정 도메인이고
+ * 세는 대상이 연동상품(아직 MSW)이라 실 route로 옮길 수 없다 — 순서 4에서 함께 간다.
+ */
 export const shoppingSettingHandlers = [
-  http.post(`${baseUrl}/api/shopping/settings/list`, async ({ request }) => {
-    const { ownerId, filters, page, pageSize } = (await request.json()) as {
-      ownerId: string;
-      filters: ShoppingSettingSearchType;
-      page: number;
-      pageSize: number;
-    };
-    return HttpResponse.json(getMockShoppingSettings(ownerId, filters, page, pageSize));
-  }),
-
-  http.patch(`${baseUrl}/api/shopping/settings/status`, async ({ request }) => {
-    const ownerId = request.headers.get('X-Owner-Id');
-    const { ids, isActive } = (await request.json()) as { ids: string[]; isActive: boolean };
-    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
-      return new HttpResponse(null, { status: 403 });
-    }
-    updateMockShoppingSettingsStatus(ids, isActive);
-    return HttpResponse.json({ success: true });
-  }),
-
-  http.post(`${baseUrl}/api/shopping/settings/delete`, async ({ request }) => {
-    const ownerId = request.headers.get('X-Owner-Id');
-    const { ids } = (await request.json()) as { ids: string[] };
-    if (!allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
-      return new HttpResponse(null, { status: 403 });
-    }
-    deleteMockShoppingSettings(ids);
-    return HttpResponse.json({ success: true });
-  }),
-
   http.post(`${baseUrl}/api/shopping/settings/linked-count`, async ({ request }) => {
     const ownerId = request.headers.get('X-Owner-Id');
     const { ids } = (await request.json()) as { ids: string[] };
-    // ownerId를 함께 검사해 타입을 좁힌다 — ids가 빈 배열이면 allOwnedBy가 공허참이라 이것만으론 null을 못 거른다.
-    if (!ownerId || !allOwnedBy(ids, ownerId, MOCK_SHOPPING_SETTINGS_DATA)) {
-      return new HttpResponse(null, { status: 403 });
-    }
+    if (!ownerId) return new HttpResponse(null, { status: 403 });
+
+    // 설정 소유권은 따로 확인하지 않는다 — 세는 쪽이 이미 ownerId로 거르므로
+    // 남의 설정 id를 섞어 보내도 0만 늘어난다.
     return HttpResponse.json({ totalCount: countMockLinkedProductsBySettings(ownerId, ids) });
-  }),
-
-  http.post(`${baseUrl}/api/shopping/settings/available-accounts`, async () => {
-    // ownerId는 body에서 읽지 않는다 — 어댑터 요청에 세션 쿠키가 붙어 실제 route가 판정한다.
-    const accounts = await fetchShoppingAccountsForMock();
-    return HttpResponse.json(getMockAvailableMallAccounts(accounts));
-  }),
-
-  http.post(`${baseUrl}/api/shopping/settings/active`, async ({ request }) => {
-    const { ownerId } = (await request.json()) as { ownerId: string };
-    return HttpResponse.json(getMockActiveShoppingSettings(ownerId));
-  }),
-
-  http.post(`${baseUrl}/api/shopping/settings/addresses`, async ({ request }) => {
-    const { mallCode } = (await request.json()) as { mallCode: ShoppingMalls; mallId: string };
-    return HttpResponse.json(getMockAddressBook(mallCode));
-  }),
-
-  http.post(`${baseUrl}/api/shopping/settings`, async ({ request }) => {
-    const { ownerId, ...body } = (await request.json()) as CreateShoppingSettingBody & { ownerId: string };
-    return HttpResponse.json(createMockShoppingSetting(body, ownerId), { status: 201 });
-  }),
-
-  // status/addresses 등 고정경로를 모두 등록한 뒤 동적경로(/:id)를 등록 - :id가 고정 세그먼트와 매칭되는 것을 방지
-  http.get(`${baseUrl}/api/shopping/settings/:id`, ({ params, request }) => {
-    const ownerId = request.headers.get('X-Owner-Id');
-    const setting = getMockShoppingSetting(params.id as string);
-    if (!setting || !isOwnerMatch(setting.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
-    return HttpResponse.json(setting);
-  }),
-
-  http.patch(`${baseUrl}/api/shopping/settings/:id`, async ({ request, params }) => {
-    const ownerId = request.headers.get('X-Owner-Id');
-    const existing = getMockShoppingSetting(params.id as string);
-    if (!existing || !isOwnerMatch(existing.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
-    const body = (await request.json()) as UpdateShoppingSettingBody;
-    const updated = updateMockShoppingSetting(params.id as string, body);
-    return HttpResponse.json(updated);
   }),
 ];

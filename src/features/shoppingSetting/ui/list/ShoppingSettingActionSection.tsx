@@ -14,6 +14,7 @@ import { useUpdateShoppingSettingsStatus } from '@/features/shoppingSetting/api/
 import { useDeleteShoppingSettings } from '@/features/shoppingSetting/api/useDeleteShoppingSettings';
 import { useGetLinkedProductCount } from '@/features/shoppingSetting/api/useGetLinkedProductCount';
 import { SETTING_STATUS_OPTIONS } from '@/features/shoppingSetting/constant/shoppingSetting.constants';
+import { buildBulkResultAlert } from '@/shared/utils/bulkResultAlert';
 import { useAlert } from '@/hooks/useAlert';
 
 export const ShoppingSettingActionSection = () => {
@@ -58,9 +59,9 @@ export const ShoppingSettingActionSection = () => {
       showCancel: true,
       onConfirm: () => {
         deleteSettings(snapshotIds, {
-          onSuccess: () => {
+          onSuccess: ({ successCount, failures }) => {
             setSelectedSettings([]);
-            showAlert({ message: `${count}개의 설정이 삭제되었습니다.`, type: 'success' });
+            showAlert(buildBulkResultAlert('삭제', successCount, failures));
           },
         });
       },
@@ -76,9 +77,9 @@ export const ShoppingSettingActionSection = () => {
     updateStatus(
       { ids: snapshotIds, isActive: statusValue === 'true' },
       {
-        onSuccess: () => {
+        onSuccess: ({ successCount, failures }) => {
           setSelectedSettings([]);
-          showAlert({ message: '사용여부가 변경되었습니다.', type: 'success' });
+          showAlert(buildBulkResultAlert('변경', successCount, failures));
         },
       },
     );

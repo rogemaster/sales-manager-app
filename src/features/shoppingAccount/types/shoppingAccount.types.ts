@@ -1,4 +1,5 @@
 import { PaginationMeta, ShoppingMalls } from '@/types/common.type';
+import { BulkFailure } from '@/shared/utils/bulkResultAlert';
 
 /**
  * 브라우저로 내려가는 모양. password·apiKey가 타입에 없다.
@@ -48,13 +49,8 @@ export interface MallAccountOption {
   mallId: string;
 }
 
-/** 대량 삭제·사용여부 변경의 건별 결과. 일부 성공이 정상 결과다(엑셀 ExcelSaveResult와 같은 모양). */
-export interface BulkAccountFailure {
-  id: string;
-  message: string;
-}
-
+/** 계정 도메인의 대량 결과. 구조는 설정과 같지만 호출 경로가 달라 타입은 합치지 않는다. */
 export interface BulkAccountResult {
   successCount: number;
-  failures: BulkAccountFailure[];
+  failures: BulkFailure[];
 }

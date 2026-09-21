@@ -3,9 +3,9 @@ import {
   MallLinkedProduct,
   MallLinkedProductRequestItem,
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
-import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
 import { Product } from '@/features/products/types/product.types';
+import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import {
   createExternalProductId,
   createLinkedProductId,
@@ -23,13 +23,15 @@ export const createMockMallLinkedProducts = (
   ownerId: string,
   createdByEmail: string,
   products: Product[],
+  // 설정도 호출자가 넘긴다 — 상품과 같은 이유다(Neon에 있어 MSW가 직접 읽을 수 없다).
+  settings: ShoppingSetting[],
 ): CreateMallLinkedProductsResult => {
   const now = new Date().toISOString();
   const result: CreateMallLinkedProductsResult = { totalCount: 0, successCount: 0, failCount: 0 };
 
   items.forEach((item) => {
     const product = products.find((p) => p.productId === item.productId);
-    const setting = MOCK_SHOPPING_SETTINGS_DATA.find((s) => s.id === item.shoppingSettingId);
+    const setting = settings.find((s) => s.id === item.shoppingSettingId);
     if (!product || !setting) return;
 
     const isSuccess = isSendSuccess();

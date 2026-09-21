@@ -74,7 +74,6 @@ const { LINKED, SETTINGS, resetMocks, OWNER_ID } = vi.hoisted(() => {
 });
 
 vi.mock('../data/MockMallLinkedProductsData', () => ({ MOCK_MALL_LINKED_PRODUCT_DATA: LINKED }));
-vi.mock('../data/MockShoppingSettingsData', () => ({ MOCK_SHOPPING_SETTINGS_DATA: SETTINGS }));
 
 import { bulkUpdateMockMallLinkedProducts } from './bulkUpdateMallLinkedProducts';
 
@@ -84,7 +83,10 @@ describe('bulkUpdateMockMallLinkedProducts — 상품 patch', () => {
   beforeEach(() => resetMocks());
 
   it('보낸 키만 덮고 나머지 키는 유지한다', () => {
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: { name: '수정된 상품명' } as Partial<Product> });
+    bulkUpdateMockMallLinkedProducts(
+      { ...baseBody, productSnapshot: { name: '수정된 상품명' } as Partial<Product> },
+      SETTINGS,
+    );
 
     expect(LINKED[0].productSnapshot.name).toBe('수정된 상품명');
     expect(LINKED[0].productSnapshot.price).toBe(10000);
@@ -92,14 +94,14 @@ describe('bulkUpdateMockMallLinkedProducts — 상품 patch', () => {
   });
 
   it('수정 시각과 수정자를 갱신한다', () => {
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: { name: 'x' } as Partial<Product> });
+    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: { name: 'x' } as Partial<Product> }, SETTINGS);
 
     expect(LINKED[0].updatedByEmail).toBe(EDITOR_EMAIL);
     expect(LINKED[0].updatedAt).not.toBe(ORIGINAL_TIME);
   });
 
   it('전송 관련 필드(status·lastSentAt·externalProductId)를 건드리지 않는다', () => {
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: { name: 'x' } as Partial<Product> });
+    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: { name: 'x' } as Partial<Product> }, SETTINGS);
 
     expect(LINKED[0].status).toBe('success');
     expect(LINKED[0].lastSentAt).toBe(ORIGINAL_TIME);
@@ -111,18 +113,21 @@ describe('bulkUpdateMockMallLinkedProducts — 상품 patch', () => {
       informationDisclosure: { key: 'wear', id: 'd_01', name: '의류', fields: { 제조자: '새제조사' } },
     } as unknown as Partial<Product>;
 
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: patch });
+    bulkUpdateMockMallLinkedProducts({ ...baseBody, productSnapshot: patch }, SETTINGS);
     LINKED[0].productSnapshot.informationDisclosure.fields.제조자 = '변조';
 
     expect((patch.informationDisclosure as { fields: Record<string, string> }).fields.제조자).toBe('새제조사');
   });
 
   it('타인 소유 건은 변경하지 않고 failCount에 센다', () => {
-    const result = bulkUpdateMockMallLinkedProducts({
-      ...baseBody,
-      ids: ['mlp_002'],
-      productSnapshot: { name: 'x' } as Partial<Product>,
-    });
+    const result = bulkUpdateMockMallLinkedProducts(
+      {
+        ...baseBody,
+        ids: ['mlp_002'],
+        productSnapshot: { name: 'x' } as Partial<Product>,
+      },
+      SETTINGS,
+    );
 
     expect(LINKED[1].productSnapshot.name).toBe('원본 상품명');
     expect(result).toEqual({ totalCount: 1, successCount: 0, failCount: 1 });
@@ -133,7 +138,7 @@ describe('bulkUpdateMockMallLinkedProducts — 설정 교체', () => {
   beforeEach(() => resetMocks());
 
   it('settingSnapshot을 오리지널 설정 값으로 교체하고 sourceShoppingSettingId를 갱신한다', () => {
-    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_002' });
+    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_002' }, SETTINGS);
 
     expect(LINKED[0].settingSnapshot.nickname).toBe('같은 계정 설정');
     expect(LINKED[0].settingSnapshot.shippingAddress?.code).toBe('addr_b');
@@ -142,14 +147,14 @@ describe('bulkUpdateMockMallLinkedProducts — 설정 교체', () => {
   });
 
   it('오리지널 설정과 스냅샷이 객체를 공유하지 않는다 (깊은 복사)', () => {
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_002' });
+    bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_002' }, SETTINGS);
     LINKED[0].settingSnapshot.shippingAddress!.name = '변조';
 
     expect(SETTINGS[0].shippingAddress?.name).toBe('새 출고지');
   });
 
   it('계정이 다른 설정은 적용하지 않고 failCount에 센다', () => {
-    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_003' });
+    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_003' }, SETTINGS);
 
     expect(LINKED[0].settingSnapshot.nickname).toBe('원본 설정명');
     expect(LINKED[0].sourceShoppingSettingId).toBe('ss_001');
@@ -157,7 +162,7 @@ describe('bulkUpdateMockMallLinkedProducts — 설정 교체', () => {
   });
 
   it('없는 설정 id면 적용하지 않고 failCount에 센다', () => {
-    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_없음' });
+    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, shoppingSettingId: 'ss_없음' }, SETTINGS);
 
     expect(LINKED[0].settingSnapshot.nickname).toBe('원본 설정명');
     expect(result).toEqual({ totalCount: 1, successCount: 0, failCount: 1 });
@@ -168,7 +173,7 @@ describe('bulkUpdateMockMallLinkedProducts — 잘못된 요청', () => {
   beforeEach(() => resetMocks());
 
   it('productSnapshot과 shoppingSettingId가 둘 다 없으면 null을 반환한다', () => {
-    expect(bulkUpdateMockMallLinkedProducts(baseBody)).toBeNull();
+    expect(bulkUpdateMockMallLinkedProducts(baseBody, SETTINGS)).toBeNull();
   });
 });
 
@@ -179,7 +184,7 @@ describe('bulkUpdateMockMallLinkedProducts — clearKeys', () => {
     // 원본에 customerCode를 심어 둔다 — 체크만 하고 값을 비운 상태를 흉내낸다.
     LINKED[0].productSnapshot.customerCode = 'C-001';
 
-    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['customerCode'] });
+    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['customerCode'] }, SETTINGS);
 
     expect('customerCode' in LINKED[0].productSnapshot).toBe(false);
     expect(LINKED[0].productSnapshot.name).toBe('원본 상품명');
@@ -188,14 +193,14 @@ describe('bulkUpdateMockMallLinkedProducts — clearKeys', () => {
 
   it('필수 그룹의 키는 clearKeys로 와도 지우지 않는다', () => {
     // 필수 값이 undefined가 되면 목록·수정 화면이 곧바로 깨진다 (price.toLocaleString() 등).
-    bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['price', 'name'] });
+    bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['price', 'name'] }, SETTINGS);
 
     expect(LINKED[0].productSnapshot.price).toBe(10000);
     expect(LINKED[0].productSnapshot.name).toBe('원본 상품명');
   });
 
   it('productSnapshot·shoppingSettingId 없이 clearKeys만 와도 정상 요청이다', () => {
-    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['customerCode'] });
+    const result = bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: ['customerCode'] }, SETTINGS);
 
     expect(result).toEqual({ totalCount: 1, successCount: 1, failCount: 0 });
   });
@@ -203,17 +208,20 @@ describe('bulkUpdateMockMallLinkedProducts — clearKeys', () => {
   it('patch와 clearKeys가 함께 오면 덮어쓰기와 지우기가 모두 적용된다', () => {
     LINKED[0].productSnapshot.customerCode = 'C-001';
 
-    bulkUpdateMockMallLinkedProducts({
-      ...baseBody,
-      productSnapshot: { name: '수정된 상품명' } as Partial<Product>,
-      clearKeys: ['customerCode'],
-    });
+    bulkUpdateMockMallLinkedProducts(
+      {
+        ...baseBody,
+        productSnapshot: { name: '수정된 상품명' } as Partial<Product>,
+        clearKeys: ['customerCode'],
+      },
+      SETTINGS,
+    );
 
     expect(LINKED[0].productSnapshot.name).toBe('수정된 상품명');
     expect('customerCode' in LINKED[0].productSnapshot).toBe(false);
   });
 
   it('빈 clearKeys 배열만 오면 여전히 잘못된 요청이다', () => {
-    expect(bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: [] })).toBeNull();
+    expect(bulkUpdateMockMallLinkedProducts({ ...baseBody, clearKeys: [] }, SETTINGS)).toBeNull();
   });
 });

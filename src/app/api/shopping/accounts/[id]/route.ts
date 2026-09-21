@@ -6,6 +6,7 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { findShoppingAccountWriteViolation } from '@/features/shoppingAccount/util/shoppingAccountWriteSchema';
 import { UpdateShoppingAccountBody } from '@/features/shoppingAccount/types/shoppingAccount.types';
+import { syncSettingMallId } from '@/features/shoppingSetting/util/syncSettingMallId';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -80,6 +81,18 @@ export async function PATCH(req: NextRequest, { params }: Context) {
       .returning(SHOPPING_ACCOUNT_PUBLIC_COLUMNS);
 
     if (!updated) return new NextResponse(null, { status: 404 });
+
+    // 설정이 들고 있는 mallId 사본을 맞춘다. neon-http에 트랜잭션이 없어 이 갱신만 실패할 수 있는데,
+    // 그때는 계정 수정을 성공으로 돌려준다 — 표시용 값 하나가 옛 값인 것이
+    // 계정 수정 자체가 실패하는 것보다 낫다.
+    if (values.mallId !== undefined) {
+      try {
+        await syncSettingMallId(id, session.ownerId, values.mallId);
+      } catch (error) {
+        console.error('설정 mallId 동기화 실패:', error);
+      }
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     // DrizzleQueryError.message는 SQL params(평문 password·apiKey)를 포함한다. cause만 남긴다.

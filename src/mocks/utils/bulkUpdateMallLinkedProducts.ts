@@ -10,7 +10,6 @@ import {
 } from '@/features/mallLinkedProduct/constant/productBulkEdit.constants';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
-import { MOCK_SHOPPING_SETTINGS_DATA } from '../data/MockShoppingSettingsData';
 import { isOwnerMatch } from './verifyOwnership';
 
 /**
@@ -40,6 +39,7 @@ const REQUIRED_PRODUCT_KEYS: ReadonlySet<keyof Product> = new Set(
  */
 export const bulkUpdateMockMallLinkedProducts = (
   body: BulkUpdateMallLinkedProductsBody,
+  settings: ShoppingSetting[],
 ): BulkUpdateMallLinkedProductsResult | null => {
   const { ownerId, ids, updatedByEmail, productSnapshot, shoppingSettingId, clearKeys } = body;
 
@@ -59,7 +59,7 @@ export const bulkUpdateMockMallLinkedProducts = (
 
     let nextSetting: ShoppingSetting | undefined;
     if (shoppingSettingId) {
-      const setting = MOCK_SHOPPING_SETTINGS_DATA.find((s) => s.id === shoppingSettingId);
+      const setting = settings.find((s) => s.id === shoppingSettingId);
       if (!setting || !isOwnerMatch(setting.ownerId, ownerId) || !isApplicableSetting(linked, setting)) {
         result.failCount += 1;
         return;
