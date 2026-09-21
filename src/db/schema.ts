@@ -1,6 +1,11 @@
 import { sql } from 'drizzle-orm';
 import { pgTable, text, integer, jsonb, timestamp, uniqueIndex, boolean } from 'drizzle-orm/pg-core';
 import type { OptionCombination, ProductInformationDisclosure } from '@/features/products/types/product.types';
+import type {
+  MallAddress,
+  NaverSettingAttributes,
+  KakaoSettingAttributes,
+} from '@/features/shoppingSetting/types/shoppingSetting.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
 
@@ -107,6 +112,32 @@ export const shoppingAccounts = pgTable('shopping_accounts', {
   // 읽기 경로는 SHOPPING_ACCOUNT_PUBLIC_COLUMNS만 통과하므로 여기 있는 것만으로는 새지 않는다.
   password: text('password').notNull(),
   apiKey: text('api_key').notNull(),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+});
+
+export const shoppingSettings = pgTable('shopping_settings', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull(),
+
+  mallAccountId: text('mall_account_id').notNull(),
+  mallCode: text('mall_code').notNull(),
+  // shopping_accounts.mallId의 사본이다. 쓰기 때 서버가 계정에서 읽어 채우고,
+  // 계정이 수정되면 syncSettingMallId가 따라 고친다(Task 11).
+  mallId: text('mall_id').notNull(),
+  nickname: text('nickname').notNull().default(''),
+  isActive: boolean('is_active').notNull().default(true),
+  productCondition: text('product_condition').notNull(),
+  salesPeriod: integer('sales_period').notNull(),
+
+  // 검색 조건에 등장하지 않아 통째로 읽고 통째로 쓴다.
+  // 폼을 거치는 쓰기 경로(shoppingSettingWriteSchema)는 주소를 필수로 요구한다. 컬럼을
+  // nullable로 두는 이유는 그 경로를 거치지 않고 만들어졌거나 만들어질 수 있는 행 때문이다 —
+  // 지금 이 컬럼이 null인 기존 행이 있다는 뜻은 아니다.
+  shippingAddress: jsonb('shipping_address').$type<MallAddress>(),
+  returnAddress: jsonb('return_address').$type<MallAddress>(),
+  mallSettings: jsonb('mall_settings').$type<NaverSettingAttributes | KakaoSettingAttributes>(),
 
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
