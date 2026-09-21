@@ -8,7 +8,8 @@ import { clampPositiveInt } from '@/shared/utils/pagination';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { ShoppingAccountSearchType } from '@/features/shoppingAccount/types/shoppingAccount.types';
 
-// 상한 1000은 MSW 어댑터(mocks/utils/fetchShoppingAccounts.ts)가 "사실상 전체"로 보내는 값이다.
+// 상한 1000은 화면 페이지네이션이 쓰는 값의 100배로, 필터 없이 "사실상 전체"를 한 번에 요청하는
+// 호출을 허용하면서도 무제한 조회는 막기 위한 값이다.
 const MAX_PAGE_SIZE = 1000;
 const DEFAULT_PAGE_SIZE = 10;
 
