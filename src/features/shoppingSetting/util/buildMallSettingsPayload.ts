@@ -3,23 +3,7 @@ import {
   KakaoSettingAttributes,
 } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { ShoppingMalls } from '@/types/common.type';
-
-const NAVER_SETTING_KEYS: (keyof NaverSettingAttributes)[] = [
-  'afterServiceContact',
-  'afterServiceGuide',
-  'purchaseReviewExposure',
-  'logisticsCompanyId',
-  'logisticsCenterId',
-  'certificationInfo',
-  'certificationExcludeReason',
-];
-
-const KAKAO_SETTING_KEYS: (keyof KakaoSettingAttributes)[] = [
-  'certs',
-  'additionalInfo',
-  'shoppingHowDisplayable',
-  'storeboardDisplayStatus',
-];
+import { NAVER_SETTING_KEYS, KAKAO_SETTING_KEYS } from '../constant/mallSettingKeys.constant';
 
 type MallSettingsSource = Partial<NaverSettingAttributes & KakaoSettingAttributes>;
 
