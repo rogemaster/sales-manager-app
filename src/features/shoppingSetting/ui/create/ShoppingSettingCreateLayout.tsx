@@ -58,6 +58,7 @@ export const ShoppingSettingCreateLayout = () => {
       isActive: true as const,
       productCondition: data.productCondition,
       salesPeriod: data.salesPeriod,
+      deliveryCompany: data.deliveryCompany,
       shippingAddress: data.shippingAddress,
       returnAddress: data.returnAddress,
     };

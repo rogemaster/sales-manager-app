@@ -16,6 +16,7 @@ export const SHOPPING_SETTING_COLUMNS = {
   isActive: shoppingSettings.isActive,
   productCondition: shoppingSettings.productCondition,
   salesPeriod: shoppingSettings.salesPeriod,
+  deliveryCompany: shoppingSettings.deliveryCompany,
   shippingAddress: shoppingSettings.shippingAddress,
   returnAddress: shoppingSettings.returnAddress,
   mallSettings: shoppingSettings.mallSettings,

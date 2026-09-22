@@ -1,3 +1,5 @@
+import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
+
 /** 남의 설정이든 없는 설정이든 같은 문구를 쓴다. 구분해 답하면 남의 id를 탐색하는 도구가 된다. */
 export const SETTING_NOT_FOUND_MESSAGE = '존재하지 않는 설정입니다.';
 
@@ -7,6 +9,7 @@ const ADDRESS_FIELD_MAX_LENGTH = 200;
 const PRODUCT_CONDITIONS = ['NEW', 'USED'];
 const SALES_PERIODS = [7, 15, 30, 60, 90];
 const ADDRESS_KEYS = ['code', 'name', 'zipCode', 'address', 'addressDetail'];
+const DELIVERY_COMPANY_IDS = DELIVERY_COMPANY.map(({ id }) => id);
 
 /** route가 받는 값은 폼을 거치지 않을 수 있어 타입을 믿을 수 없다. unknown으로 받아 여기서 좁힌다. */
 export type SettingWriteValues = Record<string, unknown>;
@@ -78,6 +81,11 @@ export const findShoppingSettingWriteViolation = (
       return '반품지를 선택해주세요.';
     }
     if (!isValidAddress(values.returnAddress)) return '반품지 값이 올바르지 않습니다.';
+  }
+
+  // 택배사는 순서 4 전송에서 네이버가 필수로 요구한다. 몰 중 가장 엄격한 쪽을 따라 입력 단계에서 필수다.
+  if (has('deliveryCompany') && !DELIVERY_COMPANY_IDS.includes(String(values.deliveryCompany))) {
+    return '택배사를 선택해주세요.';
   }
 
   return null;

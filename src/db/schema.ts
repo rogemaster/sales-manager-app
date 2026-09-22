@@ -1,11 +1,28 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, integer, jsonb, timestamp, uniqueIndex, boolean } from 'drizzle-orm/pg-core';
-import type { OptionCombination, ProductInformationDisclosure } from '@/features/products/types/product.types';
+import {
+  pgTable,
+  text,
+  integer,
+  jsonb,
+  timestamp,
+  uniqueIndex,
+  boolean,
+  index,
+  bigserial,
+  foreignKey,
+} from 'drizzle-orm/pg-core';
+import type { OptionCombination, ProductInformationDisclosure, Product } from '@/features/products/types/product.types';
 import type {
   MallAddress,
   NaverSettingAttributes,
   KakaoSettingAttributes,
 } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import type { StoredSettingSnapshot } from '@/features/mallLinkedProduct/util/linkedProductRecord';
+import type {
+  MallLinkSendAction,
+  MallLinkSendSource,
+  MallLinkStatus,
+} from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
 
@@ -130,6 +147,9 @@ export const shoppingSettings = pgTable('shopping_settings', {
   isActive: boolean('is_active').notNull().default(true),
   productCondition: text('product_condition').notNull(),
   salesPeriod: integer('sales_period').notNull(),
+  // DELIVERY_COMPANY의 id. 쓰기 스키마가 필수로 요구하고, 기본값 ''은 이 컬럼 추가 전에 만들어진 행용이다.
+  // ''이 남은 행으로 네이버에 보내면 시뮬레이터가 REQUIRED로 거절한다 — 조용히 넘어가지 않는다.
+  deliveryCompany: text('delivery_company').notNull().default(''),
 
   // 검색 조건에 등장하지 않아 통째로 읽고 통째로 쓴다.
   // 폼을 거치는 쓰기 경로(shoppingSettingWriteSchema)는 주소를 필수로 요구한다. 컬럼을
@@ -142,3 +162,68 @@ export const shoppingSettings = pgTable('shopping_settings', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 });
+
+/**
+ * 쇼핑몰 연동 데이터. 오리지널 상품·설정과 동기화되지 않는 독립 데이터다(domain-design.md).
+ *
+ * - mall_code·mall_account_id·mall_id는 불변이다. 수정 route의 UPDATE 문에 넣지 않는 것으로 지킨다.
+ * - source_*에 FK를 걸지 않는다. RESTRICT는 오리지널 삭제를 막고 CASCADE는 연동을 지운다 — 둘 다 규칙 위반이다.
+ * - 상품 스냅샷은 jsonb 통째다. 컬럼으로 펴면 Product 필드가 늘 때마다 두 테이블을 함께 마이그레이션해야 한다.
+ *   검색에 쓰는 두 값만 생성 컬럼으로 뽑는다 — DB가 파생을 강제하므로 스냅샷과 갈라질 수 없다.
+ */
+export const mallLinkedProducts = pgTable(
+  'mall_linked_products',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id').notNull(),
+
+    mallCode: text('mall_code').notNull(),
+    mallAccountId: text('mall_account_id').notNull(),
+    mallId: text('mall_id').notNull(),
+
+    sourceProductId: text('source_product_id').notNull(),
+    sourceShoppingSettingId: text('source_shopping_setting_id').notNull(),
+
+    status: text('status').$type<MallLinkStatus>().notNull(),
+    externalProductId: text('external_product_id'),
+    errorMessage: text('error_message'),
+
+    productSnapshot: jsonb('product_snapshot').$type<Product>().notNull(),
+    productName: text('product_name').generatedAlwaysAs(sql`(product_snapshot->>'name')`),
+    productState: text('product_state').generatedAlwaysAs(sql`(product_snapshot->>'state')`),
+    settingSnapshot: jsonb('setting_snapshot').$type<StoredSettingSnapshot>().notNull(),
+
+    createdByEmail: text('created_by_email').notNull(),
+    updatedByEmail: text('updated_by_email'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+    lastSentAt: timestamp('last_sent_at', { withTimezone: true }).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (table) => [index('mall_linked_products_owner_last_sent_idx').on(table.ownerId, table.lastSentAt.desc())],
+);
+
+/** 전송·재전송 1회당 1행. 연동 건에 종속된 기록이라 source_*와 달리 FK + CASCADE가 맞다. */
+export const mallLinkedProductHistories = pgTable(
+  'mall_linked_product_histories',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    linkedProductId: text('linked_product_id').notNull(),
+    ownerId: text('owner_id').notNull(),
+    action: text('action').$type<MallLinkSendAction>().notNull(),
+    status: text('status').$type<MallLinkStatus>().notNull(),
+    externalProductId: text('external_product_id'),
+    errorMessage: text('error_message'),
+    source: text('source').$type<MallLinkSendSource>().notNull(),
+    sentByEmail: text('sent_by_email').notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    // 자동 생성 이름이 Postgres 식별자 한도(63자)를 넘어 잘리면 push마다 FK를 다시 만든다 — 이름을 직접 준다.
+    foreignKey({
+      name: 'mall_linked_product_histories_linked_fk',
+      columns: [table.linkedProductId],
+      foreignColumns: [mallLinkedProducts.id],
+    }).onDelete('cascade'),
+    index('mall_linked_product_histories_linked_sent_idx').on(table.linkedProductId, table.sentAt.desc()),
+  ],
+);

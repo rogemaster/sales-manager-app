@@ -20,6 +20,7 @@ interface ShoppingSettingBase {
   isActive: boolean;
   productCondition: ProductCondition;
   salesPeriod: SalesPeriod;
+  deliveryCompany: string; // DELIVERY_COMPANY의 id. 택배 계약은 출고지 단위라 설정에 둔다
   shippingAddress: MallAddress | null;
   returnAddress: MallAddress | null;
   ownerId: string;

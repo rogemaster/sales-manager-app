@@ -26,6 +26,7 @@ import { useGetMallLinkedProduct } from '../../api/useGetMallLinkedProduct';
 import { MallLinkedProductSnapshots, useUpdateMallLinkedProduct } from '../../api/useUpdateMallLinkedProduct';
 import { useResendMallLinkedProducts } from '../../api/useResendMallLinkedProducts';
 import { MallLinkedProductInfoCard } from './MallLinkedProductInfoCard';
+import { MallLinkedProductHistoryCard } from './MallLinkedProductHistoryCard';
 
 type Props = {
   id: string;
@@ -56,6 +57,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
   const goList = () => router.push(LIST_PATH);
 
   // 이미지를 새로 골랐으면 저장 직전에 업로드해 R2 key로 바꾼다.
+  // 식별 필드는 타입을 채우려고 원본에서 가져온다. 서버는 이 값들을 저장하지 않는다(UPDATE에 불변 컬럼 없음).
   const buildSnapshots = async (record: MallLinkedProduct): Promise<MallLinkedProductSnapshots> => {
     const settingValues = settingForm.getValues();
     const productValues = productForm.getValues();
@@ -189,6 +191,8 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
           <ShoppingSettingMallInfoSection />
         </div>
       </FormProvider>
+
+      <MallLinkedProductHistoryCard id={id} />
 
       <div className="flex justify-end gap-3">
         <Button type="button" variant="outline" onClick={goList} disabled={isBusy}>

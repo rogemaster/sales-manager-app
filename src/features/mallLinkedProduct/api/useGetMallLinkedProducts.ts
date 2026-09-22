@@ -13,7 +13,7 @@ export const useGetMallLinkedProducts = () => {
 
   return useQuery({
     queryKey: [MALL_LINKED_PRODUCTS_QUERY_KEY, workspaceOwnerId, committedFilters, currentPage],
-    queryFn: () => getMallLinkedProducts(workspaceOwnerId, committedFilters, currentPage),
+    queryFn: () => getMallLinkedProducts(committedFilters, currentPage),
     enabled: !!workspaceOwnerId,
   });
 };

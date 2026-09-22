@@ -8,8 +8,8 @@ import { clampPositiveInt } from '@/shared/utils/pagination';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { ShoppingSettingSearchType } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
-// 상한 1000은 MSW 어댑터(mocks/utils/fetchShoppingSettings.ts)가 "사실상 전체"로 보내는 값이다.
-const MAX_PAGE_SIZE = 1000;
+// 상한은 다른 목록 route(예: linked-products/list)와 동일하게 맞춘다.
+const MAX_PAGE_SIZE = 100;
 const DEFAULT_PAGE_SIZE = 10;
 
 export async function POST(req: NextRequest) {

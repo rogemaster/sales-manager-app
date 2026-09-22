@@ -12,6 +12,7 @@ import {
   resetMallRegistrationStateAtom,
 } from '@/features/mallRegistration/store/mallRegistration.store';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
+import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
 
 export const MallRegistrationActionSection = () => {
   const selectedProductIds = useAtomValue(selectedProductIdsAtom);
@@ -45,6 +46,11 @@ export const MallRegistrationActionSection = () => {
       return;
     }
 
+    if (items.length > MALL_LINK_SEND_MAX_ITEMS) {
+      showAlert({ message: `한 번에 최대 ${MALL_LINK_SEND_MAX_ITEMS}건까지 전송할 수 있습니다.`, type: 'warning' });
+      return;
+    }
+
     registerToMalls(items, {
       onSuccess: ({ totalCount, successCount, failCount }) => {
         // 결과와 무관하게 staging은 항상 비운다.
@@ -61,8 +67,12 @@ export const MallRegistrationActionSection = () => {
           type: 'warning',
         });
       },
-      onError: () => {
-        showAlert({ message: '전송 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });
+      onError: (error) => {
+        showAlert({
+          message:
+            error instanceof Error && error.message ? error.message : '전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+          type: 'error',
+        });
       },
     });
   };

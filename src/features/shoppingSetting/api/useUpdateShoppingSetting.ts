@@ -11,7 +11,7 @@ export const useUpdateShoppingSetting = (id: string) => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   return useMutation({
-    mutationFn: (body: UpdateShoppingSettingBody) => updateShoppingSetting(id, body, workspaceOwnerId),
+    mutationFn: (body: UpdateShoppingSettingBody) => updateShoppingSetting(id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [SHOPPING_SETTING_LIST_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [SHOPPING_SETTING_QUERY_KEY, id, workspaceOwnerId] });
