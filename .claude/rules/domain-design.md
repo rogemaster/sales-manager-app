@@ -133,7 +133,7 @@
 - **연동 데이터 1건 = 외부 쇼핑몰 상품 1개** (외부몰이 부여한 `externalProductId` 1개).
 - 같은 상품을 같은 몰로 **여러 번 전송할 수 있고**, 그때마다 별도 연동 데이터가 생성된다. 외부몰이 중복이라 판단하면 실패 응답을 준다.
 - 스냅샷은 반드시 **깊은 복사**(`structuredClone`)로 만든다. 얕은 복사는 중첩 객체가 오리지널과 공유되어 위 원칙이 깨진다.
-- `MallLinkedProduct`는 **불변 식별 정보**(`sourceProductId`, `sourceShoppingSettingId`, `mallCode`)와 **가변 스냅샷**을 분리해 둔다. 수정 기능이 스냅샷만 건드리고 원본 추적 정보는 못 건드리게 하기 위해서다.
+- `MallLinkedProduct`는 **불변 식별 정보**(`sourceProductId`, `mallCode`, `mallAccountId`, `mallId`)와 **가변 필드**(`sourceShoppingSettingId`, 스냅샷)를 분리해 둔다. 수정 기능이 이 가변 필드만 건드리고 나머지 원본 추적 정보는 못 건드리게 하기 위해서다. `sourceShoppingSettingId`가 불변이 아닌 이유는 아래 "연동 데이터에서 수정할 수 없는 것" 절 참고.
 - 시각 필드는 셋으로 나뉜다 — `createdAt`(최초 생성) / `lastSentAt`(최종 전송, 화면의 '최종연동일시') / `updatedAt`(마지막 수정). 하나로 합치면 "수정만 하고 전송은 나중에" 하는 순간 의미가 갈라져 깨진다.
 
 설계 근거: `docs/superpowers/specs/2026-08-01-mall-linked-product-list-design.md`
@@ -153,26 +153,34 @@
 
 설계 근거: `docs/superpowers/specs/2026-08-03-mall-linked-product-edit-resend-design.md`
 
+**전송 이력(2026-09-22).** 전송·재전송 1회마다 `mall_linked_product_histories`에 1행이 쌓인다(`action` register/update, `source` simulator/random). 연동 건의 `status`·`errorMessage`는 덮어써지므로 회차별 결과는 여기에만 남는다. 이력 INSERT만 실패하면 연동 건은 외부몰 결과를 따른다 — 외부몰에 이미 반영된 결과를 부수 기록 실패로 "실패"라 적으면 사실과 어긋난다.
+
+**네이버는 시뮬레이터로 실제 전송한다.** 어댑터(`toNaverProductRequest`)는 값을 고치지 않는다 — 상품명 길이·빈 필수값을 그대로 보내 외부몰이 거절하게 둔다. 네이버 외 몰은 랜덤 판정(`judgeRandomSend`)이다.
+
 ### 연동 데이터에서 수정할 수 없는 것 — 쇼핑몰과 쇼핑몰계정
 
 이미 연동된 데이터의 **쇼핑몰(`mallCode`)과 쇼핑몰계정(`mallAccountId`·`mallId`)은 수정 대상이 아니다.** 연동 1건 = **특정 계정으로** 등록된 외부몰 상품 1개이므로, 계정이 바뀌면 그건 같은 상품의 수정이 아니라 **다른 상품**이다. 수정 화면에서 고칠 수 있는 것은 상품 값과 설정 값뿐이다.
 
-이 규칙은 문서만으로 지켜지지 않는다. 집행 지점이 두 곳이고, 둘 다 **폼이 돌려준 값에서 불변 필드(`id`·`ownerId`·`mallAccountId`·`mallId`·`mallCode`)를 원본 값으로 되돌리는** 방식이다.
+이 규칙은 문서만으로 지켜지지 않는다. 집행 지점이 두 곳이다 — 하나는 스키마(불변 필드가 top-level 컬럼이고 스냅샷에는 사본을 두지 않는다), 하나는 수정 route(`UPDATE`의 `SET`에 불변 3컬럼이 없어 무엇을 보내도 바뀌지 않는다).
 
 | 위치 | 역할 |
 |------|------|
-| `buildSnapshots` (`MallLinkedProductEditLayout`) | 폼 값에서 되돌린다. `mallCode`는 레코드, 나머지 넷은 원본 `settingSnapshot`이 정본 |
-| `updateMockMallLinkedProduct` (MSW) | 같은 필드를 기존 스냅샷 값으로 고정한다. **최종 방어선은 이쪽** |
+| `mall_linked_products` 컬럼 | `mall_code`·`mall_account_id`·`mall_id`가 top-level 컬럼이다. 스냅샷(`setting_snapshot`)에는 이 셋과 `id`·`ownerId`를 저장하지 않는다(`splitSettingSnapshot`) |
+| 수정 route (`PATCH /api/shopping/linked-products/[id]`, `/bulk`) | `UPDATE`의 `SET`에 불변 3컬럼이 없다. 무엇을 보내도 바뀌지 않는다 — **최종 방어선** |
 
-**왜 수정에만 이 장치가 필요한가 — 생성과 책임 분담이 다르다.** 생성(`createMockMallLinkedProducts`)은 클라이언트가 `{ productId, mallCode, shoppingSettingId }`만 보내고 **서버가 원본에서 읽어 스냅샷을 복사**하므로 어긋날 여지가 없다. 반면 수정은 **클라이언트가 완성된 스냅샷을 보내고 서버가 불변 필드를 지켜내는** 방식이라, 지켜내는 범위가 곧 이 규칙의 실효 범위다.
+**왜 수정에만 이 장치가 필요한가 — 생성과 책임 분담이 다르다.** 생성(`sendNewLinkedProducts`)은 클라이언트가 `{ productId, mallCode, shoppingSettingId }`만 보내고 **서버가 원본에서 읽어 스냅샷을 복사**하므로 어긋날 여지가 없다. 반면 수정은 **클라이언트가 완성된 스냅샷을 보내고 서버가 불변 필드를 지켜내는** 방식이라, 지켜내는 범위가 곧 이 규칙의 실효 범위다.
 
-**어긋나면 이제 목록에서 드러난다 (2026-08-27 변경).** 예전에는 목록이 top-level(`ownerId`·`mallCode`·`sourceShoppingSettingId`·`status`)과 `productSnapshot`만 읽어 `settingSnapshot`이 틀어져도 화면상 증상이 없었다. 지금은 목록이 `settingSnapshot`을 읽는 곳이 둘이다 — **쇼핑몰계정 필터**(`settingSnapshot.mallAccountId`)와 **테이블의 쇼핑몰계정·쇼핑몰정보설정 컬럼**(`mallId`·`nickname`). 불변 필드가 틀어지면 목록에서 바로 보이므로, 위 두 집행 지점의 실패가 조용히 묻히지는 않는다.
+**2026-09-22 DB화로 방어 방식이 바뀌었다.** 예전에는 폼 값에서 불변 필드를 "원본으로 되돌리는" 코드가 두 곳(`buildSnapshots`, MSW `updateMockMallLinkedProduct`)에 있었다. 지금은 불변 필드가 컬럼이라 **UPDATE에 넣지 않는 것**으로 끝난다. `buildSnapshots`에 남은 되돌리기는 `ShoppingSetting` 타입을 채우는 표시용이다.
 
-다만 **늦게 발견되는 파급은 그대로 남는다** — **재전송 payload가 다른 계정을 향하는 것**과 **수정 화면 주소록 조회(`watch('mallId')` 기준)가 틀어지는 것**은 목록만 봐서는 알 수 없다.
+**`sourceShoppingSettingId`는 불변이 아니다.** 일괄수정에서 같은 계정의 다른 설정으로 바뀐다. 불변은 쇼핑몰·쇼핑몰계정(`mallCode`·`mallAccountId`·`mallId`) 셋뿐이다.
 
-**목록 필터가 읽는 곳이 조건마다 다르다.** 설정 필터는 top-level `sourceShoppingSettingId`를, 계정 필터는 `settingSnapshot.mallAccountId`를 본다. 계정을 취향으로 스냅샷에서 읽는 게 아니라 **top-level에 계정 필드가 없어서** 생긴 비대칭이다. 새 필터를 붙일 때 top-level에 해당 필드가 있으면 그쪽을 쓰고, 없으면 스냅샷을 읽되 그 필드가 위 표의 불변 필드 목록에 들어 있는지 확인한다.
+**목록 필터는 전부 컬럼을 읽는다(2026-09-22).** 계정 필터가 `settingSnapshot.mallAccountId`를 파던 비대칭은 계정이 top-level 컬럼이 되며 사라졌다. 상품명·판매상태는 `product_snapshot`에서 뽑은 생성 컬럼(`product_name`·`product_state`)이다. 새 필터를 붙일 때 스냅샷 안의 값이 필요하면 생성 컬럼을 추가한다 — 사본 컬럼을 앱에서 채우지 않는다.
+
+재전송(`resendLinkedProducts`)도 클라이언트 payload가 아니라 연동 건 자신의 컬럼(`mallCode`·`mallAccountId`)만 읽어 외부몰을 호출한다 — "재전송이 다른 계정을 향한다"는 예전 문서가 우려하던 파급은 방어가 아니라 애초에 그 경로가 없어져 사라졌다.
 
 **주의 — 설정 폼 섹션 3개는 세 화면이 공유한다.** `ShoppingSettingBasicInfoSection`·`ShoppingSettingAddressSection`·`ShoppingSettingMallInfoSection`을 설정 등록/수정 화면(`ShoppingSettingForm` 경유)과 연동상품 수정 화면(래퍼 없이 직접 나열)이 함께 쓴다. 설정 화면 사정으로 이 섹션에 쇼핑몰계정 Select를 붙이면 **연동상품 수정 화면에도 그대로 딸려 들어간다.** 컴포넌트를 공유하면 의도하지 않은 화면까지 따라오는 전례는 [`ui-conventions.md`](ui-conventions.md)의 "검색 필터는 화면이 소유한다" 절 참고.
+
+설계 근거: `docs/superpowers/specs/2026-09-22-mall-linked-product-db-migration-design.md`
 
 ## 몰(mallCode)별 고유 필드 컴포넌트 분리 기준
 
