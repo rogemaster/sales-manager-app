@@ -11,11 +11,13 @@ export type MallLinkStatus = 'success' | 'failed';
  * 연동 데이터 1건 = 외부 쇼핑몰 상품 1개.
  */
 export interface MallLinkedProduct {
-  // ── 불변 식별 정보 ──
+  // ── 식별 정보 ──
+  // 불변은 mallCode와 settingSnapshot의 mallAccountId·mallId 셋이다(DB에서는 top-level 컬럼).
+  // sourceShoppingSettingId는 일괄수정에서 같은 계정의 다른 설정으로 바뀔 수 있다.
   id: string;
   ownerId: string;
   sourceProductId: string; // 파생된 오리지널 상품 (값 동기화 없음, 추적용)
-  sourceShoppingSettingId: string; // 파생된 오리지널 설정 (값 동기화 없음, 추적용)
+  sourceShoppingSettingId: string; // 적용된 오리지널 설정 (값 동기화 없음, 추적용, 가변)
   mallCode: ShoppingMalls;
 
   // ── 연동 결과 ──
@@ -28,11 +30,12 @@ export interface MallLinkedProduct {
   settingSnapshot: ShoppingSetting;
 
   // ── 로그 ──
+  // DB의 timestamptz가 JSON에서 ISO 문자열로 오지만 정보설정과 같은 표기를 쓴다. 화면은 dayjs로 찍는다.
   createdByEmail: string;
-  updatedByEmail?: string; // 수정 기능 도입 전까지는 비어 있음
-  createdAt: string; // 연동 데이터 최초 생성 시각
-  lastSentAt: string; // 최종 전송(연동) 시각 — 화면의 '최종연동일시'
-  updatedAt: string; // 마지막 수정 시각 (updatedByEmail과 짝)
+  updatedByEmail?: string;
+  createdAt: Date; // 연동 데이터 최초 생성 시각
+  lastSentAt: Date; // 최종 전송(연동) 시각 — 화면의 '최종연동일시'
+  updatedAt: Date; // 마지막 수정 시각 (updatedByEmail과 짝)
 }
 
 export type MallLinkedProductSearchType =
@@ -73,13 +76,11 @@ export interface CreateMallLinkedProductsResult {
 }
 
 export interface UpdateMallLinkedProductBody {
-  updatedByEmail: string;
   productSnapshot: Product;
   settingSnapshot: ShoppingSetting;
 }
 
 export interface ResendMallLinkedProductsBody {
-  ownerId: string;
   ids: string[];
 }
 
@@ -97,9 +98,7 @@ export interface ResendMallLinkedProductsResult {
  * clearKeys는 스냅샷에서 지울 키다. 셋 다 없으면 400이다.
  */
 export interface BulkUpdateMallLinkedProductsBody {
-  ownerId: string;
   ids: string[];
-  updatedByEmail: string;
   productSnapshot?: Partial<Product>;
   shoppingSettingId?: string;
   /**
@@ -114,4 +113,21 @@ export interface BulkUpdateMallLinkedProductsResult {
   totalCount: number;
   successCount: number;
   failCount: number;
+}
+
+export type MallLinkSendAction = 'register' | 'update';
+/** 판정 출처 — simulator는 시뮬레이터 실제 응답, random은 시뮬레이터가 없는 몰의 흉내낸 판정이다. */
+export type MallLinkSendSource = 'simulator' | 'random';
+
+/** 전송·재전송 1회의 기록. 연동 건의 status·externalProductId는 덮어써지므로 회차별 결과는 여기에만 남는다. */
+export interface MallLinkedProductHistory {
+  id: number;
+  linkedProductId: string;
+  action: MallLinkSendAction;
+  status: MallLinkStatus;
+  externalProductId: string | null;
+  errorMessage: string | null;
+  source: MallLinkSendSource;
+  sentByEmail: string;
+  sentAt: Date;
 }
