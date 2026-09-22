@@ -40,3 +40,11 @@ export const MALL_LINKED_SEARCH_TYPE: FilterOption[] = [
  * ex) 'code_A ' 로 검색하면 'code_A' 상품이 조회되지 않는다.
  */
 export const TRIMMED_SEARCH_TYPES: MallLinkedProductSearchType[] = ['productCode', 'externalProductCode'];
+
+/**
+ * 전송·재전송 1회 최대 건수. 건마다 외부 HTTP가 생기고 서버리스 함수 시간 안에 끝나야 한다.
+ * 큐를 두지 않고 처리 한도를 제품 정책으로 둔다(domain-design.md 프로젝트 규모 전제). route와 화면이 같은 값을 쓴다.
+ */
+export const MALL_LINK_SEND_MAX_ITEMS = 50;
+/** 동시에 외부몰로 보내는 건수. */
+export const MALL_LINK_SEND_CONCURRENCY = 5;
