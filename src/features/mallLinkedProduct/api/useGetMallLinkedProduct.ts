@@ -10,7 +10,7 @@ export const useGetMallLinkedProduct = (id: string) => {
 
   return useQuery({
     queryKey: [MALL_LINKED_PRODUCT_QUERY_KEY, id, workspaceOwnerId],
-    queryFn: () => getMallLinkedProduct(id, workspaceOwnerId),
+    queryFn: () => getMallLinkedProduct(id),
     enabled: !!workspaceOwnerId && !!id,
   });
 };

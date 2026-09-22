@@ -1,7 +1,4 @@
-import { MOCK_MALL_LINKED_PRODUCT_DATA } from '../data/MockMallLinkedProductsData';
-import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { Product } from '@/features/products/types/product.types';
-import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 export const isOwnerMatch = (resourceOwnerId: string, requestOwnerId: string | null): boolean =>
   !!requestOwnerId && resourceOwnerId === requestOwnerId;
@@ -23,24 +20,3 @@ export const areProductsOwnedBy = (productIds: string[], requestOwnerId: string 
     const product = products.find((p) => p.productId === productId);
     return !!product && isOwnerMatch(product.ownerId, requestOwnerId);
   });
-
-// 몰 연동 전송 요청은 상품(productId)·설정(shoppingSettingId) 두 리소스의 소유권을 함께 검증해야 한다.
-// 상품·설정 모두 호출자가 넘긴다 — 둘 다 Neon에 있어 MSW가 직접 읽을 수 없다.
-export const areMallLinkRequestsOwnedBy = (
-  items: MallLinkedProductRequestItem[],
-  requestOwnerId: string | null,
-  products: Product[],
-  settings: ShoppingSetting[],
-): boolean => {
-  const productIds = [...new Set(items.map((item) => item.productId))];
-  const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
-
-  return (
-    areProductsOwnedBy(productIds, requestOwnerId, products) && allOwnedBy(settingIds, requestOwnerId, settings)
-  );
-};
-
-// 연동 데이터는 식별자가 `id`라 제네릭 allOwnedBy를 그대로 쓸 수 있다.
-// 핸들러가 mock 데이터를 직접 import하지 않도록 얇은 래퍼로 감싼다 (msw-rules.md).
-export const areLinkedProductsOwnedBy = (ids: string[], requestOwnerId: string | null): boolean =>
-  allOwnedBy(ids, requestOwnerId, MOCK_MALL_LINKED_PRODUCT_DATA);

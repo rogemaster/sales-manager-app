@@ -1,22 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
-import { emailAtom, workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { BulkUpdateMallLinkedProductsBody } from '../types/mallLinkedProduct.types';
 import { MALL_LINKED_PRODUCTS_QUERY_KEY } from './useGetMallLinkedProducts';
 import { MALL_LINKED_PRODUCT_QUERY_KEY } from './useGetMallLinkedProduct';
 import { bulkUpdateMallLinkedProducts } from './bulkUpdateMallLinkedProducts';
 
-/** ownerId·updatedByEmail은 호출부가 넘기지 않는다 — useUpdateMallLinkedProduct와 같은 방식. */
-export type BulkUpdateVariables = Omit<BulkUpdateMallLinkedProductsBody, 'ownerId' | 'updatedByEmail'>;
+/** ownerId·updatedByEmail은 세션에서 서버가 채운다. */
+export type BulkUpdateVariables = BulkUpdateMallLinkedProductsBody;
 
 export const useBulkUpdateMallLinkedProducts = () => {
-  const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
-  const email = useAtomValue(emailAtom);
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (variables: BulkUpdateVariables) =>
-      bulkUpdateMallLinkedProducts({ ownerId: workspaceOwnerId, updatedByEmail: email, ...variables }),
+    mutationFn: (variables: BulkUpdateVariables) => bulkUpdateMallLinkedProducts(variables),
     onSuccess: () => {
       // 목록은 화면에 떠 있으므로 무효화하면 곧바로 다시 불러온다.
       queryClient.invalidateQueries({ queryKey: [MALL_LINKED_PRODUCTS_QUERY_KEY] });

@@ -1,15 +1,14 @@
 import { GetMallLinkedProductsResponse, MallLinkedProductSearch } from '../types/mallLinkedProduct.types';
 
 export const getMallLinkedProducts = async (
-  ownerId: string,
-  data: MallLinkedProductSearch,
+  filters: MallLinkedProductSearch,
   page: number,
   pageSize: number = 10,
 ): Promise<GetMallLinkedProductsResponse> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/linked-products/list`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ownerId, ...data, page, pageSize }),
+    body: JSON.stringify({ filters, page, pageSize }),
   });
 
   if (!response.ok) {

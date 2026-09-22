@@ -2,12 +2,11 @@ import { MallLinkedProduct, UpdateMallLinkedProductBody } from '../types/mallLin
 
 export const updateMallLinkedProduct = async (
   id: string,
-  ownerId: string,
   body: UpdateMallLinkedProductBody,
 ): Promise<MallLinkedProduct> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/linked-products/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 

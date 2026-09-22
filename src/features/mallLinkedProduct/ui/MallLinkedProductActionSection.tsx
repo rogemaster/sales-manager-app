@@ -7,6 +7,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { isSettingApplyModalOpenAtom, selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { useResendMallLinkedProducts } from '@/features/mallLinkedProduct/api/useResendMallLinkedProducts';
+import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
 
 type Props = {
   linkedProducts: MallLinkedProduct[];
@@ -29,6 +30,11 @@ export const MallLinkedProductActionSection = ({ linkedProducts }: Props) => {
       return;
     }
 
+    if (selectedLinkedIds.length > MALL_LINK_SEND_MAX_ITEMS) {
+      showAlert({ message: `한 번에 최대 ${MALL_LINK_SEND_MAX_ITEMS}건까지 전송할 수 있습니다.`, type: 'warning' });
+      return;
+    }
+
     resend(selectedLinkedIds, {
       onSuccess: ({ totalCount, successCount, failCount }) => {
         // 결과와 무관하게 선택을 비운다. 목록을 다시 불러오므로 처리된 행이 계속 체크돼 있으면 혼란스럽다.
@@ -45,9 +51,13 @@ export const MallLinkedProductActionSection = ({ linkedProducts }: Props) => {
           type: 'warning',
         });
       },
-      onError: () => {
+      onError: (error) => {
         setSelectedLinkedIds([]);
-        showAlert({ message: '전송 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });
+        showAlert({
+          message:
+            error instanceof Error && error.message ? error.message : '전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+          type: 'error',
+        });
       },
     });
   };
