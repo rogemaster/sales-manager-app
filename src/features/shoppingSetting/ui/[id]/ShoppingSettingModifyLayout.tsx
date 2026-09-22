@@ -37,6 +37,7 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
       nickname: data.nickname,
       productCondition: data.productCondition,
       salesPeriod: data.salesPeriod,
+      deliveryCompany: data.deliveryCompany,
       shippingAddress: data.shippingAddress,
       returnAddress: data.returnAddress,
     };

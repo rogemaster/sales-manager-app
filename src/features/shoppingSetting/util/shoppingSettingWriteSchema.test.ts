@@ -17,6 +17,7 @@ const VALID = {
   salesPeriod: 30,
   shippingAddress: ADDRESS,
   returnAddress: ADDRESS,
+  deliveryCompany: 'CJ',
 };
 
 describe('findShoppingSettingWriteViolation - create', () => {
@@ -78,6 +79,16 @@ describe('findShoppingSettingWriteViolation - create', () => {
       '반품지 값이 올바르지 않습니다.',
     );
   });
+
+  it('택배사가 없으면 거부한다', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { deliveryCompany: _omit, ...rest } = VALID;
+    expect(findShoppingSettingWriteViolation(rest)).toBe('택배사를 선택해주세요.');
+  });
+
+  it('목록에 없는 택배사면 거부한다', () => {
+    expect(findShoppingSettingWriteViolation({ ...VALID, deliveryCompany: 'DHL' })).toBe('택배사를 선택해주세요.');
+  });
 });
 
 describe('findShoppingSettingWriteViolation - partial', () => {
@@ -103,5 +114,13 @@ describe('findShoppingSettingWriteViolation - partial', () => {
     expect(findShoppingSettingWriteViolation({ salesPeriod: null }, 'partial')).toBe(
       '판매기간 값이 올바르지 않습니다.',
     );
+  });
+
+  it('partial에서 택배사를 빼고 보내면 검사하지 않는다', () => {
+    expect(findShoppingSettingWriteViolation({ nickname: '새 이름' }, 'partial')).toBeNull();
+  });
+
+  it('partial에서 택배사를 null로 보내면 거부한다', () => {
+    expect(findShoppingSettingWriteViolation({ deliveryCompany: null }, 'partial')).toBe('택배사를 선택해주세요.');
   });
 });

@@ -48,11 +48,17 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // mallAccountId가 불변인 이유: 설정은 생성 시점에 고른 계정에 묶여 있고, 계정이 바뀌면 그건
     // 같은 설정의 수정이 아니라 다른 설정이다(연동상품의 쇼핑몰·계정 불변과 같은 논리).
     const values: Record<string, unknown> = {};
-    ['nickname', 'isActive', 'productCondition', 'salesPeriod', 'shippingAddress', 'returnAddress'].forEach(
-      (key) => {
-        if (key in body) values[key] = body[key];
-      },
-    );
+    [
+      'nickname',
+      'isActive',
+      'productCondition',
+      'salesPeriod',
+      'deliveryCompany',
+      'shippingAddress',
+      'returnAddress',
+    ].forEach((key) => {
+      if (key in body) values[key] = body[key];
+    });
 
     const violation = findShoppingSettingWriteViolation(values, 'partial');
     if (violation) return NextResponse.json({ error: violation }, { status: 400 });
@@ -73,6 +79,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     if ('nickname' in values) values.nickname = String(values.nickname).trim();
     if ('productCondition' in values) values.productCondition = String(values.productCondition);
     if ('salesPeriod' in values) values.salesPeriod = Number(values.salesPeriod);
+    if ('deliveryCompany' in values) values.deliveryCompany = String(values.deliveryCompany);
     if ('shippingAddress' in values) values.shippingAddress = pickMallAddress(values.shippingAddress);
     if ('returnAddress' in values) values.returnAddress = pickMallAddress(values.returnAddress);
 

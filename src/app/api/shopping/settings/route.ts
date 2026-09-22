@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
         isActive: body.isActive as boolean,
         productCondition: String(body.productCondition),
         salesPeriod: Number(body.salesPeriod),
+        deliveryCompany: String(body.deliveryCompany),
         shippingAddress: pickMallAddress(body.shippingAddress),
         returnAddress: pickMallAddress(body.returnAddress),
         mallSettings: sanitizeMallSettings(account.mallCode as ShoppingMalls, body.mallSettings),

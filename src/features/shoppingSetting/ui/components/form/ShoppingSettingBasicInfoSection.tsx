@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShoppingSettingFormValues } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import {
   PRODUCT_CONDITION_OPTIONS,
   SALES_PERIOD_OPTIONS,
 } from '@/features/shoppingSetting/constant/shoppingSetting.constants';
+import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 
 export const ShoppingSettingBasicInfoSection = () => {
   const {
@@ -79,6 +81,32 @@ export const ShoppingSettingBasicInfoSection = () => {
                     </div>
                   ))}
                 </RadioGroup>
+                {fieldState.error && <p className="text-red-500 text-sm">{fieldState.error.message}</p>}
+              </>
+            )}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>택배사 *</Label>
+          <Controller
+            name="deliveryCompany"
+            control={control}
+            rules={{ required: '택배사를 선택해 주세요.' }}
+            render={({ field, fieldState }) => (
+              <>
+                <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-60">
+                    <SelectValue placeholder="택배사를 선택하세요." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DELIVERY_COMPANY.map((company) => (
+                      <SelectItem key={company.id} value={company.id}>
+                        {company.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {fieldState.error && <p className="text-red-500 text-sm">{fieldState.error.message}</p>}
               </>
             )}
