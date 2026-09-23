@@ -6,6 +6,7 @@ import { useUpdateShoppingAccount } from '@/features/shoppingAccount/api/useUpda
 import { UpdateShoppingAccountBody } from '@/features/shoppingAccount/types/shoppingAccount.types';
 import { ShoppingAccountForm, ShoppingAccountFormData } from '../form/ShoppingAccountForm';
 import { useAlert } from '@/hooks/useAlert';
+import { usePermission } from '@/features/auth/hook/usePermission';
 
 interface Props {
   id: string;
@@ -16,6 +17,7 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
   const { data: account, isPending: isAccountPending } = useGetShoppingAccount(id);
   const { mutate: updateAccount, isPending } = useUpdateShoppingAccount(id);
   const { showAlert } = useAlert();
+  const canUpdate = usePermission('shoppingAccount.update');
 
   const handleSubmit = (data: ShoppingAccountFormData) => {
     const body: UpdateShoppingAccountBody = {
@@ -48,7 +50,9 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
 
   if (!account) {
     return (
-      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">계정을 찾을 수 없습니다.</div>
+      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+        계정을 찾을 수 없습니다.
+      </div>
     );
   }
 
@@ -74,7 +78,13 @@ export const ShoppingAccountModifyLayout = ({ id }: Props) => {
           <p className="text-muted-foreground">쇼핑몰 계정 정보를 수정하세요.</p>
         </div>
       </div>
-      <ShoppingAccountForm mode="edit" defaultValues={defaultValues} onSubmit={handleSubmit} isSubmitting={isPending} />
+      <ShoppingAccountForm
+        mode="edit"
+        defaultValues={defaultValues}
+        onSubmit={handleSubmit}
+        isSubmitting={isPending}
+        readOnly={!canUpdate}
+      />
     </div>
   );
 };

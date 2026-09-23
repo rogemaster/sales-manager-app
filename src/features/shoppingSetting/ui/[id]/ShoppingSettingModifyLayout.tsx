@@ -13,6 +13,7 @@ import {
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { buildMallSettingsPayload } from '@/features/shoppingSetting/util/buildMallSettingsPayload';
 import { ShoppingSettingForm } from '../components/ShoppingSettingForm';
+import { usePermission } from '@/features/auth/hook/usePermission';
 
 interface Props {
   id: string;
@@ -25,6 +26,7 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
   const { mutate: updateSetting, isPending } = useUpdateShoppingSetting(id);
 
   const formData = useForm<ShoppingSettingFormValues>();
+  const canUpdate = usePermission('shoppingSetting.update');
 
   useEffect(() => {
     if (setting) {
@@ -66,7 +68,9 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
 
   if (!setting) {
     return (
-      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">설정을 찾을 수 없습니다.</div>
+      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+        설정을 찾을 수 없습니다.
+      </div>
     );
   }
 
@@ -80,7 +84,7 @@ export const ShoppingSettingModifyLayout = ({ id }: Props) => {
       </div>
       <FormProvider {...formData}>
         <form onSubmit={formData.handleSubmit(onSubmit)}>
-          <ShoppingSettingForm submitLabel="저장" isSubmitting={isPending} />
+          <ShoppingSettingForm submitLabel="저장" isSubmitting={isPending} readOnly={!canUpdate} />
         </form>
       </FormProvider>
     </div>

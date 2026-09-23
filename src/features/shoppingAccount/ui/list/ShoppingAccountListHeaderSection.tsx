@@ -1,15 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useAtomValue } from 'jotai';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { gradeAtom } from '@/features/auth/store/auth.store';
+import { usePermission } from '@/features/auth/hook/usePermission';
 
 export const ShoppingAccountListHeaderSection = () => {
   const router = useRouter();
-  const grade = useAtomValue(gradeAtom);
-  const canRegister = grade === 'super_admin' || grade === 'admin';
+  const canRegister = usePermission('shoppingAccount.create');
 
   return (
     <div className="flex items-center justify-between">
