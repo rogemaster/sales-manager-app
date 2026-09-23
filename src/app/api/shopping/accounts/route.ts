@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
-import { requireSession } from '@/shared/utils/apiAuth';
+import { requirePermission } from '@/shared/utils/apiAuth';
 import { generatorShoppingAccountCode } from '@/utils/codeGenerator';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { findShoppingAccountWriteViolation } from '@/features/shoppingAccount/util/shoppingAccountWriteSchema';
 import { CreateShoppingAccountBody } from '@/features/shoppingAccount/types/shoppingAccount.types';
 
 export async function POST(req: NextRequest) {
-  const session = await requireSession(req);
+  const session = await requirePermission(req, 'shoppingAccount.create');
   if (session instanceof NextResponse) return session;
 
   try {

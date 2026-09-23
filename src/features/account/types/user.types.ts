@@ -27,8 +27,11 @@ export interface AccountUser extends User {
 
 export interface CreateUserBody extends Omit<User, 'company' | 'location' | 'grade'> {
   password: string;
-  status: UserStatus;
   grade: SubUserGrade;
+}
+
+export interface ApproveUsersResult {
+  approvedCount: number;
 }
 
 export interface UserSearchType {

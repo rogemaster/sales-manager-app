@@ -6,6 +6,7 @@ import { ERROR_MESSAGE } from '@/features/auth/constant/errorMessage';
 import { validateAuthForm } from '../util/Validators';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { LOGIN_ERROR_CODE } from '@/features/auth/constant/loginError';
 
 export const useAuthForm = () => {
   const [formData, setFormData] = useState<LoginInfo>({ email: '', password: '' });
@@ -48,7 +49,12 @@ export const useAuthForm = () => {
       });
 
       if (result?.error) {
-        setErrors({ general: ERROR_MESSAGE.NOT_FOUND_USER });
+        setErrors({
+          general:
+            result.error === LOGIN_ERROR_CODE.PENDING_APPROVAL
+              ? ERROR_MESSAGE.PENDING_APPROVAL
+              : ERROR_MESSAGE.NOT_FOUND_USER,
+        });
       } else if (result?.ok) {
         // 로그인 성공
         setFormData({ email: '', password: '' });

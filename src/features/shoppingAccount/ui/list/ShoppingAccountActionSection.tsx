@@ -1,11 +1,11 @@
 'use client';
 
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { gradeAtom } from '@/features/auth/store/auth.store';
+import { usePermission } from '@/features/auth/hook/usePermission';
 import { selectedAccountsAtom } from '@/features/shoppingAccount/store/search.store';
 import { useDeleteShoppingAccounts } from '@/features/shoppingAccount/api/useDeleteShoppingAccounts';
 import { useUpdateShoppingAccountsStatus } from '@/features/shoppingAccount/api/useUpdateShoppingAccountsStatus';
@@ -14,15 +14,14 @@ import { buildBulkResultAlert } from '@/shared/utils/bulkResultAlert';
 import { useAlert } from '@/hooks/useAlert';
 
 export const ShoppingAccountActionSection = () => {
-  const grade = useAtomValue(gradeAtom);
   const [selectedAccounts, setSelectedAccounts] = useAtom(selectedAccountsAtom);
   const { mutate: deleteAccounts, isPending: isDeleting } = useDeleteShoppingAccounts();
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateShoppingAccountsStatus();
   const { showAlert } = useAlert();
   const [statusValue, setStatusValue] = useState<string>('true');
 
-  const canDelete = grade === 'super_admin';
-  const canChangeStatus = grade === 'super_admin' || grade === 'admin';
+  const canDelete = usePermission('shoppingAccount.delete');
+  const canChangeStatus = usePermission('shoppingAccount.changeStatus');
 
   if (!canDelete && !canChangeStatus) return null;
 

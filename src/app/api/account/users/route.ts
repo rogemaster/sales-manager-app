@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { and, eq, inArray } from 'drizzle-orm';
-import { requireSuperAdminSession } from '@/shared/utils/apiAuth';
+import { requirePermission } from '@/shared/utils/apiAuth';
 
 export async function DELETE(req: NextRequest) {
-  const session = await requireSuperAdminSession(req);
+  const session = await requirePermission(req, 'user.delete');
   if (session instanceof NextResponse) return session;
 
   try {

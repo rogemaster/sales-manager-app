@@ -119,12 +119,14 @@ const body: CreateUserBody = {
 };
 ```
 
+> **2026-09-23 갱신:** 새 사용자의 `status`는 이제 클라이언트가 보내지 않는다. 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`, `src/features/account/util/userStatus.ts`) — super_admin이 등록하면 `active`, admin이 등록하면 `pending`. `CreateUserBody`에서 `status`는 제거됐다.
+
 ### 4. Optional → Required 강제 변환은 Layout 경계에서만
 
 Zod에서 `.optional()`로 선언된 필드가 베이스 인터페이스에서 `string`이면, `?? ''` 강제 변환을 form 컴포넌트나 API 함수가 아닌 Layout 경계에서만 처리한다.
 
 ```typescript
-// ✅ 올바른 위치 — UserCreateLayout.tsx
+// ✅ 올바른 위치 (2026-09-23 이전 기준) — UserCreateLayout.tsx
 const body: CreateUserBody = {
   ...formData,
   status: 'pending',
@@ -135,6 +137,8 @@ const body: CreateUserBody = {
 // ❌ 잘못된 위치 — UserCreateForm.tsx (form 컴포넌트)
 // ❌ 잘못된 위치 — createUser.ts (API fetch 함수)
 ```
+
+> **2026-09-23 갱신:** 새 사용자의 `status`는 이제 클라이언트가 보내지 않는다. 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`, `src/features/account/util/userStatus.ts`) — super_admin이 등록하면 `active`, admin이 등록하면 `pending`. `CreateUserBody`에서 `status`는 제거됐다. 이 절의 요지(optional→required 강제 변환은 Layout 경계에서만)는 여전히 유효하다.
 
 ### 5. `Exclude<>` 로 용도 제한 서브타입 분리
 

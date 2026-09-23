@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
-import { requireSuperAdminSession } from '@/shared/utils/apiAuth';
+import { requireSession } from '@/shared/utils/apiAuth';
 
 export async function POST(req: NextRequest) {
-  const session = await requireSuperAdminSession(req);
+  // 사용자 목록 조회는 모든 등급에 허용한다(정책표 — 조회는 전 등급). 워크스페이스 필터는 아래에서 건다.
+  const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
   try {
@@ -36,7 +37,10 @@ export async function POST(req: NextRequest) {
 
     const where = and(...conditions);
 
-    const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(users).where(where);
+    const [{ total }] = await db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(users)
+      .where(where);
 
     const rows = await db
       .select()

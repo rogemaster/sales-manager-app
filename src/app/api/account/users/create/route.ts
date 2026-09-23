@@ -4,17 +4,20 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
 import { v4 as uuidv4 } from 'uuid';
-import { requireSuperAdminSession } from '@/shared/utils/apiAuth';
+import { requirePermission } from '@/shared/utils/apiAuth';
+import { isSubUserGrade, resolveNewUserStatus } from '@/features/account/util/userStatus';
 
 export async function POST(req: NextRequest) {
-  const session = await requireSuperAdminSession(req);
+  const session = await requirePermission(req, 'user.create');
   if (session instanceof NextResponse) return session;
 
   try {
-    const { email, password, name, phone, grade, status, avatar, bio } = await req.json();
+    // status는 읽지 않는다 — 등록자 등급으로 서버가 정한다.
+    const { email, password, name, phone, grade, avatar, bio } = await req.json();
 
-    if (grade === 'super_admin') {
-      return NextResponse.json({ error: '허용되지 않는 등급입니다.' }, { status: 403 });
+    // admin이 super_admin을 만들 수 있느냐는 권한 문제라 여기서 막는다. 나머지 필드 검증은 로드맵 1-3.
+    if (!isSubUserGrade(grade)) {
+      return NextResponse.json({ error: '허용되지 않는 등급입니다.' }, { status: 400 });
     }
 
     const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
     await db.insert(users).values({
       id,
       ownerId: session.ownerId,
-      status: status ?? 'active',
+      status: resolveNewUserStatus(session.grade),
       email,
       password: await hashPassword(password),
       name: name ?? '',

@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { verifyPassword } from '@/db/password';
+import { LOGIN_ERROR_CODE } from '@/features/auth/constant/loginError';
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -27,30 +28,37 @@ const authOptions: NextAuthOptions = {
           return null;
         }
 
+        let user: typeof users.$inferSelect | undefined;
         try {
           const result = await db.select().from(users).where(eq(users.email, credentials.email)).limit(1);
-          const user = result[0];
+          user = result[0];
           if (!user) return null;
 
           const isValid = await verifyPassword(credentials.password, user.password);
           if (!isValid) return null;
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            ownerId: user.ownerId as string,
-            grade: user.grade as UserGrade,
-            avatar: user.avatar ?? '',
-            phone: user.phone,
-            bio: user.bio,
-            company: user.company,
-            location: user.location,
-          };
         } catch (error) {
           console.error('인증 DB 조회 중 에러:', error);
           return null;
         }
+
+        // 비밀번호가 맞은 뒤에만 판정한다 — 틀린 비밀번호로 "승인 대기 계정"인지 알아낼 수 없게.
+        // try 밖에 두는 이유: 위 catch가 이 오류까지 null로 삼키면 클라이언트가 사유를 구분할 수 없다.
+        if (user.status === 'pending') {
+          throw new Error(LOGIN_ERROR_CODE.PENDING_APPROVAL);
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          ownerId: user.ownerId as string,
+          grade: user.grade as UserGrade,
+          avatar: user.avatar ?? '',
+          phone: user.phone,
+          bio: user.bio,
+          company: user.company,
+          location: user.location,
+        };
       },
     }),
   ],

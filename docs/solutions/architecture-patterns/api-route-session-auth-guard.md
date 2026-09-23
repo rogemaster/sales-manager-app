@@ -60,16 +60,17 @@ export async function requireSession(req: NextRequest): Promise<ApiSession | Nex
   if (!token) return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
   return {
     id: token.id,
-    ownerId: token.ownerId ?? token.id, // 과거 null 데이터 하위호환 (workspaceOwnerIdAtom과 동일 fallback)
+    ownerId: token.ownerId,
     grade: token.grade,
     email: token.email ?? '',
   };
 }
 
-export async function requireSuperAdminSession(req: NextRequest): Promise<ApiSession | NextResponse> {
+// 등급 판정은 정책표(src/shared/utils/permission.ts)를 읽는다. UI의 usePermission과 같은 표다.
+export async function requirePermission(req: NextRequest, permission: Permission): Promise<ApiSession | NextResponse> {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
-  if (session.grade !== 'super_admin') {
+  if (!can(session.grade, permission)) {
     return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 });
   }
   return session;
@@ -84,7 +85,7 @@ export async function requireSuperAdminSession(req: NextRequest): Promise<ApiSes
 
 ```typescript
 export async function DELETE(req: NextRequest) {
-  const session = await requireSuperAdminSession(req);
+  const session = await requirePermission(req, 'user.delete');
   if (session instanceof NextResponse) return session; // 401/403 즉시 반환
 
   try {
@@ -93,7 +94,7 @@ export async function DELETE(req: NextRequest) {
 }
 ```
 
-- 사용자 관리(`account/users` 3개 라우트)처럼 등급 제한이 필요하면 `requireSuperAdminSession`
+- 등급 제한이 필요한 쓰기(정책표 `PERMISSIONS`에 키가 있는 동작)는 `requirePermission(req, '<permission>')` — 2026-09-23 `requireSuperAdminSession`을 대체했다. 정책을 route에 하드코딩하지 않고 표를 읽어야 UI와 어긋나지 않는다
 - 본인 프로필 수정처럼 등급 무관하게 허용해야 하면 `requireSession`
 - 인증 실패(401)와 서버 에러(500)는 별개 관심사이므로 가드를 `try` 블록 **밖**에 둔다
 
@@ -105,7 +106,7 @@ export async function DELETE(req: NextRequest) {
 
 - middleware matcher에 페이지 경로만 등록하는 관행이, "미들웨어가 인증을 담당한다"는 잘못된 안전감을 만든다. 실제로는 라우트별로 확인해야 한다.
 - `auth-db-msw-boundary.md`의 판단 기준("유저 인증·식별에 직접 연관되면 DB")대로 새 route.ts를 추가할 때마다, 그 라우트가 middleware 보호 밖이라는 사실과 이 가드 패턴을 함께 적용하지 않으면 같은 구멍이 반복된다.
-- 클라이언트 타입 제약(`CreateUserBody.grade: SubUserGrade` 등)은 컴파일 타임에만 유효하다 — 원시 HTTP 요청은 타입을 우회할 수 있으므로 권한이 중요한 필드는 서버에서도 별도로 검증해야 한다(예: `account/users/create`가 body의 `grade === 'super_admin'`을 명시적으로 거부).
+- 클라이언트 타입 제약(`CreateUserBody.grade: SubUserGrade` 등)은 컴파일 타임에만 유효하다 — 원시 HTTP 요청은 타입을 우회할 수 있으므로 권한이 중요한 필드는 서버에서도 별도로 검증해야 한다(예: `account/users/create`가 body의 `grade === 'super_admin'`을 명시적으로 거부). 2026-09-23부터는 `isSubUserGrade`로 허용 목록(`admin`·`operator`)만 받는다.
 
 ## When to Apply
 
@@ -119,4 +120,5 @@ export async function DELETE(req: NextRequest) {
 - `[[single-item-ownership-header-pattern]]` — MSW 쪽 ownerId 검증 패턴(X-Owner-Id 헤더), bulk 액션의 fail-closed 원칙
 - `[[user-hierarchy-ownerid-pattern]]` — ownerId 테넌트 격리 원 설계
 - `src/shared/utils/apiAuth.ts`, `src/shared/utils/apiAuth.test.ts`
+- `src/shared/utils/permission.ts` — 등급 정책표(정본), `src/app/api/routePermissions.test.ts` — route 권한 거부 계약 테스트
 - `docs/superpowers/specs/2026-07-15-bulk-ownerid-fail-closed-and-api-auth-guard-design.md` — 설계 문서 전문

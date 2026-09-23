@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { and, eq, inArray } from 'drizzle-orm';
-import { requireSession } from '@/shared/utils/apiAuth';
+import { requirePermission } from '@/shared/utils/apiAuth';
 import { BulkAccountResult } from '@/features/shoppingAccount/types/shoppingAccount.types';
 import { ACCOUNT_NOT_FOUND_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 
 export async function POST(req: NextRequest) {
-  const session = await requireSession(req);
+  const session = await requirePermission(req, 'shoppingAccount.delete');
   if (session instanceof NextResponse) return session;
 
   try {

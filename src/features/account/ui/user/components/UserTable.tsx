@@ -4,10 +4,11 @@ import { useAtom } from 'jotai';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { selectedUsersAtom } from '@/features/account/store/userSearch.store';
-import { USER_TABLE_HEAD, USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
+import { USER_TABLE_HEAD, USER_GRADE_OPTIONS, USER_STATUS_OPTIONS } from '@/features/account/constant/user.constants';
 import { AccountUser } from '@/features/account/types/user.types';
 
 const gradeLabel = (grade: string) => USER_GRADE_OPTIONS.find((o) => o.id === grade)?.name ?? grade;
+const statusLabel = (status: string) => USER_STATUS_OPTIONS.find((o) => o.id === status)?.name ?? status;
 
 interface UserTableProps {
   users: AccountUser[];
@@ -58,7 +59,10 @@ export const UserTable = ({ users }: UserTableProps) => {
           </TableRow>
         ) : (
           users.map((user) => (
-            <TableRow key={user.id} className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30">
+            <TableRow
+              key={user.id}
+              className="group h-14 border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
+            >
               <TableCell onClick={(e) => e.stopPropagation()}>
                 <Checkbox
                   checked={selectedUsers.includes(user.id)}
@@ -66,6 +70,7 @@ export const UserTable = ({ users }: UserTableProps) => {
                 />
               </TableCell>
               <TableCell className="text-center">{gradeLabel(user.grade)}</TableCell>
+              <TableCell className="text-center">{statusLabel(user.status)}</TableCell>
               <TableCell className="text-center">{user.email}</TableCell>
               <TableCell className="text-center">{user.name}</TableCell>
               <TableCell className="text-center">{user.createdAt}</TableCell>

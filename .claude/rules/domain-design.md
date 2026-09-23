@@ -96,7 +96,12 @@
 
 ### 동작 규칙
 
-- 로그인한 슈퍼계정은 자신의 `id === ownerId`인 유저만 사용자 관리에서 조회/수정 가능 (슈퍼계정 자신도 이 조건을 만족)
+- 사용자 관리는 로그인 계정의 워크스페이스(`ownerId`)에 속한 유저만 다룬다 (슈퍼계정 자신도 `ownerId === id`라 포함된다)
+- **등급 정책의 정본은 `src/shared/utils/permission.ts`의 `PERMISSIONS` 표다.** UI(`usePermission`)와 API(`requirePermission`)가 이 표 하나를 읽는다. 등급 문자열을 화면이나 route에서 직접 비교하지 않는다. 표에 없는 동작은 로그인한 모든 등급에 허용된다. 단, 새 사용자 상태를 정하는 `resolveNewUserStatus`의 `=== 'super_admin'` 비교는 권한 판정이 아니라 상태 규칙이라 예외다.
+  - 원칙: **설정**(쇼핑몰계정·정보설정) 쓰기는 super_admin·admin, **일상 업무**(상품·연동상품)는 전 등급, 조회는 전 등급
+  - 사용자관리: 등록 super_admin·admin / 승인·삭제 super_admin / 목록 조회 전 등급
+- **사용자 승인 흐름:** admin이 등록한 사용자는 `pending`, super_admin이 등록하면 `active`다. 상태는 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`) — 클라이언트가 보낸 `status`는 받지 않는다. super_admin이 목록에서 승인하면 `active`가 되고, `pending` 계정은 로그인할 수 없다. 거절은 별도 상태 없이 삭제로 한다.
+  - **Why:** 2026-05-30 스펙이 승인 흐름을 정했지만 승인 주체·화면·API가 빠져 있었고, 2026-07-15 API 가드가 사용자관리를 super_admin 전용으로 막아 UI(admin 등록 버튼)와 반대로 어긋났다. 2026-09-23에 정책표를 한 곳으로 모으며 완성했다. 설계: `docs/superpowers/specs/2026-09-23-grade-permission-policy-design.md`
 - `super_admin`은 가입(회원가입) 플로우에서만 생성됨
 - `workspaceOwnerIdAtom`(`ownerId ?? id`)은 과거 `null` 데이터에 대한 하위호환 fallback이다. 신규 가입 계정은 `ownerId`가 항상 채워지므로 이 fallback 없이도 동작하지만, 안전을 위해 유지한다.
 

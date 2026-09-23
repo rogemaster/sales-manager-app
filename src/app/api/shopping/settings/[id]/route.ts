@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
-import { requireSession } from '@/shared/utils/apiAuth';
+import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 }
 
 export async function PATCH(req: NextRequest, { params }: Context) {
-  const session = await requireSession(req);
+  const session = await requirePermission(req, 'shoppingSetting.update');
   if (session instanceof NextResponse) return session;
 
   const { id } = await params;
