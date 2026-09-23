@@ -13,12 +13,20 @@ import {
   MallLinkedProductRequestItem,
   ResendMallLinkedProductsResult,
 } from '../types/mallLinkedProduct.types';
-import { splitSettingSnapshot, toMallLinkedProduct } from '../util/linkedProductRecord';
+import { toMallLinkedProduct } from '../util/linkedProductRecord';
 import { MALL_LINK_SEND_CONCURRENCY } from '../constant/mallLinkedProduct.constants';
+import {
+  buildHistoryEntry,
+  buildNewLinkedRow,
+  buildResendUpdate,
+  resolveSendAction,
+  SendActor,
+  tallySendResults,
+} from '../util/linkedProductWrite';
 import { LINKED_PRODUCT_COLUMNS, recordHistory } from './linkedProductStore';
 import { sendToMall } from './sendToMall';
 
-export type SendActor = { ownerId: string; email: string };
+export type { SendActor };
 
 /** 계정 id → API Key. 같은 워크스페이스 계정만 읽는다. 키는 이 함수 밖(응답)으로 나가지 않는다. */
 const loadApiKeys = async (ownerId: string, accountIds: string[]): Promise<Map<string, string>> => {
@@ -28,18 +36,6 @@ const loadApiKeys = async (ownerId: string, accountIds: string[]): Promise<Map<s
     .from(shoppingAccounts)
     .where(and(inArray(shoppingAccounts.id, accountIds), eq(shoppingAccounts.ownerId, ownerId)));
   return new Map(rows.map(({ id, apiKey }) => [id, apiKey]));
-};
-
-const tally = (results: PromiseSettledResult<boolean | null>[]) => {
-  const result = { totalCount: 0, successCount: 0, failCount: 0 };
-  results.forEach((settled) => {
-    // null은 대상이 없어 건너뛴 건이다(남의 것·없는 것). 기존 MSW와 같이 집계에서 뺀다.
-    if (settled.status === 'fulfilled' && settled.value === null) return;
-    result.totalCount += 1;
-    if (settled.status === 'fulfilled' && settled.value) result.successCount += 1;
-    else result.failCount += 1;
-  });
-  return result;
 };
 
 /**
@@ -90,36 +86,8 @@ export const sendNewLinkedProducts = async (
 
     const now = new Date();
     const id = `mlp_${randomUUID().slice(0, 8)}`;
-    await db.insert(mallLinkedProducts).values({
-      id,
-      ownerId: actor.ownerId,
-      mallCode,
-      mallAccountId: setting.mallAccountId,
-      mallId: setting.mallId,
-      sourceProductId: product.productId,
-      sourceShoppingSettingId: setting.id,
-      status: outcome.status,
-      externalProductId: outcome.externalProductId ?? null,
-      errorMessage: outcome.errorMessage ?? null,
-      productSnapshot: structuredClone(product),
-      settingSnapshot: splitSettingSnapshot(setting),
-      createdByEmail: actor.email,
-      createdAt: now,
-      lastSentAt: now,
-      updatedAt: now,
-    });
-
-    await recordHistory({
-      linkedProductId: id,
-      ownerId: actor.ownerId,
-      action: 'register',
-      status: outcome.status,
-      externalProductId: outcome.externalProductId ?? null,
-      errorMessage: outcome.errorMessage ?? null,
-      source: outcome.source,
-      sentByEmail: actor.email,
-      sentAt: now,
-    });
+    await db.insert(mallLinkedProducts).values(buildNewLinkedRow({ id, actor, product, setting, outcome, now }));
+    await recordHistory(buildHistoryEntry({ linkedProductId: id, actor, action: 'register', outcome, now }));
 
     return outcome.status === 'success';
   });
@@ -127,7 +95,7 @@ export const sendNewLinkedProducts = async (
   results.forEach((settled) => {
     if (settled.status === 'rejected') console.error('연동 전송 중 에러:', settled.reason);
   });
-  return tally(results);
+  return tallySendResults(results);
 };
 
 /**
@@ -152,7 +120,7 @@ export const resendLinkedProducts = async (
     const linked = linkedById.get(id);
     if (!linked) return null;
 
-    const action = linked.externalProductId ? 'update' : 'register';
+    const action = resolveSendAction(linked.externalProductId);
     const outcome = await sendToMall({
       ownerId: actor.ownerId,
       mallCode: linked.mallCode,
@@ -166,25 +134,10 @@ export const resendLinkedProducts = async (
     const now = new Date();
     await db
       .update(mallLinkedProducts)
-      .set({
-        status: outcome.status,
-        externalProductId: outcome.externalProductId ?? linked.externalProductId ?? null,
-        errorMessage: outcome.status === 'success' ? null : (outcome.errorMessage ?? null),
-        lastSentAt: now,
-      })
+      .set(buildResendUpdate(linked.externalProductId, outcome, now))
       .where(and(eq(mallLinkedProducts.id, id), eq(mallLinkedProducts.ownerId, actor.ownerId)));
 
-    await recordHistory({
-      linkedProductId: id,
-      ownerId: actor.ownerId,
-      action,
-      status: outcome.status,
-      externalProductId: outcome.externalProductId ?? null,
-      errorMessage: outcome.errorMessage ?? null,
-      source: outcome.source,
-      sentByEmail: actor.email,
-      sentAt: now,
-    });
+    await recordHistory(buildHistoryEntry({ linkedProductId: id, actor, action, outcome, now }));
 
     return outcome.status === 'success';
   });
@@ -192,5 +145,5 @@ export const resendLinkedProducts = async (
   results.forEach((settled) => {
     if (settled.status === 'rejected') console.error('연동 재전송 중 에러:', settled.reason);
   });
-  return tally(results);
+  return tallySendResults(results);
 };
