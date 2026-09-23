@@ -4,7 +4,6 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,16 +15,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { getUserInfoAtom, setUserInfoAtom } from '@/features/auth/store/auth.store';
 import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { useUpdateProfile } from '@/features/profile/api/useUpdateProfile';
-import { phoneSchemaRequired } from '@/shared/utils/phone';
-
-const profileEditSchema = z.object({
-  name: z.string().min(1, '이름을 입력해주세요.'),
-  phone: phoneSchemaRequired(),
-  company: z.string().optional(),
-  bio: z.string().optional(),
-});
-
-type ProfileEditFormData = z.infer<typeof profileEditSchema>;
+import { ProfileEditFormData, profileEditSchema } from '@/features/profile/util/profileEditSchema';
 
 export const ProfileEditLayout = () => {
   const userInfo = useAtomValue(getUserInfoAtom);

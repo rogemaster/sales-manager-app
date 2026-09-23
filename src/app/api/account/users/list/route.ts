@@ -3,14 +3,19 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { userListRequestSchema } from '@/features/account/util/userListRequestSchema';
 
 export async function POST(req: NextRequest) {
   // 사용자 목록 조회는 모든 등급에 허용한다(정책표 — 조회는 전 등급). 워크스페이스 필터는 아래에서 건다.
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
+  const body = await parseRequestBody(req, userListRequestSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    const { filters, page, pageSize } = await req.json();
+    const { filters, page, pageSize } = body;
     const { dateType, startDate, endDate, grade, searchType, searchValue } = filters;
 
     const conditions = [eq(users.ownerId, session.ownerId)];

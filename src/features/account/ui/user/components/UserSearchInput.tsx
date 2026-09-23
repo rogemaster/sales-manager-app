@@ -14,6 +14,7 @@ import {
   currentPageAtom,
 } from '@/features/account/store/userSearch.store';
 import { USER_SEARCH_TYPE } from '@/features/account/constant/user.constants';
+import { TEXT_LIMITS } from '@/shared/utils/textLimit';
 
 export const UserSearchInput = () => {
   const [searchType, setSearchType] = useAtom(userSearchTypeAtom);
@@ -57,6 +58,7 @@ export const UserSearchInput = () => {
           value={inputValue}
           onChange={handleSearchInput}
           onKeyDown={handleKeyDown}
+          maxLength={TEXT_LIMITS.search}
         />
       </div>
       <Button onClick={handleSearch}>
