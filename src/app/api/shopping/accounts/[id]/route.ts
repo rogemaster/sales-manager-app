@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
-import { requireSession } from '@/shared/utils/apiAuth';
+import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { findShoppingAccountWriteViolation } from '@/features/shoppingAccount/util/shoppingAccountWriteSchema';
 import { UpdateShoppingAccountBody } from '@/features/shoppingAccount/types/shoppingAccount.types';
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 }
 
 export async function PATCH(req: NextRequest, { params }: Context) {
-  const session = await requireSession(req);
+  const session = await requirePermission(req, 'shoppingAccount.update');
   if (session instanceof NextResponse) return session;
 
   const { id } = await params;

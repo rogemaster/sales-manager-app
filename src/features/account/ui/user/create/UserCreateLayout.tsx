@@ -10,6 +10,7 @@ import { gradeAtom } from '@/features/auth/store/auth.store';
 import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { CreateUserBody } from '@/features/account/types/user.types';
 import { useCreateUser } from '@/features/account/api/useCreateUser';
+import { resolveNewUserStatus } from '@/features/account/util/userStatus';
 import { UserCreateForm, CreateUserFormData, createUserSchema } from './UserCreateForm';
 
 export const UserCreateLayout = () => {
@@ -18,7 +19,8 @@ export const UserCreateLayout = () => {
   const { showAlert } = useAlert();
   const { mutate, isPending } = useCreateUser();
 
-  const isSuperAdmin = grade === 'super_admin';
+  // 버튼 문구용 예상값. 실제 상태는 서버가 정하고, 완료 알림은 응답의 status를 따른다.
+  const willBePending = resolveNewUserStatus(grade) === 'pending';
   const gradeOptions = USER_GRADE_OPTIONS.filter((o) => o.id !== 'super_admin');
 
   const form = useForm<CreateUserFormData>({
@@ -31,20 +33,23 @@ export const UserCreateLayout = () => {
       ...data,
       avatar: data.avatar ?? '',
       bio: data.bio ?? '',
-      status: isSuperAdmin ? 'active' : 'pending',
     };
     mutate(body, {
-      onSuccess: () => {
+      onSuccess: (user) => {
         showAlert({
           type: 'success',
-          message: isSuperAdmin
-            ? '사용자가 등록되었습니다.'
-            : '등록 요청이 완료되었습니다. 슈퍼관리자 승인 후 활성화됩니다.',
+          message:
+            user.status === 'pending'
+              ? '등록 요청이 완료되었습니다. 슈퍼관리자 승인 후 활성화됩니다.'
+              : '사용자가 등록되었습니다.',
           onConfirm: () => router.push('/account/user'),
         });
       },
-      onError: () => {
-        showAlert({ type: 'error', message: '사용자 등록에 실패했습니다.' });
+      onError: (error) => {
+        showAlert({
+          type: 'error',
+          message: error instanceof Error && error.message ? error.message : '사용자 등록에 실패했습니다.',
+        });
       },
     });
   };
@@ -63,7 +68,7 @@ export const UserCreateLayout = () => {
               취소
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isSuperAdmin ? '등록' : '등록요청'}
+              {willBePending ? '등록요청' : '등록'}
             </Button>
           </div>
         </form>

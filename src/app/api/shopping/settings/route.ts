@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { db } from '@/db';
 import { shoppingAccounts, shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
-import { requireSession } from '@/shared/utils/apiAuth';
+import { requirePermission } from '@/shared/utils/apiAuth';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
@@ -11,7 +11,7 @@ import { pickMallAddress } from '@/features/shoppingSetting/util/pickMallAddress
 import { ShoppingMalls } from '@/types/common.type';
 
 export async function POST(req: NextRequest) {
-  const session = await requireSession(req);
+  const session = await requirePermission(req, 'shoppingSetting.create');
   if (session instanceof NextResponse) return session;
 
   try {
@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
     const [account] = await db
       .select({ id: shoppingAccounts.id, mallCode: shoppingAccounts.mallCode, mallId: shoppingAccounts.mallId })
       .from(shoppingAccounts)
-      .where(
-        and(eq(shoppingAccounts.id, String(body.mallAccountId)), eq(shoppingAccounts.ownerId, session.ownerId)),
-      )
+      .where(and(eq(shoppingAccounts.id, String(body.mallAccountId)), eq(shoppingAccounts.ownerId, session.ownerId)))
       .limit(1);
 
     if (!account) return NextResponse.json({ error: '존재하지 않는 계정입니다.' }, { status: 400 });
