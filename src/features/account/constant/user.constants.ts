@@ -16,8 +16,14 @@ export const USER_SEARCH_TYPE: FilterOption[] = [
   { id: 'name', name: '이름' },
 ];
 
+export const USER_STATUS_OPTIONS: FilterOption[] = [
+  { id: 'active', name: '활성' },
+  { id: 'pending', name: '승인대기' },
+];
+
 export const USER_TABLE_HEAD: TableTitleValue[] = [
   { id: 'grade', title: '등급' },
+  { id: 'status', title: '상태' },
   { id: 'email', title: '이메일' },
   { id: 'name', title: '이름' },
   { id: 'createdAt', title: '등록일' },
