@@ -1,4 +1,5 @@
 import { ResendMallLinkedProductsResult } from '../types/mallLinkedProduct.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const resendMallLinkedProducts = async (ids: string[]): Promise<ResendMallLinkedProductsResult> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/linked-products/resend`, {
@@ -7,6 +8,7 @@ export const resendMallLinkedProducts = async (ids: string[]): Promise<ResendMal
     body: JSON.stringify({ ids }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     const { error } = (await response.json().catch(() => ({}))) as { error?: string };
     throw new Error(error ?? '쇼핑몰 연동 상품 재전송 실패');

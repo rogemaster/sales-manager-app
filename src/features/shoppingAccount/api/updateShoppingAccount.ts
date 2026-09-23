@@ -1,4 +1,5 @@
 import { ShoppingAccount, UpdateShoppingAccountBody } from '../types/shoppingAccount.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 // ownerId 인자는 시그니처에 남기되 요청에서 뺀다. 소유권 판정은 서버 세션이 한다.
 export const updateShoppingAccount = async (
@@ -12,6 +13,7 @@ export const updateShoppingAccount = async (
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('쇼핑몰 계정 수정 실패');
   return response.json();
 };

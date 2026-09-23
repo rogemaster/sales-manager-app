@@ -1,4 +1,5 @@
 import { User } from '@/features/auth/types/Auth';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export type UpdateProfileBody = {
   name: string;
@@ -13,6 +14,7 @@ export const updateProfile = async (body: UpdateProfileBody): Promise<User> => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('프로필 저장에 실패했습니다.');
   return response.json();
 };

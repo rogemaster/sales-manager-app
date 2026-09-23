@@ -1,4 +1,5 @@
 import { CustomerCodeDuplicate } from '../util/customerCode';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 /**
  * 200만 결과로 본다. 400·401·500·네트워크 오류는 "확인하지 못한 것"이지 중복이 아니므로 예외로 올린다 —
@@ -14,6 +15,7 @@ export const checkCustomerCodes = async (
     body: JSON.stringify({ codes, excludeProductId }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('고객사 상품코드 확인 요청 실패');
 
   const { duplicates } = (await response.json()) as { duplicates: CustomerCodeDuplicate[] };

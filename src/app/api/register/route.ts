@@ -4,27 +4,15 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
 import { v4 as uuidv4 } from 'uuid';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { registerBaseSchema } from '@/features/auth/util/registerValidation';
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const {
-      email,
-      password,
-      companyName,
-      representativeName,
-      businessNumber,
-      businessCategory,
-      businessLicenseName,
-      contactName,
-      contactEmail,
-      contactPhone,
-      settlementName,
-      settlementEmail,
-      settlementPhone,
-    } = body;
+  const body = await parseRequestBody(req, registerBaseSchema);
+  if (body instanceof NextResponse) return body;
 
-    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+  try {
+    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, body.email)).limit(1);
     if (existing.length > 0) {
       return NextResponse.json({ error: '이미 사용 중인 이메일입니다.' }, { status: 400 });
     }
@@ -35,23 +23,23 @@ export async function POST(req: NextRequest) {
       id,
       ownerId: id,
       status: 'active',
-      email,
-      password: await hashPassword(password),
-      name: contactName ?? '',
+      email: body.email,
+      password: await hashPassword(body.password),
+      name: body.contactName,
       avatar: null,
-      phone: contactPhone ?? '',
+      phone: body.contactPhone,
       bio: '',
-      company: companyName ?? '',
+      company: body.companyName,
       location: '',
       grade: 'super_admin',
-      representativeName: representativeName ?? '',
-      businessNumber: businessNumber ?? '',
-      businessCategory: businessCategory ?? '',
-      businessLicenseName: businessLicenseName ?? '',
-      contactEmail: contactEmail ?? '',
-      settlementName: settlementName ?? '',
-      settlementEmail: settlementEmail ?? '',
-      settlementPhone: settlementPhone ?? '',
+      representativeName: body.representativeName,
+      businessNumber: body.businessNumber,
+      businessCategory: body.businessCategory,
+      businessLicenseName: body.businessLicenseName,
+      contactEmail: body.contactEmail,
+      settlementName: body.settlementName,
+      settlementEmail: body.settlementEmail,
+      settlementPhone: body.settlementPhone,
       createdAt: now,
       updatedAt: now,
     });

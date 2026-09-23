@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
 import { GlobalHeader } from '@/components/layout';
 import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createAppQueryClient } from '@/shared/utils/appQueryClient';
 import { setUserInfoAtom } from '@/features/auth/store/auth.store';
 
 interface Props {
@@ -13,7 +14,8 @@ interface Props {
 }
 
 export default function Layout({ children }: Props) {
-  const [queryClient] = useState(() => new QueryClient());
+  // 서버가 세션을 거부하면(삭제·비활성 계정) 로그인 화면으로 보낸다.
+  const [queryClient] = useState(() => createAppQueryClient(() => void signOut({ callbackUrl: '/login' })));
   const { data: session } = useSession();
   const setUserInfo = useSetAtom(setUserInfoAtom);
 

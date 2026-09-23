@@ -10,8 +10,7 @@ import {
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { LINKED_PRODUCT_COLUMNS } from '@/features/mallLinkedProduct/server/linkedProductStore';
-import { mergeProductSnapshot } from '@/features/mallLinkedProduct/util/mergeProductSnapshot';
-import { splitSettingSnapshot } from '@/features/mallLinkedProduct/util/linkedProductRecord';
+import { buildBulkUpdate, isBulkSettingMismatch } from '@/features/mallLinkedProduct/util/linkedProductWrite';
 
 export async function PATCH(req: NextRequest) {
   const session = await requireSession(req);
@@ -53,14 +52,7 @@ export async function PATCH(req: NextRequest) {
     for (const id of uniqueIds) {
       const row = rowById.get(id);
       // 설정을 바꾸려면 몰·계정이 같아야 한다 — 계정이 바뀌면 같은 상품의 수정이 아니라 다른 상품이다.
-      // 불변 식별 정보가 컬럼이 되어 스냅샷을 파지 않고 컬럼끼리 비교한다.
-      const settingMismatch =
-        shoppingSettingId &&
-        (!setting ||
-          setting.mallCode !== row?.mallCode ||
-          setting.mallAccountId !== row?.mallAccountId ||
-          setting.mallId !== row?.mallId);
-      if (!row || settingMismatch) {
+      if (!row || (shoppingSettingId && isBulkSettingMismatch(row, setting))) {
         result.failCount += 1;
         continue;
       }
@@ -68,14 +60,7 @@ export async function PATCH(req: NextRequest) {
       try {
         await db
           .update(mallLinkedProducts)
-          .set({
-            ...(productSnapshot || hasClearKeys
-              ? { productSnapshot: mergeProductSnapshot(row.productSnapshot, productSnapshot, clearKeys) }
-              : {}),
-            ...(setting ? { settingSnapshot: splitSettingSnapshot(setting), sourceShoppingSettingId: setting.id } : {}),
-            updatedByEmail: session.email,
-            updatedAt: now,
-          })
+          .set(buildBulkUpdate(row, { productSnapshot, clearKeys, setting }, session.email, now))
           .where(and(eq(mallLinkedProducts.id, id), eq(mallLinkedProducts.ownerId, session.ownerId)));
         result.successCount += 1;
       } catch (error) {

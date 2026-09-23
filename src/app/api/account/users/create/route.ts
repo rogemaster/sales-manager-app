@@ -5,22 +5,20 @@ import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
 import { v4 as uuidv4 } from 'uuid';
 import { requirePermission } from '@/shared/utils/apiAuth';
-import { isSubUserGrade, resolveNewUserStatus } from '@/features/account/util/userStatus';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { resolveNewUserStatus } from '@/features/account/util/userStatus';
+import { createUserSchema } from '@/features/account/util/userCreateSchema';
 
 export async function POST(req: NextRequest) {
   const session = await requirePermission(req, 'user.create');
   if (session instanceof NextResponse) return session;
 
+  // 스키마에 status가 없다 — 등록자 등급으로 서버가 정한다. super_admin 등급도 스키마가 거부한다.
+  const body = await parseRequestBody(req, createUserSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    // status는 읽지 않는다 — 등록자 등급으로 서버가 정한다.
-    const { email, password, name, phone, grade, avatar, bio } = await req.json();
-
-    // admin이 super_admin을 만들 수 있느냐는 권한 문제라 여기서 막는다. 나머지 필드 검증은 로드맵 1-3.
-    if (!isSubUserGrade(grade)) {
-      return NextResponse.json({ error: '허용되지 않는 등급입니다.' }, { status: 400 });
-    }
-
-    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, body.email)).limit(1);
     if (existing.length > 0) {
       return NextResponse.json({ error: '이미 사용 중인 이메일입니다.' }, { status: 400 });
     }
@@ -32,15 +30,15 @@ export async function POST(req: NextRequest) {
       id,
       ownerId: session.ownerId,
       status: resolveNewUserStatus(session.grade),
-      email,
-      password: await hashPassword(password),
-      name: name ?? '',
-      avatar: avatar ?? null,
-      phone: phone ?? '',
-      bio: bio ?? '',
+      email: body.email,
+      password: await hashPassword(body.password),
+      name: body.name,
+      avatar: body.avatar || null,
+      phone: body.phone,
+      bio: body.bio ?? '',
       company: '',
       location: '',
-      grade,
+      grade: body.grade,
       createdAt: now,
       updatedAt: now,
     });

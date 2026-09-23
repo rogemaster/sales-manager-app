@@ -1,8 +1,10 @@
 import { MallLinkedProduct } from '../types/mallLinkedProduct.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const getMallLinkedProduct = async (id: string): Promise<MallLinkedProduct> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/linked-products/${id}`);
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     throw new Error('쇼핑몰 연동 상품 조회 실패');
   }

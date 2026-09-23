@@ -97,7 +97,7 @@ interface CreateUserBody extends Omit<User, 'company' | 'location'> {
 Zod 스키마로 생성한 form 타입(`z.infer<typeof schema>`)에 서버 전용 필드(`status`, `createdAt` 등)를 포함하지 않는다. Layout이 form 데이터에 서버 전용 필드를 추가하여 완전한 API body를 조립한다.
 
 ```typescript
-// UserCreateForm.tsx — form 타입: 사용자 입력만 포함
+// src/features/account/util/userCreateSchema.ts — form 타입: 사용자 입력만 포함
 export const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -135,6 +135,7 @@ const body: CreateUserBody = {
 };
 
 // ❌ 잘못된 위치 — UserCreateForm.tsx (form 컴포넌트)
+// ❌ 잘못된 위치 — userCreateSchema.ts (Zod 스키마)
 // ❌ 잘못된 위치 — createUser.ts (API fetch 함수)
 ```
 
@@ -318,7 +319,7 @@ const TextField = ({ name, label }: { name: MallSettingsFieldName; label: string
 
 실제 코드 위치:
 - `src/features/account/types/user.types.ts` — `UserStatus` 명명 타입, `CreateUserBody extends Omit<User, 'company' | 'location'>`
-- `src/features/account/ui/user/create/UserCreateForm.tsx` — `createUserSchema`, `CreateUserFormData`
+- `src/features/account/util/userCreateSchema.ts` — `createUserSchema`, `CreateUserFormData`
 - `src/features/account/ui/user/create/UserCreateLayout.tsx` — `?? ''` 강제 변환 경계, API body 조립
 - `src/features/shoppingAccount/ui/form/ShoppingAccountForm.tsx` — Pattern 6 실제 적용 (`ShoppingAccountFormInput`/`ShoppingAccountFormData`, `refine` 타입가드)
 - `src/features/shoppingSetting/types/shoppingSetting.types.ts` — `ShoppingSetting` discriminated union, `ShoppingSettingFormValues`(Pattern 7)

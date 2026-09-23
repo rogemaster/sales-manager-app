@@ -1,5 +1,6 @@
 import { ExcelRowFailure } from '@/types/excel.type';
 import { mapWithConcurrency } from '@/shared/utils/concurrency';
+import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 
 export type ExcelImageImportFn = (url: string) => Promise<{ ok: true; key: string } | { ok: false; reason: string }>;
 
@@ -37,6 +38,7 @@ export const resolveExcelMainImages = async <P extends { mainImage?: string | nu
     const rowNumber = rowNumbers[index];
 
     if (result.status === 'rejected') {
+      if (isUnauthorizedError(result.reason)) throw result.reason;
       failures.push({ rowNumber, message: `[메인이미지] ${IMAGE_IMPORT_FAILED_REASON}` });
       return;
     }

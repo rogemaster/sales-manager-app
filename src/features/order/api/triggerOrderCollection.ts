@@ -1,3 +1,4 @@
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 // src/features/order/api/triggerOrderCollection.ts
 import { TriggerCollectionBody } from '../types/collection.types';
 
@@ -11,6 +12,7 @@ export async function triggerOrderCollection(
     headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
     body: JSON.stringify(body),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('주문수집 실행 실패');
   return response.json();
 }

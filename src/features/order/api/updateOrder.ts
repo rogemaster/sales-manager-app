@@ -1,4 +1,5 @@
 import { OrderDetail } from '../types/order.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const updateOrder = async (
   orderId: string,
@@ -10,6 +11,7 @@ export const updateOrder = async (
     headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
     body: JSON.stringify(data),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('주문 수정 실패');
   return response.json();
 };

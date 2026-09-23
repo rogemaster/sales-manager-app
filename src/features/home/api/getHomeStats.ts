@@ -1,4 +1,5 @@
 import { HomeStats } from '../types/home.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const getHomeStats = async (ownerId: string): Promise<HomeStats> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/home/stats`, {
@@ -7,6 +8,7 @@ export const getHomeStats = async (ownerId: string): Promise<HomeStats> => {
     body: JSON.stringify({ ownerId }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     throw new Error('홈 통계 조회 실패');
   }

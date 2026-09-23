@@ -1,4 +1,5 @@
 import { OrderComment } from '../types/order.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const createOrderComment = async (
   orderId: string,
@@ -10,6 +11,7 @@ export const createOrderComment = async (
     headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
     body: JSON.stringify({ content }),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('코멘트 저장 실패');
   return response.json();
 };

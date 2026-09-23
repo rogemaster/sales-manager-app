@@ -4,6 +4,9 @@ import { UserGrade } from '@/features/auth/types/Auth';
 
 const { getToken } = vi.hoisted(() => ({ getToken: vi.fn() }));
 vi.mock('next-auth/jwt', () => ({ getToken }));
+// 세션 재검증 조회만 통과시킨다. 아래 @/db 차단은 그대로 — 계약은 "업무 데이터에 닿기 전에 403"이다.
+const { loadSessionUser } = vi.hoisted(() => ({ loadSessionUser: vi.fn() }));
+vi.mock('@/shared/utils/sessionUser', () => ({ loadSessionUser }));
 vi.mock('server-only', () => ({}));
 // 권한 판정이 DB 접근보다 먼저인지 확인한다 — DB를 건드리면 즉시 예외.
 vi.mock('@/db', () => ({
@@ -93,22 +96,28 @@ const makeReq = (method: RouteCase['method']) =>
   new NextRequest('http://localhost/api/test', { method, body: JSON.stringify({ ids: ['any_id'] }) });
 
 describe.each(CASES)('$name', ({ handler, method, allowed }) => {
+  const useGrade = (grade: UserGrade) => {
+    getToken.mockResolvedValue(sessionOf(grade));
+    loadSessionUser.mockResolvedValue({ ...sessionOf(grade), status: 'active' });
+  };
+
   beforeEach(() => {
     getToken.mockReset();
+    loadSessionUser.mockReset();
   });
 
   const denied = ALL_GRADES.filter((grade) => !allowed.includes(grade));
 
-  it.each(denied)('%s 등급이면 DB에 닿기 전에 403', async (grade) => {
-    getToken.mockResolvedValue(sessionOf(grade));
+  it.each(denied)('%s 등급이면 업무 데이터에 닿기 전에 403', async (grade) => {
+    useGrade(grade);
     const res = await handler(makeReq(method), ctx);
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: '권한이 없습니다.' });
   });
 
   it.each(allowed)('%s 등급은 권한 가드를 통과한다(403이 아니다)', async (grade) => {
-    getToken.mockResolvedValue(sessionOf(grade));
-    // 통과하면 DB 모킹이 예외를 던진다 — route가 500으로 받든 예외가 새든, 403만 아니면 된다.
+    useGrade(grade);
+    // 통과하면 DB 모킹이 예외를 던진다 — route가 400·500으로 받든 예외가 새든, 403만 아니면 된다.
     const res = await handler(makeReq(method), ctx).catch((error: unknown) => error);
     expect(res instanceof Response && res.status === 403).toBe(false);
   });

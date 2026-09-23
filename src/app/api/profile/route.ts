@@ -3,13 +3,18 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { profileEditSchema } from '@/features/profile/util/profileEditSchema';
 
 export async function PATCH(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
+  const body = await parseRequestBody(req, profileEditSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    const { name, phone, company, bio } = await req.json();
+    const { name, phone, company, bio } = body;
 
     const now = new Date().toISOString().split('T')[0];
 

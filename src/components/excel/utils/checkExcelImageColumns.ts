@@ -1,6 +1,7 @@
 import { ExcelImageCheckFn, ExcelRowWithErrors, ExcelTemplateInfo, ValidationError } from '@/types/excel.type';
 import { mapWithConcurrency } from '@/shared/utils/concurrency';
 import { getSheetRow } from './sheetRows';
+import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 
 export const IMAGE_CHECK_FAILED_REASON = '이미지를 확인하지 못했습니다.';
 
@@ -37,6 +38,7 @@ export const checkExcelImageColumns = async (
   return settled.flatMap((result, index): ValidationError[] => {
     const { row, header } = targets[index];
     if (result.status === 'rejected') {
+      if (isUnauthorizedError(result.reason)) throw result.reason;
       return [{ row, header, code: 'INVALID_IMAGE', reason: IMAGE_CHECK_FAILED_REASON }];
     }
     return result.value.ok ? [] : [{ row, header, code: 'INVALID_IMAGE', reason: result.value.reason }];

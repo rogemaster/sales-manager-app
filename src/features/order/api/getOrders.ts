@@ -1,5 +1,6 @@
 import { PaginationMeta } from '@/types/common.type';
 import { Order, OrderSearchType } from '../types/order.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export interface GetOrdersResponse extends PaginationMeta {
   orders: Order[];
@@ -12,6 +13,7 @@ export const getOrders = async (ownerId: string, filters: OrderSearchType, page:
     body: JSON.stringify({ ownerId, filters, page, pageSize }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('주문 목록 조회 실패');
 
   return response.json() as Promise<GetOrdersResponse>;

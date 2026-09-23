@@ -1,3 +1,4 @@
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 // src/features/order/api/getCollectionJobs.ts
 import { CollectionJob, CollectionSearchParams } from '../types/collection.types';
 
@@ -10,6 +11,7 @@ export async function getCollectionJobs(ownerId: string, params: CollectionSearc
     mallId: params.mallId,
   });
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order/collection/jobs?${query}`);
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('수집 작업 목록 조회 실패');
   return response.json();
 }

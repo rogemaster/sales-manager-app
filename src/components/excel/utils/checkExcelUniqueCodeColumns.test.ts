@@ -3,6 +3,7 @@ import { ExcelRowWithErrors, ExcelTemplateInfo } from '@/types/excel.type';
 import { checkExcelUniqueCodeColumns } from './checkExcelUniqueCodeColumns';
 import { EXCEL_SHEET_ROW_KEY } from './sheetRows';
 import { CUSTOMER_CODE_MAX_LENGTH } from '@/features/products/util/customerCode';
+import { UnauthorizedError } from '@/shared/utils/unauthorized';
 
 const HEADER = '고객상품코드';
 
@@ -62,6 +63,14 @@ describe('checkExcelUniqueCodeColumns', () => {
       { row: 2, header: HEADER, code: 'CODE_CHECK_FAILED' },
       { row: 4, header: HEADER, code: 'CODE_CHECK_FAILED' },
     ]);
+  });
+
+  it('확인 요청이 UnauthorizedError면 행 오류로 바꾸지 않고 그대로 던진다', async () => {
+    const checkFn = vi.fn().mockRejectedValue(new UnauthorizedError());
+
+    await expect(checkExcelUniqueCodeColumns([row(2, 'A'), row(3, 'B')], template, checkFn)).rejects.toBeInstanceOf(
+      UnauthorizedError,
+    );
   });
 
   it('빈 값·공백·null·undefined만 있으면 확인 함수를 부르지 않는다', async () => {

@@ -1,3 +1,4 @@
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 /**
  * 400만 "이미지 자체의 문제"로 보고 사유를 돌려준다.
  * 401·500·네트워크 오류는 확인에 실패한 것이지 이미지가 나쁜 것이 아니므로 예외로 올린다 —
@@ -10,6 +11,7 @@ export const checkProductImage = async (url: string): Promise<{ ok: true } | { o
     body: JSON.stringify({ url }),
   });
 
+  throwIfUnauthorized(response);
   if (response.ok) return { ok: true };
 
   if (response.status === 400) {

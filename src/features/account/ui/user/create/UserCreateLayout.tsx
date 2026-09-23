@@ -11,7 +11,8 @@ import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { CreateUserBody } from '@/features/account/types/user.types';
 import { useCreateUser } from '@/features/account/api/useCreateUser';
 import { resolveNewUserStatus } from '@/features/account/util/userStatus';
-import { UserCreateForm, CreateUserFormData, createUserSchema } from './UserCreateForm';
+import { UserCreateForm } from './UserCreateForm';
+import { CreateUserFormData, createUserSchema } from '@/features/account/util/userCreateSchema';
 
 export const UserCreateLayout = () => {
   const grade = useAtomValue(gradeAtom);

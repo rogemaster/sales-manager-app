@@ -1,3 +1,4 @@
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 /** 400만 사유로 돌려주고 그 외 실패는 예외로 올린다 — `checkProductImage`와 같은 구분이다. */
 export const importProductImage = async (
   url: string,
@@ -8,6 +9,7 @@ export const importProductImage = async (
     body: JSON.stringify({ url }),
   });
 
+  throwIfUnauthorized(response);
   if (response.ok) {
     const { key } = (await response.json()) as { key: string };
     return { ok: true, key };

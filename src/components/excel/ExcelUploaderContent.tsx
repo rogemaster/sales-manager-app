@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { processExcelUpload } from '@/components/excel/utils/processExcelUpload';
@@ -15,6 +16,7 @@ import { useSetAtom } from 'jotai';
 import { setExcelDataAtom } from '@/components/excel/store/excelData.store';
 import { checkProductImage } from '@/features/products/api/checkProductImage';
 import { REMOTE_IMAGE_CONCURRENCY } from '@/shared/constant/upload.constant';
+import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 import { excelUploadErrorCodeToMessage, excelValidErrorsCodeToMessages } from './message';
 
 type Props = {
@@ -114,7 +116,11 @@ export const ExcelUploaderContent = ({ contentDescription, fileTemplateInfo, max
       });
 
       setExcelData(rows.map((item) => ({ ...item, error: errors.filter((value) => value.row === getSheetRow(item)) })));
-    } catch {
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        await signOut({ callbackUrl: '/login' });
+        return;
+      }
       showAlert({
         type: 'error',
         message: '파일 처리 중 오류가 발생했습니다.',
