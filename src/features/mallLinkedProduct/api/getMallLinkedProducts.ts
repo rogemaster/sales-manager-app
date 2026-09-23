@@ -1,4 +1,5 @@
 import { GetMallLinkedProductsResponse, MallLinkedProductSearch } from '../types/mallLinkedProduct.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const getMallLinkedProducts = async (
   filters: MallLinkedProductSearch,
@@ -11,6 +12,7 @@ export const getMallLinkedProducts = async (
     body: JSON.stringify({ filters, page, pageSize }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     throw new Error('쇼핑몰 연동 상품 목록 호출 실패');
   }

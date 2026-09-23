@@ -1,4 +1,5 @@
 import { GetUsersResponse, UserSearchType } from '../types/user.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const getUsers = async (
   filters: UserSearchType,
@@ -10,6 +11,7 @@ export const getUsers = async (
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ filters, page, pageSize }),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('사용자 목록 조회 실패');
   return response.json();
 };

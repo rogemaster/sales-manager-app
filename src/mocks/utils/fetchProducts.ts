@@ -1,4 +1,5 @@
 import { Product } from '@/features/products/types/product.types';
+import { UnauthorizedError } from '@/shared/utils/unauthorized';
 
 // 상품이 Neon으로 이전되어 MSW가 직접 읽을 수 없다. 이 경로에는 핸들러가 없으므로 요청이
 // bypass되어 실제 route로 나가고, 같은 오리진이라 세션 쿠키가 붙어 인증도 통과한다.
@@ -21,7 +22,10 @@ export const fetchProductsForMock = async (): Promise<Product[]> => {
     }),
   });
 
-  // 실패를 조용히 삼키지 않는다 — 몰 연동 경로는 403으로 눈에 띄지만, 홈 통계·최근 상품은
+  // 401은 삼키지 않고 던진다 — 호출한 핸들러가 그대로 401을 돌려줘야 세션 만료가 로그아웃으로 이어진다.
+  if (response.status === 401) throw new UnauthorizedError();
+
+  // 그 외 실패도 조용히 삼키지 않는다 — 몰 연동 경로는 403으로 눈에 띄지만, 홈 통계·최근 상품은
   // 그냥 0건으로 렌더돼 콘솔에 아무 신호도 안 남으면 원인을 찾기 어렵다.
   if (!response.ok) {
     console.error(`fetchProductsForMock 실패: ${response.status}`);

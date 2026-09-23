@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { IMAGE_IMPORT_FAILED_REASON, resolveExcelMainImages } from './excelMainImage';
+import { UnauthorizedError } from '@/shared/utils/unauthorized';
 
 type Item = { name: string; mainImage?: string | null };
 
@@ -59,6 +60,17 @@ describe('resolveExcelMainImages', () => {
     );
 
     expect(failures).toEqual([{ rowNumber: 3, message: `[메인이미지] ${IMAGE_IMPORT_FAILED_REASON}` }]);
+  });
+
+  it('가져오기 요청이 UnauthorizedError로 실패하면 실패 행으로 바꾸지 않고 그대로 던진다', async () => {
+    await expect(
+      resolveExcelMainImages<Item>(
+        [{ name: 'A', mainImage: 'https://a.com/1.png' }],
+        [3],
+        vi.fn().mockRejectedValue(new UnauthorizedError()),
+        options,
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedError);
   });
 
   it('빈 값·공백·null·undefined는 가져오기를 호출하지 않고 실패로 기록한다', async () => {

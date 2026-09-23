@@ -7,6 +7,7 @@ import {
   toCustomerCodeKey,
 } from '@/features/products/util/customerCode';
 import { getSheetRow } from './sheetRows';
+import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 
 type Target = { row: number; code: string };
 
@@ -63,7 +64,8 @@ export const checkExcelUniqueCodeColumns = async (
     try {
       const duplicates = await checkFn(targets.map(({ code }) => code));
       existingByKey = new Map(duplicates.map(({ code, existingCode }) => [toCustomerCodeKey(code), existingCode]));
-    } catch {
+    } catch (error) {
+      if (isUnauthorizedError(error)) throw error;
       targets.forEach((target, index) => {
         const duplicate = inFile.get(index);
         if (duplicate) errors.push(duplicate);

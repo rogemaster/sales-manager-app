@@ -1,5 +1,6 @@
 import { PaginationMeta } from '@/types/common.type';
 import { Product, ProductSearch } from '../types/product.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export interface GetProductsResponse extends PaginationMeta {
   products: Product[];
@@ -13,6 +14,7 @@ export const getProducts = async (_ownerId: string, data: ProductSearch, page: n
     body: JSON.stringify({ ...data, page, pageSize }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     throw new Error('상품목록 호출 실패');
   }

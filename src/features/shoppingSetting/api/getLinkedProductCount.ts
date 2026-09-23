@@ -1,4 +1,5 @@
 import { LinkedProductCountResponse } from '../types/shoppingSetting.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const getLinkedProductCount = async (ids: string[]): Promise<LinkedProductCountResponse> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/settings/linked-count`, {
@@ -6,6 +7,7 @@ export const getLinkedProductCount = async (ids: string[]): Promise<LinkedProduc
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ids }),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('연동 상품 건수 조회 실패');
   return response.json();
 };

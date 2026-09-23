@@ -1,4 +1,5 @@
 import { Order } from '../types/order.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const bulkCreateOrders = async (data: Omit<Order, 'ownerId'>[], ownerId: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/bulk`, {
@@ -7,6 +8,7 @@ export const bulkCreateOrders = async (data: Omit<Order, 'ownerId'>[], ownerId: 
     body: JSON.stringify({ ownerId, orders: data }),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('주문 대량 등록 실패');
 
   return response.json() as Promise<{ success: boolean; count: number }>;

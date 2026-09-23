@@ -1,4 +1,5 @@
 import { ShoppingSetting, CreateShoppingSettingBody } from '../types/shoppingSetting.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const createShoppingSetting = async (
   body: CreateShoppingSettingBody,
@@ -9,6 +10,7 @@ export const createShoppingSetting = async (
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...body, ownerId }),
   });
+  throwIfUnauthorized(response);
   if (!response.ok) throw new Error('쇼핑몰 정보설정 등록 실패');
   return response.json();
 };

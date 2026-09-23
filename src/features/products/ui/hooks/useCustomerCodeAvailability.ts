@@ -2,7 +2,9 @@
 
 import { useCallback } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { signOut } from 'next-auth/react';
 import { useAlert } from '@/hooks/useAlert';
+import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 import { checkCustomerCodes } from '../../api/checkCustomerCodes';
 import { ProductFormValues } from '../../types/product.types';
 import {
@@ -35,7 +37,11 @@ export const useCustomerCodeAvailability = (form: UseFormReturn<ProductFormValue
         });
         setFocus('customerCode');
         return false;
-      } catch {
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          await signOut({ callbackUrl: '/login' });
+          return false;
+        }
         showAlert({ type: 'error', message: CUSTOMER_CODE_CHECK_FAILED_MESSAGE });
         return false;
       }

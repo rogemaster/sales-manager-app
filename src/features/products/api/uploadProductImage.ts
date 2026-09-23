@@ -1,3 +1,4 @@
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 export const uploadProductImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
@@ -8,6 +9,7 @@ export const uploadProductImage = async (file: File): Promise<string> => {
     body: formData,
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     const { error } = await response.json().catch(() => ({ error: '이미지 업로드 실패' }));
     throw new Error(error);

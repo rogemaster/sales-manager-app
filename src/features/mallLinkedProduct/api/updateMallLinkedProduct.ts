@@ -1,4 +1,5 @@
 import { MallLinkedProduct, UpdateMallLinkedProductBody } from '../types/mallLinkedProduct.types';
+import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
 export const updateMallLinkedProduct = async (
   id: string,
@@ -10,6 +11,7 @@ export const updateMallLinkedProduct = async (
     body: JSON.stringify(body),
   });
 
+  throwIfUnauthorized(response);
   if (!response.ok) {
     throw new Error('쇼핑몰 연동 상품 저장 실패');
   }
