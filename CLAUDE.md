@@ -42,7 +42,7 @@ npm run test     # Run Vitest once
 npm run test:watch  # Run Vitest in watch mode
 ```
 
-Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/mocks/utils/`, `src/shared/utils/`, `src/features/*/util/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** MSW (Mock Service Worker) handles API mocking in development automatically via `src/mocks/` — 단, 상품(`/api/products/*`)은 Neon으로 이전되어 MSW를 거치지 않는다.
+Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/mocks/utils/`, `src/shared/utils/`, `src/features/*/util/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 **권한 거부 계약**(권한이 부족한 등급이면 DB에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 route 단위로 표 기반 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다. MSW (Mock Service Worker) handles API mocking in development automatically via `src/mocks/` — 단, 상품(`/api/products/*`)은 Neon으로 이전되어 MSW를 거치지 않는다.
 
 ## Architecture Overview
 

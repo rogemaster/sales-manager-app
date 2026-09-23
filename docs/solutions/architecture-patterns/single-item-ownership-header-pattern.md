@@ -162,7 +162,7 @@ MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update, ownerId: MO
 
 **그래서 새 API를 설계할 때의 판단 순서는 이렇다.**
 
-1. 그 엔드포인트가 **실제 route handler**인가(DB·서버 전용 시크릿이 필요해서)? → `requireSession` / `requireSuperAdminSession`을 쓴다. 클라이언트가 보낸 `ownerId`는 body에 있어도 무시한다. `[[api-route-session-auth-guard]]` 참고.
+1. 그 엔드포인트가 **실제 route handler**인가(DB·서버 전용 시크릿이 필요해서)? → `requireSession`(등급 무관) 또는 `requirePermission(req, '<permission>')`(정책표 `src/shared/utils/permission.ts`에 키가 있는 쓰기)을 쓴다. 클라이언트가 보낸 `ownerId`는 body에 있어도 무시한다. `[[api-route-session-auth-guard]]` 참고.
 2. **MSW 핸들러**인가? → 이 문서의 `X-Owner-Id` 헤더 패턴을 그대로 쓴다. 서비스 워커는 세션을 읽을 수 없으므로 이게 여전히 최선이다.
 
 두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다.

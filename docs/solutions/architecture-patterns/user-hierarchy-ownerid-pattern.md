@@ -67,6 +67,8 @@ export interface CreateUserBody extends Omit<User, 'company' | 'location' | 'gra
 }
 ```
 
+> **2026-09-23 갱신:** 새 사용자의 `status`는 이제 클라이언트가 보내지 않는다. 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`, `src/features/account/util/userStatus.ts`) — super_admin이 등록하면 `active`, admin이 등록하면 `pending`. `CreateUserBody`에서 `status`는 제거됐다.
+
 ### 사용자 관리 목록 필터링
 
 유저 관련 API는 MSW가 아닌 **Neon DB route handler**로 처리한다(msw-rules.md의 예외 규칙 — 인증 관련 API는 route.ts 사용). 클라이언트가 `workspaceOwnerIdAtom`으로 해석한 `ownerId`를 body로 전달하고, route handler는 그대로 `WHERE owner_id = :ownerId`로 필터링한다.
@@ -86,6 +88,8 @@ export async function POST(req: NextRequest) {
 const { ownerId, email, password, name, phone, grade, status } = await req.json();
 await db.insert(users).values({ id, ownerId, email, /* ... */ });
 ```
+
+> **2026-09-23 갱신:** `status`는 더 이상 body에서 읽지 않는다. 서버가 `resolveNewUserStatus(등록자 grade)`로 정한다 — super_admin이 등록하면 `active`, admin이 등록하면 `pending`.
 
 ### 데이터 구조 예시
 
