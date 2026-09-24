@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |----------|----------|
 | 기능 개발 전체 과정 | `.claude/rules/workflow.md` |
 | UI 컴포넌트·화면 구현 | `.claude/rules/ui-conventions.md` |
-| MSW 핸들러·API 추가 | `.claude/rules/msw-rules.md` |
+| API 추가(route handler·MSW 핸들러) | `.claude/rules/msw-rules.md` |
 | 도메인 설계·신규 엔티티·미구현 페이지 작업 | `.claude/rules/domain-design.md` |
 | Excel 기능 구현·수정·전략 추가 | `.claude/rules/excel.md` |
 
@@ -42,16 +42,16 @@ npm run test     # Run Vitest once
 npm run test:watch  # Run Vitest in watch mode
 ```
 
-Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/mocks/utils/`, `src/shared/utils/`, `src/features/*/util/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 **권한 거부 계약**(권한이 부족한 등급이면 업무 데이터에 닿기 전에 403 — 세션 재검증 조회 `sessionUser.ts`만 모킹으로 통과시킨다)은 `src/app/api/routePermissions.test.ts`가 route 단위로 표 기반 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다. MSW (Mock Service Worker) handles API mocking in development automatically via `src/mocks/` — 단, 상품(`/api/products/*`)은 Neon으로 이전되어 MSW를 거치지 않는다.
+Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/utils/`, `src/features/*/util/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 **권한 거부 계약**(권한이 부족한 등급이면 업무 데이터에 닿기 전에 403 — 세션 재검증 조회 `sessionUser.ts`만 모킹으로 통과시킨다)은 `src/app/api/routePermissions.test.ts`가 route 단위로 표 기반 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다. MSW는 주문 영역에만 남아 있다 — 나머지 API는 전부 실제 route handler + Neon이다.
 
 ## Architecture Overview
 
-**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API calls in development are intercepted by MSW.
+**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API는 `src/app/api/` route handler + Neon(Drizzle)이 처리하고, 아직 DB로 옮기지 않은 주문 영역(주문·수집·홈 주문 통계)만 MSW 브라우저 worker가 mock한다 (`MSWProvider`는 `(authenticated)` 레이아웃 안에만 있다).
 
 ### Route Groups
 
 - `(auth)/` — Public pages: login, register
-- `(authenticated)/` — Protected pages: home, products/list, products/create, products/bulk, products/[id], order/list
+- `(authenticated)/` — Protected pages: home, profile, account(사용자관리), products, shopping(계정·정보설정·등록·연동상품), order
 - `src/middleware.ts` enforces auth: unauthenticated users redirect to `/login`
 
 ### State Management (3 layers)
@@ -72,13 +72,15 @@ Each domain lives in `src/features/[feature]/` with subfolders:
 
 ### API Layer
 
-API functions in `features/[feature]/api/` call Next.js route handlers in `src/app/api/`. In development, MSW intercepts these at the route handler level. Pattern:
+API functions in `features/[feature]/api/` call Next.js route handlers in `src/app/api/` (주문 영역은 같은 경로를 MSW가 가로챈다). Pattern:
 
 ```typescript
 const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/list`, {
   method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(data),
 });
+throwIfUnauthorized(response); // 401 → UnauthorizedError → QueryClient가 signOut (src/shared/utils/unauthorized.ts)
 if (!response.ok) throw new Error('에러 메시지');
 return response.json();
 ```
