@@ -8,7 +8,8 @@ import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { RecentProduct } from '@/features/home/types/home.types';
 
 type Props = {
-  products: RecentProduct[];
+  // undefined는 아직 받지 못한 상태(로딩·실패)다. 빈 배열과 구분해야 '없음' 문구가 잘못 뜨지 않는다.
+  products: RecentProduct[] | undefined;
 };
 
 export const RecentProducts = ({ products }: Props) => {
@@ -20,7 +21,9 @@ export const RecentProducts = ({ products }: Props) => {
           <div className="h-4 w-[3px] rounded-full bg-primary" />
           <h2 className="text-base font-bold tracking-tight">최근 등록 상품</h2>
         </div>
-        <span className="text-xs text-muted-foreground">최근 5건</span>
+        {products && products.length > 0 && (
+          <span className="text-xs text-muted-foreground">최근 {products.length}건</span>
+        )}
       </div>
 
       {/* 테이블 */}
@@ -45,7 +48,14 @@ export const RecentProducts = ({ products }: Props) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {products.map((product) => (
+          {products?.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} className="h-24 text-center text-muted-foreground text-sm">
+                등록된 상품이 없습니다.
+              </TableCell>
+            </TableRow>
+          )}
+          {products?.map((product) => (
             <TableRow
               key={product.productId}
               className="group border-b border-border/30 transition-colors last:border-0 hover:bg-muted/20"

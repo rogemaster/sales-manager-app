@@ -40,7 +40,8 @@ http.patch(`${baseUrl}/api/orders/:orderId`, async ({ request, params }) => {
 - **예외 2 — 서버 전용 시크릿이 필요한 API는 `route.ts`를 사용한다.** R2 업로드(`/api/products/image`)와 상품 DB 접근(`/api/products/*`)이 여기 해당한다. 엑셀 이미지 확인·가져오기(`/api/products/image/check`·`/import`)도 같은 예외다 — 확인은 시크릿을 쓰지 않지만 SSRF 방어가 걸린 외부 요청을 서버에서 해야 하므로 브라우저의 MSW로 처리할 수 없다. R2 자격증명과 `DATABASE_URL`은 서버 전용이라 브라우저에서 도는 MSW로 처리할 수 없다. 회원가입 route가 DB 때문에 예외인 것과 같은 구조다. 해당 경로의 MSW 핸들러와 관련 utils/data는 함께 제거한다.
   고객사 상품코드 중복 확인(`/api/products/customer-code/check`)도 상품 DB를 읽으므로 같은 예외다.
   쇼핑몰계정·정보설정·연동상품(`/api/shopping/*`)도 2026-09-21~22에 DB로 이전돼 같은 예외다. 연동상품 route는 외부몰(시뮬레이터)을 서버에서 HTTP로 부른다.
-  - 남아 있는 MSW 핸들러가 이전된 리소스를 필요로 하면(예: 홈 통계가 상품을 읽는 경우) mock util이 데이터를 직접 import하지 말고 **주입받게 고친 뒤**, 실제 route로 나가는 어댑터(`src/mocks/utils/fetchProducts.ts`)를 주입원으로 쓴다. 그 경로에 MSW 핸들러가 없으면 요청은 bypass되어 실제 route로 나가고, 같은 오리진이라 세션 쿠키가 붙어 인증도 통과한다.
+  홈 상품 통계·최근 상품(`/api/home/stats`·`/recent-products`)도 2026-09-24에 상품 DB를 직접 집계하는 route로 옮겼다. MSW의 홈 핸들러에는 주문 통계만 남는다.
+  - 남아 있는 MSW 핸들러가 이전된 리소스를 필요로 하면, 브라우저에서 실제 route를 불러 받아 오는 어댑터를 만들기보다 **그 핸들러 자체를 route로 옮긴다.** 어댑터 방식은 목록 API를 "사실상 전체"로 불러 브라우저에서 세게 되어, 상한을 넘으면 결과가 조용히 틀린다(홈 통계가 1,000건 초과 시 그랬다).
 - **그 외 route.ts가 필요하다고 판단되는 경우:** Claude가 먼저 이유를 설명하고 사용자에게 생성 여부를 확인한 후 진행한다.
 - **올바른 방법:** 해당 도메인의 `src/mocks/handlers/*.ts` 파일에 핸들러를 추가한다. 새 도메인이면 새 파일을 생성하고 `handlers.ts` 인덱스에 spread를 추가한다.
 

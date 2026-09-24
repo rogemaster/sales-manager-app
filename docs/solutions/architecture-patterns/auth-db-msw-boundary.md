@@ -1,7 +1,7 @@
 ---
 title: MSW/DB 경계 설계 — 인증·유저 정보는 DB, 비즈니스 데이터는 MSW
 date: 2026-06-24
-last_updated: 2026-09-14
+last_updated: 2026-09-24
 category: architecture-patterns
 module: auth, account
 problem_type: architecture_pattern
@@ -71,39 +71,19 @@ tags:
 - **외부 스토리지·서드파티 API 키가 필요한 기능 (R2 업로드 등)** → DB route (2026-09-01 추가)
 - **시크릿은 없어도 서버가 외부로 요청해야 하는 기능 (엑셀 이미지 확인 `/api/products/image/check`)** → route (2026-09-13 추가). 브라우저에서 도는 MSW는 SSRF 방어가 걸린 서버 측 요청을 대신할 수 없다 — [`server-side-remote-fetch-ssrf-connect-time-validation.md`](server-side-remote-fetch-ssrf-connect-time-validation.md)
 - **그 데이터를 영속화해야 배포 환경에서 의미가 있는 기능** → DB route (상품이 이 경우다. 포트폴리오 특성상 배포 URL에서 등록한 상품이 남아야 한다)
-- **나머지 비즈니스 데이터 (주문/쇼핑몰 계정·정보설정/연동상품/홈)** → MSW 유지
+- **나머지 비즈니스 데이터 (주문·수집·홈 주문 통계)** → MSW 유지. 쇼핑몰계정·정보설정·연동상품은 2026-09-21~22, 홈 상품 통계는 2026-09-24에 DB route로 옮겼다.
 
-## 과도기 — MSW에 남은 도메인이 이전된 도메인의 데이터를 필요로 할 때
+## 과도기 — MSW에 남은 도메인이 이전된 도메인의 데이터를 필요로 할 때 (2026-09-24 종료)
 
 한 도메인만 DB로 옮기면 **MSW에 남은 핸들러가 그 데이터를 읽을 수 없게 된다.** 상품 이전 때 홈 대시보드 통계와 연동상품 스냅샷 생성이 정확히 여기 걸렸다(둘 다 `MOCK_PRODUCT_DATA`를 직접 import하고 있었다).
 
-해결은 두 단계다.
+**당시 해결 — 어댑터 주입.** mock util이 상품 배열을 인자로 받게 바꾸고, MSW 핸들러가 브라우저에서 실제 `/api/products/list`를 불러 그 배열을 넘겼다. 그 경로에는 MSW 핸들러가 없어 요청이 bypass되어 실제 route로 나가고, 같은 오리진이라 세션 쿠키가 붙어 인증도 통과했다.
 
-**1단계 — mock util이 데이터를 주입받게 바꾼다.** 모듈 import를 인자로 바꾸는 것뿐이라 동작이 변하지 않고, 테스트에서 `vi.mock` 없이 배열을 넘길 수 있게 되어 오히려 검증이 단순해진다.
+**이 방식의 한계.** 페이지네이션 API를 `pageSize: 1000`으로 부르는 근사치라 초과분이 **조용히** 사라졌다. 몰 연동 전송에서는 빠진 상품이 "없음"으로 판정돼 403(권한 문제로 오인), 홈 통계에서는 1,000건을 넘으면 숫자가 틀렸다. 게다가 전체 행을 내려받아 브라우저에서 세는 구조라 집계에 드는 비용도 행 수에 비례했다.
 
-```ts
-// before: getHomeData()가 MOCK_PRODUCT_DATA를 직접 import
-// after:  getHomeData(products, ...)
-```
+**종료.** 소비자 두 곳을 차례로 route로 옮기며 어댑터(`src/mocks/utils/fetchProducts.ts`)를 삭제했다 — 연동상품은 2026-09-22 DB화, 홈 상품 통계·최근 상품은 2026-09-24(`/api/home/stats`는 `COUNT … GROUP BY state`, `/api/home/recent-products`는 `LIMIT 5`).
 
-**2단계 — 핸들러가 실제 route를 호출해 주입한다.**
-
-```ts
-// src/mocks/utils/fetchProducts.ts
-export const fetchProductsForMock = async (): Promise<Product[]> => {
-  const response = await fetch(`${base}/api/products/list`, { method: 'POST', body: ... });
-  ...
-};
-```
-
-**이게 성립하는 이유:** 그 경로에는 MSW 핸들러가 없으므로 요청이 **bypass되어 실제 route로 나가고**, 같은 오리진이라 **세션 쿠키가 자동으로 붙어** 인증도 통과한다. 별도 토큰 전달이 필요 없다.
-
-**주의점 두 가지:**
-
-- **전체 조회가 아니다.** 페이지네이션 API를 `pageSize: 1000`으로 부르는 근사치다. 초과분은 조용히 사라지고, 그 상태로 몰 연동을 전송하면 빠진 상품이 "없음"으로 판정돼 **403**이 나간다 — 권한 문제로 오인하기 쉽다. 절단이 일어나면 `console.warn`을 남기게 해뒀다.
-- **전용 "전체조회" 엔드포인트를 만들지 않는다.** 그 유일한 소비자가 곧 없어질 MSW 층이기 때문이다. 과도기 코드는 과도기 티가 나게 두는 편이 낫다.
-
-## 구현 패턴
+**결론 — 다음에 같은 상황이 오면 어댑터를 만들지 말고 소비하는 핸들러를 route로 옮긴다.** 어댑터는 "잠깐 쓸 과도기 코드"로 만들었지만 3주 넘게 살아남았고, 그동안 상한이라는 조용한 오답 조건을 품고 있었다. 핸들러를 옮기는 비용은 대개 route 하나와 쿼리 하나라, 어댑터를 짜는 비용과 크게 다르지 않다.
 
 ## 구현 패턴
 
@@ -119,14 +99,22 @@ src/app/api/
 │   ├── route.ts                       ← 사용자 삭제 (DELETE)
 │   ├── list/route.ts                  ← 사용자 목록 조회 (POST)
 │   └── create/route.ts                ← 사용자 등록 (POST)
-└── products/                          ← 2026-09-01 추가 (Neon + R2)
-    ├── list/route.ts                  ← 상품 목록 조회 (POST)
-    ├── create/route.ts                ← 상품 등록 (POST)
-    ├── bulk/route.ts                  ← 상품 대량 등록 (POST)
-    ├── image/route.ts                 ← 메인이미지 R2 업로드 (POST)
-    ├── image/check/route.ts           ← 엑셀 외부 이미지 확인만 (POST, 2026-09-13)
-    ├── image/import/route.ts          ← 엑셀 외부 이미지 R2 가져오기 (POST, 2026-09-13)
-    └── [productId]/route.ts           ← 단건 조회·수정 (GET/PATCH)
+├── products/                          ← 2026-09-01 추가 (Neon + R2)
+│   ├── list/route.ts                  ← 상품 목록 조회 (POST)
+│   ├── create/route.ts                ← 상품 등록 (POST)
+│   ├── bulk/route.ts                  ← 상품 대량 등록 (POST)
+│   ├── image/route.ts                 ← 메인이미지 R2 업로드 (POST)
+│   ├── image/check/route.ts           ← 엑셀 외부 이미지 확인만 (POST, 2026-09-13)
+│   ├── image/import/route.ts          ← 엑셀 외부 이미지 R2 가져오기 (POST, 2026-09-13)
+│   └── [productId]/route.ts           ← 단건 조회·수정 (GET/PATCH)
+├── shopping/                          ← 2026-09-21~22 추가 (계정·정보설정·연동상품)
+│   ├── accounts/ …
+│   ├── settings/ …
+│   └── linked-products/ …
+└── home/                              ← 2026-09-24 추가 (주문 통계는 MSW 유지)
+    ├── stats/route.ts                 ← 기간 내 등록 상품의 상태별 건수 (POST)
+    ├── linked-product-stats/route.ts  ← 기간 내 연동상품 성공·실패 건수 (POST)
+    └── recent-products/route.ts       ← 최근 등록 상품 5건 (POST)
 ```
 
 ### MSW route handler 제거 방법
@@ -154,7 +142,7 @@ export const authHandlers = [
 
 MSW는 빠른 프로토타이핑과 UI 개발에 여전히 유효하다. **MSW가 구조적으로 할 수 없는 일만 DB route로 옮기고, 나머지는 MSW에 두는 것이 현 단계에서 가장 합리적인 경계**다.
 
-**단, 도메인을 하나씩 옮길 때마다 위 "과도기" 절의 비용이 발생한다.** 옮기는 도메인의 데이터를 MSW 잔존 도메인이 읽고 있는지 먼저 grep하고(상품의 경우 홈·연동상품 두 곳이었다), 주입 리팩터를 **이전 작업과 분리된 단계로** 잡는 편이 낫다. 시그니처만 바꾸는 단계는 동작이 변하지 않아 리뷰가 쉽고, 실제 이전 단계와 섞이면 무엇이 원인인지 가려지지 않는다.
+**단, 도메인을 하나씩 옮길 때마다 위 "과도기" 절의 비용이 발생한다.** 옮기는 도메인의 데이터를 MSW 잔존 도메인이 읽고 있는지 먼저 grep하고(상품의 경우 홈·연동상품 두 곳이었다), 걸리는 핸들러가 있으면 **그 핸들러도 함께 route로 옮기는 것을 이전 범위에 넣는다.**
 
 ## Related
 

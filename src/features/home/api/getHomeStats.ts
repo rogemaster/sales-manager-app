@@ -1,11 +1,11 @@
 import { HomeStats } from '../types/home.types';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
-export const getHomeStats = async (ownerId: string): Promise<HomeStats> => {
+export const getHomeStats = async (startDate: string, endDate: string): Promise<HomeStats> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/home/stats`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ownerId }),
+    body: JSON.stringify({ startDate, endDate }),
   });
 
   throwIfUnauthorized(response);
