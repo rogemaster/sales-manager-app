@@ -88,7 +88,7 @@
 ### 타입 구조
 
 - `AccountUser.ownerId: string | null`
-  - 슈퍼계정(`super_admin`)은 가입 시 `ownerId`에 **자기 자신의 `id`를 동일하게 저장** (`ownerId === id`) — 2026-07-08부터 적용, 그 이전 가입 계정은 `null`이었으나 실 DB의 기존 계정도 함께 마이그레이션 완료
+  - 슈퍼계정(`super_admin`)은 가입 시 `ownerId`에 **자기 자신의 `id`를 동일하게 저장** (`ownerId === id`). 과거 `null`이던 계정도 실 DB에서 마이그레이션됐다
   - 종속 유저는 `ownerId`에 슈퍼계정의 `id`를 저장
   - `string | null` 타입은 하위호환(과거 `null` 데이터, 로그아웃 시 클라이언트 초기화 상태)을 위해 유지하지만, 신규 생성되는 모든 계정은 항상 non-null 값을 갖는다
 - `SubUserGrade = Exclude<UserGrade, 'super_admin'>` — 사용자 등록 폼에서는 `super_admin` 옵션 없음
@@ -115,9 +115,7 @@
 
 판정 기준은 **엔드포인트 경로**다. `/api/shopping/settings/active` 는 `shoppingSetting` 도메인이므로, 그 화면이 `mallRegistration`이든 `mallLinkedProduct`든 관계없이 `shoppingSetting/api/`에 둔다.
 
-- **Why:** 2026-08-06 정리 전, `getActiveShoppingSettings`는 MSW 핸들러(`handlers/shoppingSettings.ts`)와 mock util은 shoppingSetting 쪽에 있는데 클라이언트 api/훅/타입만 `mallRegistration`에 있었다. 처음 그 화면을 만들면서 그 자리에 둔 것뿐인데, 결과적으로 두 개의 역방향 의존이 생겼다:
-  - `mallLinkedProduct`의 필터가 `mallRegistration`의 훅을 import — 의미상 `shoppingSetting`을 봐야 할 의존이 엉뚱한 형제 도메인으로 향함
-  - `mocks/utils/getActiveShoppingSettings.ts`(shoppingSetting 데이터 처리)가 `mallRegistration`의 타입을 import
+- **Why:** `getActiveShoppingSettings`의 api·훅·타입을 처음 소비한 `mallRegistration`에 뒀더니, 두 번째 소비처인 `mallLinkedProduct` 필터가 형제 도메인 `mallRegistration`을 import하는 역방향 의존이 생겼다(2026-08-06 정리).
 - **징후:** "이 훅을 두 번째 화면에서도 쓰게 됐다"면 배치를 의심할 시점이다. 첫 소비처가 정본 위치라는 보장은 없다.
 - 두 도메인에서 같은 리소스를 요청하는데 응답 형태만 다르면, 타입을 복제하지 말고 리소스 도메인의 타입 파일에 **둘 다** 둔다 (예: `shoppingSetting.types.ts`의 `AvailableMallAccount`와 `ActiveShoppingSettingOption`은 나란히 있어야 관계가 드러난다).
 
@@ -171,17 +169,17 @@
 | 위치 | 역할 |
 |------|------|
 | `mall_linked_products` 컬럼 | `mall_code`·`mall_account_id`·`mall_id`가 top-level 컬럼이다. 스냅샷(`setting_snapshot`)에는 이 셋과 `id`·`ownerId`를 저장하지 않는다(`splitSettingSnapshot`) |
-| 수정 route (`PATCH /api/shopping/linked-products/[id]`, `/bulk`) | `UPDATE`의 `SET`에 불변 3컬럼이 없다. 무엇을 보내도 바뀌지 않는다 — **최종 방어선** |
+| 수정 route (`PATCH /api/shopping/linked-products/[id]`, `/bulk`) | `UPDATE`의 `SET`을 순수 함수 `buildSnapshotUpdate`·`buildBulkUpdate`(`features/mallLinkedProduct/util/linkedProductWrite.ts`)가 만들고, 그 반환 타입에 불변 3컬럼이 없다. 무엇을 보내도 바뀌지 않는다 — **최종 방어선**(`linkedProductWrite.test.ts`가 지킨다) |
 
 **왜 수정에만 이 장치가 필요한가 — 생성과 책임 분담이 다르다.** 생성(`sendNewLinkedProducts`)은 클라이언트가 `{ productId, mallCode, shoppingSettingId }`만 보내고 **서버가 원본에서 읽어 스냅샷을 복사**하므로 어긋날 여지가 없다. 반면 수정은 **클라이언트가 완성된 스냅샷을 보내고 서버가 불변 필드를 지켜내는** 방식이라, 지켜내는 범위가 곧 이 규칙의 실효 범위다.
 
-**2026-09-22 DB화로 방어 방식이 바뀌었다.** 예전에는 폼 값에서 불변 필드를 "원본으로 되돌리는" 코드가 두 곳(`buildSnapshots`, MSW `updateMockMallLinkedProduct`)에 있었다. 지금은 불변 필드가 컬럼이라 **UPDATE에 넣지 않는 것**으로 끝난다. `buildSnapshots`에 남은 되돌리기는 `ShoppingSetting` 타입을 채우는 표시용이다.
+방어는 불변 필드를 **UPDATE에 넣지 않는 것**으로 끝난다. 클라이언트 `buildSnapshots`에 있는 "원본으로 되돌리기"는 `ShoppingSetting` 타입을 채우는 표시용이지 방어가 아니다 — 여기를 고쳐 규칙을 지키려 하지 않는다.
 
 **`sourceShoppingSettingId`는 불변이 아니다.** 일괄수정에서 같은 계정의 다른 설정으로 바뀐다. 불변은 쇼핑몰·쇼핑몰계정(`mallCode`·`mallAccountId`·`mallId`) 셋뿐이다.
 
-**목록 필터는 전부 컬럼을 읽는다(2026-09-22).** 계정 필터가 `settingSnapshot.mallAccountId`를 파던 비대칭은 계정이 top-level 컬럼이 되며 사라졌다. 상품명·판매상태는 `product_snapshot`에서 뽑은 생성 컬럼(`product_name`·`product_state`)이다. 새 필터를 붙일 때 스냅샷 안의 값이 필요하면 생성 컬럼을 추가한다 — 사본 컬럼을 앱에서 채우지 않는다.
+**목록 필터는 전부 컬럼을 읽는다.** 쇼핑몰·계정은 top-level 컬럼이고, 상품명·판매상태는 `product_snapshot`에서 뽑은 생성 컬럼(`product_name`·`product_state`)이다. 새 필터를 붙일 때 스냅샷 안의 값이 필요하면 생성 컬럼을 추가한다 — 사본 컬럼을 앱에서 채우지 않는다.
 
-재전송(`resendLinkedProducts`)도 클라이언트 payload가 아니라 연동 건 자신의 컬럼(`mallCode`·`mallAccountId`)만 읽어 외부몰을 호출한다 — "재전송이 다른 계정을 향한다"는 예전 문서가 우려하던 파급은 방어가 아니라 애초에 그 경로가 없어져 사라졌다.
+재전송(`resendLinkedProducts`)도 클라이언트 payload가 아니라 연동 건 자신의 컬럼(`mallCode`·`mallAccountId`)만 읽어 외부몰을 호출한다 — 재전송이 다른 계정을 향할 경로가 없다.
 
 **주의 — 설정 폼 섹션 3개는 세 화면이 공유한다.** `ShoppingSettingBasicInfoSection`·`ShoppingSettingAddressSection`·`ShoppingSettingMallInfoSection`을 설정 등록/수정 화면(`ShoppingSettingForm` 경유)과 연동상품 수정 화면(래퍼 없이 직접 나열)이 함께 쓴다. 설정 화면 사정으로 이 섹션에 쇼핑몰계정 Select를 붙이면 **연동상품 수정 화면에도 그대로 딸려 들어간다.** 컴포넌트를 공유하면 의도하지 않은 화면까지 따라오는 전례는 [`ui-conventions.md`](ui-conventions.md)의 "검색 필터는 화면이 소유한다" 절 참고.
 

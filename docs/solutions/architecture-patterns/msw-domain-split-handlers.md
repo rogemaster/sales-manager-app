@@ -55,6 +55,8 @@ src/mocks/
 └── utils/                   # 비즈니스 로직 유틸 (flat 구조 유지)
 ```
 
+> 위 트리는 분리 당시(2026-06-22) 구조다. 이후 인증·사용자·상품·쇼핑몰·홈 상품 통계가 route handler + Neon으로 옮겨가며 해당 핸들러 파일이 삭제됐고, 2026-09-24 기준 `handlers/`에는 주문 영역의 `home.ts`(order-stats)·`orders.ts`·`collection.ts`만 남았다. 현재 구조는 `.claude/rules/msw-rules.md` 참고. 분리 패턴(얇은 인덱스, `config.ts`, 고정 경로 먼저 등록)은 그대로 유효하다.
+
 ### config.ts — 공유 baseUrl
 
 ```typescript

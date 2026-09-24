@@ -53,7 +53,6 @@
 메뉴·버튼은 있지만 실제 화면/기능이 아직 구현되지 않은 경우, **클릭 시 alert로 막는 방식을 쓰지 않는다.** 대신 해당 메뉴·버튼 항목 자체를 사이드바/화면에서 삭제한다. 실제 구현이 완료되면 그때 다시 추가한다.
 
 - **Why:** alert 차단 코드는 "나중에 제거해야 한다"는 부채를 만들고, 클릭해도 아무것도 안 되는 버튼이 보이는 것 자체가 어색한 UX다. 없는 기능은 아예 안 보이는 게 자연스럽다.
-- (2026-06-25 alert 차단 방식을 전면 폐기하고 이 방침으로 전환 완료)
 
 ## 필터·쇼핑몰 공용 상수 (도메인별 재정의 금지)
 
@@ -65,7 +64,7 @@
 | 쇼핑몰 목록을 `FilterOption[]`으로 | `SHOPPING_MALL_OPTIONS` — `@/shared/constant/shoppingMall.constant` |
 | mallCode → 쇼핑몰 한글명 | `getShoppingMallName(code)` — `@/utils/shoppingMallGenerator` |
 
-- **Why:** 셋 다 공용 구현이 있는데도 도메인마다 다른 이름으로 재정의되어 있었다. 2026-08-06 정리 시점에 `{ id: 'ALL', name: '전체' }`가 8개 이름(`ALL_USER_GRADE`, `ALL_ACCOUNT_STATUS`, `ALL_MALL_NAME`, `ALL_SETTING_MALL_NAME`, `ALL_MALL_ACCOUNT`, `ALL_PRODUCT_STATUS_OPTION`, `ALL_ORDER_STATUS`, 로컬 `ALL_OPTION` 2곳)으로, `SHOPPING_MALLS.map(...)` 파생이 5곳, 로컬 `getMallName` 정의가 **10곳**에 있었다. 전부 제거하고 위 3개로 통일했다.
+- **Why:** 공용 구현이 있는데도 도메인마다 다른 이름으로 재정의돼 있었다(2026-08-06 정리 시점에 '전체' 옵션 8개 이름, 로컬 `getMallName` 10곳). 새로 만들면 같은 일이 반복된다.
 - 새 필터를 만들 때 "이 도메인 전용 '전체' 옵션"이 필요해 보이면 대부분 착각이다. `id: 'ALL'`은 검색 필터 타입들이 `T | 'ALL'` 형태로 이미 전제하고 있는 값이다.
 - `SHOPPING_MALLS`(원본 배열) 직접 참조는 **다른 형태로 파생할 때만** 허용한다 (예: `ShoppingAccountForm`의 코드 목록 `MALL_CODES`, mock 데이터 생성). 이름 조회·필터 옵션 목적이면 위 표를 쓴다.
 
@@ -98,7 +97,7 @@ export const XxxDateFilter = () => {
 
 - `dateType`은 **선택적**이다. 기준일이 하나뿐인 화면(주문수집 등)은 생략하고 `label`만 바꾼다.
 - `dateType`을 값·옵션·핸들러 개별 prop으로 흩지 않고 한 객체로 묶은 이유는 셋이 항상 함께 필요하기 때문이다. 일부만 넘기는 잘못된 조합을 타입 레벨에서 막는다.
-- **Why:** 이 배선(`pickerInitDate`·`resetKey`·`handleChangeDateRange`)이 7개 화면에 통째로 복사돼 있었다. 특히 "기간 버튼을 누르면 `resetKey`를 올려 `RangeDatePicker` 내부 state를 재동기화한다"는 비자명한 트릭이 7벌 복제돼, 여기 버그가 생기면 7곳을 고쳐야 했다. 2026-08-06 공용화 완료.
+- **Why:** "기간 버튼을 누르면 `resetKey`를 올려 `RangeDatePicker` 내부 state를 재동기화한다"는 비자명한 배선이 `RangeDateFilter` 안에만 있어야 한다. 화면마다 조립하면 이 트릭이 복제된다(2026-08-06 공용화 전 7벌).
 
 ## 목록 화면 검색 필터 store 네이밍
 
@@ -109,7 +108,7 @@ export const XxxDateFilter = () => {
 | UI 조작 중인 draft (검색 버튼 전) | `get<Domain>SearchFilterAtom` |
 | 검색 버튼으로 확정된 값 (쿼리에 사용) | `committedFiltersAtom` |
 
-`draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만, 5개 도메인(account·order·shoppingAccount·shoppingSetting·mallLinkedProduct) 중 4개가 이미 위 형태였고 2026-08-06에 나머지 하나를 맞춰 통일했다. 새 목록 화면은 위 표를 따른다.
+`draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만 기존 목록 화면이 전부 위 형태라 이쪽으로 통일했다. 새 목록 화면은 위 표를 따른다.
 
 ## 검색 필터는 화면이 소유한다 (다른 도메인 것을 가져다 쓰지 않는다)
 
