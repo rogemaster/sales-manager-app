@@ -13,6 +13,7 @@ applies_when:
   - 새 기능을 MSW vs DB 중 어디서 처리할지 결정할 때
   - 서버 전용 시크릿(외부 스토리지 키·DB 접속 정보)이 필요한 기능을 설계할 때
   - MSW에 남은 핸들러가 이미 DB로 옮긴 도메인의 데이터를 읽어야 할 때
+  - 도메인을 route로 옮긴 뒤 MSW를 켜는 범위(서버 listen, Provider 위치)를 점검할 때
 tags:
   - msw
   - neon-db
@@ -121,17 +122,20 @@ src/app/api/
 
 DB로 전환한 경로의 MSW 핸들러 파일과 관련 utils를 함께 제거해야 브라우저 fetch가 실제 route handler에 도달한다. 핸들러 파일 자체를 삭제하고 `handlers.ts` 인덱스의 import/spread도 제거한다.
 
-```typescript
-// src/mocks/handlers/auth.ts — logout만 유지 (나머지는 route.ts로 처리)
-export const authHandlers = [
-  http.post(`${baseUrl}/api/logout`, () => {
-    return new HttpResponse(null, {
-      headers: { 'Set-Cookie': 'connect.sid=;HttpOnly;Path=/;Max-Age=0' },
-    });
-  }),
-];
-// users.ts, profile.ts 핸들러 파일은 삭제됨
-```
+`auth.ts`는 2026-09-24에 마지막 남은 `/api/logout`까지 지워져 파일째 삭제됐다. 로그아웃은 NextAuth `signOut`(`/api/auth/signout`)이 처리하고 있었고, 이 핸들러는 express-session 시절 `connect.sid` 쿠키를 지우는 초기 잔재로 호출처가 없었다. **핸들러를 옮길 때 "남긴다"고 적은 것도 호출처를 grep해 실제로 쓰이는지 확인한다** — 이 문서가 "logout만 유지"라고 적어 둔 탓에 석 달간 필요한 코드처럼 읽혔다.
+
+## MSW를 켜는 범위 — 필요한 화면만 (2026-09-24)
+
+MSW는 **주문 영역(주문 목록·상세·수집, 홈 주문 통계)이 쓰는 브라우저 worker 하나**만 남았다. `MSWProvider`는 `(authenticated)` 레이아웃의 본문만 감싼다.
+
+**서버 MSW(`instrumentation.ts`의 `setupServer().listen()`)는 삭제했다.** 2026-06-05에 가입·로그인을 MSW로 돌리던 시절 운영 오류를 고치려고 넣은 것인데, 가입·로그인이 route로 옮겨간 뒤에는 가로챌 서버 측 요청이 하나도 없었다. 그런데도 켜져 있던 비용이 컸다:
+
+- **DB 쿼리가 전부 경고로 찍혔다.** `drizzle-orm/neon-http`는 쿼리를 `fetch`로 보낸다. Node에서 도는 MSW는 전역 `fetch`를 가로채므로, 기본값 `onUnhandledRequest: 'warn'`이 **쿼리마다 요청 본문(SQL + 파라미터 값)을 로그에 출력**했다. dev에서 `/api/check-email` 한 번에 `[MSW] Warning: … POST https://…neon.tech/sql … "params":["<이메일>","1"]`가 찍히는 것을 확인했다. 운영도 같은 코드 경로였다(`NODE_ENV` 조건 없음, msw가 `dependencies`).
+- 로그 노이즈가 아니라 **민감정보 노출**이다 — 같은 경로로 비밀번호 해시·쇼핑몰계정 자격증명 INSERT의 파라미터도 찍힐 수 있다.
+
+**루트에 있던 `MSWProvider`는 `(authenticated)`로 내렸다.** 루트에 둔 이유도 가입·로그인 커버였다. worker 준비 전 `null`을 렌더하므로 서버가 그린 HTML이 비어 있었다(`/login` HTML에 '로그인' 0건 → 이동 후 표시됨). 헤더·사이드바는 MSW API를 부르지 않아 감싸지 않는다. 재로그인으로 레이아웃이 다시 마운트돼도 `worker.start()`는 한 번만 부른다(모듈 스코프 promise).
+
+**교훈 — MSW를 켜 둔 이유가 사라지면 켜는 범위도 같이 줄인다.** 도메인을 route로 옮길 때마다 핸들러는 지웠지만, 그 핸들러들 때문에 켜 둔 전역 장치(서버 `listen()`, 루트 Provider)는 그대로 남았다. 전역 장치는 핸들러 목록이 줄어도 에러가 나지 않아 스스로 드러나지 않는다. 특히 **서버에서 도는 MSW는 서버의 모든 `fetch`를 지나가므로**, `fetch` 기반 DB 드라이버·외부 API 호출이 생기면 그 요청 본문이 로그에 남는다.
 
 ## Why Not Full DB Migration
 
