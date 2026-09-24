@@ -29,3 +29,11 @@ export const toKstDateRange = (startDate: string, endDate: string): { start: Dat
   start: dayjs.tz(startDate, KST).startOf('day').toDate(),
   endExclusive: dayjs.tz(endDate, KST).startOf('day').add(1, 'day').toDate(),
 });
+
+/**
+ * 시각을 KST 기준 'YYYY-MM-DD'로 자른다.
+ *
+ * 서버(Vercel)는 UTC로 돌기 때문에 dayjs(date).format()을 그대로 쓰면
+ * KST 자정~오전 9시 사이 시각이 전날 날짜로 표시된다.
+ */
+export const toKstYmd = (date: Date | string): string => dayjs(date).tz(KST).format('YYYY-MM-DD');

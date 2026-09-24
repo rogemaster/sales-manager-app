@@ -7,8 +7,7 @@ import { isYmd, toKstDateRange } from '@/shared/utils/date';
 import { clampPositiveInt } from '@/shared/utils/pagination';
 import { ProductSearch } from '@/features/products/types/product.types';
 
-// 상한 1000은 MSW 어댑터(mocks/utils/fetchProducts.ts)가 "사실상 전체"로 보내는 값이다.
-const MAX_PAGE_SIZE = 1000;
+const MAX_PAGE_SIZE = 100;
 const DEFAULT_PAGE_SIZE = 10;
 
 export async function POST(req: NextRequest) {

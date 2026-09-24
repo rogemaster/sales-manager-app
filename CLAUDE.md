@@ -118,7 +118,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
   - `formatPhone(value)` — 자동 하이픈 포맷터 (010-XXXX-XXXX)
   - `PHONE_REGEX` — 직접 regex가 필요한 경우
 - **몰(mallCode)별 고유 필드 컴포넌트 분리 기준:** 몰 고유 필드 컴포넌트가 3개 이상이 되면 Excel 전략 패턴처럼 디렉토리로 분리한다. 자세한 내용은 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md) 참고.
-- **시각 컬럼과 날짜 범위 필터:** 신규 테이블의 시각 컬럼은 `timestamp({ withTimezone: true })`를 쓴다. 날짜 범위 필터는 `src/shared/utils/date.ts`의 `toKstDateRange()`로 **KST 반개구간**(`>= start`, `< end + 1일`)을 만들어 비교한다. `lte(endDate)`로 비교하면 끝날짜 당일에 등록된 건이 통째로 누락되고, UTC 기준으로 자르면 KST 자정~오전 9시 등록 건이 하루 밀린다. `users` 테이블이 `text` `'YYYY-MM-DD'`인 것은 하위호환으로 유지하는 것이며 **선례로 삼지 않는다.**
+- **시각 컬럼과 날짜 범위 필터:** 신규 테이블의 시각 컬럼은 `timestamp({ withTimezone: true })`를 쓴다. 날짜 범위 필터는 `src/shared/utils/date.ts`의 `toKstDateRange()`로 **KST 반개구간**(`>= start`, `< end + 1일`)을 만들어 비교한다. `lte(endDate)`로 비교하면 끝날짜 당일에 등록된 건이 통째로 누락되고, UTC 기준으로 자르면 KST 자정~오전 9시 등록 건이 하루 밀린다. `users` 테이블이 `text` `'YYYY-MM-DD'`인 것은 하위호환으로 유지하는 것이며 **선례로 삼지 않는다.** 서버에서 시각을 `'YYYY-MM-DD'`로 잘라 내려줄 때는 `toKstYmd()`를 쓴다 — Vercel은 UTC라 `dayjs(date).format()`은 KST 자정~오전 9시 건을 전날로 표시한다.
 
 ## Claude Code 서브에이전트 (Agent)
 

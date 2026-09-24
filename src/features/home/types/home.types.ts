@@ -8,6 +8,12 @@ export interface HomeStats {
   waitSale: number;
 }
 
+export interface HomeLinkedProductStats {
+  total: number;
+  success: number;
+  failed: number;
+}
+
 export interface HomeOrderStats {
   newOrder: number;
   confirmedOrder: number;

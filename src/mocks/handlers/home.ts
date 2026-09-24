@@ -1,33 +1,10 @@
 import { http, HttpResponse } from 'msw';
 import { baseUrl } from '../config';
-import { getMockHomeStats, getMockRecentProducts } from '../utils/getHomeData';
 import { getMockHomeOrderStats } from '../utils/getHomeOrderStats';
-import { fetchProductsForMock } from '../utils/fetchProducts';
-import { isUnauthorizedError } from '@/shared/utils/unauthorized';
 
+// 상품 통계·최근 상품은 실제 route(/api/home/stats, /api/home/recent-products)가 처리한다.
+// 주문 데이터는 아직 mock이라 주문 통계만 여기 남는다.
 export const homeHandlers = [
-  http.post(`${baseUrl}/api/home/stats`, async ({ request }) => {
-    const { ownerId } = (await request.json()) as { ownerId: string };
-    try {
-      const products = await fetchProductsForMock();
-      return HttpResponse.json(getMockHomeStats(products, ownerId));
-    } catch (error) {
-      if (isUnauthorizedError(error)) return new HttpResponse(null, { status: 401 });
-      throw error;
-    }
-  }),
-
-  http.post(`${baseUrl}/api/home/recent-products`, async ({ request }) => {
-    const { ownerId } = (await request.json()) as { ownerId: string };
-    try {
-      const products = await fetchProductsForMock();
-      return HttpResponse.json(getMockRecentProducts(products, ownerId));
-    } catch (error) {
-      if (isUnauthorizedError(error)) return new HttpResponse(null, { status: 401 });
-      throw error;
-    }
-  }),
-
   http.post(`${baseUrl}/api/home/order-stats`, async ({ request }) => {
     const { ownerId, startDate, endDate } = (await request.json()) as {
       ownerId: string;

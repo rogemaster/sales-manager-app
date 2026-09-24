@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isYmd, toKstDateRange } from './date';
+import { isYmd, toKstDateRange, toKstYmd } from './date';
 
 describe('toKstDateRange', () => {
   it('start는 KST 자정 = UTC 전날 15:00 이다', () => {
@@ -59,5 +59,20 @@ describe('isYmd', () => {
     expect(isYmd(null)).toBe(false);
     expect(isYmd(20260901)).toBe(false);
     expect(isYmd(new Date())).toBe(false);
+  });
+});
+
+describe('toKstYmd', () => {
+  it('KST 자정 직후(UTC 전날 15:00)는 KST 날짜로 자른다', () => {
+    // UTC로 자르면 2026-08-31로 하루 밀린다 — 서버(Vercel)는 UTC로 돈다
+    expect(toKstYmd(new Date('2026-08-31T15:00:00.000Z'))).toBe('2026-09-01');
+  });
+
+  it('KST 자정 직전(UTC 14:59)은 그날로 남는다', () => {
+    expect(toKstYmd(new Date('2026-08-31T14:59:59.999Z'))).toBe('2026-08-31');
+  });
+
+  it('ISO 문자열도 받는다', () => {
+    expect(toKstYmd('2026-09-01T08:00:00+09:00')).toBe('2026-09-01');
   });
 });
