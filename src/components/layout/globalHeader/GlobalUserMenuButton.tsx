@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronDown, LogOut, Settings } from 'lucide-react';
-import { useAtomValue, useSetAtom } from 'jotai/index';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { getUserInfoAtom, resetUserInfoAtom } from '@/features/auth/store/auth.store';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
