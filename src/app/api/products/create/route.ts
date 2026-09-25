@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { products } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
@@ -67,6 +68,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: CUSTOMER_CODE_CONFLICT_MESSAGE }, { status: 400 });
     }
     console.error('상품 등록 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

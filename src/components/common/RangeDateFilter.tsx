@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RangeDatePicker } from '@/components/common/RangeDatePicker';
 import { DatePickerRangeButton } from '@/components/common/DatePickerRangeButton';
-import { calculatorRangeDate } from '@/lib/utils';
+import { calculatorRangeDate } from '@/shared/utils/date';
 import { FilterOption, RangeTypeProps } from '@/types/common.type';
 
 type DateTypeSelect = {

@@ -7,3 +7,17 @@ export const clampPositiveInt = (value: unknown, fallback: number, max: number):
   if (!Number.isFinite(parsed) || parsed < 1) return fallback;
   return Math.min(parsed, max);
 };
+
+/** 목록 하단 페이지 버튼에 보여줄 번호들. 현재 페이지가 속한 range 단위 블록을 돌려준다(TablePagination). */
+export const getPage = (range: number, currentPage: number, totalPages: number): number[] => {
+  const maxRange = range || 10;
+
+  if (totalPages <= range) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const currentBlock = Math.floor((currentPage - 1) / maxRange);
+  const startPage = currentBlock * maxRange + 1;
+  const endPage = Math.min(startPage + maxRange - 1, totalPages);
+  return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+};

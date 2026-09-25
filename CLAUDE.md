@@ -83,10 +83,12 @@ const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/l
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(data),
 });
-throwIfUnauthorized(response); // 401 → UnauthorizedError → QueryClient가 signOut (src/shared/utils/unauthorized.ts)
-if (!response.ok) throw new Error('에러 메시지');
+// 401 → UnauthorizedError(전역 signOut), 그 밖의 실패 → 서버 { error } 사유 또는 fallback으로 throw (src/shared/utils/apiResponse.ts)
+await throwIfNotOk(response, '상품 목록 조회 실패');
 return response.json();
 ```
+
+route의 catch는 `serverErrorResponse()`(src/shared/utils/serverError.ts)로 500을 돌려준다.
 
 ### Shared Components
 

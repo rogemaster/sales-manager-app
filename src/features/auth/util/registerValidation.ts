@@ -4,8 +4,6 @@ import { passwordSchema } from '@/shared/utils/password';
 import { EMAIL_FORMAT_MESSAGE, EMAIL_REGEX, emailSchema } from '@/shared/utils/email';
 import { maxLengthMessage, TEXT_LIMITS } from '@/shared/utils/textLimit';
 
-export { formatPhone } from '@/shared/utils/phone';
-
 const BUSINESS_NUMBER_REGEX = /^\d{3}-\d{2}-\d{5}$/;
 
 const shortText = (emptyMessage?: string) => {

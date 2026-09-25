@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { randomUUID } from 'crypto';
 import { db } from '@/db';
 import { shoppingAccounts, shoppingSettings } from '@/db/schema';
@@ -57,6 +58,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
     console.error('쇼핑몰 정보설정 생성 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

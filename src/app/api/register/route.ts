@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { EMAIL_TAKEN_MESSAGE, isEmailTaken } from '@/features/account/server/userStore';
 import { db } from '@/db';
 import { users } from '@/db/schema';
@@ -47,6 +48,6 @@ export async function POST(req: NextRequest) {
     return new NextResponse(null, { status: 201 });
   } catch (error) {
     console.error('회원가입 처리 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

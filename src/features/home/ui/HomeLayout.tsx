@@ -11,7 +11,7 @@ import { getHomeLinkedProductStats } from '@/features/home/api/getHomeLinkedProd
 import { getHomeOrderStats } from '@/features/home/api/getHomeOrderStats';
 import { getRecentProducts } from '@/features/home/api/getRecentProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
-import { calculatorRangeDate } from '@/lib/utils';
+import { calculatorRangeDate } from '@/shared/utils/date';
 import { ClaimStatCards } from './components/ClaimStatCards';
 import { InquiryStatCards } from './components/InquiryStatCards';
 import { LinkedProductStatCards } from './components/LinkedProductStatCards';

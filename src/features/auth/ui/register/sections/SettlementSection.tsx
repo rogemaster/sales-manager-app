@@ -4,7 +4,8 @@ import { Control, Controller, FieldErrors, UseFormRegister } from 'react-hook-fo
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { RegisterFormData, formatPhone } from '@/features/auth/util/registerValidation';
+import { RegisterFormData } from '@/features/auth/util/registerValidation';
+import { formatPhone } from '@/shared/utils/phone';
 
 type Props = {
   register: UseFormRegister<RegisterFormData>;

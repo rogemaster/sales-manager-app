@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { isEmailTaken } from '@/features/account/server/userStore';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { checkEmailSchema } from '@/features/auth/util/registerValidation';
@@ -13,6 +14,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ available: !(await isEmailTaken(email)) });
   } catch (error) {
     console.error('이메일 중복 확인 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { INVALID_IMAGE_URL_MESSAGE } from '@/shared/constant/upload.constant';
 import { buildImageKey, putImage, PRODUCT_IMAGE_PREFIX } from '@/lib/storage';
@@ -24,6 +25,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: remoteImageErrorMessage(error) }, { status: 400 });
     }
     console.error('이미지 가져오기 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

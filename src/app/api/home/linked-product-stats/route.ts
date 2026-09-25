@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { mallLinkedProducts } from '@/db/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
@@ -33,6 +34,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(toLinkedProductStats(rows));
   } catch (error) {
     console.error('홈 연동상품 통계 조회 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }
