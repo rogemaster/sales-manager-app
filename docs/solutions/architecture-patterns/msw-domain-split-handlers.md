@@ -1,6 +1,7 @@
 ---
 title: MSW handlers를 도메인별 파일로 분리하는 패턴
 date: 2026-06-22
+last_updated: 2026-09-25
 category: architecture-patterns
 module: mocks
 problem_type: architecture_pattern
@@ -8,7 +9,7 @@ component: development_workflow
 severity: medium
 applies_when:
   - MSW handler file grows beyond ~100 lines
-  - Adding a new domain to the mock API layer
+  - Adding a handler to the remaining mock API layer (order area only — new domains are route handlers)
   - "A PATCH route uses both a static segment (e.g. /status) and a dynamic segment (e.g. /:id) under the same prefix"
 symptoms:
   - handlers.ts becomes hard to navigate and maintain as domains multiply
@@ -69,27 +70,12 @@ export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 ### handlers.ts — index only
 
 ```typescript
-import { authHandlers } from './handlers/auth';
+// src/mocks/handlers.ts (2026-09-24 기준 — 주문 영역만 남았다)
 import { homeHandlers } from './handlers/home';
-import { productHandlers } from './handlers/products';
 import { orderHandlers } from './handlers/orders';
-import { mallAccountHandlers } from './handlers/mallAccounts';
 import { collectionHandlers } from './handlers/collection';
-import { userHandlers } from './handlers/users';
-import { profileHandlers } from './handlers/profile';
-import { shoppingAccountHandlers } from './handlers/shoppingAccounts';
 
-export const handlers = [
-  ...authHandlers,
-  ...homeHandlers,
-  ...productHandlers,
-  ...orderHandlers,
-  ...mallAccountHandlers,
-  ...collectionHandlers,
-  ...userHandlers,
-  ...profileHandlers,
-  ...shoppingAccountHandlers,
-];
+export const handlers = [...homeHandlers, ...orderHandlers, ...collectionHandlers];
 ```
 
 핸들러 정의나 비즈니스 로직은 이 파일에 넣지 않는다.
@@ -123,7 +109,7 @@ export const orderHandlers = [
 고정 경로(`/status`)와 동적 경로(`/:id`)가 같은 prefix를 공유할 때, MSW는 등록 순서대로 첫 번째 매칭 핸들러를 사용한다. **고정 경로 핸들러를 반드시 먼저 등록**하지 않으면 `/:id`가 문자열 `"status"`를 가로챈다.
 
 ```typescript
-// src/mocks/handlers/shoppingAccounts.ts
+// src/mocks/handlers/shoppingAccounts.ts (당시 예시 — 2026-09-21 route로 옮겨가며 삭제됨)
 export const shoppingAccountHandlers = [
   // 고정 경로 FIRST — /:id가 "status"를 가로채는 것을 방지
   http.patch(`${baseUrl}/api/shopping/accounts/status`, async ({ request }) => {
@@ -136,15 +122,19 @@ export const shoppingAccountHandlers = [
 ];
 ```
 
+충돌은 **메서드까지 같을 때만** 난다. 지금 남은 `orders.ts`의 `POST /orders/bulk`와 `GET·PATCH /orders/:orderId`는 메서드가 달라 충돌하지 않지만, 고정 경로를 먼저 두는 순서는 지켜져 있다. Next.js route handler는 파일 경로로 라우팅하므로 이 문제가 없다 — 등록 순서 규칙은 MSW 핸들러에만 해당한다.
+
 이 순서 규칙의 상세한 작동 원리는 `docs/solutions/integration-issues/msw-patch-route-ordering-conflict.md` 참고.
 
 ### 새 핸들러 추가 절차
 
+**새 API는 기본적으로 `src/app/api/.../route.ts` + Neon으로 만든다.** MSW 핸들러는 아직 DB로 옮기지 않은 주문 영역의 mock을 넓힐 때만 추가한다(`.claude/rules/msw-rules.md`). 그 경우:
+
 1. 해당 도메인 파일 `src/mocks/handlers/<domain>.ts`를 찾는다.
-2. 그 파일의 export 배열에 `http.*` 핸들러를 추가한다.
-3. 새 도메인이면 `src/mocks/handlers/newDomain.ts`를 생성하고, `handlers.ts` 인덱스에 spread를 추가한다.
-4. 로직이 단순 one-liner 이상이면 `src/mocks/utils/<verb><Domain>.ts`로 분리한다.
-5. **절대 금지:** `src/app/api/*/route.ts` 파일 생성 — MSW가 개발 환경의 모든 API 요청을 가로채므로 Next.js route handler 파일은 필요 없다.
+2. 그 파일의 export 배열에 `http.*` 핸들러를 추가한다. 고정 경로는 같은 prefix의 동적 경로보다 먼저 등록한다.
+3. 로직이 단순 one-liner 이상이면 `src/mocks/utils/<verb><Domain>.ts`로 분리한다.
+
+> 분리 당시(2026-06-22)에는 5번째 단계로 *"`route.ts` 생성 절대 금지 — MSW가 모든 API를 가로챈다"*가 있었다. 2026-09-24 기준 이 규칙은 뒤집혔다 — 주문 외 모든 API가 route handler다.
 
 ## Why This Matters
 
@@ -161,10 +151,9 @@ export const shoppingAccountHandlers = [
 
 ## When to Apply
 
-- 새 도메인이 추가될 때 (새 피처 모듈, 새 API 라우트 집합)
 - 기존 도메인 핸들러 파일이 화면 한 페이지를 넘길 때
 - 고정 경로와 동적 경로가 같은 prefix를 공유할 때 — 항상 등록 순서를 확인한다
-- `browser.ts`와 `node.ts`는 수정 불필요 — 이들은 `handlers.ts` index의 `handlers` 배열을 import하므로 내부 구조 변경의 영향을 받지 않는다
+- `browser.ts`는 수정 불필요 — `handlers.ts` index의 `handlers` 배열을 import하므로 내부 구조 변경의 영향을 받지 않는다 (서버용 `node.ts`는 2026-09-24 서버 MSW와 함께 삭제됐다)
 
 ## Examples
 
@@ -208,31 +197,9 @@ export const productHandlers = [
 ];
 ```
 
-### 새 도메인 추가 예시
+### 새 도메인은 MSW 파일이 아니라 route로 만든다
 
-```typescript
-// src/mocks/handlers/purchaseAccounts.ts (새 파일)
-import { http, HttpResponse } from 'msw';
-import { baseUrl } from '../config';
-import { getPurchaseAccounts } from '../utils/getPurchaseAccounts';
-
-export const purchaseAccountHandlers = [
-  http.post(`${baseUrl}/api/purchase/accounts/list`, async ({ request }) => {
-    const body = await request.json();
-    return HttpResponse.json(getPurchaseAccounts(body));
-  }),
-];
-```
-
-```typescript
-// src/mocks/handlers.ts에 한 줄 추가
-import { purchaseAccountHandlers } from './handlers/purchaseAccounts';
-
-export const handlers = [
-  // ...기존 핸들러들...
-  ...purchaseAccountHandlers,
-];
-```
+분리 당시에는 매입처 같은 새 도메인을 `handlers/purchaseAccounts.ts` 파일 추가 + 인덱스 spread 한 줄로 붙이는 예시를 들었다. 지금은 새 도메인을 MSW로 만들지 않는다 — `src/app/api/<domain>/.../route.ts`에 `requireSession`/`requirePermission`으로 시작하는 route handler를 만든다(`.claude/rules/msw-rules.md`, `[[api-route-session-auth-guard]]`).
 
 ## Related
 

@@ -70,23 +70,26 @@ export const isOwnerMatch = (resourceOwnerId: string, requestOwnerId: string | n
 ### 핸들러 패턴 (GET/PATCH 공통)
 
 ```typescript
-// src/mocks/handlers/products.ts
-http.get(`${baseUrl}/api/products/:productId`, ({ params, request }) => {
+// src/mocks/handlers/orders.ts
+http.get(`${baseUrl}/api/orders/:orderId`, ({ params, request }) => {
+  const { orderId } = params;
   const ownerId = request.headers.get('X-Owner-Id');
-  const data = MOCK_PRODUCT_DATA.find((item) => item.productId === params.productId);
-  if (!data || !isOwnerMatch(data.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
-  return HttpResponse.json(data);
+  const base = MOCK_ORDERS_DATA.find((item) => item.orderNumber === orderId);
+  if (!base || !isOwnerMatch(base.ownerId, ownerId)) return new HttpResponse(null, { status: 404 });
+  // ...상세 보강 후 반환
 }),
 ```
+
+(처음 적용한 곳은 상품 단건 GET/PATCH였다. 상품은 2026-09-01 route로 옮겨 이 패턴을 떠났다 — 아래 갱신 절.)
 
 **불일치와 리소스 없음을 항상 같은 404로 응답한다.** 다른 테넌트 리소스가 "존재는 하지만 접근 불가"인지 "아예 없음"인지 구분해서 알려주면 존재 여부 자체가 유출된다.
 
 ### 클라이언트 — 헤더 첨부
 
 ```typescript
-// src/features/products/api/getProduct.ts
-export const getProduct = async (productId: string, ownerId: string) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${productId}`, {
+// src/features/order/api/getOrder.ts
+export const getOrder = async (orderId: string, ownerId: string): Promise<OrderDetail> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}`, {
     headers: { 'X-Owner-Id': ownerId },
   });
   // ...
@@ -138,9 +141,11 @@ const findOwnedOrder = (orderId: string, ownerId: string | null) => {
 PATCH 핸들러는 *읽기* 접근을 소유권 체크로 막지만, 업데이트 payload 자체(도메인 타입에 `ownerId` 필드가 있는 경우)를 그대로 spread하면 클라이언트가 보낸 `ownerId`로 리소스 소유권이 조용히 바뀔 수 있다. `updateMockX` 유틸에서 기존 레코드의 `ownerId`를 항상 재고정한다.
 
 ```typescript
-// src/mocks/utils/updateProduct.ts
-MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update, ownerId: MOCK_PRODUCT_DATA[index].ownerId };
+// src/mocks/utils/updateOrder.ts
+MOCK_ORDERS_DATA[index] = { ...MOCK_ORDERS_DATA[index], ...orderUpdate, ownerId: MOCK_ORDERS_DATA[index].ownerId };
 ```
+
+route로 옮긴 도메인에서는 같은 역할을 `UPDATE`의 `SET`에 `ownerId`를 넣지 않는 것이 한다(예: `src/features/mallLinkedProduct/util/linkedProductWrite.ts`의 `buildSnapshotUpdate`).
 
 현재 UI 폼에 `ownerId`를 편집 가능한 필드로 노출한 곳은 없어 당장 악용 가능한 권한 상승은 아니지만(최악의 경우 자기 리소스를 자기 테넌트에서 스스로 이탈시키는 정도), 이 작업의 목적 자체가 테넌트 격리 강화이므로 재고정을 함께 넣었다.
 
@@ -165,11 +170,11 @@ MOCK_PRODUCT_DATA[index] = { ...MOCK_PRODUCT_DATA[index], ...update, ownerId: MO
 1. 그 엔드포인트가 **실제 route handler**인가(DB·서버 전용 시크릿이 필요해서)? → `requireSession`(등급 무관) 또는 `requirePermission(req, '<permission>')`(정책표 `src/shared/utils/permission.ts`에 키가 있는 쓰기)을 쓴다. 클라이언트가 보낸 `ownerId`는 body에 있어도 무시한다. `[[api-route-session-auth-guard]]` 참고.
 2. **MSW 핸들러**인가? → 이 문서의 `X-Owner-Id` 헤더 패턴을 그대로 쓴다. 서비스 워커는 세션을 읽을 수 없으므로 이게 여전히 최선이다.
 
-두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다.
+두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다. **2026-09-24 기준 2번(헤더 패턴)을 쓰는 곳은 주문 영역(주문 상세·클레임·코멘트·히스토리·수정, 주문 수집 트리거)뿐이다.** 쇼핑몰계정·정보설정·연동상품도 2026-09-21~22에 1번으로 넘어갔다.
 
 ## When to Apply
 
-- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → **MSW로 처리하는 경우에 한해** GET/PATCH 모두 `X-Owner-Id` 헤더 + `isOwnerMatch` 검증 (실 route라면 위 갱신 절의 1번)
+- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → 새 API는 route가 기본이므로 **위 갱신 절의 1번**(`requireSession`/`requirePermission`)을 쓴다. 이 문서의 헤더 패턴은 주문 영역 MSW 핸들러를 넓힐 때만 해당한다
 - 여러 id를 한 번에 받는 액션(일괄 실행/일괄 삭제 등)을 설계할 때 → **기본값은 fail-closed**(`allOwnedBy`로 전부 소유 확인 후 진행, 하나라도 불일치 시 전체 거부). 필터링-후-진행으로 갈 정당한 이유가 있다면 그 이유를 문서에 명시할 것
 - 기존 API 함수 시그니처에 인자를 추가할 때 → 커밋 전에 반드시 전체 호출부 grep
 

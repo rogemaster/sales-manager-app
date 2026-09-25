@@ -84,7 +84,7 @@ const settingOptions: FilterOption[] = useMemo(() => {
 
 - **틀린 값이 그럴듯해서 오래 산다.** 설정 별칭("네이버 기본", "쿠팡 메인")은 계정 이름처럼 읽힌다. 값이 비어 있거나 깨져 보이지 않으니 화면만 봐서는 오류를 알아채기 어렵다.
 - **denormalize된 필드가 함정이다.** `ShoppingSetting.mallId`는 성능을 위해 계정에서 복사해 둔 값이다. 하위 엔티티 안에 상위 값이 섞여 있으므로, "`settingSnapshot`에서 꺼냈으니 설정 값"이라는 추론이 성립하지 않는다.
-- **연동 데이터에서는 스냅샷이 정본이다.** `sourceShoppingSettingId`로 지금의 오리지널 설정을 거슬러 조회하면 전송 당시와 다른 답이 나올 수 있다. 계정 필터가 `settingSnapshot.mallAccountId`를 읽는 이유다.
+- **연동 데이터에서는 스냅샷이 정본이다.** `sourceShoppingSettingId`로 지금의 오리지널 설정을 거슬러 조회하면 전송 당시와 다른 답이 나올 수 있다. 계정 필터가 오리지널 설정이 아니라 연동 건 자신의 값을 읽는 이유다 — 처음에는 `settingSnapshot.mallAccountId`였고, 2026-09-22 DB화 뒤로는 연동 건의 top-level 컬럼 `mall_account_id`다(불변 식별 필드라 스냅샷에는 사본을 두지 않는다).
 
 ## When to Apply
 
@@ -96,7 +96,7 @@ const settingOptions: FilterOption[] = useMemo(() => {
 
 - `src/features/mallLinkedProduct/ui/components/MallLinkedProductTable.tsx` — 계정·설정 컬럼 분리
 - `src/features/mallLinkedProduct/ui/components/filter/MallLinkedConditionFilter.tsx` — 계정→설정 연쇄 필터
-- `src/mocks/utils/getMallLinkedProducts.ts` — 계정은 스냅샷, 설정은 top-level `sourceShoppingSettingId`로 거른다
+- `src/app/api/shopping/linked-products/list/route.ts` — 계정은 `mall_account_id`, 설정은 `source_shopping_setting_id` 컬럼으로 거른다
 - [`mall-account-to-setting-one-to-many-pattern.md`](mall-account-to-setting-one-to-many-pattern.md) — 계정 1 : 설정 N 구조와 `nickname`의 역할
 - [`snapshot-entity-source-link-break-is-by-design.md`](snapshot-entity-source-link-break-is-by-design.md) — 연동 데이터가 오리지널과 동기화되지 않는 이유
-- `.claude/rules/domain-design.md` — "연동 데이터에서 수정할 수 없는 것" 절 (목록이 `settingSnapshot`을 읽게 된 변화 반영됨)
+- `.claude/rules/domain-design.md` — "연동 데이터에서 수정할 수 없는 것" 절 (목록 필터가 전부 컬럼을 읽는다)

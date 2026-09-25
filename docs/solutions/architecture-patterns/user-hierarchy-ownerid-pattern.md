@@ -71,25 +71,34 @@ export interface CreateUserBody extends Omit<User, 'company' | 'location' | 'gra
 
 ### 사용자 관리 목록 필터링
 
-유저 관련 API는 MSW가 아닌 **Neon DB route handler**로 처리한다(msw-rules.md의 예외 규칙 — 인증 관련 API는 route.ts 사용). 클라이언트가 `workspaceOwnerIdAtom`으로 해석한 `ownerId`를 body로 전달하고, route handler는 그대로 `WHERE owner_id = :ownerId`로 필터링한다.
+유저 관련 API는 **Neon DB route handler**로 처리한다. **`ownerId`는 클라이언트가 보낸 값이 아니라 세션에서 꺼낸 값을 쓴다** — `requireSession`/`requirePermission`(`src/shared/utils/apiAuth.ts`)이 매 요청 DB에서 사용자를 다시 조회해 돌려주는 `session.ownerId`다. body에 `ownerId`가 들어 있어도 읽지 않는다.
 
 ```typescript
 // src/app/api/account/users/list/route.ts
 export async function POST(req: NextRequest) {
-  const { ownerId, filters, page, pageSize } = await req.json();
-  const conditions = [eq(users.ownerId, ownerId), /* 날짜/등급/검색 조건 추가 */];
-  const rows = await db.select().from(users).where(and(...conditions)).limit(pageSize).offset((page - 1) * pageSize);
+  const session = await requireSession(req); // 목록 조회는 전 등급 허용
+  if (session instanceof NextResponse) return session;
+  const body = await parseRequestBody(req, userListRequestSchema);
+  if (body instanceof NextResponse) return body;
+
+  const conditions = [eq(users.ownerId, session.ownerId) /* 날짜/등급/검색 조건 추가 */];
   // ...
 }
 ```
 
 ```typescript
-// src/app/api/account/users/create/route.ts — 하위 유저 등록 시 ownerId를 body로 그대로 저장
-const { ownerId, email, password, name, phone, grade, status } = await req.json();
-await db.insert(users).values({ id, ownerId, email, /* ... */ });
+// src/app/api/account/users/create/route.ts — 하위 유저는 등록자의 워크스페이스에 종속된다
+const session = await requirePermission(req, 'user.create'); // super_admin·admin
+// ...
+await db.insert(users).values({
+  id,
+  ownerId: session.ownerId,
+  status: resolveNewUserStatus(session.grade), // super_admin → active, admin → pending
+  /* ... */
+});
 ```
 
-> **2026-09-23 갱신:** `status`는 더 이상 body에서 읽지 않는다. 서버가 `resolveNewUserStatus(등록자 grade)`로 정한다 — super_admin이 등록하면 `active`, admin이 등록하면 `pending`.
+> **경위:** 처음(2026-06)에는 클라이언트가 `workspaceOwnerIdAtom`으로 해석한 `ownerId`를 body로 보내고 route가 그대로 `WHERE`에 넣었다. 다른 워크스페이스의 `ownerId`를 보내면 그 워크스페이스를 조회할 수 있는 구조였다. 2026-07-16 인증 가드(`[[api-route-session-auth-guard]]`)에서 세션 기반으로 바뀌었고, 2026-09-23 등급 정책표(`src/shared/utils/permission.ts`)로 `status`도 서버가 정한다.
 
 ### 데이터 구조 예시
 
@@ -133,6 +142,8 @@ UPDATE users SET owner_id = id WHERE id = 'usr_2f20748f';
 ```
 
 ### mock 데이터를 실제 DB id와 맞추는 절차
+
+> **2026-09-22 이후 대상이 줄었다.** 쇼핑몰계정·정보설정은 Neon으로 옮겨 시드 스크립트(`scripts/seedShoppingAccounts.ts` 등, 로컬 전용)가 실제 계정 id로 행을 만든다. 이 절차가 아직 적용되는 곳은 MSW에 남은 주문 영역 mock(`src/mocks/data/MockOrdersData.ts`·`MockCollectionJobsData.ts`)뿐이다.
 
 이 프로젝트처럼 **일부 도메인은 실 DB(Neon), 일부는 MSW mock**을 쓰는 구조에서는, mock 데이터의 `ownerId`가 실제 DB의 계정 id와 반드시 일치해야 로그인 후 데이터가 보인다. 새 mock 도메인을 추가하거나 인증 흐름이 바뀔 때마다:
 
@@ -204,7 +215,7 @@ interface PurchaseSource {
 ## When to Apply
 
 - 새로운 도메인 엔티티(매입처, 매출처 등)를 설계할 때 → `ownerId: string` 포함
-- 목록 조회 MSW handler 또는 API를 작성할 때 → `ownerId` 필터 필수
+- 목록 조회 API를 작성할 때 → `ownerId` 필터 필수. route라면 값은 세션(`session.ownerId`)에서 꺼낸다
 - 사용자 등록 Zod 스키마를 작성할 때 → `grade`를 `SubUserGrade`로 제한
 
 ## Related
@@ -214,5 +225,6 @@ interface PurchaseSource {
 - `src/features/auth/store/auth.store.ts` — `workspaceOwnerIdAtom` (2026-07-18부터 `ownerIdAtom`을 그대로 노출, `?? id` fallback 없음)
 - `src/app/api/register/route.ts` — 회원가입 시 `ownerId` 자기참조 저장
 - `src/app/api/account/users/list/route.ts`, `create/route.ts` — Neon DB 기반 사용자 목록/등록
-- `src/mocks/data/MockShoppingAccountsData.ts`, `MockShoppingSettingsData.ts` — 실제 계정 id로 동기화된 mock 데이터 예시
+- `src/shared/utils/apiAuth.ts` — `requireSession`/`requirePermission`, 세션 `ownerId`의 출처
+- `src/mocks/data/MockOrdersData.ts` — 아직 실제 계정 id와 맞춰야 하는 mock 데이터(주문 영역)
 - `docs/solutions/architecture-patterns/typescript-type-design-patterns.md` — `Exclude<>` 기반 SubUserGrade 패턴 (Pattern 5)

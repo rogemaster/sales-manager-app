@@ -259,18 +259,24 @@ if (matchedAccount.mallCode === 'NSST') {
 `{ ...unionTypedValue, otherField }` 처럼 discriminated union 값을 객체 spread로 복사/병합하면, TypeScript는 결과 타입을 "각 필드 타입의 union"으로 납작하게 만들어버린다 — 판별 필드와 나머지 필드 사이의 상관관계(`mallCode: 'NSST'`일 때만 `mallSettings: NaverSettingAttributes`)가 사라진다. 그 결과 원래 유효한 값인데도 discriminated union 타입에 재할당할 수 없는 것처럼 에러가 난다.
 
 ```typescript
-// mocks/utils/createShoppingSetting.ts
-// spread는 discriminated union의 mallCode/mallSettings 상관관계를 지워버리므로 단언이 필요
-const newSetting = {
-  id: `ss_${Date.now()}`,
-  ownerId,
-  ...body, // body: CreateShoppingSettingBody (discriminated union)
-  createdAt: now,
-  updatedAt: now,
+// src/features/mallLinkedProduct/util/linkedProductRecord.ts — toMallLinkedProduct
+// DB 행의 스냅샷(jsonb)과 top-level 컬럼(mallCode 등)을 spread로 합치면
+// mallCode/mallSettings 상관관계가 사라지므로 경계에서 1회 단언한다
+const settingSnapshot = {
+  ...row.settingSnapshot,
+  createdAt: toDate(row.settingSnapshot.createdAt),
+  updatedAt: toDate(row.settingSnapshot.updatedAt),
+  id: row.sourceShoppingSettingId,
+  ownerId: row.ownerId,
+  mallCode: row.mallCode,
+  mallAccountId: row.mallAccountId,
+  mallId: row.mallId,
 } as ShoppingSetting;
 ```
 
-이런 지점에서는 `as` 캐스팅을 금지하지 않는다 — 대신 **spread 경계에 정확히 1회**, 이유를 설명하는 주석과 함께 적용한다. Pattern 6/7의 "as 캐스팅 제거" 원칙과 모순되지 않는다: 그 패턴들이 없애려는 건 "타입을 제대로 안 좁혀서 필드 접근마다 반복되는 캐스팅"이고, 여기서는 spread라는 언어 차원의 정보 손실 지점 딱 한 곳에 캐스팅을 격리한 것이다. 비즈니스 로직(폼 제출부 등)에서 같은 이유로 캐스팅이 필요하다면, 먼저 Pattern 7처럼 리터럴 분기로 재구성할 수 없는지 검토한다 — spread 캐스팅은 mock 유틸처럼 "이미 유효한 값을 그대로 복사"하는 경우로 한정한다.
+(이 패턴이 처음 도출된 곳은 MSW mock util `createShoppingSetting.ts`의 `{ id, ownerId, ...body } as ShoppingSetting`였다. 정보설정이 2026-09-21 DB로 옮겨가며 그 파일은 삭제됐다.)
+
+이런 지점에서는 `as` 캐스팅을 금지하지 않는다 — 대신 **spread 경계에 정확히 1회**, 이유를 설명하는 주석과 함께 적용한다. Pattern 6/7의 "as 캐스팅 제거" 원칙과 모순되지 않는다: 그 패턴들이 없애려는 건 "타입을 제대로 안 좁혀서 필드 접근마다 반복되는 캐스팅"이고, 여기서는 spread라는 언어 차원의 정보 손실 지점 딱 한 곳에 캐스팅을 격리한 것이다. 비즈니스 로직(폼 제출부 등)에서 같은 이유로 캐스팅이 필요하다면, 먼저 Pattern 7처럼 리터럴 분기로 재구성할 수 없는지 검토한다 — spread 캐스팅은 DB 행 → 도메인 타입 변환처럼 "이미 유효한 값을 그대로 복사"하는 경우로 한정한다.
 
 ### 9. 필드명 리터럴 유니온은 새로 나열하지 말고 기존 타입에서 keyof로 파생시킨다
 
@@ -324,7 +330,7 @@ const TextField = ({ name, label }: { name: MallSettingsFieldName; label: string
 - `src/features/shoppingAccount/ui/form/ShoppingAccountForm.tsx` — Pattern 6 실제 적용 (`ShoppingAccountFormInput`/`ShoppingAccountFormData`, `refine` 타입가드)
 - `src/features/shoppingSetting/types/shoppingSetting.types.ts` — `ShoppingSetting` discriminated union, `ShoppingSettingFormValues`(Pattern 7)
 - `src/features/shoppingSetting/ui/create/ShoppingSettingCreateLayout.tsx`, `.../[id]/ShoppingSettingModifyLayout.tsx` — Pattern 7 리터럴 분기 제출부
-- `src/mocks/utils/createShoppingSetting.ts`, `src/mocks/utils/updateShoppingSetting.ts`, `src/mocks/utils/getShoppingSettings.test.ts` — Pattern 8 경계 캐스팅 실제 적용(각 파일 1회, 주석 포함)
+- `src/features/mallLinkedProduct/util/linkedProductRecord.ts` (`toMallLinkedProduct`) — Pattern 8 경계 캐스팅 실제 적용(DB 행 → 도메인 타입 경계에 1회)
 - `src/features/shoppingSetting/ui/components/form/ShoppingSettingMallInfoSection.tsx` — Pattern 9 `MallSettingsFieldName` 실제 적용
 - `src/features/shoppingAccount/ui/create/ShoppingAccountCreateLayout.tsx`, `.../modify/ShoppingAccountModifyLayout.tsx` — Pattern 6 적용으로 `as` 캐스팅 제거된 제출부
 

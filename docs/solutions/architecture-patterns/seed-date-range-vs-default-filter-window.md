@@ -66,7 +66,7 @@ conditions.push(gte(dateCol, start), lt(dateCol, endExclusive));
 
 **증상이 코드 버그처럼 보인다.** 화면은 "데이터가 유실됐다" 또는 "페이지네이션이 깨졌다"로 읽히지만 `route.ts`도 `search.store.ts`도 정상 동작이다. 코드만 읽어서는 안 잡히고, 필터 폭과 시드 스프레드를 나란히 놓고 봐야 드러난다. 그래서 목록이 예상보다 적게 나올 때는 **API 로직·페이지네이션을 의심하기 전에 기본 필터부터 재현**하는 편이 빠르다.
 
-**같은 함정이 이미 다른 화면에 있었다.** `src/mocks/data/MockMallLinkedProductsData.ts`의 시드는 `daysAgo(10)`·`daysAgo(12)`를 썼는데 연동상품 목록의 기본 필터도 최근 7일(`dateType: 'lastSentAt'`)이라, 12건을 심어두고 8건만 보고 있었다. 상품목록에서 원인을 찾기 전까지 아무도 이상하게 여기지 않았다.
+**같은 함정이 이미 다른 화면에 있었다.** 당시 연동상품 mock 시드(`src/mocks/data/MockMallLinkedProductsData.ts`, 2026-09-22 DB화로 삭제)는 `daysAgo(10)`·`daysAgo(12)`를 썼는데 연동상품 목록의 기본 필터도 최근 7일(`dateType: 'lastSentAt'`)이라, 12건을 심어두고 8건만 보고 있었다. 상품목록에서 원인을 찾기 전까지 아무도 이상하게 여기지 않았다.
 
 **"상대 날짜를 쓰라"는 주석만으로는 막히지 않는다.** 그 파일에는 이미 *"절대 날짜 시드는 시간이 지나면 기본 화면이 비어버린다"* 는 주석이 있었고 실제로 `daysAgo()`를 쓰고 있었다. 주석이 다룬 축(절대/상대)과 실제로 깨진 축(폭)이 달랐던 것이다. 규칙을 적을 때 **어느 축을 막는 규칙인지** 함께 적지 않으면 이런 식으로 비껴간다.
 
@@ -96,4 +96,4 @@ conditions.push(gte(dateCol, start), lt(dateCol, endExclusive));
 - `src/features/products/store/search.store.ts` — 상품목록 기본 필터 상수
 - `src/app/api/products/list/route.ts` — 우회 경로 없이 적용되는 날짜 조건
 - `src/features/mallLinkedProduct/store/search.store.ts` — 연동상품 목록 기본 필터 상수
-- `src/mocks/data/MockMallLinkedProductsData.ts` — 같은 함정이 있었던 시드와 수정 후 주석
+- `scripts/seedMallLinkedProducts.ts`(로컬 전용) — 지금의 연동상품 시드. 실제 전송 경로로 행을 만들어 `lastSentAt`이 실행 시점이다. 기본 7일 필터를 벗어나면 `--reset`으로 다시 돌린다 — 폭 문제는 없어졌지만 **시간이 지나면 창 밖으로 밀려나는** 같은 축의 함정은 남아 있다

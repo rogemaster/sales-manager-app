@@ -84,7 +84,7 @@ export interface ShoppingAccount {
 
 대체 후 정식 위치:
 - `src/features/shoppingAccount/api/getShoppingAccountsByMall.ts`, `useGetShoppingAccountsByMall.ts`
-- `src/mocks/utils/getShoppingAccountsByMall.ts` (`AvailableMallAccount` 패턴을 따름)
+- `src/app/api/shopping/accounts/by-mall/route.ts` (`AvailableMallAccount` 패턴을 따름 — 처음에는 MSW mock util `getShoppingAccountsByMall.ts`였고, 2026-09-21 쇼핑몰계정 DB화 때 route로 옮겨졌다)
 
 ## Related
 

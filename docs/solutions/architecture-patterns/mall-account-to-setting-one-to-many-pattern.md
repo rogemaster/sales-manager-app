@@ -49,18 +49,21 @@ export interface ShoppingSetting {
 "계정 등록 쇼핑몰 리스트"를 보여주는 신규추가 모달에서, **이미 설정이 등록된 계정도 다시 노출해야 하는지**가 애매했다. 1:N 구조를 확정한 순간 답이 정해진다 — 계정 1건에 설정이 여러 개 허용되므로, 이미 설정된 계정도 목록에서 제외하면 안 된다. 대신 "이미 N건 설정됨" 배지로 상태만 알려준다.
 
 ```typescript
-// src/mocks/utils/getAvailableMallAccounts.ts
-export const getMockAvailableMallAccounts = (ownerId: string): AvailableMallAccount[] => {
-  return MOCK_SHOPPING_ACCOUNTS_DATA.filter((account) => account.ownerId === ownerId).map((account) => ({
-    id: account.id,
-    mallCode: account.mallCode,
-    mallId: account.mallId,
-    settingCount: MOCK_SHOPPING_SETTINGS_DATA.filter((s) => s.mallAccountId === account.id).length,
-  }));
-};
+// src/app/api/shopping/settings/available-accounts/route.ts
+const accounts = await db
+  .select({
+    id: shoppingAccounts.id,
+    mallCode: shoppingAccounts.mallCode,
+    mallId: shoppingAccounts.mallId,
+    settingCount: sql<number>`count(${shoppingSettings.id})::int`,
+  })
+  .from(shoppingAccounts)
+  .leftJoin(shoppingSettings, eq(shoppingSettings.mallAccountId, shoppingAccounts.id))
+  .where(and(eq(shoppingAccounts.ownerId, session.ownerId), eq(shoppingAccounts.isActive, true)))
+  .groupBy(shoppingAccounts.id, shoppingAccounts.mallCode, shoppingAccounts.mallId);
 ```
 
-이 함수는 계정을 **필터링하지 않고 전부** 반환하며, `settingCount`는 단순 표시용 부가 정보다.
+설정 건수로 계정을 **거르지 않는다** — 설정이 하나도 없는 계정도 0으로 나와야 하므로 계정 기준 `LEFT JOIN`이다. `settingCount`는 단순 표시용 부가 정보다. (거르는 조건은 워크스페이스와 활성 계정 여부뿐이다. 처음에는 MSW mock util `getAvailableMallAccounts.ts`가 같은 일을 했고, 2026-09-21 정보설정 DB화 때 이 route로 옮겨졌다.)
 
 ## Why This Matters
 
@@ -76,6 +79,6 @@ export const getMockAvailableMallAccounts = (ownerId: string): AvailableMallAcco
 ## Related
 
 - `src/features/shoppingSetting/types/shoppingSetting.types.ts` — `ShoppingSetting`, `AvailableMallAccount`
-- `src/mocks/utils/getAvailableMallAccounts.ts` — 계정별 설정 건수 집계
+- `src/app/api/shopping/settings/available-accounts/route.ts` — 계정별 설정 건수 집계
 - `src/features/shoppingSetting/ui/list/components/NewSettingModal.tsx` — "이미 N건 설정됨" 배지 노출
 - `docs/superpowers/specs/2026-07-08-shopping-mall-settings-design.md` — 원 설계 결정 배경
