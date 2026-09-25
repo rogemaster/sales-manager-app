@@ -8,6 +8,7 @@ import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settin
 import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
 import { pickMallAddress } from '@/features/shoppingSetting/util/pickMallAddress';
+import { ACCOUNT_NOT_FOUND_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 import { ShoppingMalls } from '@/types/common.type';
 
 export async function POST(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
       .where(and(eq(shoppingAccounts.id, String(body.mallAccountId)), eq(shoppingAccounts.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!account) return NextResponse.json({ error: '존재하지 않는 계정입니다.' }, { status: 400 });
+    if (!account) return NextResponse.json({ error: ACCOUNT_NOT_FOUND_MESSAGE }, { status: 400 });
 
     const now = new Date();
 

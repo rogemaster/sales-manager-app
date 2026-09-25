@@ -12,17 +12,17 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PHONE_REGEX } from '@/shared/utils/phone';
 import { CATEGORIES } from '@/shared/constant/category.constant';
-import { SHOPPING_MALLS, SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
+import { SHOPPING_MALL_CODES, SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
+import { EMAIL_FORMAT_MESSAGE, EMAIL_REGEX } from '@/shared/utils/email';
+import { ACCOUNT_STATUS_OPTIONS } from '@/features/shoppingAccount/constant/shoppingAccount.constants';
 import { ShoppingMalls } from '@/types/common.type';
-
-const MALL_CODES: string[] = SHOPPING_MALLS.map((mall) => mall.code);
 
 const buildShoppingAccountSchema = (mode: 'create' | 'edit') =>
   z.object({
     mallCode: z
       .string()
       .min(1, '쇼핑몰을 선택해주세요.')
-      .refine((val): val is ShoppingMalls => MALL_CODES.includes(val), {
+      .refine((val): val is ShoppingMalls => SHOPPING_MALL_CODES.includes(val), {
         message: '유효하지 않은 쇼핑몰입니다.',
       }),
     mallId: z.string().min(1, '쇼핑몰 ID를 입력해주세요.'),
@@ -40,8 +40,8 @@ const buildShoppingAccountSchema = (mode: 'create' | 'edit') =>
     email: z
       .string()
       .optional()
-      .refine((val) => !val || z.string().email().safeParse(val).success, {
-        message: '올바른 이메일 형식을 입력해주세요.',
+      .refine((val) => !val || EMAIL_REGEX.test(val), {
+        message: EMAIL_FORMAT_MESSAGE,
       }),
     domain: z.string().optional(),
     category: z.string().min(1, '카테고리를 선택해주세요.'),
@@ -60,11 +60,6 @@ interface ShoppingAccountFormProps {
   /** 권한이 없는 등급(operator)이 상세를 볼 때. 입력을 막고 저장·초기화 버튼을 숨긴다. */
   readOnly?: boolean;
 }
-
-const IS_ACTIVE_OPTIONS = [
-  { value: 'true', label: '사용' },
-  { value: 'false', label: '미사용' },
-];
 
 export const ShoppingAccountForm = ({
   defaultValues,
@@ -183,9 +178,9 @@ export const ShoppingAccountForm = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {IS_ACTIVE_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
+                            {ACCOUNT_STATUS_OPTIONS.map((option) => (
+                              <SelectItem key={option.id} value={option.id}>
+                                {option.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

@@ -46,5 +46,7 @@ export const TRIMMED_SEARCH_TYPES: MallLinkedProductSearchType[] = ['productCode
  * 큐를 두지 않고 처리 한도를 제품 정책으로 둔다(domain-design.md 프로젝트 규모 전제). route와 화면이 같은 값을 쓴다.
  */
 export const MALL_LINK_SEND_MAX_ITEMS = 50;
+/** 한도를 넘었을 때 화면 경고와 route 400이 같은 문구를 쓴다. */
+export const MALL_LINK_SEND_LIMIT_MESSAGE = `한 번에 최대 ${MALL_LINK_SEND_MAX_ITEMS}건까지 전송할 수 있습니다.`;
 /** 동시에 외부몰로 보내는 건수. */
 export const MALL_LINK_SEND_CONCURRENCY = 5;

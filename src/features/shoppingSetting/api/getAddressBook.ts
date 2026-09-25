@@ -1,7 +1,5 @@
-import { MallAddress } from '../types/shoppingSetting.types';
+import { MallAddress, MallAddressType } from '../types/shoppingSetting.types';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
-
-export type MallAddressType = 'SHIPPING' | 'RETURN';
 
 export const getAddressBook = async (mallAccountId: string, addressType: MallAddressType): Promise<MallAddress[]> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/settings/addresses`, {

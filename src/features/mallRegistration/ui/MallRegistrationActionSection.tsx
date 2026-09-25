@@ -12,8 +12,12 @@ import {
   resetMallRegistrationStateAtom,
 } from '@/features/mallRegistration/store/mallRegistration.store';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
-import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import {
+  MALL_LINK_SEND_LIMIT_MESSAGE,
+  MALL_LINK_SEND_MAX_ITEMS,
+} from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
 import { getErrorMessage } from '@/shared/utils/errorMessage';
+import { buildSendResultAlert } from '@/features/mallLinkedProduct/util/sendResultAlert';
 
 export const MallRegistrationActionSection = () => {
   const selectedProductIds = useAtomValue(selectedProductIdsAtom);
@@ -48,25 +52,16 @@ export const MallRegistrationActionSection = () => {
     }
 
     if (items.length > MALL_LINK_SEND_MAX_ITEMS) {
-      showAlert({ message: `한 번에 최대 ${MALL_LINK_SEND_MAX_ITEMS}건까지 전송할 수 있습니다.`, type: 'warning' });
+      showAlert({ message: MALL_LINK_SEND_LIMIT_MESSAGE, type: 'warning' });
       return;
     }
 
     registerToMalls(items, {
-      onSuccess: ({ totalCount, successCount, failCount }) => {
+      onSuccess: (result) => {
         // 결과와 무관하게 staging은 항상 비운다.
         // 실패 건은 연동 데이터로 남아 '쇼핑몰 연동 상품 목록' 화면에서 확인·수정한다.
         resetState();
-
-        if (failCount === 0) {
-          showAlert({ message: `${successCount}건이 쇼핑몰로 전송되었습니다.`, type: 'success' });
-          return;
-        }
-
-        showAlert({
-          message: `총 ${totalCount}건 중 ${successCount}건 전송 성공, ${failCount}건 실패했습니다.`,
-          type: 'warning',
-        });
+        showAlert(buildSendResultAlert(result, 'send'));
       },
       onError: (error) => {
         showAlert({

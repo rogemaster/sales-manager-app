@@ -1,5 +1,6 @@
+import { MALL_AUTH_FAILED_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
+
 export const MALL_NO_RESPONSE_MESSAGE = '외부 쇼핑몰 응답 없음';
-export const MALL_AUTH_FAILED_MESSAGE = '쇼핑몰 인증에 실패했습니다. 계정의 API Key를 확인해주세요.';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);

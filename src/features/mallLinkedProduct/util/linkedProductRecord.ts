@@ -1,4 +1,5 @@
-import { Product } from '@/features/products/types/product.types';
+import type { InferSelectModel } from 'drizzle-orm';
+import type { mallLinkedProducts } from '@/db/schema';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { ShoppingMalls } from '@/types/common.type';
 import { MallLinkedProduct, MallLinkStatus } from '../types/mallLinkedProduct.types';
@@ -25,26 +26,11 @@ export const splitSettingSnapshot = (setting: ShoppingSetting): StoredSettingSna
   return structuredClone(rest) as StoredSettingSnapshot;
 };
 
-/** mall_linked_products 한 행. 생성 컬럼(product_name·product_state)은 읽지 않는다. */
-export interface LinkedProductRow {
-  id: string;
-  ownerId: string;
-  mallCode: string;
-  mallAccountId: string;
-  mallId: string;
-  sourceProductId: string;
-  sourceShoppingSettingId: string;
-  status: string;
-  externalProductId: string | null;
-  errorMessage: string | null;
-  productSnapshot: Product;
-  settingSnapshot: StoredSettingSnapshot;
-  createdByEmail: string;
-  updatedByEmail: string | null;
-  createdAt: Date;
-  lastSentAt: Date;
-  updatedAt: Date;
-}
+/**
+ * mall_linked_products 한 행. 스키마에서 파생한다 — 손으로 적으면 컬럼을 추가했을 때 이 타입과
+ * 읽기 목록(LINKED_PRODUCT_COLUMNS)이 조용히 어긋난다. 생성 컬럼(product_name·product_state)은 검색 전용이라 읽지 않는다.
+ */
+export type LinkedProductRow = Omit<InferSelectModel<typeof mallLinkedProducts>, 'productName' | 'productState'>;
 
 const toDate = (value: unknown): Date => (value instanceof Date ? value : new Date(String(value)));
 

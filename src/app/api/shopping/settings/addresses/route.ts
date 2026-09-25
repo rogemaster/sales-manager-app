@@ -6,6 +6,11 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { toMallAddresses } from '@/features/shoppingSetting/util/naverAddressBook';
 import { STATIC_MALL_ADDRESS_BOOK } from '@/features/shoppingSetting/constant/mallAddressBook.constant';
 import { ShoppingMalls } from '@/types/common.type';
+import { MallAddressType } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import {
+  MALL_ACCOUNT_MISSING_MESSAGE,
+  MALL_AUTH_FAILED_MESSAGE,
+} from '@/features/shoppingAccount/util/accountMessages';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -14,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const { mallAccountId, addressType } = (await req.json()) as {
       mallAccountId: string;
-      addressType: 'SHIPPING' | 'RETURN';
+      addressType: MallAddressType;
     };
 
     if (addressType !== 'SHIPPING' && addressType !== 'RETURN') {
@@ -29,7 +34,7 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (!account) {
-      return NextResponse.json({ error: '쇼핑몰 계정을 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: MALL_ACCOUNT_MISSING_MESSAGE }, { status: 404 });
     }
 
     if (account.mallCode !== 'NSST') {
@@ -44,10 +49,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (response.status === 401) {
-      return NextResponse.json(
-        { error: '쇼핑몰 인증에 실패했습니다. 계정의 API Key를 확인해주세요.' },
-        { status: 502 },
-      );
+      return NextResponse.json({ error: MALL_AUTH_FAILED_MESSAGE }, { status: 502 });
     }
 
     if (!response.ok) {

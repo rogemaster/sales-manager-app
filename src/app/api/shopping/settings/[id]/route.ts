@@ -4,7 +4,10 @@ import { shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
-import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
+import {
+  findShoppingSettingWriteViolation,
+  SETTING_NOT_FOUND_MESSAGE,
+} from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
 import { pickMallAddress } from '@/features/shoppingSetting/util/pickMallAddress';
 import { ShoppingMalls } from '@/types/common.type';
@@ -25,7 +28,7 @@ export async function GET(req: NextRequest, { params }: Context) {
       .where(and(eq(shoppingSettings.id, id), eq(shoppingSettings.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!setting) return NextResponse.json({ error: '존재하지 않는 설정입니다.' }, { status: 404 });
+    if (!setting) return NextResponse.json({ error: SETTING_NOT_FOUND_MESSAGE }, { status: 404 });
 
     return NextResponse.json(setting);
   } catch (error) {
@@ -70,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
       .where(and(eq(shoppingSettings.id, id), eq(shoppingSettings.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!existing) return NextResponse.json({ error: '존재하지 않는 설정입니다.' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: SETTING_NOT_FOUND_MESSAGE }, { status: 404 });
 
     if ('mallSettings' in body) {
       values.mallSettings = sanitizeMallSettings(existing.mallCode as ShoppingMalls, body.mallSettings);
