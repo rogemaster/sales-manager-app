@@ -65,6 +65,7 @@ export interface GetMallLinkedProductsResponse extends PaginationMeta {
 /** 전송 요청 1건 — 어떤 상품을 어떤 몰·설정으로 보낼지 */
 export interface MallLinkedProductRequestItem {
   productId: string;
+  /** 서버는 이 값을 쓰지 않는다 — 몰은 shoppingSettingId로 읽은 설정의 mallCode를 따른다(클라이언트 값을 믿지 않는다). */
   mallCode: ShoppingMalls;
   shoppingSettingId: string;
 }
@@ -78,10 +79,6 @@ export interface CreateMallLinkedProductsResult {
 export interface UpdateMallLinkedProductBody {
   productSnapshot: Product;
   settingSnapshot: ShoppingSetting;
-}
-
-export interface ResendMallLinkedProductsBody {
-  ids: string[];
 }
 
 /** CreateMallLinkedProductsResult와 구조가 같지만 의미가 다르고 한쪽만 바뀔 수 있어 합치지 않는다. */

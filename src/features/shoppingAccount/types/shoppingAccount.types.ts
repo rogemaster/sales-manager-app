@@ -3,7 +3,7 @@ import { BulkFailure } from '@/shared/utils/bulkResultAlert';
 
 /**
  * 브라우저로 내려가는 모양. password·apiKey가 타입에 없다.
- * 키는 등록 시 한 번 들어가고 이후 외부몰 전송(실행 순서 4)에서 서버만 읽는다.
+ * 키는 등록 시 한 번 들어가고 이후 외부몰 전송(`server/linkedProductSend.ts`)과 주소록 조회에서 서버만 읽는다.
  */
 export interface ShoppingAccount {
   id: string;

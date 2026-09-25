@@ -26,8 +26,6 @@ import {
 import { LINKED_PRODUCT_COLUMNS, recordHistory } from './linkedProductStore';
 import { sendToMall } from './sendToMall';
 
-export type { SendActor };
-
 /** 계정 id → API Key. 같은 워크스페이스 계정만 읽는다. 키는 이 함수 밖(응답)으로 나가지 않는다. */
 const loadApiKeys = async (ownerId: string, accountIds: string[]): Promise<Map<string, string>> => {
   if (accountIds.length === 0) return new Map();

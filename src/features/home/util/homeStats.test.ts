@@ -28,7 +28,7 @@ describe('toHomeStats', () => {
   });
 
   it('알 수 없는 상태는 칸에 담지 않지만 total에는 센다', () => {
-    // 이전 MSW 집계와 같은 규칙 — total은 "등록된 상품 수"다
+    // total은 "등록된 상품 수"다
     expect(
       toHomeStats([
         { state: 'ON_SALE', count: 1 },

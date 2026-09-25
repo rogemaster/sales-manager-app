@@ -8,7 +8,6 @@ import { requireSession } from '@/shared/utils/apiAuth';
  * 신규 설정을 만들 때 고를 수 있는 계정 목록. 계정마다 딸린 설정 건수를 함께 준다.
  *
  * 설정이 하나도 없는 계정도 0으로 나와야 하므로 계정 기준 LEFT JOIN이다.
- * 순서 2에서는 MSW가 실 route를 어댑터로 불러 세었지만, 이제 한 번의 질의로 끝난다.
  */
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);

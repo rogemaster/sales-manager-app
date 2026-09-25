@@ -4,14 +4,12 @@ import { MALL_LINKED_PRODUCTS_QUERY_KEY } from './useGetMallLinkedProducts';
 import { MALL_LINKED_PRODUCT_QUERY_KEY } from './useGetMallLinkedProduct';
 import { bulkUpdateMallLinkedProducts } from './bulkUpdateMallLinkedProducts';
 
-/** ownerId·updatedByEmail은 세션에서 서버가 채운다. */
-export type BulkUpdateVariables = BulkUpdateMallLinkedProductsBody;
-
 export const useBulkUpdateMallLinkedProducts = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (variables: BulkUpdateVariables) => bulkUpdateMallLinkedProducts(variables),
+    // ownerId·updatedByEmail은 세션에서 서버가 채운다.
+    mutationFn: (variables: BulkUpdateMallLinkedProductsBody) => bulkUpdateMallLinkedProducts(variables),
     onSuccess: () => {
       // 목록은 화면에 떠 있으므로 무효화하면 곧바로 다시 불러온다.
       queryClient.invalidateQueries({ queryKey: [MALL_LINKED_PRODUCTS_QUERY_KEY] });

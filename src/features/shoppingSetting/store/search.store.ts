@@ -14,7 +14,6 @@ export const settingStartDateAtom = atom<string>(DEFAULT_START_DATE);
 export const settingEndDateAtom = atom<string>(DEFAULT_END_DATE);
 export const settingMallCodeAtom = atom<string>('ALL');
 export const settingMallAccountIdAtom = atom<string>('ALL');
-export const settingSearchValueAtom = atom<string>('');
 
 export const getSettingSearchFilterAtom = atom<ShoppingSettingSearchType>((get) => ({
   dateType: get(settingDateTypeAtom),
@@ -22,7 +21,7 @@ export const getSettingSearchFilterAtom = atom<ShoppingSettingSearchType>((get) 
   endDate: get(settingEndDateAtom),
   mallCode: get(settingMallCodeAtom) as ShoppingSettingSearchType['mallCode'],
   mallAccountId: get(settingMallAccountIdAtom),
-  searchValue: get(settingSearchValueAtom),
+  searchValue: '', // 검색어는 입력칸이 들고 있다가 검색 버튼에서 committed에 넣는다
 }));
 
 export const committedFiltersAtom = atom<ShoppingSettingSearchType>({
