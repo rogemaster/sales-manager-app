@@ -10,7 +10,7 @@ export const useGetAvailableMallAccounts = () => {
 
   return useQuery({
     queryKey: [AVAILABLE_MALL_ACCOUNTS_QUERY_KEY, workspaceOwnerId],
-    queryFn: () => getAvailableMallAccounts(workspaceOwnerId),
+    queryFn: () => getAvailableMallAccounts(),
     enabled: !!workspaceOwnerId,
   });
 };

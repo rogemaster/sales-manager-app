@@ -1,9 +1,7 @@
 import { GetShoppingAccountsResponse, ShoppingAccountSearchType } from '../types/shoppingAccount.types';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
-// ownerId 인자는 시그니처에 남기되 요청에서 뺀다. 소유권 판정은 서버 세션이 한다.
 export const getShoppingAccounts = async (
-  _ownerId: string,
   filters: ShoppingAccountSearchType,
   page: number,
   pageSize = 10,

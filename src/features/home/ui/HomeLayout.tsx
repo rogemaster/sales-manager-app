@@ -58,7 +58,7 @@ export const HomeLayout = () => {
 
   const { data: recentProducts } = useQuery({
     queryKey: ['home', 'recent-products', workspaceOwnerId],
-    queryFn: () => getRecentProducts(workspaceOwnerId),
+    queryFn: () => getRecentProducts(),
     enabled: !!workspaceOwnerId,
   });
 

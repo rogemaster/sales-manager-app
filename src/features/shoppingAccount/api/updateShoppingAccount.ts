@@ -1,13 +1,7 @@
 import { ShoppingAccount, UpdateShoppingAccountBody } from '../types/shoppingAccount.types';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
-// ownerId 인자는 시그니처에 남기되 요청에서 뺀다. 소유권 판정은 서버 세션이 한다.
-export const updateShoppingAccount = async (
-  id: string,
-  body: UpdateShoppingAccountBody,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _ownerId: string,
-): Promise<ShoppingAccount> => {
+export const updateShoppingAccount = async (id: string, body: UpdateShoppingAccountBody): Promise<ShoppingAccount> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/accounts/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

@@ -11,7 +11,7 @@ export const useGetShoppingAccountsByMall = (mallCode: ShoppingMalls | 'ALL') =>
 
   return useQuery({
     queryKey: [MALL_ACCOUNT_OPTIONS_QUERY_KEY, workspaceOwnerId, mallCode],
-    queryFn: () => getShoppingAccountsByMall(workspaceOwnerId, mallCode as ShoppingMalls),
+    queryFn: () => getShoppingAccountsByMall(mallCode as ShoppingMalls),
     enabled: !!workspaceOwnerId && mallCode !== 'ALL',
   });
 };

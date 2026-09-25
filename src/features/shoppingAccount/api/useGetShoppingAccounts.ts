@@ -13,7 +13,7 @@ export const useGetShoppingAccounts = () => {
 
   return useQuery({
     queryKey: [SHOPPING_ACCOUNT_LIST_QUERY_KEY, workspaceOwnerId, filters, currentPage],
-    queryFn: () => getShoppingAccounts(workspaceOwnerId, filters, currentPage),
+    queryFn: () => getShoppingAccounts(filters, currentPage),
     enabled: !!workspaceOwnerId,
   });
 };

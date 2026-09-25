@@ -1,12 +1,8 @@
 import { RecentProduct } from '../types/home.types';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
-export const getRecentProducts = async (ownerId: string): Promise<RecentProduct[]> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/home/recent-products`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ownerId }),
-  });
+export const getRecentProducts = async (): Promise<RecentProduct[]> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/home/recent-products`, { method: 'POST' });
 
   throwIfUnauthorized(response);
   if (!response.ok) {

@@ -10,7 +10,7 @@ export const useGetShoppingAccount = (id: string) => {
 
   return useQuery({
     queryKey: [SHOPPING_ACCOUNT_QUERY_KEY, id, workspaceOwnerId],
-    queryFn: () => getShoppingAccount(id, workspaceOwnerId),
+    queryFn: () => getShoppingAccount(id),
     enabled: !!id && !!workspaceOwnerId,
   });
 };

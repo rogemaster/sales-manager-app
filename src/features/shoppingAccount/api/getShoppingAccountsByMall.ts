@@ -2,11 +2,7 @@ import { MallAccountOption } from '../types/shoppingAccount.types';
 import { ShoppingMalls } from '@/types/common.type';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 
-// ownerId 인자는 시그니처에 남기되 요청에서 뺀다. 소유권 판정은 서버 세션이 한다.
-export const getShoppingAccountsByMall = async (
-  _ownerId: string,
-  mallCode: ShoppingMalls,
-): Promise<MallAccountOption[]> => {
+export const getShoppingAccountsByMall = async (mallCode: ShoppingMalls): Promise<MallAccountOption[]> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/accounts/by-mall`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
