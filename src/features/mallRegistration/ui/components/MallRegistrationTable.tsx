@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getCategoryName } from '@/lib/utils';
+import { getCategoryName } from '@/shared/constant/category.constant';
 import { MALL_REGISTRATION_TABLE_HEAD } from '@/features/mallRegistration/constant/mallRegistration.constants';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';

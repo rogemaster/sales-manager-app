@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PHONE_REGEX } from '@/shared/utils/phone';
-import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import { SHOPPING_MALLS, SHOPPING_MALL_OPTIONS } from '@/shared/constant/shoppingMall.constant';
 import { ShoppingMalls } from '@/types/common.type';
 
@@ -284,7 +284,7 @@ export const ShoppingAccountForm = ({
                             <SelectValue placeholder="카테고리를 선택하세요." />
                           </SelectTrigger>
                           <SelectContent>
-                            {MOCK_CATEGORY_DATA.map((cat) => (
+                            {CATEGORIES.map((cat) => (
                               <SelectItem key={cat.id} value={cat.name}>
                                 {cat.name}
                               </SelectItem>

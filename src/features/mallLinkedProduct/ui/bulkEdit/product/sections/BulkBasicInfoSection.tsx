@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { X } from 'lucide-react';
 import { Product } from '@/features/products/types/product.types';
-import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,7 +94,7 @@ export const BulkBasicInfoSection = () => {
                   <SelectValue placeholder="카테고리를 선택하세요." />
                 </SelectTrigger>
                 <SelectContent>
-                  {MOCK_CATEGORY_DATA.map((option) => (
+                  {CATEGORIES.map((option) => (
                     <SelectItem key={option.id} value={option.id}>
                       {option.name}
                     </SelectItem>

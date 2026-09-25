@@ -148,7 +148,7 @@ src/
 ├── utils/             # 코드 · 번호 생성기
 ├── lib/               # R2 저장소 · 원격 이미지 가져오기(서버 전용), cn() 등 헬퍼
 ├── db/                # Drizzle 클라이언트와 스키마
-├── mocks/             # MSW 핸들러 · mock 데이터 (주문 영역) + 카테고리 상수(MockCategoryData)
+├── mocks/             # MSW 핸들러 · mock 데이터 (주문 영역)
 ├── simulators/        # 외부몰(네이버) API 시뮬레이터 — api/external/naver route가 사용
 ├── types/             # 공통 타입
 └── middleware.ts      # 인증 라우트 보호
