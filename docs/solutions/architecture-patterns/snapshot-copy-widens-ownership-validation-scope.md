@@ -53,19 +53,20 @@ if (!areProductsOwnedBy(productIds, ownerId)) {
 **요청 본문의 모든 id에 대해, 그 id로 무엇을 하는지 확인하고 각각 소유권을 검증한다.**
 
 ```ts
-// src/mocks/utils/verifyOwnership.ts
-export const areMallLinkRequestsOwnedBy = (items: MallLinkedProductRequestItem[], ownerId: string | null) => {
-  const productIds = [...new Set(items.map((item) => item.productId))];
-  const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
+// src/features/mallLinkedProduct/server/linkedProductSend.ts — sendNewLinkedProducts
+const productIds = [...new Set(items.map((item) => item.productId))];
+const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
 
-  return (
-    areProductsOwnedBy(productIds, ownerId) &&
-    allOwnedBy(settingIds, ownerId, MOCK_SHOPPING_SETTINGS_DATA)
-  );
-};
+// 두 종류의 id를 모두 세션 워크스페이스로 걸러 읽는다
+const [productRows, settingRows] = await Promise.all([
+  db.select().from(products).where(and(inArray(products.productId, productIds), eq(products.ownerId, actor.ownerId))),
+  db.select(SHOPPING_SETTING_COLUMNS).from(shoppingSettings)
+    .where(and(inArray(shoppingSettings.id, settingIds), eq(shoppingSettings.ownerId, actor.ownerId))),
+]);
+// 이후 건별로 product·setting을 찾지 못하면(남의 것·없는 것) 그 건은 보내지 않는다
 ```
 
-핸들러는 한 줄 위임만 한다 (`.claude/rules/msw-rules.md`).
+(MSW 시절에는 `src/mocks/utils/verifyOwnership.ts`의 `areMallLinkRequestsOwnedBy`가 두 id를 모두 검사해 하나라도 남의 것이면 전체를 403으로 거부했다. 2026-09-22 DB화 뒤로는 거르는 방식이라 **남의 id는 조용히 건너뛴다** — 그 결과 "전부 건너뛰면 0건 전송 성공"이 되는 문제는 로드맵 3-3으로 남아 있다.)
 
 **점검 질문:** 이 id로 조회한 결과가 응답이나 저장 데이터에 실리는가? 실린다면 그 리소스의 소유권도 검증 대상이다. "이미 검증된 다른 id와 함께 왔다"는 이유로 통과시키지 않는다.
 

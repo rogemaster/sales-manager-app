@@ -65,11 +65,13 @@ tags:
 ## Implementation
 
 - 건수 조회는 삭제 직전 전용 엔드포인트 `POST /api/shopping/settings/linked-count`로 한다
-  (`ids` + `X-Owner-Id` → `{ totalCount }`). 목록 API 응답에 건수를 얹는 방식도 검토했으나,
+  (`{ ids }` → `{ totalCount }`). 목록 API 응답에 건수를 얹는 방식도 검토했으나,
   삭제 확인 창 하나 때문에 목록 API·타입·테이블까지 범위를 넓힐 이유가 없었다.
-- 소유권 검증은 기존 bulk 컨벤션대로 `allOwnedBy`로 fail-closed. **단, `ownerId`
-  null 검사를 함께 해야 한다** — `ids`가 빈 배열이면 `allOwnedBy`의 `.every`가 공허참이라
-  헤더가 없어도 통과한다.
+- 소유권은 세션으로 거른다(`requireSession` → `WHERE owner_id = session.ownerId AND
+  source_shopping_setting_id IN ids`). 설정 소유권을 따로 확인하지 않는다 — 남의 설정 id를 섞어도
+  세어지는 건 없고 0만 늘어난다. 빈 `ids`는 `{ totalCount: 0 }`이다.
+  - (MSW 시절에는 `X-Owner-Id` 헤더 + `allOwnedBy` fail-closed였고, 빈 배열이면 `.every`가 공허참이라
+    헤더 없이 통과하는 함정 때문에 `ownerId` null 검사를 함께 했다. 2026-09-21 DB화로 사라진 방식이다.)
 - 조회에 실패하면 삭제를 진행하지 않는다. 경고를 못 띄운 채 지우는 것보다 사용자가 다시
   시도하게 하는 편이 낫다.
 - 클라이언트 `api/`·타입은 엔드포인트 경로(`/api/shopping/settings/`)를 따라

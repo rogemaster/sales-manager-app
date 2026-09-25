@@ -27,12 +27,14 @@ tags:
 
 | 구분 | 회원가입 (`/register`) | 사용자 등록 (`/account/users/create`) |
 |------|----------------------|--------------------------------------|
-| 생성 주체 | 본인 직접 | 슈퍼계정이 대신 등록 |
+| 생성 주체 | 본인 직접 | 같은 워크스페이스의 `super_admin`·`admin`이 대신 등록 |
 | 등급 | `super_admin` 고정 | `admin` / `operator` |
-| `ownerId` | `null` | 등록한 슈퍼계정의 `id` |
+| `ownerId` | 자기 자신의 `id` (`ownerId === id`) | 등록한 계정의 워크스페이스(`session.ownerId`) |
 | 회사 정보 필드 | 모두 입력 (13개 필드) | 없음 (7개 필드만) |
-| 비밀번호 | 본인이 설정 | 슈퍼계정이 임시 비밀번호 설정 |
-| 로그인 가능 | 즉시 가능 | 즉시 가능 |
+| 비밀번호 | 본인이 설정 | 등록자가 임시 비밀번호 설정 |
+| 로그인 가능 | 즉시 가능 | super_admin이 등록하면 즉시(`active`), admin이 등록하면 super_admin 승인 후(`pending` → `active`) |
+
+> **2026-09-25 갱신:** 처음(2026-06)에는 슈퍼계정의 `ownerId`가 `null`이었고 등록은 슈퍼계정만 했다. 2026-07-08 자기참조(`ownerId === id`)로 바뀌었고, 2026-09-23 등급 정책표로 admin 등록과 승인 흐름이 생겼다 — `[[user-hierarchy-ownerid-pattern]]`, `[[single-permission-table-shared-by-ui-and-api]]`.
 
 ## 단일 테이블 설계 결정
 
@@ -42,7 +44,7 @@ tags:
 
 1. **로그인 흐름이 동일하다.** `authorize()`가 이메일로 사용자를 조회할 때, 하나의 쿼리로 모든 유형의 사용자를 처리할 수 있다. 테이블이 분리되면 두 테이블을 모두 조회해야 한다.
 
-2. **자연스러운 구분자가 이미 있다.** `ownerId: null`이 곧 슈퍼계정이고, `ownerId: string`이 종속 유저다. 별도 테이블 없이도 완벽히 구분된다.
+2. **자연스러운 구분자가 이미 있다.** `ownerId === id`가 곧 슈퍼계정이고, `ownerId !== id`가 종속 유저다(등급 `super_admin`도 같은 구분을 준다). 별도 테이블 없이도 완벽히 구분된다.
 
 3. **SaaS 표준 패턴이다.** Slack, Notion 등 대부분의 B2B SaaS가 role/discriminator 컬럼으로 단일 users 테이블을 운용한다.
 
@@ -79,11 +81,11 @@ export const users = pgTable('users', {
 ## 사용자 식별 패턴
 
 ```typescript
-const isSuper = user.ownerId === null;        // 슈퍼계정 판단
-const isSub   = user.ownerId !== null;        // 종속 유저 판단
+const isSuper = user.ownerId === user.id;     // 슈퍼계정 판단 (자기참조)
+const isSub   = user.ownerId !== user.id;     // 종속 유저 판단
 
-// 목록 조회: 항상 ownerId로 필터
-db.select().from(users).where(eq(users.ownerId, currentUserId));
+// 목록 조회: 항상 세션의 워크스페이스로 필터 (클라이언트가 보낸 값은 쓰지 않는다)
+db.select().from(users).where(eq(users.ownerId, session.ownerId));
 ```
 
 ## Related

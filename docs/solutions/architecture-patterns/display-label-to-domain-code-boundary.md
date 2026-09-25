@@ -83,7 +83,9 @@ export const findProductWriteViolation = (product: unknown, mode: 'full' | 'part
   for (const field of FIELDS) {
     const value = record[field.key];
 
-    if (value === undefined) {
+    // 선택 필드의 null은 "값 없음"이다(DB nullable 컬럼·빈 숫자 입력) — undefined와 같게 다룬다.
+    // 이 조건을 undefined만으로 두면 null이 스키마 검사로 넘어가 거부된다 — [[absent-optional-value-arrives-as-null]]
+    if (value === undefined || (value === null && !field.required)) {
       if (mode === 'partial' || !field.required) continue; // PATCH는 바꾸려는 필드만 보낸다
       return `${subject(field.label)} 없습니다`;
     }

@@ -101,6 +101,8 @@ route가 같은 상수를 import하게 만든다 — 각자 정의하면 한쪽�
 
 기존 9곳을 이 모양으로 바꾸는 것은 별도 작업이다. 다만 **새 대량 API는 C를 따른다.**
 
+> **2026-09-25 현황:** 9곳 중 MSW 8곳은 도메인을 DB로 옮기면서 사라졌다(쇼핑몰계정·정보설정의 삭제·상태변경은 C 모양 `{ successCount, failures }`으로 새로 만들어졌다). 전부-아니면-전무(403) 방식으로 남은 곳은 사용자 삭제 `DELETE /api/account/users` **1곳**이다.
+
 ## 관련
 
 - `.claude/rules/excel.md` — `ExcelSaveResult` 부분 성공 모양(선례)

@@ -21,6 +21,8 @@ tags:
 
 # 클라이언트가 완성본을 보내는 수정 API는 불변 필드 복원 범위가 곧 도메인 규칙의 실효 범위다
 
+> **⚠️ 방어 방식이 바뀌었다 (2026-09-22).** 이 문서의 "서버가 불변 필드를 원본 값으로 **되돌린다**"는 MSW 시절 구현이다. 지금은 불변 필드(`mallCode`·`mallAccountId`·`mallId`)가 top-level 컬럼이고 스냅샷에 사본이 없어서, 수정 route가 `UPDATE`의 `SET`에 **아예 넣지 않는** 방식으로 지킨다(`buildSnapshotUpdate`·`splitSettingSnapshot`, `src/features/mallLinkedProduct/util/linkedProductWrite.ts`·`linkedProductRecord.ts`). 생성은 `buildNewLinkedRow`가 서버에서 원본을 읽어 만든다. 현재 방식은 [`snapshot-jsonb-with-generated-search-columns-and-single-identity-copy.md`](snapshot-jsonb-with-generated-search-columns-and-single-identity-copy.md). 아래의 판별 기준 — **"클라이언트가 완성본을 보내면, 서버가 지켜내는 범위가 곧 규칙의 실효 범위다"** — 는 그대로 유효하다. 아래 본문의 `createMockMallLinkedProducts`·MSW 핸들러·`src/mocks/utils/` 테스트는 코드에 없다.
+
 ## Context
 
 연동 상품 수정(`/shopping/linked-products/[id]`)은 스냅샷 전체를 폼에 부어 편집하고

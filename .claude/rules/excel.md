@@ -19,7 +19,7 @@
 | 메시지 | `message.ts` — 업로드 오류 코드·검증 오류 → 한글 메시지 |
 | 기능 스코프 Provider | `src/components/providers/ExcelProvider.tsx` |
 
-도메인별 상수는 `src/features/<domain>/constant/`에 둔다 — 템플릿 컬럼 정의(`bulkTemplate.constant.ts`의 `ExcelTemplateInfo[]`)와 미리보기 테이블 컬럼(`excel.constants.tsx`).
+도메인별 상수는 `src/features/<domain>/constant/`에 둔다 — 템플릿 컬럼 정의(`bulkTemplate.constant.ts`의 `ExcelTemplate` — `{ templateTitle, template: ExcelTemplateInfo[] }`)와 미리보기 테이블 컬럼(`excel.constants.tsx`).
 
 ---
 
