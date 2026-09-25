@@ -324,7 +324,7 @@ const TextField = ({ name, label }: { name: MallSettingsFieldName; label: string
 ## Examples
 
 실제 코드 위치:
-- `src/features/account/types/user.types.ts` — `UserStatus` 명명 타입, `CreateUserBody extends Omit<User, 'company' | 'location'>`
+- `src/features/account/types/user.types.ts` — `UserStatus` 명명 타입, `CreateUserBody extends Omit<User, 'company' | 'location' | 'grade'>`(grade는 `SubUserGrade`로 다시 좁혀 선언)
 - `src/features/account/util/userCreateSchema.ts` — `createUserSchema`, `CreateUserFormData`
 - `src/features/account/ui/user/create/UserCreateLayout.tsx` — `?? ''` 강제 변환 경계, API body 조립
 - `src/features/shoppingAccount/ui/form/ShoppingAccountForm.tsx` — Pattern 6 실제 적용 (`ShoppingAccountFormInput`/`ShoppingAccountFormData`, `refine` 타입가드)

@@ -170,7 +170,7 @@ SELECT COUNT(*) FROM users WHERE owner_id IS NULL;
 ### 변경 내용
 
 - `AccountUser.ownerId`, `UserWithId.ownerId`, `ownerIdAtom`(기본값 `null`→`''`), `next-auth.d.ts`의 `User`/`Session.user`/`JWT` 3곳 — 전부 `string | null` → `string`으로 좁힘
-- `src/shared/utils/apiAuth.ts`의 `token.ownerId ?? token.id`, `auth.store.ts`의 `workspaceOwnerIdAtom`(`ownerId ?? id`) — fallback 전부 제거. 로그아웃 상태는 `ownerIdAtom`이 `''`(falsy)로 리셋되므로 `enabled: !!workspaceOwnerId` 게이팅은 fallback 없이도 동일하게 동작한다.
+- `src/shared/utils/apiAuth.ts`의 `token.ownerId ?? token.id`, `auth.store.ts`의 `workspaceOwnerIdAtom`(`ownerId ?? id`) — fallback 전부 제거. (2026-09-24 세션 재검증 도입 후 서버의 `resolveApiSession`은 **토큰이 아니라 DB 행**을 읽으므로, nullable 컬럼을 받는 그 한 곳에 `ownerId: user.ownerId ?? user.id`가 다시 있다. 클라이언트 atom에는 여전히 fallback이 없다.) 로그아웃 상태는 `ownerIdAtom`이 `''`(falsy)로 리셋되므로 `enabled: !!workspaceOwnerId` 게이팅은 fallback 없이도 동일하게 동작한다.
 - **DB 스키마(`src/db/schema.ts`의 `owner_id` 컬럼)는 그대로 nullable로 남겨뒀다** — 마이그레이션 없이 앱 레벨 타입만 좁혔다. 그 결과 NextAuth `authorize()` 콜백 한 곳(`src/app/api/auth/[...nextauth]/route.ts`)에서만 `ownerId: user.ownerId as string` 단일 assertion이 필요하다(DB row는 여전히 `string | null`로 추론되기 때문).
 
 ```typescript

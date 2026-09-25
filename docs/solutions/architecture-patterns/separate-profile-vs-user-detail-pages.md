@@ -28,6 +28,8 @@ In this app, two screens display user information: a user's own profile (`/profi
 
 ## Guidance
 
+> **2026-09-25 현재 구현:** 아래 구조 중 실제로 남은 것은 `/profile/edit`(본인 수정)뿐이다. 본인 보기는 `/profile` 페이지가 아니라 헤더 메뉴가 여는 **`ProfileModal`**(`src/features/profile/ui/ProfileModal.tsx`)이고, 여전히 API 없이 `getUserInfoAtom`만 읽는다. 관리자용 사용자 상세(`/account/user/[id]`)는 만들어지지 않았다 — 사용자 관리는 목록·등록·승인·삭제만 있다. **원칙(본인 보기와 관리자 상세는 데이터 출처·권한이 달라 합치지 않는다)은 그대로 유효하다.** 관리자 상세를 만들게 되면 이 원칙을 따른다.
+
 **Create separate routes and components for self-view profile and admin user detail.**
 
 - **Profile page** (`/profile`): Self-view of the logged-in user

@@ -77,14 +77,15 @@ const values = valuesForm.getValues();
 그래서 제출 직전에 별도 검사가 하나 더 붙는다.
 
 ```ts
-// Product 타입에서 optional(?)이 아닌 필드는 체크했으면 값이 반드시 있어야 한다
+// 상품 폼이 필수로 받는 필드는 체크했으면 값이 반드시 있어야 한다
+// (기준은 Product 타입의 optional 여부가 아니다 — 규정 정보는 하위호환 때문에 타입상 optional이지만 폼은 필수다)
 const hasEmptyRequired = REQUIRED_BULK_EDIT_GROUPS.some(
   (group) => checked[group] === true &&
     PRODUCT_BULK_EDIT_GROUPS[group].some((key) => values[key] === undefined || values[key] === ''),
 );
 ```
 
-**검증이 두 갈래인 이유:** 재사용 섹션의 필수는 컴포넌트가 알고(`trigger`), 새로 만든 섹션의 필수는 타입이 안다(`REQUIRED_BULK_EDIT_GROUPS`). 둘을 한 곳으로 합치려면 재사용 섹션의 `required`를 뜯어야 하는데, 그건 세 화면을 건드리는 일이다.
+**검증이 두 갈래인 이유:** 재사용 섹션의 필수는 컴포넌트가 알고(`trigger`), 새로 만든 섹션의 필수는 상품 폼 기준을 옮겨 적은 목록이 안다(`REQUIRED_BULK_EDIT_GROUPS` — 상품 폼에 필수를 늘리면 이 배열도 함께 늘린다, [[same-form-three-screens-three-validation-mechanisms]]). 둘을 한 곳으로 합치려면 재사용 섹션의 `required`를 뜯어야 하는데, 그건 세 화면을 건드리는 일이다.
 
 ## 판별 질문
 

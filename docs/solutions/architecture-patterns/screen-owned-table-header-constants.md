@@ -70,11 +70,11 @@ export const MALL_REGISTRATION_TABLE_HEAD: TableTitleValue[] = [
 ```tsx
 // src/features/products/ui/list/components/productTable/ProductTableBody.tsx
 <TableCell className="text-center">
-  {product.netPrice === undefined ? '-' : `${product.netPrice.toLocaleString()}원`}
+  {product.netPrice == null ? '-' : `${product.netPrice.toLocaleString()}원`}
 </TableCell>
 ```
 
-**옵셔널 필드는 렌더링 가드가 필요하다.** `Product.netPrice`는 `number | undefined`(엑셀 대량등록에서도 선택 입력)라, 옆 컬럼의 `product.price.toLocaleString()`을 그대로 복사했다면 값이 없는 상품에서 런타임 에러가 났을 것이다. 헤더에 컬럼을 추가할 때는 대응 필드가 필수인지 옵셔널인지도 함께 확인한다.
+**옵셔널 필드는 렌더링 가드가 필요하다.** `Product.netPrice`는 타입상 `number | undefined`(엑셀 대량등록에서도 선택 입력)지만 DB에서 읽으면 `null`로 온다 — 그래서 가드는 `=== undefined`가 아니라 `== null`이다([[db-null-vs-domain-undefined-boundary]]). 옆 컬럼의 `product.price.toLocaleString()`을 그대로 복사했다면 옆 컬럼의 `product.price.toLocaleString()`을 그대로 복사했다면 값이 없는 상품에서 런타임 에러가 났을 것이다. 헤더에 컬럼을 추가할 때는 대응 필드가 필수인지 옵셔널인지도 함께 확인한다.
 
 ## Why This Matters
 

@@ -137,7 +137,11 @@ useEffect(() => {
 ```typescript
 // src/middleware.ts
 export const config = {
-  matcher: ['/', '/home/:path*', '/products/:path*', '/order/:path*', '/account/:path*' /* 새 그룹 추가 시 여기 */],
+  matcher: [
+    '/', '/home/:path*', '/products/:path*', '/order/:path*', '/account/:path*',
+    '/shopping/:path*', '/profile/:path*', // 아래 2번 사고 뒤 추가됐다
+    /* 새 그룹 추가 시 여기 */
+  ],
 };
 ```
 

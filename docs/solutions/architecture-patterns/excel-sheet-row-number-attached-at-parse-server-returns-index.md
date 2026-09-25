@@ -42,8 +42,11 @@ tags:
 ### 2. 파싱 직후, 행을 펼치기 전에 복사한다
 
 ```ts
-// processExcelUpload.ts
-const rows = attachSheetRowNumbers(XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRowType[]);
+// processExcelUpload.ts — 파싱과 번호 붙이기를 readSheetRows가 한 번에 한다
+const rows = readSheetRows(worksheet, fileTemplateInfo);
+
+// sheetRows.ts — readSheetRows 안에서 sheet_to_json 직후, 펼치기 전에 붙인다
+return attachSheetRowNumbers(textRows).map(/* 숫자 컬럼만 원래 값으로 되돌림 */);
 
 // sheetRows.ts
 export const EXCEL_SHEET_ROW_KEY = '__sheetRow';

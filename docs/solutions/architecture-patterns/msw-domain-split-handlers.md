@@ -86,14 +86,13 @@ export const handlers = [...homeHandlers, ...orderHandlers, ...collectionHandler
 // src/mocks/handlers/orders.ts
 import { http, HttpResponse } from 'msw';
 import { baseUrl } from '../config';
-import { getOrders } from '../utils/getOrders';
+import { getMockOrders } from '../utils/getOrders';
 import { updateMockOrder } from '../utils/updateOrder';
 
 export const orderHandlers = [
   http.post(`${baseUrl}/api/orders/list`, async ({ request }) => {
-    const body = await request.json();
-    const result = getOrders(body);
-    return HttpResponse.json(result);
+    const { ownerId, filters, page, pageSize } = await request.json();
+    return HttpResponse.json(getMockOrders(ownerId, filters, page, pageSize));
   }),
   http.patch(`${baseUrl}/api/orders/:orderId`, async ({ request, params }) => {
     const update = await request.json();

@@ -114,7 +114,7 @@ const [options, setOptions] = useState<ProductOptionDraft[]>([]);
 
 `OptionCombination`에는 원래 `combination: string`(`'색상: 블랙, 사이즈: S'`)이 있었다. `values`에서 그대로 만들어지는 **표시용 라벨**이었고, 읽는 곳은 조합 목록의 라벨 한 군데뿐이었다. 나머지 3곳은 `replace()`로 행을 재조립할 때 값을 잃지 않으려고 옮겨 담는 pass-through였다.
 
-저장 데이터가 같은 사실을 두 형태로 갖고 있었으므로, 옵션값을 고치는 경로마다 라벨 동기화를 기억해야 했다. 그 경로는 하나가 아니다 — 화면(`ProductOptionConfirmTable`)에 더해 **엑셀 업로드도 옵션을 쓰도록 설계돼 있다**(`bulkTemplate.constant.ts`에 `옵션1`·`옵션2`·`추가옵션` 컬럼이 있고 `productExcelSaveStrategy`가 아직 매핑하지 않을 뿐이다). 작성자가 늘수록 어긋날 자리가 늘어난다.
+저장 데이터가 같은 사실을 두 형태로 갖고 있었으므로, 옵션값을 고치는 경로마다 라벨 동기화를 기억해야 했다. 그 경로는 하나가 아니다 — 화면(`ProductOptionConfirmTable`)에 더해 **엑셀 업로드도 옵션을 쓰도록 설계돼 있다**(당시 `bulkTemplate.constant.ts`에 `옵션1`·`옵션2`·`추가옵션` 컬럼이 있었고 `productExcelSaveStrategy`가 아직 매핑하지 않았다. 지금은 `옵션명1`·`옵션값1`… 컬럼을 `toExcelOptionPairs`로 매핑한다). 작성자가 늘수록 어긋날 자리가 늘어난다.
 
 `formatCombinationLabel(values)` 한 줄로 대체했다. 부수 효과로 `optionCombinations`의 재귀에서 문자열 누적 파라미터가 사라져 함수가 짧아졌다.
 

@@ -33,8 +33,8 @@ tags:
 
 | 경로 | 클라이언트가 보내는 것 | 불변 필드를 지키는 주체 |
 |------|----------------------|----------------------|
-| **생성** (`createMockMallLinkedProducts`) | `{ productId, mallCode, shoppingSettingId }` | **서버가 원본에서 읽어 복사** — 어긋날 여지가 없다 |
-| **수정** (`updateMockMallLinkedProduct`) | 완성된 스냅샷 전체 | 서버가 받은 스냅샷에서 불변 필드만 **되돌린다** |
+| **생성** (당시 `createMockMallLinkedProducts`, 현재 `sendNewLinkedProducts`) | `{ productId, mallCode, shoppingSettingId }` | **서버가 원본에서 읽어 복사** — 어긋날 여지가 없다 |
+| **수정** (당시 `updateMockMallLinkedProduct`, 현재 `PATCH /linked-products/[id]`) | 완성된 스냅샷 전체 | 당시: 받은 스냅샷에서 불변 필드만 **되돌렸다**. 현재: 불변 필드를 `UPDATE`에 넣지 않는다 |
 
 수정 쪽은 "지켜내는 필드 목록"이 곧 규칙의 실효 범위다. 목록에서 하나 빠지면 조용히 뚫린다.
 
@@ -58,11 +58,15 @@ export interface BulkUpdateMallLinkedProductsBody {
 id만 받아도 검사는 필요하다 — 사용자가 **다른 계정의 설정**을 고를 수 있기 때문이다.
 
 ```ts
-const isApplicableSetting = (linked, setting) =>
-  setting.mallCode === linked.mallCode &&
-  setting.mallAccountId === linked.settingSnapshot.mallAccountId &&
-  setting.mallId === linked.settingSnapshot.mallId;
+// src/features/mallLinkedProduct/util/linkedProductWrite.ts (MSW 시절 이름은 isApplicableSetting — 참/거짓이 반대였다)
+export const isBulkSettingMismatch = (row, setting) =>
+  !setting ||
+  setting.mallCode !== row.mallCode ||
+  setting.mallAccountId !== row.mallAccountId ||
+  setting.mallId !== row.mallId;
 ```
+
+불변 3필드는 이제 스냅샷이 아니라 연동 건의 top-level 컬럼(`row`)에서 읽는다. 설정을 못 찾은 경우(남의 것·없는 것)도 불일치로 본다.
 
 불일치면 그 건은 적용하지 않고 실패로 센다. UI에서 이미 같은 몰·계정으로 좁히지만, **이 서버 검사가 실제로 일을 했다.**
 
