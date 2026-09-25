@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
+import { DELIVERY_TYPE_OPTION, isPaidDelivery } from '@/shared/constant/delivery.constant';
 import { BulkEditFieldWrapper } from '../BulkEditFieldWrapper';
 
 // 빈 입력을 NaN이 아니라 undefined로 받는다 — valueAsNumber를 쓰면 "비었다"와 "0"을 구분할 수 없다.
@@ -17,7 +17,7 @@ export const BulkPriceQuantitySection = () => {
 
   // 원본(ProductPriceAndQuantityInfo)과 같은 조건. 무료/착불이면 배송비 입력이 의미가 없다.
   const deliveryType = watch('deliveryType');
-  const isDeliveryPrice = deliveryType === 'NOT_FREE' || deliveryType === 'CONDITIONAL_FREE';
+  const isDeliveryPrice = isPaidDelivery(deliveryType);
 
   return (
     <Card className="overflow-hidden">
@@ -54,7 +54,7 @@ export const BulkPriceQuantitySection = () => {
                   onValueChange={(value) => {
                     field.onChange(value);
                     // 무료·착불로 바꾸면 이전에 입력한 배송비가 남아 함께 전송되므로 0으로 되돌린다 (원본과 동일).
-                    if (value !== 'NOT_FREE' && value !== 'CONDITIONAL_FREE') setValue('deliveryPrice', 0);
+                    if (!isPaidDelivery(value)) setValue('deliveryPrice', 0);
                   }}
                 >
                   <SelectTrigger className="w-full">

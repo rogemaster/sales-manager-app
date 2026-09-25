@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Product } from '@/features/products/types/product.types';
 import { X } from 'lucide-react';
-import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -111,7 +111,7 @@ export const ProductBasicinfo = () => {
                   triggerClassName="w-full"
                   value={field.value ?? ''}
                   onValueChange={field.onChange}
-                  options={MOCK_CATEGORY_DATA}
+                  options={CATEGORIES}
                   placeholder="카테고리를 선택하세요."
                 />
                 {fieldState.error && <p className="text-red-500 text-sm">{fieldState.error.message}</p>}

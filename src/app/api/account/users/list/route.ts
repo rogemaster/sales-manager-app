@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { parseRequestBody } from '@/shared/utils/requestBody';
+import { toPublicUser } from '@/features/account/util/publicUser';
 import { userListRequestSchema } from '@/features/account/util/userListRequestSchema';
 
 export async function POST(req: NextRequest) {
@@ -54,13 +56,12 @@ export async function POST(req: NextRequest) {
       .limit(pageSize)
       .offset((page - 1) * pageSize);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const result = rows.map(({ password: _, ...user }) => user);
+    const result = rows.map(toPublicUser);
     const totalPages = Math.ceil(total / pageSize) || 1;
 
     return NextResponse.json({ users: result, total, page, pageSize, totalPages });
   } catch (error) {
     console.error('사용자 목록 조회 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import {
   ADULT_PRODUCT_OPTIONS,
   ORIGIN_COUNTRIES,
+  ORIGIN_ETC,
   TAX_TYPE_OPTIONS,
 } from '@/features/products/constant/compliance.constants';
 import { BulkEditFieldWrapper } from '../BulkEditFieldWrapper';
@@ -44,7 +45,7 @@ export const BulkComplianceSection = () => {
                     // 지우지 않으면 KR을 골라도 이전 기타값이 함께 전송된다.
                     // undefined가 아니라 ''로 지우는 이유 — undefined는 patch에서 빠지고
                     // clearKeys로만 전달되는데, 여기서 원하는 건 "빈 값으로 덮어쓰기"다.
-                    if (value !== 'ETC') setValue('originCountryEtc', '');
+                    if (value !== ORIGIN_ETC) setValue('originCountryEtc', '');
                   }}
                 >
                   <SelectTrigger className="w-full">
@@ -60,7 +61,7 @@ export const BulkComplianceSection = () => {
                 </Select>
               )}
             />
-            {originCountryCode === 'ETC' && (
+            {originCountryCode === ORIGIN_ETC && (
               <Input placeholder="원산지를 입력하세요." {...register('originCountryEtc')} />
             )}
           </div>

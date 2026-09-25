@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { INVALID_IMAGE_URL_MESSAGE } from '@/shared/constant/upload.constant';
 import { fetchRemoteImage, readImageUrl, RemoteImageError, remoteImageErrorMessage } from '@/lib/remoteImage';
 
 // 엑셀 업로드 미리보기 단계에서 이미지 주소가 쓸 수 있는 이미지인지 확인만 한다.
@@ -10,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const url = readImageUrl(await req.json().catch(() => null));
-    if (!url) return NextResponse.json({ error: '올바른 이미지 주소가 아닙니다.' }, { status: 400 });
+    if (!url) return NextResponse.json({ error: INVALID_IMAGE_URL_MESSAGE }, { status: 400 });
 
     await fetchRemoteImage(url);
     return NextResponse.json({ ok: true });
@@ -19,6 +21,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: remoteImageErrorMessage(error) }, { status: 400 });
     }
     console.error('이미지 확인 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

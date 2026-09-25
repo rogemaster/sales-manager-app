@@ -9,6 +9,7 @@ import { FilterSelect } from '@/components/common/FilterSelect';
 import { Product } from '@/features/products/types/product.types';
 import {
   ORIGIN_COUNTRIES,
+  ORIGIN_ETC,
   TAX_TYPE_OPTIONS,
   ADULT_PRODUCT_OPTIONS,
 } from '@/features/products/constant/compliance.constants';
@@ -51,7 +52,7 @@ export const ProductComplianceSection = () => {
                   value={field.value ?? ''}
                   onValueChange={(value) => {
                     field.onChange(value);
-                    if (value !== 'ETC') {
+                    if (value !== ORIGIN_ETC) {
                       setValue('originCountryEtc', undefined);
                     }
                   }}
@@ -63,7 +64,7 @@ export const ProductComplianceSection = () => {
             )}
           />
 
-          {originCountryCode === 'ETC' && (
+          {originCountryCode === ORIGIN_ETC && (
             <div className="space-y-2">
               <Label htmlFor="originCountryEtc">원산지 (기타) *</Label>
               <Input
@@ -72,7 +73,7 @@ export const ProductComplianceSection = () => {
                 {...register('originCountryEtc', {
                   // '기타'에서 다른 국가로 되돌리면 이 입력이 언마운트된다. required면 안 보이는 필드가 제출을 막는다.
                   validate: (value) =>
-                    getValues('originCountryCode') !== 'ETC' || !!value?.trim() || '원산지를 입력해 주세요.',
+                    getValues('originCountryCode') !== ORIGIN_ETC || !!value?.trim() || '원산지를 입력해 주세요.',
                 })}
               />
               {errors.originCountryEtc && <p className="text-red-500 text-sm">{errors.originCountryEtc.message}</p>}

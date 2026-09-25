@@ -1,7 +1,7 @@
 import type { mallLinkedProductHistories, mallLinkedProducts } from '@/db/schema';
 import { Product } from '@/features/products/types/product.types';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
-import { MallLinkSendAction } from '../types/mallLinkedProduct.types';
+import { MallLinkSendAction, UpdateMallLinkedProductBody } from '../types/mallLinkedProduct.types';
 import { LinkedProductRow, splitSettingSnapshot } from './linkedProductRecord';
 import { mergeProductSnapshot } from './mergeProductSnapshot';
 import { MallSendOutcome } from './randomMallSend';
@@ -120,11 +120,7 @@ export type BulkUpdate = Partial<
  * 연동 1건 = 특정 계정으로 등록된 외부몰 상품 1개라 계정이 바뀌면 다른 상품이다.
  * status·lastSentAt·externalProductId는 재전송의 소관이라 넣지 않는다.
  */
-export const buildSnapshotUpdate = (
-  body: { productSnapshot: Product; settingSnapshot: ShoppingSetting },
-  email: string,
-  now: Date,
-): SnapshotUpdate => ({
+export const buildSnapshotUpdate = (body: UpdateMallLinkedProductBody, email: string, now: Date): SnapshotUpdate => ({
   productSnapshot: structuredClone(body.productSnapshot),
   settingSnapshot: splitSettingSnapshot(body.settingSnapshot),
   updatedByEmail: email,

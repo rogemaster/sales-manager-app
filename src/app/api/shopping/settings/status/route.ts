@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { shoppingSettings } from '@/db/schema';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -40,6 +41,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ successCount: updated.length, failures } satisfies BulkSettingResult);
   } catch (error) {
     console.error('쇼핑몰 정보설정 사용여부 변경 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

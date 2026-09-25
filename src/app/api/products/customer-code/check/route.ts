@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { findExistingCustomerCodes } from '@/lib/customerCodeDuplicates';
 import { matchExistingCustomerCodes, readCustomerCodeCheckRequest } from '@/features/products/util/customerCode';
@@ -16,6 +17,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ duplicates: matchExistingCustomerCodes(request.codes, existing) });
   } catch (error) {
     console.error('고객사 상품코드 확인 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

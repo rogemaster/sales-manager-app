@@ -24,6 +24,11 @@ export const generatorOrderCode = () => {
   return `order_${uuid[0]}${uuid[1]}`;
 };
 
+// 사용자 — 가입·사용자 등록 route가 쓴다
+export const generatorUserId = () => {
+  return `usr_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
+};
+
 // 쇼핑몰계정 — 서버가 채번한다(클라이언트 채번을 신뢰하지 않는다)
 export const generatorShoppingAccountCode = () => {
   return `sa_${uuidv4().split('-')[0]}`;

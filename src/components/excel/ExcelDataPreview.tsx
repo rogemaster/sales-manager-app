@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { ExcelHeaderProps, ExcelRowWithErrors, ExcelTableColumnsType } from '@/types/excel.type';
+import { ExcelHeaderProps, ExcelRowWithErrors, ExcelSaveType, ExcelTableColumnsType } from '@/types/excel.type';
 import { getExcelSaveStrategy } from './utils/getExcelSaveStrategy';
 import { formatExcelFailureSummary } from './utils/formatExcelFailureSummary';
 import { Card, CardContent } from '../ui/card';
@@ -15,9 +15,9 @@ import { ExcelSaveProgressDialog } from './components/ExcelSaveProgressDialog';
 import { useMutation } from '@tanstack/react-query';
 import { useAlert } from '@/hooks/useAlert';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
-type SaveType = 'PRODUCT' | 'ORDER';
-type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: SaveType };
+type Props = { excelHeader: ExcelHeaderProps; tableColumns: ExcelTableColumnsType[]; saveType: ExcelSaveType };
 
 export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props) => {
   const uploadedData = useExcelData();
@@ -49,8 +49,7 @@ export const ExcelDataPreview = ({ excelHeader, tableColumns, saveType }: Props)
     onError: (error) => {
       showAlert({
         type: 'error',
-        message:
-          error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
+        message: getErrorMessage(error, '저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
       });
     },
     onSettled: () => setSaveProgress(null),

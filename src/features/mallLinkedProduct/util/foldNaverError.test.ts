@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { foldNaverError, MALL_AUTH_FAILED_MESSAGE, MALL_NO_RESPONSE_MESSAGE } from './foldNaverError';
+import { foldNaverError, MALL_NO_RESPONSE_MESSAGE } from './foldNaverError';
+import { MALL_AUTH_FAILED_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 
 describe('foldNaverError', () => {
   it('필드 오류를 전부 이어 붙인다 (접두사 없이)', () => {

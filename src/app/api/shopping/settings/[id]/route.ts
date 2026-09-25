@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
-import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
+import {
+  findShoppingSettingWriteViolation,
+  SETTING_NOT_FOUND_MESSAGE,
+} from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
 import { pickMallAddress } from '@/features/shoppingSetting/util/pickMallAddress';
 import { ShoppingMalls } from '@/types/common.type';
@@ -25,12 +29,12 @@ export async function GET(req: NextRequest, { params }: Context) {
       .where(and(eq(shoppingSettings.id, id), eq(shoppingSettings.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!setting) return NextResponse.json({ error: '존재하지 않는 설정입니다.' }, { status: 404 });
+    if (!setting) return NextResponse.json({ error: SETTING_NOT_FOUND_MESSAGE }, { status: 404 });
 
     return NextResponse.json(setting);
   } catch (error) {
     console.error('쇼핑몰 정보설정 조회 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }
 
@@ -70,7 +74,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
       .where(and(eq(shoppingSettings.id, id), eq(shoppingSettings.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!existing) return NextResponse.json({ error: '존재하지 않는 설정입니다.' }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: SETTING_NOT_FOUND_MESSAGE }, { status: 404 });
 
     if ('mallSettings' in body) {
       values.mallSettings = sanitizeMallSettings(existing.mallCode as ShoppingMalls, body.mallSettings);
@@ -92,6 +96,6 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     return NextResponse.json(updated);
   } catch (error) {
     console.error('쇼핑몰 정보설정 수정 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

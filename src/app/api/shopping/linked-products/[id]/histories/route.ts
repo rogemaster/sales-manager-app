@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProductHistories } from '@/db/schema';
@@ -37,6 +38,6 @@ export async function GET(req: NextRequest, { params }: Context) {
     return NextResponse.json(histories);
   } catch (error) {
     console.error('전송 이력 조회 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

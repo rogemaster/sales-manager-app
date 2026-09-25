@@ -11,6 +11,7 @@ import { useGetActiveShoppingSettings } from '@/features/shoppingSetting/api/use
 import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { isSettingApplyModalOpenAtom, selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { useBulkUpdateMallLinkedProducts } from '@/features/mallLinkedProduct/api/useBulkUpdateMallLinkedProducts';
+import { buildSendResultAlert } from '@/features/mallLinkedProduct/util/sendResultAlert';
 
 type Props = {
   linkedProducts: MallLinkedProduct[];
@@ -44,19 +45,11 @@ export const ShoppingSettingApplyModal = ({ linkedProducts }: Props) => {
     bulkUpdate(
       { ids: selectedLinkedIds, shoppingSettingId: selectedSettingId },
       {
-        onSuccess: ({ totalCount, successCount, failCount }) => {
+        onSuccess: (result) => {
           setIsOpen(false);
 
           // 선택은 유지한다 — 수정 직후 곧바로 '선택 재전송'을 누를 수 있어야 한다.
-          if (failCount === 0) {
-            showAlert({ message: `${successCount}건이 수정되었습니다.`, type: 'success' });
-            return;
-          }
-
-          showAlert({
-            message: `총 ${totalCount}건 중 ${successCount}건 수정, ${failCount}건 실패했습니다.`,
-            type: 'warning',
-          });
+          showAlert(buildSendResultAlert(result, 'update'));
         },
         onError: () => {
           showAlert({ message: '수정 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });

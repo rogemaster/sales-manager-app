@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FilterSelect } from '@/components/common/FilterSelect';
 import { FilterOption } from '@/types/common.type';
-import { CreateUserFormData } from '@/features/account/util/userCreateSchema';
+import { CreateUserBody } from '@/features/account/types/user.types';
 
 interface UserCreateFormProps {
   gradeOptions: FilterOption[];
@@ -19,7 +19,7 @@ export const UserCreateForm = ({ gradeOptions }: UserCreateFormProps) => {
     control,
     setValue,
     formState: { errors },
-  } = useFormContext<CreateUserFormData>();
+  } = useFormContext<CreateUserBody>();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

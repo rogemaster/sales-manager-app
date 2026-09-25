@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { products } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
+import { IMAGE_NOT_OWNED_MESSAGE } from '@/shared/constant/upload.constant';
 import { Product } from '@/features/products/types/product.types';
 import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
 import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constant';
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
     // create·PATCH와 같은 규칙: mainImage가 없으면 통과, 있으면 본인 네임스페이스의 key여야 한다.
     const invalidIndex = normalized.findIndex((p) => p.mainImage && !isMainImageOwnedBy(p.mainImage, session.ownerId));
     if (invalidIndex !== -1) {
-      return rowError('본인이 업로드한 이미지만 사용할 수 있습니다.', invalidIndex);
+      return rowError(IMAGE_NOT_OWNED_MESSAGE, invalidIndex);
     }
 
     for (const [index, product] of normalized.entries()) {
@@ -110,6 +112,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: CUSTOMER_CODE_CONFLICT_MESSAGE }, { status: 400 });
     }
     console.error('상품 대량 등록 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

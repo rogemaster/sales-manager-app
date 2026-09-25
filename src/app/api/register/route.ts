@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
+import { EMAIL_TAKEN_MESSAGE, isEmailTaken } from '@/features/account/server/userStore';
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
-import { v4 as uuidv4 } from 'uuid';
+import { generatorUserId } from '@/utils/codeGenerator';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { toKstYmd } from '@/shared/utils/date';
 import { registerBaseSchema } from '@/features/auth/util/registerValidation';
@@ -13,13 +14,12 @@ export async function POST(req: NextRequest) {
   if (body instanceof NextResponse) return body;
 
   try {
-    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, body.email)).limit(1);
-    if (existing.length > 0) {
-      return NextResponse.json({ error: '이미 사용 중인 이메일입니다.' }, { status: 400 });
+    if (await isEmailTaken(body.email)) {
+      return NextResponse.json({ error: EMAIL_TAKEN_MESSAGE }, { status: 400 });
     }
 
     const now = toKstYmd(new Date());
-    const id = `usr_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
+    const id = generatorUserId();
     await db.insert(users).values({
       id,
       ownerId: id,
@@ -48,6 +48,6 @@ export async function POST(req: NextRequest) {
     return new NextResponse(null, { status: 201 });
   } catch (error) {
     console.error('회원가입 처리 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

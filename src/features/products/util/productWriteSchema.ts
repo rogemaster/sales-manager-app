@@ -8,6 +8,7 @@ import {
   TAX_TYPE_OPTIONS,
 } from '@/features/products/constant/compliance.constants';
 import { CUSTOMER_CODE_MAX_LENGTH } from '@/features/products/util/customerCode';
+import { MAX_IMAGE_URL_LENGTH } from '@/shared/constant/upload.constant';
 
 // integer 컬럼의 범위. 넘으면 Postgres가 던져 배치 전체가 500이 된다.
 const MAX_INT = 2147483647;
@@ -61,7 +62,7 @@ const FIELDS: {
   { key: 'brand', label: '브랜드', required: true, ...text(100) },
   { key: 'manufacturer', label: '제조업체', required: true, ...text(100) },
   { key: 'detailPage', label: '상세설명', required: true, ...text(50000) },
-  { key: 'mainImage', label: '메인이미지', required: true, ...text(2048) },
+  { key: 'mainImage', label: '메인이미지', required: true, ...text(MAX_IMAGE_URL_LENGTH) },
   { key: 'customerCode', label: '고객상품코드', required: false, ...text(CUSTOMER_CODE_MAX_LENGTH) },
   { key: 'modelName', label: '모델명', required: false, ...text(100) },
   { key: 'modelId', label: '모델번호', required: false, ...text(100) },

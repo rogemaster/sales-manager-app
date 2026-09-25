@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGetAddressBook } from '@/features/shoppingSetting/api/useGetAddressBook';
-import { MallAddressType } from '@/features/shoppingSetting/api/getAddressBook';
+import { MallAddressType } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { useAlert } from '@/hooks/useAlert';
 

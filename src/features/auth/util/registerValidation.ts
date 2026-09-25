@@ -1,12 +1,10 @@
 import { z } from 'zod';
 import { phoneSchemaRequired } from '@/shared/utils/phone';
 import { passwordSchema } from '@/shared/utils/password';
+import { EMAIL_FORMAT_MESSAGE, EMAIL_REGEX, emailSchema } from '@/shared/utils/email';
 import { maxLengthMessage, TEXT_LIMITS } from '@/shared/utils/textLimit';
 
-export { formatPhone } from '@/shared/utils/phone';
-
 const BUSINESS_NUMBER_REGEX = /^\d{3}-\d{2}-\d{5}$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const shortText = (emptyMessage?: string) => {
   const base = z.string().max(TEXT_LIMITS.shortText, maxLengthMessage(TEXT_LIMITS.shortText));
@@ -18,26 +16,20 @@ const shortText = (emptyMessage?: string) => {
  * passwordConfirm은 화면에서만 쓰므로 여기 없다 — refine이 붙은 스키마는 omit할 수 없어 기본 객체를 따로 둔다.
  */
 export const registerBaseSchema = z.object({
-  email: z
-    .string()
-    .email('올바른 이메일 형식을 입력해주세요')
-    .max(TEXT_LIMITS.email, maxLengthMessage(TEXT_LIMITS.email)),
+  email: emailSchema,
   password: passwordSchema,
   companyName: shortText('상호/법인명을 입력해주세요'),
   representativeName: shortText('대표자명을 입력해주세요'),
   businessNumber: z.string().regex(BUSINESS_NUMBER_REGEX, '올바른 사업자등록번호 형식을 입력해주세요'),
   businessCategory: shortText('업종을 선택해주세요'),
   contactName: shortText('담당자명을 입력해주세요'),
-  contactEmail: z
-    .string()
-    .email('올바른 이메일 형식을 입력해주세요')
-    .max(TEXT_LIMITS.email, maxLengthMessage(TEXT_LIMITS.email)),
+  contactEmail: emailSchema,
   contactPhone: phoneSchemaRequired('담당자 휴대폰을 입력해주세요', '올바른 휴대폰 형식이 아닙니다. (예: 010-1234-5678)'),
   settlementName: shortText(),
   settlementEmail: z
     .string()
     .max(TEXT_LIMITS.email, maxLengthMessage(TEXT_LIMITS.email))
-    .refine((val) => val === '' || EMAIL_REGEX.test(val), '올바른 이메일 형식을 입력해주세요'),
+    .refine((val) => val === '' || EMAIL_REGEX.test(val), EMAIL_FORMAT_MESSAGE),
   settlementPhone: shortText(),
   // 사업자등록증 파일명. 폼 필드가 아니라 제출 시 따로 붙여 보낸다.
   businessLicenseName: shortText().default(''),

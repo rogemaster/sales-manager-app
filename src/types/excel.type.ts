@@ -114,8 +114,14 @@ export type ValidationResult = {
   errors: ValidationError[] | [];
 };
 
+// 엑셀 저장 대상 도메인. 미리보기 화면과 저장 전략 선택이 같은 값을 쓴다.
+export type ExcelSaveType = 'PRODUCT' | 'ORDER';
+
 // 업로드 시 이미지 주소 하나를 확인하는 함수. ok: false는 이미지 자체의 문제이고, 확인 요청이 실패하면 throw한다.
 export type ExcelImageCheckFn = (url: string) => Promise<{ ok: true } | { ok: false; reason: string }>;
+
+// 저장 시 외부 이미지를 가져와 저장소 key로 바꾸는 함수. ok: false는 그 이미지를 쓸 수 없다는 뜻이고, 요청 실패는 throw한다.
+export type ExcelImageImportFn = (url: string) => Promise<{ ok: true; key: string } | { ok: false; reason: string }>;
 
 // 업로드 시 코드 목록을 한 번에 확인하는 함수. 이미 등록된 코드만 돌려주고, 확인 요청이 실패하면 throw한다.
 export type ExcelCodeCheckFn = (codes: string[]) => Promise<{ code: string; existingCode: string }[]>;

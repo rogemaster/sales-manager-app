@@ -1,5 +1,5 @@
 import { ExcelDownloaderProps, ExcelUploaderProps, ExcelHeaderProps, ExcelTableColumnsType } from '@/types/excel.type';
-import { PRODUCT_BULK_EXCEL_TEMPLATE } from './bulkTemplate.constant';
+import { PRODUCT_BULK_EXCEL_TEMPLATE, PRODUCT_EXCEL_COL } from './bulkTemplate.constant';
 import {
   formatExcelOptionSummary,
   resolveExcelTotalQuantity,
@@ -7,6 +7,13 @@ import {
 } from '@/features/products/util/excelOptions';
 import { PRODUCT_BULK_MAX_ROWS } from './bulk.constant';
 import { getSheetRow } from '@/components/excel/utils/sheetRows';
+import { ExcelRowWithErrors } from '@/types/excel.type';
+
+/** 미리보기 셀 값. 행 객체에는 오류 배열(error)도 같은 모양으로 섞여 있어 배열은 걸러낸다. */
+const cellOf = (row: ExcelRowWithErrors, column: string) => {
+  const value = row[column];
+  return Array.isArray(value) ? undefined : value;
+};
 
 // 엑셀 양식 다운로드
 export const PRODUCT_EXCEL_TEMPLATE_DOWNLOADER: ExcelDownloaderProps = {
@@ -52,24 +59,24 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   },
   {
     key: 'customerCode',
-    headerTitle: '고객상품코드',
-    accessor: (r) => !Array.isArray(r['고객상품코드']) && r['고객상품코드'],
+    headerTitle: PRODUCT_EXCEL_COL.customerCode,
+    accessor: (r) => cellOf(r, PRODUCT_EXCEL_COL.customerCode),
     cellClassName: 'font-mono text-sm',
   },
   {
     key: 'name',
-    headerTitle: '상품명',
-    accessor: (r) => !Array.isArray(r['상품명']) && r['상품명'],
+    headerTitle: PRODUCT_EXCEL_COL.name,
+    accessor: (r) => cellOf(r, PRODUCT_EXCEL_COL.name),
   },
   {
     key: 'category',
-    headerTitle: '카테고리',
-    accessor: (r) => !Array.isArray(r['카테고리']) && r['카테고리'],
+    headerTitle: PRODUCT_EXCEL_COL.category,
+    accessor: (r) => cellOf(r, PRODUCT_EXCEL_COL.category),
   },
   {
     key: 'price',
-    headerTitle: '판매가',
-    accessor: (r) => !Array.isArray(r['판매가']) && r['판매가'],
+    headerTitle: PRODUCT_EXCEL_COL.price,
+    accessor: (r) => cellOf(r, PRODUCT_EXCEL_COL.price),
   },
   {
     key: 'options',
@@ -81,7 +88,7 @@ export const PRODUCT_EXCEL_TABLE_COLUMNS: ExcelTableColumnsType[] = [
   },
   {
     key: 'totalQuantity',
-    headerTitle: '총수량',
+    headerTitle: PRODUCT_EXCEL_COL.totalQuantity,
     accessor: (r) => resolveExcelTotalQuantity(r),
   },
   {

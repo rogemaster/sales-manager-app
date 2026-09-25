@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RegisterFormData, formatBusinessNumber } from '@/features/auth/util/registerValidation';
-import { MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 
 type Props = {
   register: UseFormRegister<RegisterFormData>;
@@ -95,7 +95,7 @@ export const CompanyInfoSection = ({
                       <SelectValue placeholder="업종 선택" />
                     </SelectTrigger>
                     <SelectContent>
-                      {MOCK_CATEGORY_DATA.map((cat) => (
+                      {CATEGORIES.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
                           {cat.name}
                         </SelectItem>

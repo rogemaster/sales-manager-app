@@ -1,6 +1,7 @@
 import { MallAddress } from '../types/shoppingSetting.types';
 
-const ADDRESS_KEYS = ['code', 'name', 'zipCode', 'address', 'addressDetail'] as const;
+/** MallAddress의 다섯 키. 쓰기 검증(shoppingSettingWriteSchema)과 저장 값 추리기가 같은 목록을 쓴다. */
+export const MALL_ADDRESS_KEYS = ['code', 'name', 'zipCode', 'address', 'addressDetail'] as const;
 
 /**
  * 알려진 다섯 키만 남긴 MallAddress를 돌려준다.
@@ -12,7 +13,7 @@ const ADDRESS_KEYS = ['code', 'name', 'zipCode', 'address', 'addressDetail'] as 
  */
 export const pickMallAddress = (value: unknown): MallAddress => {
   const address = value as Record<string, unknown>;
-  return ADDRESS_KEYS.reduce((picked, key) => {
+  return MALL_ADDRESS_KEYS.reduce((picked, key) => {
     picked[key] = address[key] as string;
     return picked;
   }, {} as MallAddress);

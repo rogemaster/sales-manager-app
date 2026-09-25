@@ -6,9 +6,9 @@ import { toNaverProductRequest } from '../util/naverProductRequest';
 import { foldNaverError, MALL_NO_RESPONSE_MESSAGE } from '../util/foldNaverError';
 import { judgeRandomSend, MallSendOutcome } from '../util/randomMallSend';
 import { hasPriorSuccess } from './linkedProductStore';
+import { MALL_ACCOUNT_MISSING_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 
 const SIMULATOR_TIMEOUT_MS = 10_000;
-export const MALL_ACCOUNT_MISSING_MESSAGE = '쇼핑몰 계정을 찾을 수 없습니다.';
 
 export interface SendTarget {
   ownerId: string;

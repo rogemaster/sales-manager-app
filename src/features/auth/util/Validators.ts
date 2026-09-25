@@ -1,6 +1,7 @@
 import { LoginInfo, ValidationResult } from '@/features/auth/types/Auth';
 import { ERROR_MESSAGE } from '../constant/errorMessage';
 import { isValidPassword } from '@/shared/utils/password';
+import { EMAIL_REGEX } from '@/shared/utils/email';
 
 export const validateAuthForm = (formData: LoginInfo): ValidationResult => {
   const error: ValidationResult['error'] = {};
@@ -9,9 +10,8 @@ export const validateAuthForm = (formData: LoginInfo): ValidationResult => {
   if (formData.email.trim() === '') {
     error.email = ERROR_MESSAGE.NOT_FOUND_EMAIL;
   } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      error.email = ERROR_MESSAGE.SIGNUP_FIELD;
+    if (!EMAIL_REGEX.test(formData.email)) {
+      error.email = ERROR_MESSAGE.INVALID_EMAIL_FORMAT;
     }
   }
 

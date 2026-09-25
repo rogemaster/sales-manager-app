@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getCategoryName } from '@/lib/utils';
+import { getCategoryName } from '@/shared/constant/category.constant';
 import { LIST_TABLE_HEAD } from '@/features/products/constant/table.constants';
 import { ProductStatusBadge } from '@/components/common/ProductStatusBadge';
 import { Product } from '@/features/products/types/product.types';

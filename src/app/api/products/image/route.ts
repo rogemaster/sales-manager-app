@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { buildImageKey, detectImageType, putImage, PRODUCT_IMAGE_PREFIX } from '@/lib/storage';
-import { ALLOWED_IMAGE_MIME, MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
+import {
+  ALLOWED_IMAGE_MIME,
+  IMAGE_UPLOAD_TOO_LARGE_MESSAGE,
+  IMAGE_UPLOAD_TYPE_MESSAGE,
+  MAX_IMAGE_BYTES,
+} from '@/shared/constant/upload.constant';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
@@ -23,14 +29,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (!ALLOWED_IMAGE_MIME.includes(file.type as (typeof ALLOWED_IMAGE_MIME)[number])) {
-      return NextResponse.json({ error: 'PNG 또는 JPG 이미지만 업로드할 수 있습니다.' }, { status: 400 });
+      return NextResponse.json({ error: IMAGE_UPLOAD_TYPE_MESSAGE }, { status: 400 });
     }
 
     // Vercel 서버리스 함수의 요청 본문 제한(4.5MB)이 이 검사보다 먼저 걸린다 — 운영(Vercel)에서는
     // 초과 요청이 여기 도달하기 전에 플랫폼이 413으로 끊는다. 로컬 개발 서버·자체 호스팅 배포에는
     // 그 제한이 없으므로, 실제로 실행되는 쪽은 이 검사다.
     if (file.size > MAX_IMAGE_BYTES) {
-      return NextResponse.json({ error: '4MB 이하 이미지를 업로드해 주세요.' }, { status: 400 });
+      return NextResponse.json({ error: IMAGE_UPLOAD_TOO_LARGE_MESSAGE }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -45,6 +51,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ key });
   } catch (error) {
     console.error('이미지 업로드 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

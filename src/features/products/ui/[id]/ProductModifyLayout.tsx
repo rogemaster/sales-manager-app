@@ -10,6 +10,7 @@ import { getProduct } from '../../api/getProduct';
 import { updateProduct } from '../../api/updateProduct';
 import { useEffect } from 'react';
 import { useAlert } from '@/hooks/useAlert';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 import { useRouter } from 'next/navigation';
 import { resolveMainImageKey } from '@/shared/api/uploadImage';
 import { useCustomerCodeAvailability } from '../hooks/useCustomerCodeAvailability';
@@ -29,14 +30,14 @@ export const ProductModifyLayout = ({ productId }: Props) => {
 
   const { data: queryData, isSuccess } = useQuery({
     queryKey: ['productId', productId, workspaceOwnerId],
-    queryFn: () => getProduct(productId, workspaceOwnerId),
+    queryFn: () => getProduct(productId),
     enabled: !!workspaceOwnerId,
   });
 
   const { mutate } = useMutation({
     mutationFn: async (data: ProductFormValues) => {
       const mainImage = await resolveMainImageKey(data.mainImage);
-      return updateProduct(productId, { ...data, mainImage }, workspaceOwnerId);
+      return updateProduct(productId, { ...data, mainImage });
     },
     onSuccess: () => {
       showAlert({
@@ -50,7 +51,7 @@ export const ProductModifyLayout = ({ productId }: Props) => {
     onError: (error) => {
       showAlert({
         type: 'error',
-        message: error instanceof Error && error.message ? error.message : '상품수정 실패',
+        message: getErrorMessage(error, '상품수정 실패'),
       });
     },
   });

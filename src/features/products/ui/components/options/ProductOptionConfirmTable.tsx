@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { formatCombinationLabel } from '@/features/products/util/Options';
+import { resolveTotalQuantity } from '@/features/products/util/excelOptions';
 import { generatorSkuCode } from '@/utils/codeGenerator';
 
 type Props = {
@@ -50,7 +51,8 @@ export const ProductOptionConfirmTable = ({ name, optionCombinations, isOptionsC
       }));
 
       replace(newOption);
-      if (name === 'option') setValue('totalQuantity', newOption.length * bulkQuantity);
+      // 엑셀 대량등록과 같은 규칙 — 조합 수 × 수량
+      if (name === 'option') setValue('totalQuantity', resolveTotalQuantity(newOption, bulkQuantity));
 
       showAlert({
         type: 'success',

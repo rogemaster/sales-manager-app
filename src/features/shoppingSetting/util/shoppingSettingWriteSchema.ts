@@ -1,14 +1,17 @@
 import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
+import { TEXT_LIMITS } from '@/shared/utils/textLimit';
+import { PRODUCT_CONDITION_OPTIONS, SALES_PERIOD_OPTIONS } from '../constant/shoppingSetting.constants';
+import { MALL_ADDRESS_KEYS } from './pickMallAddress';
 
 /** 남의 설정이든 없는 설정이든 같은 문구를 쓴다. 구분해 답하면 남의 id를 탐색하는 도구가 된다. */
 export const SETTING_NOT_FOUND_MESSAGE = '존재하지 않는 설정입니다.';
 
-const NICKNAME_MAX_LENGTH = 100;
+const NICKNAME_MAX_LENGTH = TEXT_LIMITS.shortText;
 const ADDRESS_FIELD_MAX_LENGTH = 200;
 
-const PRODUCT_CONDITIONS = ['NEW', 'USED'];
-const SALES_PERIODS = [7, 15, 30, 60, 90];
-const ADDRESS_KEYS = ['code', 'name', 'zipCode', 'address', 'addressDetail'];
+// 허용값은 화면 Select가 쓰는 옵션에서 파생한다 — 옵션을 늘리면 서버 검증도 따라간다.
+const PRODUCT_CONDITIONS = PRODUCT_CONDITION_OPTIONS.map(({ id }) => id);
+const SALES_PERIODS = SALES_PERIOD_OPTIONS.map(({ id }) => Number(id));
 const DELIVERY_COMPANY_IDS = DELIVERY_COMPANY.map(({ id }) => id);
 
 /** route가 받는 값은 폼을 거치지 않을 수 있어 타입을 믿을 수 없다. unknown으로 받아 여기서 좁힌다. */
@@ -20,7 +23,7 @@ const isFilledString = (value: unknown): value is string => typeof value === 'st
 const isValidAddress = (value: unknown): boolean => {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
   const address = value as Record<string, unknown>;
-  return ADDRESS_KEYS.every((key) => {
+  return MALL_ADDRESS_KEYS.every((key) => {
     const field = address[key];
     if (typeof field !== 'string') return false;
     if (field.length > ADDRESS_FIELD_MAX_LENGTH) return false;

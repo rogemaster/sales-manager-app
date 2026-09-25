@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -50,6 +51,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ...updated, avatar: updated.avatar ?? '' });
   } catch (error) {
     console.error('프로필 수정 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

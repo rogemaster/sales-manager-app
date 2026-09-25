@@ -29,6 +29,7 @@ import { BulkPriceQuantitySection } from './sections/BulkPriceQuantitySection';
 import { BulkBrandModelSection } from './sections/BulkBrandModelSection';
 import { BulkComplianceSection } from './sections/BulkComplianceSection';
 import { BulkDetailInfoSection } from './sections/BulkDetailInfoSection';
+import { buildSendResultAlert } from '@/features/mallLinkedProduct/util/sendResultAlert';
 
 const LIST_PATH = '/shopping/linked-products';
 
@@ -95,18 +96,9 @@ export const ProductBulkEditLayout = () => {
     bulkUpdate(
       { ids: selectedLinkedIds, productSnapshot, clearKeys },
       {
-        onSuccess: ({ totalCount, successCount, failCount }) => {
+        onSuccess: (result) => {
           // 선택은 유지한다 — 수정 직후 곧바로 '선택 재전송'을 누를 수 있어야 한다.
-          if (failCount === 0) {
-            showAlert({ message: `${successCount}건이 수정되었습니다.`, type: 'success', onConfirm: goList });
-            return;
-          }
-
-          showAlert({
-            message: `총 ${totalCount}건 중 ${successCount}건 수정, ${failCount}건 실패했습니다.`,
-            type: 'warning',
-            onConfirm: goList,
-          });
+          showAlert({ ...buildSendResultAlert(result, 'update'), onConfirm: goList });
         },
         onError: () => {
           showAlert({ message: '수정 중 오류가 발생했습니다. 다시 시도해주세요.', type: 'error' });

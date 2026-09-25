@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { createProduct } from '../../api/createProduct';
 import { useAlert } from '@/hooks/useAlert';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 import { ProductForm } from '../components/ProductForm';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { resolveMainImageKey } from '@/shared/api/uploadImage';
@@ -45,7 +46,7 @@ export const ProductCreateLayout = () => {
     onError: (error) => {
       showAlert({
         type: 'error',
-        message: error instanceof Error && error.message ? error.message : '상품등록 실패',
+        message: getErrorMessage(error, '상품등록 실패'),
       });
     },
   });

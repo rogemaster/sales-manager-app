@@ -6,7 +6,7 @@ import { FilterSelect } from '@/components/common/FilterSelect';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
+import { DELIVERY_TYPE_OPTION, isPaidDelivery } from '@/shared/constant/delivery.constant';
 
 export const ProductPriceAndQuantityInfo = () => {
   const {
@@ -18,7 +18,7 @@ export const ProductPriceAndQuantityInfo = () => {
   } = useFormContext<Product>();
 
   const deliveryType = watch('deliveryType');
-  const isDeliveryPrice = deliveryType === 'NOT_FREE' || deliveryType === 'CONDITIONAL_FREE';
+  const isDeliveryPrice = isPaidDelivery(deliveryType);
 
   return (
     <Card className="overflow-hidden">
@@ -75,7 +75,7 @@ export const ProductPriceAndQuantityInfo = () => {
                   value={field.value ?? ''}
                   onValueChange={(value) => {
                     field.onChange(value);
-                    if (value !== 'NOT_FREE' && value !== 'CONDITIONAL_FREE') {
+                    if (!isPaidDelivery(value)) {
                       setValue('deliveryPrice', 0);
                     }
                   }}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { users } from '@/db/schema';
@@ -39,6 +40,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ approvedCount: approved.length } satisfies ApproveUsersResult);
   } catch (error) {
     console.error('사용자 승인 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

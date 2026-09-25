@@ -32,7 +32,7 @@ src/mocks/
 │   ├── home.ts        # home/order-stats
 │   ├── orders.ts      # orders CRUD + comments/claim/history
 │   └── collection.ts  # order/collection jobs + trigger
-├── data/              # mock 원본 데이터 (MockCategoryData는 화면이 직접 import하는 상수다)
+├── data/              # mock 원본 데이터 (운영 화면이 import하면 안 된다 — 카테고리 상수는 shared/constant/category.constant.ts)
 └── utils/             # 핸들러가 호출하는 로직
 ```
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProducts, shoppingSettings } from '@/db/schema';
@@ -72,6 +73,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('쇼핑몰 연동 상품 일괄수정 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

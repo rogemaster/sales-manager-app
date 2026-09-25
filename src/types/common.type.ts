@@ -1,4 +1,5 @@
 import { ManipulateType } from 'dayjs';
+import type { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
 
 export interface TableTitleValue {
   id: string;
@@ -52,24 +53,8 @@ export interface ShoppingMallType {
   name: string;
 }
 
-// 쇼핑몰 지정 타입
-export type ShoppingMalls =
-  | 'AUC'
-  | 'GMK'
-  | '11ST'
-  | 'INTP'
-  | 'NSST'
-  | 'COUP'
-  | 'CJH'
-  | 'GSH'
-  | 'LOTH'
-  | 'SSGC'
-  | 'HDH'
-  | 'OHOU'
-  | 'HALF'
-  | 'MUSIN'
-  | 'KAKAOS'
-  | 'MUST';
+// 쇼핑몰 코드 — SHOPPING_MALLS 배열에서 파생한다(몰 추가는 배열 한 곳만 고친다)
+export type ShoppingMalls = (typeof SHOPPING_MALLS)[number]['code'];
 
 // 필터 관련 타입들
 export interface FilterOption {

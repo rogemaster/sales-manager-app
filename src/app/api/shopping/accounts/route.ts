@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { requirePermission } from '@/shared/utils/apiAuth';
@@ -47,6 +48,6 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     // DrizzleQueryError.message는 SQL params(평문 password·apiKey)를 포함한다. cause만 남긴다.
     console.error('쇼핑몰 계정 등록 중 에러:', error instanceof Error ? (error.cause ?? error.name) : error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

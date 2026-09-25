@@ -9,6 +9,7 @@ import { useDeleteUsers } from '@/features/account/api/useDeleteUsers';
 import { useApproveUsers } from '@/features/account/api/useApproveUsers';
 import { usePermission } from '@/features/auth/hook/usePermission';
 import { useAlert } from '@/hooks/useAlert';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 export const UserActionSection = () => {
   const [selectedUsers, setSelectedUsers] = useAtom(selectedUsersAtom);
@@ -42,7 +43,7 @@ export const UserActionSection = () => {
       },
       onError: (error) => {
         showAlert({
-          message: error instanceof Error && error.message ? error.message : '사용자 승인에 실패했습니다.',
+          message: getErrorMessage(error, '사용자 승인에 실패했습니다.'),
           type: 'error',
         });
       },
@@ -71,7 +72,7 @@ export const UserActionSection = () => {
           // onError가 없으면 서버가 거절해도 화면에 아무 변화가 없어 삭제된 것처럼 보인다.
           onError: (error) => {
             showAlert({
-              message: error instanceof Error && error.message ? error.message : '사용자 삭제에 실패했습니다.',
+              message: getErrorMessage(error, '사용자 삭제에 실패했습니다.'),
               type: 'error',
             });
           },

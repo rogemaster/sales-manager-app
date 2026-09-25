@@ -1,3 +1,5 @@
+import { SUB_USER_GRADES, USER_GRADES } from '../constant/grade.constant';
+
 export interface LoginInfo {
   email: string;
   password: string;
@@ -14,8 +16,8 @@ export interface ValidationResult {
   error: Errors;
 }
 
-export type UserGrade = 'super_admin' | 'admin' | 'operator';
-export type SubUserGrade = Exclude<UserGrade, 'super_admin'>;
+export type UserGrade = (typeof USER_GRADES)[number];
+export type SubUserGrade = (typeof SUB_USER_GRADES)[number];
 
 export interface User {
   email: string;

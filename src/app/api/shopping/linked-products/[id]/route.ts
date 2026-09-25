@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProducts } from '@/db/schema';
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest, { params }: Context) {
     return NextResponse.json(toMallLinkedProduct(row));
   } catch (error) {
     console.error('쇼핑몰 연동 상품 조회 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }
 
@@ -57,6 +58,6 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     return NextResponse.json(toMallLinkedProduct(updated));
   } catch (error) {
     console.error('쇼핑몰 연동 상품 저장 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

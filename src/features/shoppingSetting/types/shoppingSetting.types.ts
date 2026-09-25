@@ -4,6 +4,9 @@ import { BulkFailure } from '@/shared/utils/bulkResultAlert';
 export type ProductCondition = 'NEW' | 'USED'; // 신상품 / 중고상품
 export type SalesPeriod = 7 | 15 | 30 | 60 | 90;
 
+/** 주소록 종류 — 출고지·반품지. 주소록 조회 화면·api·route가 같이 쓴다. */
+export type MallAddressType = 'SHIPPING' | 'RETURN';
+
 export interface MallAddress {
   code: string; // 출고지코드 / 반품지코드 (몰 내부 식별자)
   name: string; // 출고지명 / 반품지명

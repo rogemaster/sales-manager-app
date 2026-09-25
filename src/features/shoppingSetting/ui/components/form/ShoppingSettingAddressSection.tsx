@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { AddressSelectModal } from '../address/AddressSelectModal';
-import { MallAddressType } from '@/features/shoppingSetting/api/getAddressBook';
+import { MallAddressType } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { ShoppingSettingFormValues, MallAddress } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
 interface AddressPickerFieldProps {

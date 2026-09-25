@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { RangeTypeProps } from '@/types/common.type';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -37,3 +38,9 @@ export const toKstDateRange = (startDate: string, endDate: string): { start: Dat
  * KST 자정~오전 9시 사이 시각이 전날 날짜로 표시된다.
  */
 export const toKstYmd = (date: Date | string): string => dayjs(date).tz(KST).format('YYYY-MM-DD');
+
+/** 화면의 기간 버튼(최근 N일·N개월)용 [시작, 끝] Date. 브라우저 시각 기준이다 — 서버 필터 비교는 toKstDateRange가 한다. */
+export const calculatorRangeDate = (value: RangeTypeProps): [Date, Date] => {
+  const startDate = dayjs().subtract(value.range, value.uniq).toDate();
+  return [startDate, new Date()];
+};

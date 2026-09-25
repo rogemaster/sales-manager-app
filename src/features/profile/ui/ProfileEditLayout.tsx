@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAlert } from '@/hooks/useAlert';
 import { getUserInfoAtom, setUserInfoAtom } from '@/features/auth/store/auth.store';
-import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
+import { getGradeLabel } from '@/features/account/constant/user.constants';
 import { useUpdateProfile } from '@/features/profile/api/useUpdateProfile';
 import { ProfileEditFormData, profileEditSchema } from '@/features/profile/util/profileEditSchema';
 
@@ -24,7 +24,7 @@ export const ProfileEditLayout = () => {
   const router = useRouter();
   const { showAlert } = useAlert();
   const { mutate, isPending } = useUpdateProfile();
-  const gradeLabel = USER_GRADE_OPTIONS.find((o) => o.id === grade)?.name ?? grade;
+  const gradeLabel = getGradeLabel(grade);
 
   const {
     register,

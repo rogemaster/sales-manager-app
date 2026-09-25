@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAddressBook, MallAddressType } from './getAddressBook';
+import { getAddressBook } from './getAddressBook';
+import { MallAddressType } from '../types/shoppingSetting.types';
 
 export const ADDRESS_BOOK_QUERY_KEY = 'shoppingSettingAddressBook';
 

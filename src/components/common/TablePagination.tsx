@@ -1,7 +1,7 @@
 'use client';
 
 import { MouseEventHandler } from 'react';
-import { getPage } from '@/lib/utils';
+import { getPage } from '@/shared/utils/pagination';
 import {
   Pagination,
   PaginationContent,

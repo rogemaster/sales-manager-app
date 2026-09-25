@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { randomUUID } from 'crypto';
 import { db } from '@/db';
 import { shoppingAccounts, shoppingSettings } from '@/db/schema';
@@ -8,6 +9,7 @@ import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settin
 import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
 import { pickMallAddress } from '@/features/shoppingSetting/util/pickMallAddress';
+import { ACCOUNT_NOT_FOUND_MESSAGE } from '@/features/shoppingAccount/util/accountMessages';
 import { ShoppingMalls } from '@/types/common.type';
 
 export async function POST(req: NextRequest) {
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
       .where(and(eq(shoppingAccounts.id, String(body.mallAccountId)), eq(shoppingAccounts.ownerId, session.ownerId)))
       .limit(1);
 
-    if (!account) return NextResponse.json({ error: '존재하지 않는 계정입니다.' }, { status: 400 });
+    if (!account) return NextResponse.json({ error: ACCOUNT_NOT_FOUND_MESSAGE }, { status: 400 });
 
     const now = new Date();
 
@@ -56,6 +58,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
     console.error('쇼핑몰 정보설정 생성 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

@@ -21,12 +21,16 @@ import { ProductInformationDisclosureSection } from '@/features/products/ui/comp
 import { ShoppingSettingBasicInfoSection } from '@/features/shoppingSetting/ui/components/form/ShoppingSettingBasicInfoSection';
 import { ShoppingSettingAddressSection } from '@/features/shoppingSetting/ui/components/form/ShoppingSettingAddressSection';
 import { ShoppingSettingMallInfoSection } from '@/features/shoppingSetting/ui/components/form/ShoppingSettingMallInfoSection';
-import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
+import {
+  MallLinkedProduct,
+  UpdateMallLinkedProductBody,
+} from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { useGetMallLinkedProduct } from '../../api/useGetMallLinkedProduct';
-import { MallLinkedProductSnapshots, useUpdateMallLinkedProduct } from '../../api/useUpdateMallLinkedProduct';
+import { useUpdateMallLinkedProduct } from '../../api/useUpdateMallLinkedProduct';
 import { useResendMallLinkedProducts } from '../../api/useResendMallLinkedProducts';
 import { MallLinkedProductInfoCard } from './MallLinkedProductInfoCard';
 import { MallLinkedProductHistoryCard } from './MallLinkedProductHistoryCard';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 type Props = {
   id: string;
@@ -58,7 +62,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
 
   // 이미지를 새로 골랐으면 저장 직전에 업로드해 R2 key로 바꾼다.
   // 식별 필드는 타입을 채우려고 원본에서 가져온다. 서버는 이 값들을 저장하지 않는다(UPDATE에 불변 컬럼 없음).
-  const buildSnapshots = async (record: MallLinkedProduct): Promise<MallLinkedProductSnapshots> => {
+  const buildSnapshots = async (record: MallLinkedProduct): Promise<UpdateMallLinkedProductBody> => {
     const settingValues = settingForm.getValues();
     const productValues = productForm.getValues();
     const mainImage = await resolveMainImageKey(productValues.mainImage);
@@ -95,7 +99,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
   };
 
   const saveErrorMessage = (error: unknown) =>
-    error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+    getErrorMessage(error, '저장 중 오류가 발생했습니다. 다시 시도해주세요.');
 
   const handleSave = async () => {
     if (!linked || !(await validateBothForms())) return;

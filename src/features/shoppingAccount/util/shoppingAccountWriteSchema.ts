@@ -1,9 +1,7 @@
-import { SHOPPING_MALLS } from '@/shared/constant/shoppingMall.constant';
+import { SHOPPING_MALL_CODES } from '@/shared/constant/shoppingMall.constant';
+import { EMAIL_REGEX } from '@/shared/utils/email';
 import { PHONE_REGEX } from '@/shared/utils/phone';
 import { CreateShoppingAccountBody } from '../types/shoppingAccount.types';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MALL_CODES: string[] = SHOPPING_MALLS.map((mall) => mall.code);
 
 type WriteValues = Partial<CreateShoppingAccountBody>;
 
@@ -38,7 +36,7 @@ export const findShoppingAccountWriteViolation = (
 ): string | null => {
   const has = (key: keyof WriteValues) => mode === 'create' || key in values;
 
-  if (has('mallCode') && !MALL_CODES.includes(String(values.mallCode ?? ''))) {
+  if (has('mallCode') && !SHOPPING_MALL_CODES.includes(String(values.mallCode ?? ''))) {
     return '유효하지 않은 쇼핑몰입니다.';
   }
 

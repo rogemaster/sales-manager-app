@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { products } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { generatorProductCode } from '@/utils/codeGenerator';
 import { isMainImageOwnedBy } from '@/lib/storage';
+import { IMAGE_NOT_OWNED_MESSAGE } from '@/shared/constant/upload.constant';
 import { CreateProductRequest } from '@/features/products/types/product.types';
 import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
 import {
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     // key 형태라면 본인 네임스페이스여야 한다 — 아니면 다른 테넌트의 R2 객체를 가리키는 key가 그대로 저장된다.
     if (values.mainImage && !isMainImageOwnedBy(values.mainImage, session.ownerId)) {
-      return NextResponse.json({ error: '본인이 업로드한 이미지만 사용할 수 있습니다.' }, { status: 400 });
+      return NextResponse.json({ error: IMAGE_NOT_OWNED_MESSAGE }, { status: 400 });
     }
 
     // 컬럼이 text·integer라 DB가 값을 걸러주지 않는다. 폼을 거치지 않는 요청을 여기서 막는다.
@@ -66,6 +68,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: CUSTOMER_CODE_CONFLICT_MESSAGE }, { status: 400 });
     }
     console.error('상품 등록 중 에러:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    return serverErrorResponse();
   }
 }

@@ -2,6 +2,7 @@ import { OptionCombination, ProductOption } from '@/features/products/types/prod
 import { ExcelRowWithErrors } from '@/types/excel.type';
 import { optionCombinations, validateOptions } from './Options';
 import { generatorSkuCode } from '@/utils/codeGenerator';
+import { PRODUCT_EXCEL_COL } from '../constant/bulkTemplate.constant';
 
 /** 엑셀에서 읽은 옵션명·옵션값 한 쌍. 시트 셀이라 타입을 특정할 수 없다 */
 export interface ExcelOptionPair {
@@ -74,10 +75,10 @@ export const toExcelOptionPairs = (
   row: ExcelRowWithErrors,
 ): { pairs: ExcelOptionPair[]; subPairs: ExcelOptionPair[] } => ({
   pairs: [
-    { name: row['옵션명1'], values: row['옵션값1'] },
-    { name: row['옵션명2'], values: row['옵션값2'] },
+    { name: row[PRODUCT_EXCEL_COL.option1Name], values: row[PRODUCT_EXCEL_COL.option1Value] },
+    { name: row[PRODUCT_EXCEL_COL.option2Name], values: row[PRODUCT_EXCEL_COL.option2Value] },
   ],
-  subPairs: [{ name: row['추가옵션명'], values: row['추가옵션값'] }],
+  subPairs: [{ name: row[PRODUCT_EXCEL_COL.subOptionName], values: row[PRODUCT_EXCEL_COL.subOptionValue] }],
 });
 
 /**
@@ -121,7 +122,7 @@ export const resolveTotalQuantity = (option: OptionCombination[] | undefined, qu
  * @param row 업로드된 엑셀 한 행
  */
 export const resolveExcelTotalQuantity = (row: ExcelRowWithErrors): number => {
-  const quantity = Number(row['총수량']) || 0;
+  const quantity = Number(row[PRODUCT_EXCEL_COL.totalQuantity]) || 0;
   const { pairs } = toExcelOptionPairs(row);
 
   return resolveTotalQuantity(buildCombinationsFromExcel(pairs, quantity, ''), quantity);

@@ -7,7 +7,12 @@ import { useAlert } from '@/hooks/useAlert';
 import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { isSettingApplyModalOpenAtom, selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { useResendMallLinkedProducts } from '@/features/mallLinkedProduct/api/useResendMallLinkedProducts';
-import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import {
+  MALL_LINK_SEND_LIMIT_MESSAGE,
+  MALL_LINK_SEND_MAX_ITEMS,
+} from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
+import { buildSendResultAlert } from '@/features/mallLinkedProduct/util/sendResultAlert';
 
 type Props = {
   linkedProducts: MallLinkedProduct[];
@@ -31,31 +36,21 @@ export const MallLinkedProductActionSection = ({ linkedProducts }: Props) => {
     }
 
     if (selectedLinkedIds.length > MALL_LINK_SEND_MAX_ITEMS) {
-      showAlert({ message: `한 번에 최대 ${MALL_LINK_SEND_MAX_ITEMS}건까지 전송할 수 있습니다.`, type: 'warning' });
+      showAlert({ message: MALL_LINK_SEND_LIMIT_MESSAGE, type: 'warning' });
       return;
     }
 
     resend(selectedLinkedIds, {
-      onSuccess: ({ totalCount, successCount, failCount }) => {
+      onSuccess: (result) => {
         // 결과와 무관하게 선택을 비운다. 목록을 다시 불러오므로 처리된 행이 계속 체크돼 있으면 혼란스럽다.
         // 실패 건은 목록에 사유와 함께 남아 거기서 다시 조치한다.
         setSelectedLinkedIds([]);
-
-        if (failCount === 0) {
-          showAlert({ message: `${successCount}건이 쇼핑몰로 전송되었습니다.`, type: 'success' });
-          return;
-        }
-
-        showAlert({
-          message: `총 ${totalCount}건 중 ${successCount}건 전송 성공, ${failCount}건 실패했습니다.`,
-          type: 'warning',
-        });
+        showAlert(buildSendResultAlert(result, 'send'));
       },
       onError: (error) => {
         setSelectedLinkedIds([]);
         showAlert({
-          message:
-            error instanceof Error && error.message ? error.message : '전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+          message: getErrorMessage(error, '전송 중 오류가 발생했습니다. 다시 시도해주세요.'),
           type: 'error',
         });
       },

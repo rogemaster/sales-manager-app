@@ -2,7 +2,8 @@
 
 import { useAtom } from 'jotai';
 import { categoryAtom } from '@/features/products/store/search.store';
-import { ALL_CATEGORY_OPTION, MOCK_CATEGORY_DATA } from '@/mocks/data/MockCategoryData';
+import { CATEGORIES } from '@/shared/constant/category.constant';
+import { ALL_FILTER_OPTION } from '@/shared/constant/filter.constant';
 import { FilterSelect } from '@/components/common/FilterSelect';
 
 export const ProductSearchCategory = () => {
@@ -20,8 +21,8 @@ export const ProductSearchCategory = () => {
       triggerClassName="w-48"
       value={getCategoryAtom}
       onValueChange={handleCategoryChange}
-      options={MOCK_CATEGORY_DATA}
-      allOption={ALL_CATEGORY_OPTION}
+      options={CATEGORIES}
+      allOption={ALL_FILTER_OPTION}
     />
   );
 };
