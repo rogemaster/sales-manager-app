@@ -30,14 +30,14 @@ export const ProductModifyLayout = ({ productId }: Props) => {
 
   const { data: queryData, isSuccess } = useQuery({
     queryKey: ['productId', productId, workspaceOwnerId],
-    queryFn: () => getProduct(productId, workspaceOwnerId),
+    queryFn: () => getProduct(productId),
     enabled: !!workspaceOwnerId,
   });
 
   const { mutate } = useMutation({
     mutationFn: async (data: ProductFormValues) => {
       const mainImage = await resolveMainImageKey(data.mainImage);
-      return updateProduct(productId, { ...data, mainImage }, workspaceOwnerId);
+      return updateProduct(productId, { ...data, mainImage });
     },
     onSuccess: () => {
       showAlert({

@@ -1,5 +1,5 @@
 import { GetShoppingAccountsResponse, ShoppingAccountSearchType } from '../types/shoppingAccount.types';
-import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
+import { throwIfNotOk } from '@/shared/utils/apiResponse';
 
 export const getShoppingAccounts = async (
   filters: ShoppingAccountSearchType,
@@ -11,7 +11,6 @@ export const getShoppingAccounts = async (
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ filters, page, pageSize }),
   });
-  throwIfUnauthorized(response);
-  if (!response.ok) throw new Error('쇼핑몰 계정 목록 조회 실패');
+  await throwIfNotOk(response, '쇼핑몰 계정 목록 조회 실패');
   return response.json();
 };

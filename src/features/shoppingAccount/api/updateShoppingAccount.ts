@@ -1,5 +1,5 @@
 import { ShoppingAccount, UpdateShoppingAccountBody } from '../types/shoppingAccount.types';
-import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
+import { throwIfNotOk } from '@/shared/utils/apiResponse';
 
 export const updateShoppingAccount = async (id: string, body: UpdateShoppingAccountBody): Promise<ShoppingAccount> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/shopping/accounts/${id}`, {
@@ -7,7 +7,6 @@ export const updateShoppingAccount = async (id: string, body: UpdateShoppingAcco
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  throwIfUnauthorized(response);
-  if (!response.ok) throw new Error('쇼핑몰 계정 수정 실패');
+  await throwIfNotOk(response, '쇼핑몰 계정 수정 실패');
   return response.json();
 };
