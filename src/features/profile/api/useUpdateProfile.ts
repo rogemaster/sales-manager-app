@@ -1,8 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { updateProfile, UpdateProfileBody } from './updateProfile';
+import { updateProfile } from './updateProfile';
+import { ProfileEditFormData } from '../util/profileEditSchema';
 
 export const useUpdateProfile = () => {
   return useMutation({
-    mutationFn: (body: UpdateProfileBody) => updateProfile(body),
+    mutationFn: (body: ProfileEditFormData) => updateProfile(body),
   });
 };

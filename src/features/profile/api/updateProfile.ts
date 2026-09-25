@@ -1,14 +1,9 @@
 import { User } from '@/features/auth/types/Auth';
 import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
+import { ProfileEditFormData } from '../util/profileEditSchema';
 
-export type UpdateProfileBody = {
-  name: string;
-  phone: string;
-  company?: string;
-  bio?: string;
-};
-
-export const updateProfile = async (body: UpdateProfileBody): Promise<User> => {
+// 본문 타입은 서버(PATCH /api/profile)가 검증하는 스키마에서 파생한다 — 폼·api·route가 같은 타입을 본다.
+export const updateProfile = async (body: ProfileEditFormData): Promise<User> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

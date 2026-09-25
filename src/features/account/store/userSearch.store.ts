@@ -10,11 +10,11 @@ const DEFAULT_END_DATE = dayjs().format('YYYY-MM-DD');
 export const currentPageAtom = atom<number>(1);
 export const selectedUsersAtom = atom<string[]>([]);
 
-export const userDateTypeAtom = atom<string>(DEFAULT_DATE_TYPE);
+export const userDateTypeAtom = atom<UserSearchType['dateType']>(DEFAULT_DATE_TYPE);
 export const userStartDateAtom = atom<string>(DEFAULT_START_DATE);
 export const userEndDateAtom = atom<string>(DEFAULT_END_DATE);
 export const userGradeAtom = atom<UserGrade | 'ALL'>('ALL');
-export const userSearchTypeAtom = atom<string>('email');
+export const userSearchTypeAtom = atom<UserSearchType['searchType']>('email');
 
 // UI draft 상태 — 검색 버튼 클릭 전까지 API 호출에 사용되지 않음
 export const getUserSearchFilterAtom = atom<UserSearchType>((get) => ({

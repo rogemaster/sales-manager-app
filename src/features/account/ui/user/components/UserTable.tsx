@@ -4,10 +4,9 @@ import { useAtom } from 'jotai';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { selectedUsersAtom } from '@/features/account/store/userSearch.store';
-import { USER_TABLE_HEAD, USER_GRADE_OPTIONS, USER_STATUS_OPTIONS } from '@/features/account/constant/user.constants';
+import { USER_TABLE_HEAD, USER_STATUS_OPTIONS, getGradeLabel } from '@/features/account/constant/user.constants';
 import { AccountUser } from '@/features/account/types/user.types';
 
-const gradeLabel = (grade: string) => USER_GRADE_OPTIONS.find((o) => o.id === grade)?.name ?? grade;
 const statusLabel = (status: string) => USER_STATUS_OPTIONS.find((o) => o.id === status)?.name ?? status;
 
 interface UserTableProps {
@@ -69,7 +68,7 @@ export const UserTable = ({ users }: UserTableProps) => {
                   onCheckedChange={(checked: boolean) => handleSelectUser(user.id, checked)}
                 />
               </TableCell>
-              <TableCell className="text-center">{gradeLabel(user.grade)}</TableCell>
+              <TableCell className="text-center">{getGradeLabel(user.grade)}</TableCell>
               <TableCell className="text-center">{statusLabel(user.status)}</TableCell>
               <TableCell className="text-center">{user.email}</TableCell>
               <TableCell className="text-center">{user.name}</TableCell>

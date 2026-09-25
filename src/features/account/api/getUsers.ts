@@ -4,7 +4,7 @@ import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
 export const getUsers = async (
   filters: UserSearchType,
   page: number,
-  pageSize: number = 20,
+  pageSize: number = 10, // 다른 목록 화면과 같은 기본값
 ): Promise<GetUsersResponse> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/account/users/list`, {
     method: 'POST',

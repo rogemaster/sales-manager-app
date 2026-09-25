@@ -15,6 +15,7 @@ import {
 } from '@/features/account/store/userSearch.store';
 import { USER_SEARCH_TYPE } from '@/features/account/constant/user.constants';
 import { TEXT_LIMITS } from '@/shared/utils/textLimit';
+import { UserSearchType } from '@/features/account/types/user.types';
 
 export const UserSearchInput = () => {
   const [searchType, setSearchType] = useAtom(userSearchTypeAtom);
@@ -40,7 +41,8 @@ export const UserSearchInput = () => {
   return (
     <div className="flex items-center gap-4">
       <Label className="w-20 text-right">검색어</Label>
-      <Select value={searchType} onValueChange={setSearchType}>
+      {/* 선택지는 USER_SEARCH_TYPE에서만 나온다 */}
+      <Select value={searchType} onValueChange={(value) => setSearchType(value as UserSearchType['searchType'])}>
         <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>

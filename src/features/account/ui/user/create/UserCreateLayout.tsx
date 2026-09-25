@@ -7,12 +7,12 @@ import { useAtomValue } from 'jotai';
 import { Button } from '@/components/ui/button';
 import { useAlert } from '@/hooks/useAlert';
 import { gradeAtom } from '@/features/auth/store/auth.store';
-import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
+import { SUB_USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
 import { CreateUserBody } from '@/features/account/types/user.types';
 import { useCreateUser } from '@/features/account/api/useCreateUser';
 import { resolveNewUserStatus } from '@/features/account/util/userStatus';
 import { UserCreateForm } from './UserCreateForm';
-import { CreateUserFormData, createUserSchema } from '@/features/account/util/userCreateSchema';
+import { createUserSchema } from '@/features/account/util/userCreateSchema';
 import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 export const UserCreateLayout = () => {
@@ -23,19 +23,13 @@ export const UserCreateLayout = () => {
 
   // 버튼 문구용 예상값. 실제 상태는 서버가 정하고, 완료 알림은 응답의 status를 따른다.
   const willBePending = resolveNewUserStatus(grade) === 'pending';
-  const gradeOptions = USER_GRADE_OPTIONS.filter((o) => o.id !== 'super_admin');
 
-  const form = useForm<CreateUserFormData>({
+  const form = useForm<CreateUserBody>({
     resolver: zodResolver(createUserSchema),
     defaultValues: { email: '', password: '', name: '', phone: '', bio: '', avatar: '' },
   });
 
-  const onSubmit = (data: CreateUserFormData) => {
-    const body: CreateUserBody = {
-      ...data,
-      avatar: data.avatar ?? '',
-      bio: data.bio ?? '',
-    };
+  const onSubmit = (body: CreateUserBody) => {
     mutate(body, {
       onSuccess: (user) => {
         showAlert({
@@ -64,7 +58,7 @@ export const UserCreateLayout = () => {
       </div>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <UserCreateForm gradeOptions={gradeOptions} />
+          <UserCreateForm gradeOptions={SUB_USER_GRADE_OPTIONS} />
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => router.push('/account/user')}>
               취소

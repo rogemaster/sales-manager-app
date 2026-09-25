@@ -1,6 +1,7 @@
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 import { UserGrade } from '@/features/auth/types/Auth';
+import { USER_GRADES } from '@/features/auth/constant/grade.constant';
 import { can, Permission } from '@/shared/utils/permission';
 import { loadSessionUser, SessionUserRow } from '@/shared/utils/sessionUser';
 
@@ -11,14 +12,12 @@ export type ApiSession = {
   email: string;
 };
 
-const USER_GRADES: readonly string[] = ['super_admin', 'admin', 'operator'] satisfies UserGrade[];
-
 /**
  * DB 행으로 세션을 만든다. 삭제·비활성·알 수 없는 등급이면 null.
  * 등급과 워크스페이스는 토큰이 아니라 DB 값이다 — 토큰은 발급 시점 사본이라 최대 30일 낡는다.
  */
 export function resolveApiSession(user: SessionUserRow | null): ApiSession | null {
-  if (!user || user.status !== 'active' || !USER_GRADES.includes(user.grade)) return null;
+  if (!user || user.status !== 'active' || !(USER_GRADES as readonly string[]).includes(user.grade)) return null;
   return {
     id: user.id,
     // owner_id 컬럼이 nullable이라(2026-07-08 이전 가입 계정의 하위호환) id로 대신한다.

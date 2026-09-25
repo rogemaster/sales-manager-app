@@ -1,4 +1,4 @@
-import { User, UserGrade, SubUserGrade } from '@/features/auth/types/Auth';
+import { User, UserGrade } from '@/features/auth/types/Auth';
 import { PaginationMeta } from '@/types/common.type';
 
 export type UserStatus = 'active' | 'pending';
@@ -25,21 +25,20 @@ export interface AccountUser extends User {
   settlementPhone: string;
 }
 
-export interface CreateUserBody extends Omit<User, 'company' | 'location' | 'grade'> {
-  password: string;
-  grade: SubUserGrade;
-}
+// 등록 본문은 서버 스키마에서 파생한다(grade는 SubUserGrade로 좁혀져 super_admin을 줄 수 없다).
+export type { CreateUserBody } from '../util/userCreateSchema';
 
 export interface ApproveUsersResult {
   approvedCount: number;
 }
 
+/** 사용자 목록 검색 조건. 값의 범위는 서버 스키마(userListRequestSchema)의 enum과 같다. */
 export interface UserSearchType {
-  dateType: string;
+  dateType: 'createdAt' | 'updatedAt';
   startDate: string;
   endDate: string;
   grade: UserGrade | 'ALL';
-  searchType: string;
+  searchType: 'email' | 'name';
   searchValue: string;
 }
 

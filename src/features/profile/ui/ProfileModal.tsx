@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getUserInfoAtom } from '@/features/auth/store/auth.store';
-import { USER_GRADE_OPTIONS } from '@/features/account/constant/user.constants';
+import { getGradeLabel } from '@/features/account/constant/user.constants';
 
 type Props = {
   open: boolean;
@@ -24,7 +24,7 @@ const Field = ({ label, value }: { label: string; value: string | undefined }) =
 export const ProfileModal = ({ open, onOpenChange }: Props) => {
   const { avatar, name, email, grade, phone, company, bio } = useAtomValue(getUserInfoAtom);
   const router = useRouter();
-  const gradeLabel = USER_GRADE_OPTIONS.find((o) => o.id === grade)?.name ?? grade;
+  const gradeLabel = getGradeLabel(grade);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

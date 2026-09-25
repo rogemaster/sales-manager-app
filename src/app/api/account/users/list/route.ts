@@ -4,6 +4,7 @@ import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { parseRequestBody } from '@/shared/utils/requestBody';
+import { toPublicUser } from '@/features/account/util/publicUser';
 import { userListRequestSchema } from '@/features/account/util/userListRequestSchema';
 
 export async function POST(req: NextRequest) {
@@ -54,8 +55,7 @@ export async function POST(req: NextRequest) {
       .limit(pageSize)
       .offset((page - 1) * pageSize);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const result = rows.map(({ password: _, ...user }) => user);
+    const result = rows.map(toPublicUser);
     const totalPages = Math.ceil(total / pageSize) || 1;
 
     return NextResponse.json({ users: result, total, page, pageSize, totalPages });

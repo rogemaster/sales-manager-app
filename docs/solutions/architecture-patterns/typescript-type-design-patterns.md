@@ -121,6 +121,8 @@ const body: CreateUserBody = {
 
 > **2026-09-23 갱신:** 새 사용자의 `status`는 이제 클라이언트가 보내지 않는다. 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`, `src/features/account/util/userStatus.ts`) — super_admin이 등록하면 `active`, admin이 등록하면 `pending`. `CreateUserBody`에서 `status`는 제거됐다.
 
+> **2026-09-26 갱신 — 사용자 등록에서는 둘을 합쳤다.** 이 패턴의 전제는 "폼 타입과 서버가 받는 본문이 다르다"였다. 2026-09-24부터 서버(`/api/account/users/create`)가 **폼과 같은 `createUserSchema`로 검증**하면서 전제가 사라졌다 — 서버 전용 필드(`status`)는 스키마에 없고 서버가 정하며, `avatar`·`bio`는 서버도 선택값으로 받는다. 그래서 `CreateUserBody = z.infer<typeof createUserSchema>` 하나로 합쳤고 아래 Pattern 4의 `?? ''` 변환도 없앴다. **판별 기준:** 서버가 폼과 같은 스키마로 검증하면 타입은 하나다(같은 호출 경로의 타입은 하나 — `domain-design.md`). 서버가 다른 모양을 받거나 서버 전용 필드를 클라이언트가 채워야 할 때만 이 패턴처럼 나눈다.
+
 ### 4. Optional → Required 강제 변환은 Layout 경계에서만
 
 Zod에서 `.optional()`로 선언된 필드가 베이스 인터페이스에서 `string`이면, `?? ''` 강제 변환을 form 컴포넌트나 API 함수가 아닌 Layout 경계에서만 처리한다.
@@ -324,9 +326,8 @@ const TextField = ({ name, label }: { name: MallSettingsFieldName; label: string
 ## Examples
 
 실제 코드 위치:
-- `src/features/account/types/user.types.ts` — `UserStatus` 명명 타입, `CreateUserBody extends Omit<User, 'company' | 'location' | 'grade'>`(grade는 `SubUserGrade`로 다시 좁혀 선언)
-- `src/features/account/util/userCreateSchema.ts` — `createUserSchema`, `CreateUserFormData`
-- `src/features/account/ui/user/create/UserCreateLayout.tsx` — `?? ''` 강제 변환 경계, API body 조립
+- `src/features/account/types/user.types.ts` — `UserStatus` 명명 타입. `CreateUserBody`는 2026-09-26부터 `userCreateSchema.ts`에서 파생해 여기서 다시 내보낸다(Pattern 1·3·4의 예전 예시였다 — Pattern 3 끝의 갱신 노트 참고)
+- `src/features/account/util/userCreateSchema.ts` — `createUserSchema`, `CreateUserBody`(폼·API·route가 공유)
 - `src/features/shoppingAccount/ui/form/ShoppingAccountForm.tsx` — Pattern 6 실제 적용 (`ShoppingAccountFormInput`/`ShoppingAccountFormData`, `refine` 타입가드)
 - `src/features/shoppingSetting/types/shoppingSetting.types.ts` — `ShoppingSetting` discriminated union, `ShoppingSettingFormValues`(Pattern 7)
 - `src/features/shoppingSetting/ui/create/ShoppingSettingCreateLayout.tsx`, `.../[id]/ShoppingSettingModifyLayout.tsx` — Pattern 7 리터럴 분기 제출부
