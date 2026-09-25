@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/db/password';
 import { v4 as uuidv4 } from 'uuid';
 import { parseRequestBody } from '@/shared/utils/requestBody';
+import { toKstYmd } from '@/shared/utils/date';
 import { registerBaseSchema } from '@/features/auth/util/registerValidation';
 
 export async function POST(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '이미 사용 중인 이메일입니다.' }, { status: 400 });
     }
 
-    const now = new Date().toISOString().split('T')[0];
+    const now = toKstYmd(new Date());
     const id = `usr_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
     await db.insert(users).values({
       id,

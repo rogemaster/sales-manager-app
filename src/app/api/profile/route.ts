@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { toKstYmd } from '@/shared/utils/date';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { profileEditSchema } from '@/features/profile/util/profileEditSchema';
 
@@ -16,7 +17,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const { name, phone, company, bio } = body;
 
-    const now = new Date().toISOString().split('T')[0];
+    const now = toKstYmd(new Date());
 
     await db
       .update(users)

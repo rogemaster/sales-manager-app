@@ -12,14 +12,16 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const { ids, isActive } = (await req.json()) as { ids: string[]; isActive: boolean };
+
+    // 값 검사를 빈 목록 처리보다 먼저 한다 — 쇼핑몰계정 status route와 같은 요청에 같은 응답을 준다.
+    if (typeof isActive !== 'boolean') {
+      return NextResponse.json({ error: '사용여부 값이 올바르지 않습니다.' }, { status: 400 });
+    }
+
     const uniqueIds = [...new Set(ids)];
 
     if (uniqueIds.length === 0) {
       return NextResponse.json({ successCount: 0, failures: [] } satisfies BulkSettingResult);
-    }
-
-    if (typeof isActive !== 'boolean') {
-      return NextResponse.json({ error: '사용여부 값이 올바르지 않습니다.' }, { status: 400 });
     }
 
     // 내 것만 바꾼다. 부분 성공이 정상 결과이므로 전체를 거부하지 않는다 —
