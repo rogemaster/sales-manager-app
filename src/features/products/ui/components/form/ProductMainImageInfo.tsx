@@ -1,13 +1,18 @@
 'use client';
 
 import React, { ChangeEvent, DragEvent, useEffect, useRef, useState } from 'react';
-import { acceptImage } from '@/constant/accept.content';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useController, useFormContext } from 'react-hook-form';
 import { ProductFormValues } from '@/features/products/types/product.types';
-import { ALLOWED_IMAGE_MIME, MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
+import {
+  ALLOWED_IMAGE_MIME,
+  IMAGE_ACCEPT,
+  IMAGE_UPLOAD_TOO_LARGE_MESSAGE,
+  IMAGE_UPLOAD_TYPE_MESSAGE,
+  MAX_IMAGE_BYTES,
+} from '@/shared/constant/upload.constant';
 import { toProductImageUrl } from '@/features/products/util/productImage';
 
 export const ProductMainImageInfo = () => {
@@ -43,14 +48,14 @@ export const ProductMainImageInfo = () => {
   const processFile = (file: File) => {
     // 파일 선택 창은 accept로 거르지만 드래그는 아무 파일이나 들어온다. 서버와 같은 목록으로 여기서 막는다.
     if (!(ALLOWED_IMAGE_MIME as readonly string[]).includes(file.type)) {
-      setError('mainImage', { type: 'manual', message: 'PNG 또는 JPG 이미지만 업로드할 수 있습니다.' });
+      setError('mainImage', { type: 'manual', message: IMAGE_UPLOAD_TYPE_MESSAGE });
       return;
     }
 
     // 4.5MB를 넘으면 Vercel이 route 도달 전에 413으로 끊어 사용자가 원인을 알 수 없다.
     // 여기서 먼저 막아 의미 있는 메시지를 보여준다. 서버 검증은 그대로 유지된다.
     if (file.size > MAX_IMAGE_BYTES) {
-      setError('mainImage', { type: 'manual', message: '4MB 이하 이미지를 업로드해 주세요.' });
+      setError('mainImage', { type: 'manual', message: IMAGE_UPLOAD_TOO_LARGE_MESSAGE });
       return;
     }
 
@@ -118,7 +123,7 @@ export const ProductMainImageInfo = () => {
             <p className="text-sm text-muted-foreground mb-2">이미지를 드래그하거나 클릭하여 업로드하세요</p>
             <input
               type="file"
-              accept={acceptImage}
+              accept={IMAGE_ACCEPT}
               onChange={handleImageUpload}
               className="hidden"
               ref={handleFileInputRef}

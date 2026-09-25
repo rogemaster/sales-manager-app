@@ -4,7 +4,12 @@ import http from 'node:http';
 import https from 'node:https';
 import net from 'node:net';
 import { detectImageType, DetectedImage } from '@/lib/storage';
-import { MAX_IMAGE_BYTES } from '@/shared/constant/upload.constant';
+import {
+  INVALID_IMAGE_URL_MESSAGE,
+  MAX_IMAGE_BYTES,
+  MAX_IMAGE_SIZE_LABEL,
+  MAX_IMAGE_URL_LENGTH,
+} from '@/shared/constant/upload.constant';
 
 export type RemoteImageErrorCode =
   | 'INVALID_URL'
@@ -29,7 +34,7 @@ export class RemoteImageError extends Error {
 export const remoteImageErrorMessage = (error: RemoteImageError): string => {
   switch (error.code) {
     case 'INVALID_URL':
-      return '올바른 이미지 주소가 아닙니다.';
+      return INVALID_IMAGE_URL_MESSAGE;
     case 'BLOCKED_ADDRESS':
       return '허용되지 않는 주소입니다.';
     case 'HTTP_ERROR':
@@ -39,16 +44,13 @@ export const remoteImageErrorMessage = (error: RemoteImageError): string => {
     case 'TIMEOUT':
       return '응답 시간이 초과되었습니다.';
     case 'TOO_LARGE':
-      return '4MB 이하 이미지만 사용할 수 있습니다.';
+      return `${MAX_IMAGE_SIZE_LABEL} 이하 이미지만 사용할 수 있습니다.`;
     case 'NOT_IMAGE':
       return 'PNG 또는 JPG 이미지가 아닙니다.';
     case 'NETWORK_ERROR':
       return '이미지 서버에 연결할 수 없습니다.';
   }
 };
-
-// productWriteSchema의 mainImage 길이 상한과 같은 값이다. 가져온 key가 들어갈 자리의 원래 값이 이 주소이기 때문.
-export const MAX_IMAGE_URL_LENGTH = 2048;
 
 const TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 3;

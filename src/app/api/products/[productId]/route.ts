@@ -4,6 +4,7 @@ import { products } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
 import { isMainImageOwnedBy } from '@/lib/storage';
+import { IMAGE_NOT_OWNED_MESSAGE } from '@/shared/constant/upload.constant';
 import { Product } from '@/features/products/types/product.types';
 import { findProductWriteViolation } from '@/features/products/util/productWriteSchema';
 import {
@@ -65,7 +66,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // key 형태의 mainImage라면 본인 네임스페이스여야 한다 — 그렇지 않으면 다른 테넌트의
     // R2 객체를 자기 상품에 걸 수 있다.
     if (values.mainImage && !isMainImageOwnedBy(values.mainImage, session.ownerId)) {
-      return NextResponse.json({ error: '본인이 업로드한 이미지만 사용할 수 있습니다.' }, { status: 400 });
+      return NextResponse.json({ error: IMAGE_NOT_OWNED_MESSAGE }, { status: 400 });
     }
 
     // 보내지 않은 필드는 검사하지 않는다 — PATCH는 바꾸려는 필드만 보낸다.
