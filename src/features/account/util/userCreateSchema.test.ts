@@ -3,7 +3,7 @@ import { AVATAR_MAX_LENGTH, createUserSchema } from './userCreateSchema';
 
 const VALID = {
   email: 'staff@example.com',
-  password: 'secret1',
+  password: 'secret12!',
   grade: 'admin',
   name: '직원',
   phone: '010-1234-5678',
@@ -18,6 +18,10 @@ describe('createUserSchema', () => {
 
   it.each(['super_admin', 'owner', ''])('등급 %s는 거부한다 — super_admin은 가입으로만 생긴다', (grade) => {
     expect(createUserSchema.safeParse({ ...VALID, grade }).success).toBe(false);
+  });
+
+  it('비밀번호는 가입과 같은 규칙이다 — 6자 영문·숫자만으로는 거부한다', () => {
+    expect(createUserSchema.safeParse({ ...VALID, password: 'secret1' }).success).toBe(false);
   });
 
   it('이름이 100자를 넘으면 거부한다', () => {

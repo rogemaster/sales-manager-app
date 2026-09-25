@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { SubUserGrade } from '@/features/auth/types/Auth';
 import { phoneSchemaRequired } from '@/shared/utils/phone';
+import { passwordSchema } from '@/shared/utils/password';
 import { maxLengthMessage, TEXT_LIMITS } from '@/shared/utils/textLimit';
 
 /** 프로필 사진은 base64 data URL로 text 컬럼에 저장된다. 원본 약 700KB까지. */
@@ -11,10 +12,7 @@ const SUB_USER_GRADES = ['admin', 'operator'] as const satisfies readonly SubUse
 /** 사용자 등록 폼과 /api/account/users/create가 함께 쓴다. super_admin은 가입으로만 생기므로 등급에 없다. */
 export const createUserSchema = z.object({
   email: z.string().email('올바른 이메일 형식이 아닙니다.').max(TEXT_LIMITS.email, maxLengthMessage(TEXT_LIMITS.email)),
-  password: z
-    .string()
-    .min(6, '비밀번호는 6자 이상이어야 합니다.')
-    .max(TEXT_LIMITS.password, maxLengthMessage(TEXT_LIMITS.password)),
+  password: passwordSchema, // 가입과 같은 규칙
   grade: z.enum(SUB_USER_GRADES, { message: '등급을 선택해주세요.' }),
   name: z.string().min(1, '이름을 입력해주세요.').max(TEXT_LIMITS.shortText, maxLengthMessage(TEXT_LIMITS.shortText)),
   phone: phoneSchemaRequired(),

@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { phoneSchemaRequired } from '@/shared/utils/phone';
+import { passwordSchema } from '@/shared/utils/password';
 import { maxLengthMessage, TEXT_LIMITS } from '@/shared/utils/textLimit';
 
 export { formatPhone } from '@/shared/utils/phone';
 
-const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{9,}$/;
 const BUSINESS_NUMBER_REGEX = /^\d{3}-\d{2}-\d{5}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,10 +22,7 @@ export const registerBaseSchema = z.object({
     .string()
     .email('올바른 이메일 형식을 입력해주세요')
     .max(TEXT_LIMITS.email, maxLengthMessage(TEXT_LIMITS.email)),
-  password: z
-    .string()
-    .regex(PASSWORD_REGEX, '영어, 숫자, 특수문자 조합 9자 이상 입력해주세요')
-    .max(TEXT_LIMITS.password, maxLengthMessage(TEXT_LIMITS.password)),
+  password: passwordSchema,
   companyName: shortText('상호/법인명을 입력해주세요'),
   representativeName: shortText('대표자명을 입력해주세요'),
   businessNumber: z.string().regex(BUSINESS_NUMBER_REGEX, '올바른 사업자등록번호 형식을 입력해주세요'),
@@ -47,6 +44,9 @@ export const registerBaseSchema = z.object({
 });
 
 export type RegisterBody = z.infer<typeof registerBaseSchema>;
+
+/** 이메일 중복 확인 요청 본문. /api/check-email이 가입과 같은 이메일 규칙으로 검증한다. */
+export const checkEmailSchema = registerBaseSchema.pick({ email: true });
 
 /** 가입 폼. 서버 스키마에 비밀번호 확인을 더한다. */
 export const registerSchema = registerBaseSchema

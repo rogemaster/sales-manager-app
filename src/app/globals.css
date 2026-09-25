@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* shadcn/ui 컴포넌트의 animate-in/out·fade·zoom 클래스를 동작시킨다(Tailwind 4용) */
+@import "tw-animate-css";
 
 :root {
   --background: #ffffff;

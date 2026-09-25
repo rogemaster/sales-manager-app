@@ -3,6 +3,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { requirePermission } from '@/shared/utils/apiAuth';
+import { toKstYmd } from '@/shared/utils/date';
 import { ApproveUsersResult } from '@/features/account/types/user.types';
 
 export async function PATCH(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // 이미 active인 사용자는 오류가 아니라 건너뛴다 — 화면에 승인된 인원 수를 보여준다.
-    const now = new Date().toISOString().split('T')[0];
+    const now = toKstYmd(new Date());
     const approved = await db
       .update(users)
       .set({ status: 'active', updatedAt: now })

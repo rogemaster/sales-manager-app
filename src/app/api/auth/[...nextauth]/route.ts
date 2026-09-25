@@ -64,7 +64,8 @@ const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: '/login',
-    error: '/auth/error',
+    // 전용 오류 페이지가 없다. NextAuth가 ?error=코드를 붙여 로그인 화면으로 돌려보낸다.
+    error: '/login',
   },
   callbacks: {
     async jwt({ token, user }) {

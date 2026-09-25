@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { registerBaseSchema, registerSchema } from './registerValidation';
+import { checkEmailSchema, registerBaseSchema, registerSchema } from './registerValidation';
 
 const VALID = {
   email: 'owner@example.com',
@@ -56,4 +56,17 @@ describe('registerSchema (화면)', () => {
   it('비밀번호 확인이 같으면 통과한다', () => {
     expect(registerSchema.safeParse({ ...VALID, passwordConfirm: VALID.password }).success).toBe(true);
   });
+});
+
+describe('checkEmailSchema', () => {
+  it('가입과 같은 이메일 규칙으로 통과시킨다', () => {
+    expect(checkEmailSchema.safeParse({ email: 'owner@example.com' }).success).toBe(true);
+  });
+
+  it.each([{}, { email: '' }, { email: 'not-an-email' }, { email: 123 }, { email: { $ne: null } }])(
+    '이메일이 아니면 거부한다 — %j',
+    (body) => {
+      expect(checkEmailSchema.safeParse(body).success).toBe(false);
+    },
+  );
 });
