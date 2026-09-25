@@ -10,7 +10,7 @@ export const useGetActiveShoppingSettings = () => {
 
   return useQuery({
     queryKey: [ACTIVE_SHOPPING_SETTINGS_QUERY_KEY, workspaceOwnerId],
-    queryFn: () => getActiveShoppingSettings(workspaceOwnerId),
+    queryFn: () => getActiveShoppingSettings(),
     enabled: !!workspaceOwnerId,
   });
 };

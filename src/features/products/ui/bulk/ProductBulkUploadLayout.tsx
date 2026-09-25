@@ -36,7 +36,7 @@ export const ProductBulkUploadLayout = () => {
 
       {/* 업로드 섹션 */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* 양식 다운로드 - 완 */}
+        {/* 양식 다운로드 */}
         <ExcelDownloader
           excelHeader={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.excelHeader}
           isTemplateInfo={PRODUCT_EXCEL_TEMPLATE_DOWNLOADER.isTemplateInfo}
@@ -46,11 +46,11 @@ export const ProductBulkUploadLayout = () => {
           templateName="상품등록"
         />
 
-        {/* 파일 업로드 - 완 */}
+        {/* 파일 업로드 */}
         <ExcelUploader
           excelHeader={PRODUCT_EXCEL_TEMPLATE_UPLOADER.excelHeader}
           contentDescription={PRODUCT_EXCEL_TEMPLATE_UPLOADER.contentDescription}
-          fileTemplateInfo={PRODUCT_BULK_EXCEL_TEMPLATE.template}
+          fileTemplateInfo={PRODUCT_EXCEL_TEMPLATE_UPLOADER.fileTemplateInfo}
           maxRows={PRODUCT_EXCEL_TEMPLATE_UPLOADER.maxRows}
         />
       </div>

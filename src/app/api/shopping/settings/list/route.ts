@@ -8,7 +8,7 @@ import { clampPositiveInt } from '@/shared/utils/pagination';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { ShoppingSettingSearchType } from '@/features/shoppingSetting/types/shoppingSetting.types';
 
-// 상한은 다른 목록 route(예: linked-products/list)와 동일하게 맞춘다.
+// 상한은 상품·연동상품 목록 route와 같은 100이다(쇼핑몰계정 목록만 1000).
 const MAX_PAGE_SIZE = 100;
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (mallCode !== 'ALL') conditions.push(eq(shoppingSettings.mallCode, mallCode));
     if (mallAccountId !== 'ALL') conditions.push(eq(shoppingSettings.mallAccountId, mallAccountId));
     if (searchValue) {
-      // MSW의 mallId·nickname OR 검색과 같은 의미. ilike라 대소문자를 구분하지 않는다.
+      // 검색어는 mallId·nickname 중 하나에 걸리면 된다(OR). ilike라 대소문자를 구분하지 않는다.
       const keyword = `%${searchValue}%`;
       const matched = or(ilike(shoppingSettings.mallId, keyword), ilike(shoppingSettings.nickname, keyword));
       if (matched) conditions.push(matched);

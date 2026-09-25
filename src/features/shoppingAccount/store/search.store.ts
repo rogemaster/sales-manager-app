@@ -14,7 +14,6 @@ export const accountStartDateAtom = atom<string>(DEFAULT_START_DATE);
 export const accountEndDateAtom = atom<string>(DEFAULT_END_DATE);
 export const accountIsActiveAtom = atom<'true' | 'false' | 'ALL'>('ALL');
 export const accountMallCodeAtom = atom<string>('ALL');
-export const accountSearchValueAtom = atom<string>('');
 
 export const getAccountSearchFilterAtom = atom<ShoppingAccountSearchType>((get) => ({
   dateType: get(accountDateTypeAtom),
@@ -22,7 +21,7 @@ export const getAccountSearchFilterAtom = atom<ShoppingAccountSearchType>((get) 
   endDate: get(accountEndDateAtom),
   isActive: get(accountIsActiveAtom),
   mallCode: get(accountMallCodeAtom) as ShoppingAccountSearchType['mallCode'],
-  searchValue: get(accountSearchValueAtom),
+  searchValue: '', // 검색어는 입력칸이 들고 있다가 검색 버튼에서 committed에 넣는다
 }));
 
 export const committedFiltersAtom = atom<ShoppingAccountSearchType>({

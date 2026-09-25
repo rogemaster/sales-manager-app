@@ -15,7 +15,7 @@ const STATE_TO_KEY: Record<ProductStateType, Exclude<keyof HomeStats, 'total'>> 
 };
 
 // state 컬럼은 text라 코드 밖의 값이 있을 수 있다. 그런 행은 칸에 담지 않지만 total에는 센다 —
-// total은 "등록된 상품 수"이고, 이전 MSW 집계도 같은 규칙이었다.
+// total은 "등록된 상품 수"다.
 export const toHomeStats = (rows: StateCountRow[]): HomeStats => {
   const stats: HomeStats = { total: 0, onSale: 0, soldOut: 0, saleDis: 0, waitSale: 0 };
   for (const { state, count } of rows) {

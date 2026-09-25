@@ -15,7 +15,6 @@ export const userStartDateAtom = atom<string>(DEFAULT_START_DATE);
 export const userEndDateAtom = atom<string>(DEFAULT_END_DATE);
 export const userGradeAtom = atom<UserGrade | 'ALL'>('ALL');
 export const userSearchTypeAtom = atom<string>('email');
-export const userSearchValueAtom = atom<string>('');
 
 // UI draft 상태 — 검색 버튼 클릭 전까지 API 호출에 사용되지 않음
 export const getUserSearchFilterAtom = atom<UserSearchType>((get) => ({
@@ -24,7 +23,7 @@ export const getUserSearchFilterAtom = atom<UserSearchType>((get) => ({
   endDate: get(userEndDateAtom),
   grade: get(userGradeAtom),
   searchType: get(userSearchTypeAtom),
-  searchValue: get(userSearchValueAtom),
+  searchValue: '', // 검색어는 입력칸이 들고 있다가 검색 버튼에서 committed에 넣는다
 }));
 
 // 검색 버튼 클릭 시 확정된 필터 — API 쿼리에 실제로 사용

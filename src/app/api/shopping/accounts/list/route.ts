@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (isActive !== 'ALL') conditions.push(eq(shoppingAccounts.isActive, isActive === 'true'));
     if (mallCode !== 'ALL') conditions.push(eq(shoppingAccounts.mallCode, mallCode));
     if (searchValue) {
-      // MSW의 mallId·nickname OR 검색과 같은 의미. ilike라 대소문자를 구분하지 않는다.
+      // 검색어는 mallId·nickname 중 하나에 걸리면 된다(OR). ilike라 대소문자를 구분하지 않는다.
       const keyword = `%${searchValue}%`;
       const matched = or(ilike(shoppingAccounts.mallId, keyword), ilike(shoppingAccounts.nickname, keyword));
       if (matched) conditions.push(matched);

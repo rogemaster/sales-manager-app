@@ -15,10 +15,7 @@ export const validateOptions = (options: ProductOption[]) => {
     values: opt.values.map((val) => val.trim()).filter((val) => val.length > 0),
   }));
 
-  const validOptions = normalizedOptions.filter((opt) => opt.name && opt.values.length > 0);
-  if (validOptions.length === 0) return [];
-
-  return validOptions;
+  return normalizedOptions.filter((opt) => opt.name && opt.values.length > 0);
 };
 
 /**

@@ -76,13 +76,11 @@ export const ProductModifyLayout = ({ productId }: Props) => {
           <p className="text-muted-foreground">상품을 수정하세요.</p>
         </div>
       </div>
-      {formData && (
-        <FormProvider {...formData}>
-          <form onSubmit={formData.handleSubmit(onSubmit)} className="space-y-6">
-            <ProductForm submitLabel="상품 수정" />
-          </form>
-        </FormProvider>
-      )}
+      <FormProvider {...formData}>
+        <form onSubmit={formData.handleSubmit(onSubmit)} className="space-y-6">
+          <ProductForm submitLabel="상품 수정" />
+        </form>
+      </FormProvider>
     </div>
   );
 };

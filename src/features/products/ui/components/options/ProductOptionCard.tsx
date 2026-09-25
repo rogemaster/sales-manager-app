@@ -62,11 +62,9 @@ export const ProductOptionCard = ({ type, initialOptions, onConfirm, onReset }: 
 
     setConfirmedOptions(validOptions);
 
-    const combinations = optionCombinations(validOptions);
-    if (combinations.length > 0) {
-      setIsOptionsConfirmed(true);
-      onConfirm(combinations);
-    }
+    // 유효 옵션은 값이 1개 이상이므로 조합도 항상 1개 이상이다.
+    setIsOptionsConfirmed(true);
+    onConfirm(optionCombinations(validOptions));
   };
 
   const handleResetOptions = () => {
