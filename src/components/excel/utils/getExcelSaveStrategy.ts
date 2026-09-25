@@ -5,13 +5,11 @@ import { importProductImage } from '@/features/products/api/importProductImage';
 import { resolveExcelMainImages } from '@/features/products/util/excelMainImage';
 import { bulkCreateOrders } from '@/features/order/api/bulkCreateOrders';
 import { REMOTE_IMAGE_CONCURRENCY } from '@/shared/constant/upload.constant';
-import { ExcelSaveFn } from '@/types/excel.type';
+import { ExcelSaveFn, ExcelSaveType } from '@/types/excel.type';
 import { formatExcelFailureSummary } from './formatExcelFailureSummary';
 import { getSheetRow } from './sheetRows';
 
-type SaveType = 'PRODUCT' | 'ORDER';
-
-export const getExcelSaveStrategy = (type: SaveType, ownerId: string): ExcelSaveFn => {
+export const getExcelSaveStrategy = (type: ExcelSaveType, ownerId: string): ExcelSaveFn => {
   switch (type) {
     case 'PRODUCT':
       return async (rows, context) => {

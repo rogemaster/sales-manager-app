@@ -1,5 +1,8 @@
 import { FilterOption } from '@/types/common.type';
 
+/** 원산지 "기타". 이 코드일 때만 originCountryEtc(자유 입력)를 쓴다. */
+export const ORIGIN_ETC = 'ETC';
+
 export const ORIGIN_COUNTRIES: FilterOption[] = [
   { id: 'KR', name: '대한민국' },
   { id: 'CN', name: '중국' },
@@ -13,7 +16,7 @@ export const ORIGIN_COUNTRIES: FilterOption[] = [
   { id: 'TH', name: '태국' },
   { id: 'ID', name: '인도네시아' },
   { id: 'IN', name: '인도' },
-  { id: 'ETC', name: '기타' },
+  { id: ORIGIN_ETC, name: '기타' },
 ];
 
 export const TAX_TYPE_OPTIONS: FilterOption[] = [

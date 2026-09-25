@@ -13,6 +13,7 @@ import { useCreateUser } from '@/features/account/api/useCreateUser';
 import { resolveNewUserStatus } from '@/features/account/util/userStatus';
 import { UserCreateForm } from './UserCreateForm';
 import { CreateUserFormData, createUserSchema } from '@/features/account/util/userCreateSchema';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 export const UserCreateLayout = () => {
   const grade = useAtomValue(gradeAtom);
@@ -49,7 +50,7 @@ export const UserCreateLayout = () => {
       onError: (error) => {
         showAlert({
           type: 'error',
-          message: error instanceof Error && error.message ? error.message : '사용자 등록에 실패했습니다.',
+          message: getErrorMessage(error, '사용자 등록에 실패했습니다.'),
         });
       },
     });

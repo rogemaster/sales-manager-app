@@ -1,6 +1,7 @@
 import { Product } from '@/features/products/types/product.types';
 import { ShoppingSetting } from '@/features/shoppingSetting/types/shoppingSetting.types';
 import { toProductImageUrl } from '@/features/products/util/productImage';
+import { ORIGIN_ETC } from '@/features/products/constant/compliance.constants';
 
 /**
  * 네이버 상품 등록·수정 요청 본문. 시뮬레이터 타입(src/simulators/naver/types.ts)을 import하지 않고
@@ -54,7 +55,7 @@ const optional = <T>(value: T | null | undefined): T | undefined =>
   value === null || value === undefined ? undefined : value;
 
 const toOriginAreaCode = (product: Product): string | undefined =>
-  product.originCountryCode === 'ETC' ? optional(product.originCountryEtc) : optional(product.originCountryCode);
+  product.originCountryCode === ORIGIN_ETC ? optional(product.originCountryEtc) : optional(product.originCountryCode);
 
 const toMinorPurchasable = (product: Product): boolean | undefined => {
   if (product.adultProductType === 'ADULT') return false;

@@ -13,6 +13,7 @@ import {
 } from '@/features/mallRegistration/store/mallRegistration.store';
 import { MallLinkedProductRequestItem } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 export const MallRegistrationActionSection = () => {
   const selectedProductIds = useAtomValue(selectedProductIdsAtom);
@@ -69,8 +70,7 @@ export const MallRegistrationActionSection = () => {
       },
       onError: (error) => {
         showAlert({
-          message:
-            error instanceof Error && error.message ? error.message : '전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+          message: getErrorMessage(error, '전송 중 오류가 발생했습니다. 다시 시도해주세요.'),
           type: 'error',
         });
       },

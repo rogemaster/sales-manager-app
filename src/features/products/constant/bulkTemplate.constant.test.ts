@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PRODUCT_BULK_EXCEL_TEMPLATE } from './bulkTemplate.constant';
+import { PRODUCT_BULK_EXCEL_TEMPLATE, PRODUCT_EXCEL_COL } from './bulkTemplate.constant';
 
 describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
   it('컬럼 24개를 정의된 순서대로 갖는다', () => {
@@ -64,5 +64,19 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
       '상세설명',
       '총수량',
     ]);
+  });
+});
+
+describe('PRODUCT_EXCEL_COL', () => {
+  // 저장 전략·미리보기는 이름표로 셀을 읽고, 시트 헤더는 양식의 name이다. 둘이 어긋나면 그 컬럼이 조용히 빈 값이 된다.
+  it('양식의 모든 컬럼이 같은 key의 이름표 글자를 헤더로 쓴다', () => {
+    for (const { key, name } of PRODUCT_BULK_EXCEL_TEMPLATE.template) {
+      expect(PRODUCT_EXCEL_COL[key as keyof typeof PRODUCT_EXCEL_COL]).toBe(name);
+    }
+  });
+
+  it('이름표에 양식에 없는 컬럼이 없다', () => {
+    const templateKeys = PRODUCT_BULK_EXCEL_TEMPLATE.template.map(({ key }) => key);
+    expect(Object.keys(PRODUCT_EXCEL_COL).sort()).toEqual([...templateKeys].sort());
   });
 });

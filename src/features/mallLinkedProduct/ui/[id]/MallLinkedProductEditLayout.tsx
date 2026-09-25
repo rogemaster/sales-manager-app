@@ -27,6 +27,7 @@ import { MallLinkedProductSnapshots, useUpdateMallLinkedProduct } from '../../ap
 import { useResendMallLinkedProducts } from '../../api/useResendMallLinkedProducts';
 import { MallLinkedProductInfoCard } from './MallLinkedProductInfoCard';
 import { MallLinkedProductHistoryCard } from './MallLinkedProductHistoryCard';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 type Props = {
   id: string;
@@ -95,7 +96,7 @@ export const MallLinkedProductEditLayout = ({ id }: Props) => {
   };
 
   const saveErrorMessage = (error: unknown) =>
-    error instanceof Error && error.message ? error.message : '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
+    getErrorMessage(error, '저장 중 오류가 발생했습니다. 다시 시도해주세요.');
 
   const handleSave = async () => {
     if (!linked || !(await validateBothForms())) return;

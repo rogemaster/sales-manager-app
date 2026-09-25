@@ -8,6 +8,7 @@ import { MallLinkedProduct } from '@/features/mallLinkedProduct/types/mallLinked
 import { isSettingApplyModalOpenAtom, selectedLinkedIdsAtom } from '@/features/mallLinkedProduct/store/selection.store';
 import { useResendMallLinkedProducts } from '@/features/mallLinkedProduct/api/useResendMallLinkedProducts';
 import { MALL_LINK_SEND_MAX_ITEMS } from '@/features/mallLinkedProduct/constant/mallLinkedProduct.constants';
+import { getErrorMessage } from '@/shared/utils/errorMessage';
 
 type Props = {
   linkedProducts: MallLinkedProduct[];
@@ -54,8 +55,7 @@ export const MallLinkedProductActionSection = ({ linkedProducts }: Props) => {
       onError: (error) => {
         setSelectedLinkedIds([]);
         showAlert({
-          message:
-            error instanceof Error && error.message ? error.message : '전송 중 오류가 발생했습니다. 다시 시도해주세요.',
+          message: getErrorMessage(error, '전송 중 오류가 발생했습니다. 다시 시도해주세요.'),
           type: 'error',
         });
       },

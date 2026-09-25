@@ -1,8 +1,6 @@
-import { ExcelRowFailure } from '@/types/excel.type';
+import { ExcelImageImportFn, ExcelRowFailure } from '@/types/excel.type';
 import { mapWithConcurrency } from '@/shared/utils/concurrency';
 import { isUnauthorizedError } from '@/shared/utils/unauthorized';
-
-export type ExcelImageImportFn = (url: string) => Promise<{ ok: true; key: string } | { ok: false; reason: string }>;
 
 export const IMAGE_IMPORT_FAILED_REASON = '이미지를 가져오지 못했습니다.';
 const EMPTY_MAIN_IMAGE_REASON = '메인이미지가 비어 있습니다.';
