@@ -43,7 +43,7 @@ npm run test     # Run Vitest once
 npm run test:watch  # Run Vitest in watch mode
 ```
 
-Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/utils/`, `src/features/*/util/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
+Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/utils/`, `src/utils/`, `src/features/*/util/`·`constant/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, `src/components/excel/`의 utils·strategies·message)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
 
 ## Architecture Overview
 
@@ -68,8 +68,10 @@ Each domain lives in `src/features/[feature]/` with subfolders:
 - `store/` — Jotai atoms
 - `types/` — TypeScript interfaces
 - `ui/` — React components for this feature
-- `util/` — Feature-specific utilities
+- `util/` — Feature-specific utilities (Zod 쓰기 스키마 `*Schema.ts` 포함 — 폼과 route가 공유)
 - `constant/` — Feature-specific constants
+- `hook/` — feature 전용 React hook (예: `auth/hook/usePermission`)
+- `server/` — route만 부르는 서버 전용 로직 (예: `mallLinkedProduct/server/`)
 
 ### API Layer
 
@@ -111,7 +113,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
 - **API functions:** verb-first — `getProducts`, `createProduct`, `updateProduct`
 - **Components:** PascalCase files; `'use client'` only where needed (forms, hooks, interactive UI)
 - **Prettier:** `printWidth: 120`, `singleQuote: true`, `trailingComma: all`, `semi: true`
-- **TypeScript:** strict mode; interface-based domain models; Zod schemas co-located with forms
+- **TypeScript:** strict mode; interface-based domain models; Zod write schemas in `features/*/util/*Schema.ts` (shared by form and route)
 - **연락처 필드:** 연락처(휴대폰) 필드를 추가할 때는 inline regex를 쓰지 않고 `src/shared/utils/phone.ts`에서 import한다.
   - `phoneSchemaRequired(emptyMsg?, formatMsg?)` — 필수 Zod 스키마
   - `formatPhone(value)` — 자동 하이픈 포맷터 (010-XXXX-XXXX)

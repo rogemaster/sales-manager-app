@@ -87,10 +87,10 @@
 
 ### 타입 구조
 
-- `AccountUser.ownerId: string | null`
+- `AccountUser.ownerId: string` (세션·JWT 타입도 `string`)
   - 슈퍼계정(`super_admin`)은 가입 시 `ownerId`에 **자기 자신의 `id`를 동일하게 저장** (`ownerId === id`). 과거 `null`이던 계정도 실 DB에서 마이그레이션됐다
   - 종속 유저는 `ownerId`에 슈퍼계정의 `id`를 저장
-  - `string | null` 타입은 하위호환(과거 `null` 데이터, 로그아웃 시 클라이언트 초기화 상태)을 위해 유지하지만, 신규 생성되는 모든 계정은 항상 non-null 값을 갖는다
+  - nullable로 남은 곳은 DB 컬럼 `users.owner_id`와 그 행을 그대로 읽는 `SessionUserRow.ownerId`뿐이다. 서버는 `resolveApiSession`(`src/shared/utils/apiAuth.ts`)에서 `ownerId ?? id`로 한 번 채워 넘긴다
 - `SubUserGrade = Exclude<UserGrade, 'super_admin'>` — 사용자 등록 폼에서는 `super_admin` 옵션 없음
 - `CreateUserBody.grade: SubUserGrade` — 타입 레벨에서 `super_admin` 부여 불가
 
@@ -103,7 +103,7 @@
 - **사용자 승인 흐름:** admin이 등록한 사용자는 `pending`, super_admin이 등록하면 `active`다. 상태는 서버가 등록자 등급으로 정한다(`resolveNewUserStatus`) — 클라이언트가 보낸 `status`는 받지 않는다. super_admin이 목록에서 승인하면 `active`가 되고, `pending` 계정은 로그인할 수 없다. 거절은 별도 상태 없이 삭제로 한다.
   - **Why:** 2026-05-30 스펙이 승인 흐름을 정했지만 승인 주체·화면·API가 빠져 있었고, 2026-07-15 API 가드가 사용자관리를 super_admin 전용으로 막아 UI(admin 등록 버튼)와 반대로 어긋났다. 2026-09-23에 정책표를 한 곳으로 모으며 완성했다. 설계: `docs/superpowers/specs/2026-09-23-grade-permission-policy-design.md`
 - `super_admin`은 가입(회원가입) 플로우에서만 생성됨
-- `workspaceOwnerIdAtom`(`ownerId ?? id`)은 과거 `null` 데이터에 대한 하위호환 fallback이다. 신규 가입 계정은 `ownerId`가 항상 채워지므로 이 fallback 없이도 동작하지만, 안전을 위해 유지한다.
+- `workspaceOwnerIdAtom`은 `ownerIdAtom`을 그대로 읽는다(클라이언트 fallback 없음). 로그아웃 상태에서는 `''`라 React Query `enabled: !!workspaceOwnerId` 게이팅에 그대로 쓴다. 과거 `null` 데이터 대비 fallback은 서버의 `resolveApiSession`에만 있다.
 
 ### 확장 적용 방침
 
@@ -191,13 +191,15 @@
 
 ### 새 몰에 고유 속성 추가 시 체크리스트
 
-`ShoppingSetting`의 `mallCode` discriminated union은 세 번째 arm(`Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never`)이 나머지 몰 전체를 흡수하는 캐치올이라, 새 몰의 `Exclude`에 추가하는 걸 빠뜨려도 **컴파일 에러가 나지 않는다.** 새 몰(예: `COUP`)에 고유 속성을 추가할 때는 아래 5곳을 함께 수정해야 한다:
+`ShoppingSetting`의 `mallCode` discriminated union은 세 번째 arm(`Exclude<ShoppingMalls, 'NSST' | 'KAKAOS'>; mallSettings?: never`)이 나머지 몰 전체를 흡수하는 캐치올이라, 새 몰의 `Exclude`에 추가하는 걸 빠뜨려도 **컴파일 에러가 나지 않는다.** 새 몰(예: `COUP`)에 고유 속성을 추가할 때는 아래 7곳을 함께 수정해야 한다:
 
 1. `shoppingSetting.types.ts` — `CoupangSettingAttributes` 인터페이스 추가
 2. `shoppingSetting.types.ts` — `ShoppingSetting`에 새 union arm 추가 + 캐치올 `Exclude<...>`에 새 mallCode 추가
 3. `shoppingSetting.types.ts` — `ShoppingSettingFormValues.mallSettings`의 `Partial<...>` 인터섹션에 새 속성 추가
-4. `buildMallSettingsPayload.ts` — 오버로드 시그니처 + KEYS 배열 + `case` 분기 추가
-5. `ShoppingSettingMallInfoSection.tsx`(또는 분리된 `mallFields/`) — 조건 분기 + Fields 컴포넌트 추가
+4. `mallSettingKeys.constant.ts` — `COUPANG_SETTING_FIELD_TYPES`(필드별 string/boolean)와 거기서 파생하는 `COUPANG_SETTING_KEYS` 추가
+5. `buildMallSettingsPayload.ts` — 오버로드 시그니처 + `if (mallCode === 'COUP')` 분기 추가
+6. `ShoppingSettingMallInfoSection.tsx`(또는 분리된 `mallFields/`) — 조건 분기 + Fields 컴포넌트 추가
+7. `sanitizeMallSettings.ts`(서버 쓰기 경로) — 첫 줄의 몰 코드 허용 조건과 `fieldTypes` 선택 분기에 새 몰 추가. **빠뜨리면 그 몰의 고유 설정이 저장 시 조용히 `null`로 버려진다**(화면·타입 어디서도 오류가 나지 않는다)
 
 캐치올 arm 때문에 타입 체커가 강제하지 않으므로, 이 체크리스트를 수동으로 따라야 한다.
 
@@ -224,7 +226,7 @@ type GenericMallSetting = ShoppingSettingBase & {
 export type ShoppingSetting = MallSpecificSetting | GenericMallSetting;
 ```
 
-`buildMallSettingsPayload.ts`의 KEYS 배열, `mallFields/`의 Fields 컴포넌트 레지스트리도 같은 방식(`{ [K in keyof MallAttributesMap]: ... }`)으로 맞춘다 — 이 형태는 몰 하나를 통째로 빠뜨리면 **컴파일 에러가 나므로**, 현재의 "사람이 체크리스트를 기억해야 하는" 위험을 줄여준다.
+`mallSettingKeys.constant.ts`의 `*_SETTING_FIELD_TYPES`, `mallFields/`의 Fields 컴포넌트 레지스트리도 같은 방식(`{ [K in keyof MallAttributesMap]: ... }`)으로 맞춘다 — 이 형태는 몰 하나를 통째로 빠뜨리면 **컴파일 에러가 나므로**, 현재의 "사람이 체크리스트를 기억해야 하는" 위험을 줄여준다.
 
 **도입 시점을 미루는 이유:** 타입 복잡도 자체는 크리티컬한 반대 근거가 아니다(파생 로직은 `shoppingSetting.types.ts` 한 곳에 국한되고, 소비하는 쪽은 지금과 동일한 평범한 discriminated union으로 보인다). 진짜 이유는 YAGNI — 몰 2개(n=2)만으로 일반화된 모양을 확정하면 3번째 몰의 실제 속성 구조가 다를 경우(필드 타입이 다르거나 중첩 구조가 필요한 경우 등) 추측에 기반한 설계라 다시 손봐야 할 수 있다. 3번째 몰의 실제 데이터를 본 뒤 전환하는 게 더 안전하다.
 

@@ -108,7 +108,9 @@ export const XxxDateFilter = () => {
 | UI 조작 중인 draft (검색 버튼 전) | `get<Domain>SearchFilterAtom` |
 | 검색 버튼으로 확정된 값 (쿼리에 사용) | `committedFiltersAtom` |
 
-`draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만 기존 목록 화면이 전부 위 형태라 이쪽으로 통일했다. 새 목록 화면은 위 표를 따른다.
+`draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만 기존 목록 화면 대부분(사용자·쇼핑몰계정·정보설정·연동상품·주문)이 위 형태라 이쪽으로 통일했다. 새 목록 화면은 위 표를 따른다.
+
+- **예외 2곳(선례로 삼지 않는다):** 상품목록과 쇼핑몰 상품등록(`mallRegistration`)은 확정값을 atom이 아니라 레이아웃의 `useState(appliedFilter)`에 둔다. 상품목록은 draft 이름도 도메인 접두어 없는 `getSearchFilterAtom`이다.
 
 ## 검색 필터는 화면이 소유한다 (다른 도메인 것을 가져다 쓰지 않는다)
 
