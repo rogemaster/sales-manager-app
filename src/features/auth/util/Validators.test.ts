@@ -7,12 +7,12 @@ import { ERROR_MESSAGE } from '../constant/errorMessage';
 describe('validateAuthForm', () => {
   describe('유효한 입력', () => {
     it('올바른 이메일과 비밀번호면 isValid가 true다', () => {
-      const result = validateAuthForm({ email: 'user@example.com', password: 'pass123' });
+      const result = validateAuthForm({ email: 'user@example.com', password: 'admin123@' });
       expect(result.isValid).toBe(true);
     });
 
     it('유효한 경우 error 객체가 비어있다', () => {
-      const result = validateAuthForm({ email: 'user@example.com', password: 'pass123' });
+      const result = validateAuthForm({ email: 'user@example.com', password: 'admin123@' });
       expect(result.error).toEqual({});
     });
   });
@@ -56,14 +56,19 @@ describe('validateAuthForm', () => {
       expect(result.error.password).toBe(ERROR_MESSAGE.NOT_FOUND_PASSWORD);
     });
 
-    it('비밀번호가 5자면 길이 오류를 반환한다', () => {
+    it('비밀번호가 5자면 형식 오류를 반환한다', () => {
       const result = validateAuthForm({ email: 'user@example.com', password: '12345' });
       expect(result.isValid).toBe(false);
-      expect(result.error.password).toBe(ERROR_MESSAGE.NOT_FOUND_PASSWORD_LENGTH);
+      expect(result.error.password).toBe(ERROR_MESSAGE.INVALID_PASSWORD_FORMAT);
     });
 
-    it('비밀번호가 6자면 유효하다', () => {
-      const result = validateAuthForm({ email: 'user@example.com', password: '123456' });
+    it('6자 영문·숫자만으로는 형식 오류다 — 가입과 같은 규칙', () => {
+      const result = validateAuthForm({ email: 'user@example.com', password: 'pass123' });
+      expect(result.error.password).toBe(ERROR_MESSAGE.INVALID_PASSWORD_FORMAT);
+    });
+
+    it('영어·숫자·특수문자 조합 9자면 유효하다', () => {
+      const result = validateAuthForm({ email: 'user@example.com', password: 'admin123@' });
       expect(result.error.password).toBeUndefined();
     });
   });
