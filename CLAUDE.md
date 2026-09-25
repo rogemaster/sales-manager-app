@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | API 추가(route handler·MSW 핸들러) | `.claude/rules/msw-rules.md` |
 | 도메인 설계·신규 엔티티·미구현 페이지 작업 | `.claude/rules/domain-design.md` |
 | Excel 기능 구현·수정·전략 추가 | `.claude/rules/excel.md` |
+| 커밋·PR, 새 문서의 저장 위치 결정 | `.claude/rules/git.md` |
 
 ### CLAUDE.md 관리 원칙
 
@@ -29,8 +30,8 @@ CLAUDE.md는 항상 로드되므로 간결하게 유지한다. 새 규칙을 CLA
 
 향후 작업 목록(스펙의 "다음 라운드로 넘기는 오픈 이슈", 메모리의 미착수 목록 등)에 항목을 적을 때는 **사용자가 요청한 것인지 Claude의 추정인지 반드시 구분해 표기한다.** 사용자 요구면 원문 표현을 함께 남기고, 추정이면 "(Claude 추정 — 미확인)"으로 명시한다. 추정 항목은 다음 라운드 착수 전 사용자에게 실재 여부를 먼저 확인한다.
 
-- **Why:** 2026-08-01 스펙에 Claude가 "이번 범위 밖"으로 적은 **연동 해제(삭제)** 항목이 다음 스펙 → 메모리로 두 번 옮겨 적히는 사이 "다음 라운드 1순위 작업"으로 승격됐다. 2026-08-11 전수 검토에서 사용자 발화가 한 번도 없었음이 확인돼 삭제했다. 같은 검토에서 "제외된 몰 재조사"(사용자는 제외만 지시), "오리지널 상품 삭제 시 정합성"(상품 삭제 기능 자체가 없음)도 같은 경로로 만들어진 것이 드러났다.
-- 반대로 사용자가 실제로 미뤄둔 항목은 원문이 남아 있어야 범위가 줄지 않는다. 단, **원문 단어만 옮겨 적고 그 의미를 함께 적지 않으면 다음 라운드에서 해석할 수 없게 된다** — 위 검토에서 복원한 "상품 공통 필드 추가"의 `giftBrandId`·"상품타입"이 그랬다. 2026-08-14에 사용자에게 다시 물어 확인한 결과 `giftBrandId`는 카카오가 `brand`를 부르는 이름이고, "상품타입"은 필드가 아니라 필드를 추가할 대상 타입(`Product` 인터페이스)을 가리킨 말이어서, 둘 다 신규 필드가 아니었다.
+- **Why:** Claude가 "범위 밖"으로 적은 항목이 스펙 → 메모리로 옮겨지는 사이 "1순위 작업"으로 승격된 전례가 있다(2026-08-11 전수 검토에서 3건 삭제).
+- 사용자가 실제로 미뤄둔 항목은 **원문과 함께 그 의미도 적는다.** 단어만 옮기면 다음 라운드에서 해석할 수 없다(`giftBrandId`·"상품타입"이 신규 필드가 아니었던 사례, 2026-08-14).
 
 ## Commands
 
@@ -42,7 +43,7 @@ npm run test     # Run Vitest once
 npm run test:watch  # Run Vitest in watch mode
 ```
 
-Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/utils/`, `src/features/*/util/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 **권한 거부 계약**(권한이 부족한 등급이면 업무 데이터에 닿기 전에 403 — 세션 재검증 조회 `sessionUser.ts`만 모킹으로 통과시킨다)은 `src/app/api/routePermissions.test.ts`가 route 단위로 표 기반 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다. MSW는 주문 영역에만 남아 있다 — 나머지 API는 전부 실제 route handler + Neon이다.
+Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/utils/`, `src/features/*/util/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, Excel 전략)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
 
 ## Architecture Overview
 
@@ -72,7 +73,7 @@ Each domain lives in `src/features/[feature]/` with subfolders:
 
 ### API Layer
 
-API functions in `features/[feature]/api/` call Next.js route handlers in `src/app/api/` (주문 영역은 같은 경로를 MSW가 가로챈다). Pattern:
+API functions in `features/[feature]/api/` call Next.js route handlers in `src/app/api/`. Pattern:
 
 ```typescript
 const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/list`, {
@@ -96,10 +97,6 @@ return response.json();
 
 Tailwind CSS 4 with `cn()` (`clsx` + `tailwind-merge`) for conditional classes. CVA (class-variance-authority) for component variants. Path alias `@/*` maps to `src/*`.
 
-### Excel
-
-Strategy pattern in `src/components/excel/strategies/`. ExcelJS for generation, XLSX for parsing. Template download and bulk upload flows handled via `ExcelProvider`.
-
 ### Documented Solutions
 
 `docs/solutions/` — 과거 버그·베스트 프랙티스·설계 패턴 문서 모음. 카테고리별 디렉토리 + YAML frontmatter(`module`, `tags`, `problem_type`)로 검색 가능. 관련 기능 구현·디버깅 시 참고.
@@ -119,8 +116,8 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
   - `phoneSchemaRequired(emptyMsg?, formatMsg?)` — 필수 Zod 스키마
   - `formatPhone(value)` — 자동 하이픈 포맷터 (010-XXXX-XXXX)
   - `PHONE_REGEX` — 직접 regex가 필요한 경우
-- **몰(mallCode)별 고유 필드 컴포넌트 분리 기준:** 몰 고유 필드 컴포넌트가 3개 이상이 되면 Excel 전략 패턴처럼 디렉토리로 분리한다. 자세한 내용은 [`.claude/rules/domain-design.md`](.claude/rules/domain-design.md) 참고.
 - **시각 컬럼과 날짜 범위 필터:** 신규 테이블의 시각 컬럼은 `timestamp({ withTimezone: true })`를 쓴다. 날짜 범위 필터는 `src/shared/utils/date.ts`의 `toKstDateRange()`로 **KST 반개구간**(`>= start`, `< end + 1일`)을 만들어 비교한다. `lte(endDate)`로 비교하면 끝날짜 당일에 등록된 건이 통째로 누락되고, UTC 기준으로 자르면 KST 자정~오전 9시 등록 건이 하루 밀린다. `users` 테이블이 `text` `'YYYY-MM-DD'`인 것은 하위호환으로 유지하는 것이며 **선례로 삼지 않는다.** 서버에서 시각을 `'YYYY-MM-DD'`로 잘라 내려줄 때는 `toKstYmd()`를 쓴다 — Vercel은 UTC라 `dayjs(date).format()`은 KST 자정~오전 9시 건을 전날로 표시한다.
+- **스키마 반영은 `npx drizzle-kit push`다(마이그레이션 파일 없음).** push는 식 유니크 인덱스(`products_owner_customer_code_unique`·`naver_products_seller_name_unique`)를 매번 DROP/CREATE해 그 사이 중복 차단이 사라지므로, 사용 중인 DB에는 돌리지 않는다. 마이그레이션 파일(`generate`+`migrate`) 전환은 주문 DB화 결정 때 함께 정한다(2026-09-25 보류).
 
 ## Claude Code 서브에이전트 (Agent)
 
@@ -139,12 +136,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
 - **작업 중 git 명령 절대 금지:** `git add`, `git commit`, `git push`, 브랜치 생성 등 모든 git 작업은 사용자가 명시적으로 요청할 때만 실행한다. 코드 작성·파일 저장 후 자동으로 commit하지 않는다. 모든 작업이 완료된 후 사용자가 직접 검토하고 git 작업을 진행한다.
 - **이 규칙은 서브에이전트/스킬 위임 시에도 동일하게 적용된다.** `workflow.md`의 TDD 사이클이나 `subagent-driven-development` 등 워크플로우 스킬의 기본 템플릿이 "Task 완료 후 커밋"을 표준 스텝으로 포함하고 있어도, 서브에이전트 디스패치 프롬프트에 git commit 지시를 넣지 않는다. 커밋이 필요해 보이는 시점마다 매번 사용자에게 먼저 확인한다 — 과거 이 규칙을 스킬 기본 템플릿을 그대로 따르다 어긴 전례가 반복됐다.
 - **작업은 항상 새 브랜치에서 진행:** `main`에 직접 커밋하지 않는다. git 작업 요청 시 현재 브랜치를 먼저 확인하고, `main`이면 사용자에게 안내하여 `feat/<작업명>` 브랜치를 먼저 생성한 뒤 진행한다.
-- **AI 협업 문서 중 커밋 대상은 일부다 (2026-09-04 범위 축소).** `CLAUDE.md`와 `.claude/rules/`는 전부 커밋한다. `docs/` 아래는 **`docs/solutions/architecture-patterns/`만** 커밋하고, `docs/superpowers/`(specs·plans), `docs/research/`, 나머지 `docs/solutions/` 카테고리(`conventions`·`logic-errors`·`ui-bugs`·`integration-issues`)는 `.gitignore`로 제외해 로컬에만 보관한다.
-  - **판단 기준:** 재사용 가능한 **설계 결론**은 커밋하고, 특정 작업의 **진행 기록**은 커밋하지 않는다. 새 문서를 어디에 쓸지 정할 때 이 기준으로 디렉토리를 고른다 — 디렉토리가 곧 커밋 여부를 결정한다.
-  - **Why:** 2026-07-23 `cb0ac97`로 `docs/` 전체를 취업용 포트폴리오 자료로 공개했으나, 2026-09-04 시점에 117개 중 56개가 specs·plans여서 제3자가 읽을 동기가 없는 진행 기록이 대부분을 차지했다. 정제된 설계 패턴만 남기는 쪽이 신호 대 잡음 면에서 낫다고 판단해 범위를 좁혔다.
-  - **이미 공개된 것은 되돌아가지 않는다.** 제외 처리는 현재 트리에만 적용되며, `cb0ac97` 이후 32개 커밋의 히스토리와 머지된 PR 페이지에는 그대로 남아 있다. 이 조치의 목적은 노출 차단이 아니라 **큐레이션**이므로 히스토리 재작성은 하지 않기로 했다 — "완전히 지워달라"는 요청이 아닌 한 `filter-repo`·force push를 제안하지 말 것.
-  - `docs/solutions/architecture-patterns/`의 문서가 제외 대상 문서를 참조할 때는 **마크다운 링크를 쓰지 않는다**(GitHub에서 404가 난다). 백틱 텍스트로만 경로를 적으면 로컬에서는 그대로 유효하고 외부에서는 내부 참조 표기로 읽힌다.
-- **`.gitignore`가 실제로 무시하는 것은 `.claude/settings.json`, `.claude/settings.local.json`, `/.superpowers/`, `.gstack/`, 그리고 위 `docs/` 제외 규칙이다.** 커밋 전 확신이 안 서면 규칙 문구가 아니라 `git ls-tree -r --name-only HEAD -- <경로>` 또는 `git check-ignore <경로>`로 실측할 것.
+- **커밋 범위:** `CLAUDE.md`·`.claude/rules/`는 전부, `docs/`는 `docs/solutions/architecture-patterns/`만 커밋한다(`scripts/`·나머지 `docs/`는 로컬 전용). 판단 기준·`.gitignore` 실측 방법은 [`.claude/rules/git.md`](.claude/rules/git.md).
 - **`gh` CLI가 이 환경에 설치되어 있지 않다.** PR 생성은 GitHub 웹에서 직접 진행하거나, 사용자에게 URL을 안내하는 것으로 마무리할 것.
 - **소프트웨어 설치 절대 금지:** `winget`, `npm install -g`, `choco` 등 시스템에 영구적인 변경을 주는 명령은 사용자가 명시적으로 요청한 경우에만 실행할 것. 도구가 없다고 해서 자동으로 설치를 시도하지 말 것.
 - push 후 GitHub가 출력하는 PR 생성 URL을 사용자에게 안내하면 충분하다:

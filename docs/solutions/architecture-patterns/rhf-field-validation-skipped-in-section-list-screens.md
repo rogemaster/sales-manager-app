@@ -70,7 +70,7 @@ const validateBothForms = async () => {
 2. 폼 섹션 컴포넌트 — 신규 생성 또는 기존 섹션에 필드 추가
 3. `src/features/products/ui/components/ProductForm.tsx` — 섹션 배치 (`/products/create`·`/products/[id]` 자동 반영)
 4. **`src/features/mallLinkedProduct/ui/[id]/MallLinkedProductEditLayout.tsx`** — 섹션 직접 나열 구조라 수동 추가. `<FormProvider {...productForm}>` **안쪽**에 넣어야 한다
-5. `src/mocks/data/MockProductsData.ts` — 필수 필드면 기존 20건에 값을 채운다. 안 채우면 기존 상품 수정 화면이 저장 불가 상태가 된다
+5. 기존 상품 행(Neon `products`) — 필수 필드면 이미 저장된 상품에 값을 채울지 정한다. 안 채우면 기존 상품 수정 화면이 저장 불가 상태가 된다. 쓰기 route가 공유하는 스키마(`src/features/products/util/productWriteSchema.ts`)에도 반영한다 (2026-09-01 이전에는 mock `MockProductsData.ts`의 20건을 채우는 단계였다)
 6. 엑셀 대량등록(`bulkTemplate.constant.ts` + `productExcelSaveStrategy.ts`) — 반영하지 않으면 엑셀로 만든 상품은 필수 필드가 빈 채로 생성된다
 
 ## 새 화면을 만들 때

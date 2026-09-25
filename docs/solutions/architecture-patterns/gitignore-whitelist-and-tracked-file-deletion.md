@@ -160,5 +160,5 @@ git restore --source=<변경-전-커밋> --worktree -- docs/solutions/convention
 
 ## 관련
 
-- `CLAUDE.md` Git/PR 규칙 — 커밋 범위와 판단 기준
+- `.claude/rules/git.md` — 커밋 범위와 판단 기준 (2026-09-25 `CLAUDE.md` Git/PR 규칙에서 분리)
 - `.claude/rules/workflow.md` PHASE 4 — 카테고리 선택이 곧 커밋 여부 결정
