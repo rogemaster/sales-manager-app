@@ -4,6 +4,7 @@ import { FilterOption } from '@/types/common.type';
 import { Product } from '@/features/products/types/product.types';
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import { PRODUCT_EXCEL_COL } from '@/features/products/constant/bulkTemplate.constant';
 import {
   buildCombinationsFromExcel,
@@ -35,7 +36,7 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
       productId: generatorProductCode(),
       customerCode: (r[PRODUCT_EXCEL_COL.customerCode] as string) || undefined,
       name: r[PRODUCT_EXCEL_COL.name] as string,
-      categoryId: (r[PRODUCT_EXCEL_COL.category] as string) || '',
+      categoryId: toCode(CATEGORIES, r[PRODUCT_EXCEL_COL.category]) || '',
       brand: (r[PRODUCT_EXCEL_COL.brand] as string) || '',
       manufacturer: (r[PRODUCT_EXCEL_COL.manufacturer] as string) || '',
       // 시트에서 숫자로 파싱될 수 있어 String()으로 좁힌다 (as string은 컴파일 타임 캐스팅이라 런타임 값이 number인 채로 남는다)

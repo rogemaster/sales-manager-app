@@ -4,7 +4,7 @@ import { ExcelRowWithErrors } from '@/types/excel.type';
 
 const baseRow: ExcelRowWithErrors = {
   상품명: '테스트 상품',
-  카테고리: 'CAT-001',
+  카테고리: '의류',
   판매가: 10000,
   판매상태: '판매중',
   배송정책: '무료배송',
@@ -135,6 +135,18 @@ describe('productExcelSaveStrategy - 표시명을 코드로 치환', () => {
       'CHARGE_RECEIVED',
       'CONDITIONAL_FREE',
     ]);
+  });
+
+  it('카테고리 한글 표시명을 코드로 바꾼다', () => {
+    const rows = ['의류', '가전', '스포츠'].map((category) => ({ ...baseRow, 카테고리: category }));
+
+    expect(productExcelSaveStrategy(rows).map((p) => p.categoryId)).toEqual(['c00001', 'c00011', 'c00012']);
+  });
+
+  it('카테고리가 표시명이 아니면(코드·빈 값 포함) 빈 값으로 두어 서버가 거절하게 한다', () => {
+    const rows = ['c00001', '옷', ''].map((category) => ({ ...baseRow, 카테고리: category }));
+
+    expect(productExcelSaveStrategy(rows).map((p) => p.categoryId)).toEqual(['', '', '']);
   });
 
   it('앞뒤 공백이 붙은 표시명도 코드로 바꾼다', () => {

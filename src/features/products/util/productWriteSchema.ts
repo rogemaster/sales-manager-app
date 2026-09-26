@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { FilterOption } from '@/types/common.type';
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import {
   ADULT_PRODUCT_OPTIONS,
   ORIGIN_COUNTRIES,
@@ -62,7 +63,8 @@ const FIELDS: {
   limit: number;
 }[] = [
   { key: 'name', label: '상품명', required: true, ...text(200) },
-  { key: 'categoryId', label: '카테고리', required: true, ...text(100) },
+  // 코드 목록 안의 값만 받는다. 글자 규칙(text)이면 빈 값('')이 통과해 네이버 전송 불가 상품이 생긴다.
+  { key: 'categoryId', label: '카테고리', required: true, ...code(CATEGORIES) },
   { key: 'brand', label: '브랜드', required: true, ...text(100) },
   { key: 'manufacturer', label: '제조업체', required: true, ...text(100) },
   { key: 'detailPage', label: '상세설명', required: true, ...text(50000) },

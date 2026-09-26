@@ -9,7 +9,7 @@ import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constan
 
 const valid = {
   name: '테스트 상품',
-  categoryId: 'CAT-001',
+  categoryId: 'c00001',
   price: 10000,
   state: 'ON_SALE',
   deliveryType: 'FREE',
@@ -126,6 +126,17 @@ describe('findProductWriteViolation - 개수', () => {
 });
 
 describe('findProductWriteViolation - 열거', () => {
+  // 네이버가 카테고리를 요구한다. 예전에는 글자 규칙이라 빈 값('')이 통과해 전송 불가 상품이 생겼다.
+  it.each(['', '의류', 'CAT-001'])('카테고리가 코드 목록 밖(%s)이면 잡는다', (categoryId) => {
+    expect(findProductWriteViolation({ ...valid, categoryId })).toBe(
+      `카테고리에 사용할 수 없는 값입니다: '${categoryId}'`,
+    );
+  });
+
+  it('수정(partial)에서도 카테고리를 빈 값으로 바꾸지 못한다', () => {
+    expect(findProductWriteViolation({ categoryId: '' }, 'partial')).toBe("카테고리에 사용할 수 없는 값입니다: ''");
+  });
+
   it('판매상태가 코드가 아니면 잡는다', () => {
     expect(findProductWriteViolation({ ...valid, state: '판매중' })).toBe(
       "판매상태에 사용할 수 없는 값입니다: '판매중'",

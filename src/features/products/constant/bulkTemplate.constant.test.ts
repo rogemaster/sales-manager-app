@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 import { PRODUCT_BULK_EXCEL_TEMPLATE, PRODUCT_EXCEL_COL } from './bulkTemplate.constant';
 
 describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
@@ -54,6 +55,7 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
 
     expect(requiredColumns).toEqual([
       '상품명',
+      '카테고리',
       '브랜드',
       '제조업체',
       '판매가',
@@ -64,6 +66,16 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
       '상세설명',
       '총수량',
     ]);
+  });
+});
+
+describe('카테고리 컬럼', () => {
+  // 네이버가 카테고리를 요구한다 — 빈 값이나 코드(c00001)가 아니라 화면 Select와 같은 표시명을 받는다.
+  it('카테고리 표시명만 적을 수 있다', () => {
+    const category = PRODUCT_BULK_EXCEL_TEMPLATE.template.find((item) => item.name === '카테고리');
+
+    expect(category?.req).toBe(true);
+    expect(category?.allowed).toEqual(CATEGORIES.map(({ name }) => name));
   });
 });
 
