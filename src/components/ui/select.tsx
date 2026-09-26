@@ -7,9 +7,20 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 function Select({
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+  // <form> 안의 Radix Select는 숨은 native <select>에 값을 넣고 change 이벤트를 흘린다. 값이 선택지 등록보다
+  // 먼저 바뀌면(캐시된 데이터로 폼을 reset하는 재진입) native 값이 ''로 떨어져 onValueChange('')가 온다.
+  // SelectItem은 빈 값을 가질 수 없으므로(Radix가 금지) ''는 사용자 선택이 아니다 — 흘려보내면 폼 값이 지워진다.
+  const handleValueChange = React.useCallback(
+    (value: string) => {
+      if (value !== "") onValueChange?.(value)
+    },
+    [onValueChange]
+  )
+
+  return <SelectPrimitive.Root data-slot="select" onValueChange={handleValueChange} {...props} />
 }
 
 function SelectGroup({
