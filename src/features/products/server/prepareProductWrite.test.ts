@@ -13,7 +13,7 @@ const OWN_IMAGE = `${PRODUCT_IMAGE_PREFIX}/${OWNER}/a.png`;
 
 const valid = {
   name: '테스트 상품',
-  categoryId: 'CAT-001',
+  categoryId: 'c00001',
   price: 10000,
   state: 'ON_SALE',
   deliveryType: 'FREE',

@@ -1,6 +1,7 @@
 import { ExcelTemplate } from '@/types/excel.type';
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
+import { CATEGORIES } from '@/shared/constant/category.constant';
 
 /**
  * 시트 컬럼 이름(헤더 글자). 파싱된 행의 키가 이 글자라서, 양식·저장 전략·미리보기가 모두 여기서 읽는다.
@@ -51,7 +52,10 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
     {
       key: 'category',
       name: PRODUCT_EXCEL_COL.category,
-      req: false,
+      // 네이버가 카테고리를 요구한다 — 입력 필수는 가장 엄격한 몰을 따른다(domain-design.md).
+      // 예전에는 선택이고 적은 글자를 그대로 저장해, 코드(c00001)를 알아야 했고 빈 값 상품이 전송 불가로 남았다.
+      req: true,
+      allowed: CATEGORIES.map(({ name }) => name),
     },
     {
       key: 'brand',
