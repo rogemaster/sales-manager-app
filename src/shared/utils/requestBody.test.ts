@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { INVALID_BODY_MESSAGE, parseRequestBody } from './requestBody';
+import { INVALID_BODY_MESSAGE, objectBodySchema, parseRequestBody } from './requestBody';
 
 const schema = z.object({ name: z.string().min(1, '이름을 입력해주세요.'), size: z.number().default(20) });
 const makeReq = (body: string) => new NextRequest('http://localhost/api/test', { method: 'POST', body });
@@ -23,5 +23,19 @@ describe('parseRequestBody', () => {
     const result = await parseRequestBody(makeReq('{not json'), schema);
     expect((result as NextResponse).status).toBe(400);
     expect(await (result as NextResponse).json()).toEqual({ error: INVALID_BODY_MESSAGE });
+  });
+});
+
+describe('objectBodySchema', () => {
+  it('객체만 통과시키고 배열·null·원시값은 주어진 문구로 거부한다', () => {
+    const schema = objectBodySchema('형식 오류');
+    expect(schema.safeParse({ a: 1 }).success).toBe(true);
+    for (const body of [null, [], 'x', 1]) {
+      expect(schema.safeParse(body).error?.issues[0]?.message).toBe('형식 오류');
+    }
+  });
+
+  it('문구를 주지 않으면 공통 문구를 쓴다', () => {
+    expect(objectBodySchema().safeParse(null).error?.issues[0]?.message).toBe(INVALID_BODY_MESSAGE);
   });
 });
