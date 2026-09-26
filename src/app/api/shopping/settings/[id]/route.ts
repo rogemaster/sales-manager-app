@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
+import { objectBodySchema, parseRequestBody } from '@/shared/utils/requestBody';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import {
   findShoppingSettingWriteViolation,
@@ -44,9 +45,10 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
   const { id } = await params;
 
-  try {
-    const body = (await req.json()) as Record<string, unknown>;
+  const body = await parseRequestBody(req, objectBodySchema());
+  if (body instanceof NextResponse) return body;
 
+  try {
     // 보낸 필드만, 그리고 허용된 필드만 바꾼다. id·ownerId·createdAt·mallAccountId·mallCode·mallId는
     // 이 목록에 없으므로 요청에 섞여 와도 반영되지 않는다.
     // mallAccountId가 불변인 이유: 설정은 생성 시점에 고른 계정에 묶여 있고, 계정이 바뀌면 그건

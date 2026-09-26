@@ -4,33 +4,22 @@ import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { and, desc, eq, gte, ilike, lt, or, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
-import { isYmd, toKstDateRange } from '@/shared/utils/date';
-import { clampPositiveInt } from '@/shared/utils/pagination';
+import { toKstDateRange } from '@/shared/utils/date';
+import { parseRequestBody } from '@/shared/utils/requestBody';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
-import { ShoppingAccountSearchType } from '@/features/shoppingAccount/types/shoppingAccount.types';
-
-// 상한 1000은 화면 페이지네이션이 쓰는 값의 100배로, 필터 없이 "사실상 전체"를 한 번에 요청하는
-// 호출을 허용하면서도 무제한 조회는 막기 위한 값이다.
-const MAX_PAGE_SIZE = 1000;
-const DEFAULT_PAGE_SIZE = 10;
+import { shoppingAccountListRequestSchema } from '@/features/shoppingAccount/util/shoppingAccountRequestSchema';
 
 export async function POST(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
+  // 클라이언트가 ownerId를 보내더라도 스키마가 버린다. 소유권은 세션만 신뢰한다.
+  const body = await parseRequestBody(req, shoppingAccountListRequestSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    // 클라이언트가 ownerId를 보내더라도 무시한다. 소유권은 세션만 신뢰한다.
-    const body = (await req.json()) as { filters: ShoppingAccountSearchType; page: number; pageSize: number };
+    const { page, pageSize } = body;
     const { dateType, startDate, endDate, isActive, mallCode, searchValue } = body.filters;
-
-    const page = clampPositiveInt(body.page, 1, Number.MAX_SAFE_INTEGER);
-    const pageSize = clampPositiveInt(body.pageSize, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
-
-    // 날짜는 클램프하지 않고 거절한다 — 임의의 기본값으로 대체하면 사용자가 요청한 것과
-    // 다른 기간의 결과를 정상 응답으로 돌려주게 되어 빈 목록의 원인을 추적할 수 없다.
-    if (!isYmd(startDate) || !isYmd(endDate)) {
-      return NextResponse.json({ error: '검색 기간이 올바르지 않습니다.' }, { status: 400 });
-    }
 
     const conditions = [eq(shoppingAccounts.ownerId, session.ownerId)];
 

@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requireSession, requirePermission } from '@/shared/utils/apiAuth';
+import { objectBodySchema, parseRequestBody } from '@/shared/utils/requestBody';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { findShoppingAccountWriteViolation } from '@/features/shoppingAccount/util/shoppingAccountWriteSchema';
 import { UpdateShoppingAccountBody } from '@/features/shoppingAccount/types/shoppingAccount.types';
@@ -40,20 +41,17 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
   const { id } = await params;
 
+  const raw = await parseRequestBody(req, objectBodySchema());
+  if (raw instanceof NextResponse) return raw;
+
   try {
-    const update = (await req.json()) as UpdateShoppingAccountBody & {
-      id?: string;
-      ownerId?: string;
-      createdAt?: string;
-    };
+    // 필드 규칙은 아래 검증 함수가 본다. 타입은 그 검사를 통과한 뒤에야 참이 된다.
+    const rest = raw as Partial<UpdateShoppingAccountBody>;
+    const { password, apiKey } = rest;
 
-    // id·ownerId·createdAt은 수정 대상이 아니다. 요청에 섞여 와도 버린다.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id: _id, ownerId: _oid, createdAt: _createdAt, password, apiKey, ...rest } = update;
-
-    // rest에 테이블 컬럼에 없는 키가 섞여 그대로 .set()까지 가면 drizzle의 mapUpdateSet이
-    // undefined 컬럼을 참조해 500이 된다. 허용 키만, "보낸 필드만 바꾼다"를 지키기 위해
-    // 존재하는 키만(in 연산자) 담는다 — 값을 못 채운 키를 undefined로 채워 넣지 않는다.
+    // 테이블 컬럼에 없는 키가 .set()까지 가면 drizzle의 mapUpdateSet이 undefined 컬럼을 참조해 500이 된다.
+    // 허용 키만, "보낸 필드만 바꾼다"를 지키기 위해 존재하는 키만(in 연산자) 담는다 —
+    // 값을 못 채운 키를 undefined로 채워 넣지 않는다. id·ownerId·createdAt은 목록에 없어 버려진다.
     const values: Partial<UpdateShoppingAccountBody> = {};
     if ('mallCode' in rest) values.mallCode = rest.mallCode;
     if ('mallId' in rest) values.mallId = rest.mallId;

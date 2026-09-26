@@ -5,6 +5,7 @@ import { db } from '@/db';
 import { shoppingAccounts, shoppingSettings } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { requirePermission } from '@/shared/utils/apiAuth';
+import { objectBodySchema, parseRequestBody } from '@/shared/utils/requestBody';
 import { SHOPPING_SETTING_COLUMNS } from '@/features/shoppingSetting/util/settingColumns';
 import { findShoppingSettingWriteViolation } from '@/features/shoppingSetting/util/shoppingSettingWriteSchema';
 import { sanitizeMallSettings } from '@/features/shoppingSetting/util/sanitizeMallSettings';
@@ -16,9 +17,11 @@ export async function POST(req: NextRequest) {
   const session = await requirePermission(req, 'shoppingSetting.create');
   if (session instanceof NextResponse) return session;
 
-  try {
-    const body = (await req.json()) as Record<string, unknown>;
+  // 필드 규칙은 아래 검증 함수가 본다(한글 메시지). 여기서는 객체인지만 본다.
+  const body = await parseRequestBody(req, objectBodySchema());
+  if (body instanceof NextResponse) return body;
 
+  try {
     const violation = findShoppingSettingWriteViolation(body, 'create');
     if (violation) return NextResponse.json({ error: violation }, { status: 400 });
 

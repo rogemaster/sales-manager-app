@@ -6,7 +6,8 @@ import { requireSession } from '@/shared/utils/apiAuth';
 import { toMallAddresses } from '@/features/shoppingSetting/util/naverAddressBook';
 import { STATIC_MALL_ADDRESS_BOOK } from '@/features/shoppingSetting/constant/mallAddressBook.constant';
 import { ShoppingMalls } from '@/types/common.type';
-import { MallAddressType } from '@/features/shoppingSetting/types/shoppingSetting.types';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { mallAddressBookRequestSchema } from '@/features/shoppingSetting/util/shoppingSettingRequestSchema';
 import {
   MALL_ACCOUNT_MISSING_MESSAGE,
   MALL_AUTH_FAILED_MESSAGE,
@@ -16,15 +17,13 @@ export async function POST(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
-  try {
-    const { mallAccountId, addressType } = (await req.json()) as {
-      mallAccountId: string;
-      addressType: MallAddressType;
-    };
+  // try 밖에서 읽는다 — 아래 catch는 모든 오류를 502(주소록 조회 실패)로 돌려주므로,
+  // 안에 두면 잘못된 요청도 외부몰 장애처럼 보인다.
+  const body = await parseRequestBody(req, mallAddressBookRequestSchema);
+  if (body instanceof NextResponse) return body;
 
-    if (addressType !== 'SHIPPING' && addressType !== 'RETURN') {
-      return NextResponse.json({ error: '주소 종류가 올바르지 않습니다.' }, { status: 400 });
-    }
+  try {
+    const { mallAccountId, addressType } = body;
 
     // 계정에서 mallCode와 apiKey를 얻는다. 클라이언트는 mallCode를 보내지 않는다.
     const [account] = await db
