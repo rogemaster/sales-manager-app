@@ -43,7 +43,8 @@ const loadApiKeys = async (ownerId: string, accountIds: string[]): Promise<Map<s
  */
 export const sendNewLinkedProducts = async (
   actor: SendActor,
-  items: MallLinkedProductRequestItem[],
+  // mallCode는 받지 않는다 — 몰은 조회한 설정에서 읽는다(요청 스키마도 버린다).
+  items: Pick<MallLinkedProductRequestItem, 'productId' | 'shoppingSettingId'>[],
 ): Promise<CreateMallLinkedProductsResult> => {
   const productIds = [...new Set(items.map((item) => item.productId))];
   const settingIds = [...new Set(items.map((item) => item.shoppingSettingId))];
