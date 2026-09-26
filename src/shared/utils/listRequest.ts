@@ -21,7 +21,8 @@ export const INVALID_FILTER_MESSAGE = '검색 조건이 올바르지 않습니�
 const filterError = { errorMap: () => ({ message: INVALID_FILTER_MESSAGE }) };
 
 /** 목록 필터 Select의 코드값. 목록 밖이면 거절한다 — 조용히 무시하면 필터가 걸리지 않은 결과를 돌려준다. */
-export const filterCodeSchema = (codes: readonly string[]) => z.enum(codes as [string, ...string[]], filterError);
+// 제네릭이라 as const 배열을 넘기면 결과 타입이 리터럴 유니온으로 남는다.
+export const filterCodeSchema = <T extends string>(codes: readonly T[]) => z.enum(codes as [T, ...T[]], filterError);
 
 /** 목록 검색어·id 같은 자유 입력 필터. */
 export const filterTextSchema = (max: number) => z.string(filterError).max(max, INVALID_FILTER_MESSAGE);
