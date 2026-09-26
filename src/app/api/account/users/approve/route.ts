@@ -4,6 +4,8 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { requirePermission } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { bulkIdsRequestSchema } from '@/shared/utils/bulkRequest';
 import { toKstYmd } from '@/shared/utils/date';
 import { ApproveUsersResult } from '@/features/account/types/user.types';
 
@@ -11,9 +13,13 @@ export async function PATCH(req: NextRequest) {
   const session = await requirePermission(req, 'user.approve');
   if (session instanceof NextResponse) return session;
 
+  // ids가 빠지거나 문자열이 아닌 값이 섞이면 400이다 — "0명 승인"으로 답하면 화면이
+  // "승인 대기 중인 사용자가 없습니다"라는 사실과 다른 안내를 띄운다. 중복은 스키마가 걷어낸다.
+  const body = await parseRequestBody(req, bulkIdsRequestSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    const { ids } = (await req.json()) as { ids?: unknown };
-    const uniqueIds = Array.isArray(ids) ? [...new Set(ids.filter((id): id is string => typeof id === 'string'))] : [];
+    const { ids: uniqueIds } = body;
 
     if (uniqueIds.length === 0) {
       return NextResponse.json({ approvedCount: 0 } satisfies ApproveUsersResult);

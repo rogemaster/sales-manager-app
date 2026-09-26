@@ -5,17 +5,15 @@ import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { db } from '@/db';
 import { mallLinkedProducts } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
-import { isYmd, toKstDateRange } from '@/shared/utils/date';
-import { clampPositiveInt } from '@/shared/utils/pagination';
+import { toKstDateRange } from '@/shared/utils/date';
+import { parseRequestBody } from '@/shared/utils/requestBody';
 import {
-  MallLinkedProductSearch,
   MallLinkedProductSearchType,
+  MallLinkStatus,
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { LINKED_PRODUCT_COLUMNS } from '@/features/mallLinkedProduct/server/linkedProductStore';
 import { toMallLinkedProduct } from '@/features/mallLinkedProduct/util/linkedProductRecord';
-
-const MAX_PAGE_SIZE = 100;
-const DEFAULT_PAGE_SIZE = 10;
+import { mallLinkedProductListRequestSchema } from '@/features/mallLinkedProduct/util/mallLinkedProductRequestSchema';
 
 // 검색 타입별 대상 컬럼. 전부 컬럼이다 — 상품명은 product_snapshot에서 뽑은 생성 컬럼이다.
 const SEARCH_COLUMN: Record<MallLinkedProductSearchType, AnyPgColumn> = {
@@ -30,18 +28,17 @@ export async function POST(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
+  // 클라이언트가 ownerId를 보내더라도 스키마가 버린다. 소유권은 세션만 신뢰한다.
+  const body = await parseRequestBody(req, mallLinkedProductListRequestSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    const body = (await req.json()) as { filters: MallLinkedProductSearch; page: number; pageSize: number };
-    const { dateType, startDate, endDate, mallCode, mallAccountId, shoppingSettingId, linkStatus, saleState } =
+    const { page, pageSize } = body;
+    const { dateType, startDate, endDate, mallCode, mallAccountId, shoppingSettingId, saleState, searchValue } =
       body.filters;
-    const { searchType, searchValue } = body.filters;
-
-    const page = clampPositiveInt(body.page, 1, Number.MAX_SAFE_INTEGER);
-    const pageSize = clampPositiveInt(body.pageSize, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
-
-    if (!isYmd(startDate) || !isYmd(endDate)) {
-      return NextResponse.json({ error: '검색 기간이 올바르지 않습니다.' }, { status: 400 });
-    }
+    // 스키마가 옵션 상수(MALL_LINK_STATUS_OPTIONS·MALL_LINKED_SEARCH_TYPE) 안의 값만 통과시킨다.
+    const linkStatus = body.filters.linkStatus as MallLinkStatus | 'ALL';
+    const searchType = body.filters.searchType as MallLinkedProductSearchType;
 
     const conditions = [eq(mallLinkedProducts.ownerId, session.ownerId)];
 

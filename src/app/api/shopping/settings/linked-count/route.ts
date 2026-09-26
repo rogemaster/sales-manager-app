@@ -4,6 +4,8 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProducts } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { bulkIdsRequestSchema } from '@/shared/utils/bulkRequest';
 
 /**
  * 삭제 대상 설정들에서 파생된 연동 건수. 삭제 확인 창의 경고에만 쓴다 — 연동 데이터는 설정과 독립이라 지우지 않는다.
@@ -13,9 +15,13 @@ export async function POST(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
+  // ids가 빠진 요청을 0건으로 답하지 않는다 — 화면은 0건을 보고 "연동 상품 없음"으로 경고 없이 삭제로 넘어간다.
+  const body = await parseRequestBody(req, bulkIdsRequestSchema);
+  if (body instanceof NextResponse) return body;
+
   try {
-    const { ids } = (await req.json()) as { ids?: string[] };
-    if (!Array.isArray(ids) || ids.length === 0) return NextResponse.json({ totalCount: 0 });
+    const { ids } = body;
+    if (ids.length === 0) return NextResponse.json({ totalCount: 0 });
 
     // 설정 소유권은 따로 확인하지 않는다 — owner_id로 거르므로 남의 설정 id를 섞어도 0만 늘어난다.
     const [{ totalCount }] = await db

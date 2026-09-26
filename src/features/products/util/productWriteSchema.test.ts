@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { findProductWriteViolation } from './productWriteSchema';
+import {
+  findProductWriteViolation,
+  pickProductWriteFields,
+  productBulkRequestSchema,
+  productWriteBodySchema,
+} from './productWriteSchema';
+import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constant';
 
 const valid = {
   name: '테스트 상품',
@@ -213,5 +219,42 @@ describe('findProductWriteViolation - null 처리', () => {
     expect(findProductWriteViolation({ ...valid, option: [{ ...combo, quantity: -1 }] })).toBe(
       '옵션의 형식이 올바르지 않습니다',
     );
+  });
+});
+
+describe('pickProductWriteFields', () => {
+  it('서버가 정하는 필드와 모르는 필드를 버린다', () => {
+    const picked = pickProductWriteFields({
+      ...valid,
+      productId: 'P',
+      ownerId: 'o',
+      createDate: 1,
+      updateDate: 2,
+      x: 1,
+    });
+    expect(picked).toEqual(valid);
+  });
+});
+
+describe('요청 본문 스키마', () => {
+  it('등록·수정 본문은 객체만 받는다', () => {
+    expect(productWriteBodySchema.safeParse(valid).success).toBe(true);
+    for (const body of [null, [], 'x', 1]) {
+      const result = productWriteBodySchema.safeParse(body);
+      expect(result.error?.issues[0]?.message).toBe('상품 데이터의 형식이 올바르지 않습니다');
+    }
+  });
+
+  it('대량등록 본문은 상품 객체 배열이고 상한을 넘으면 거부한다', () => {
+    expect(productBulkRequestSchema.safeParse({ products: [] }).success).toBe(true);
+    expect(productBulkRequestSchema.safeParse({ products: [valid] }).success).toBe(true);
+
+    const over = productBulkRequestSchema.safeParse({ products: Array(PRODUCT_BULK_MAX_ROWS + 1).fill(valid) });
+    expect(over.error?.issues[0]?.message).toBe(`한 번에 최대 ${PRODUCT_BULK_MAX_ROWS}건까지 등록할 수 있습니다.`);
+
+    for (const body of [null, {}, { products: 'x' }, { products: [null] }]) {
+      const result = productBulkRequestSchema.safeParse(body);
+      expect(result.error?.issues[0]?.message).toBe('상품 데이터의 형식이 올바르지 않습니다');
+    }
   });
 });

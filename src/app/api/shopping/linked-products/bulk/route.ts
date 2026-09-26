@@ -4,6 +4,8 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProducts, shoppingSettings } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
+import { mallLinkedProductBulkUpdateRequestSchema } from '@/features/mallLinkedProduct/util/mallLinkedProductRequestSchema';
 import {
   BulkUpdateMallLinkedProductsBody,
   BulkUpdateMallLinkedProductsResult,
@@ -17,15 +19,13 @@ export async function PATCH(req: NextRequest) {
   const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
-  try {
-    const { ids, productSnapshot, shoppingSettingId, clearKeys } =
-      (await req.json()) as BulkUpdateMallLinkedProductsBody;
+  // "수정할 내용이 없음"(바꿀 값·설정·비울 키가 모두 없음)도 스키마가 거절한다.
+  const parsed = await parseRequestBody(req, mallLinkedProductBulkUpdateRequestSchema);
+  if (parsed instanceof NextResponse) return parsed;
 
-    // 값을 비우는 요청도 "무언가를 요청했다"에 해당한다 — clearKeys만 온 요청은 정상이다.
-    const hasClearKeys = (clearKeys?.length ?? 0) > 0;
-    if (!Array.isArray(ids) || (!productSnapshot && !shoppingSettingId && !hasClearKeys)) {
-      return NextResponse.json({ error: '수정할 내용이 없습니다.' }, { status: 400 });
-    }
+  try {
+    // 스키마는 모양만 본다. 스냅샷 값은 외부몰이 판정하고, 필수 키 삭제는 mergeProductSnapshot이 막는다.
+    const { ids, productSnapshot, shoppingSettingId, clearKeys } = parsed as BulkUpdateMallLinkedProductsBody;
 
     const uniqueIds = [...new Set(ids)];
     const rows = uniqueIds.length

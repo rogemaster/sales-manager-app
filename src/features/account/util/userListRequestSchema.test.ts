@@ -19,16 +19,9 @@ describe('userListRequestSchema', () => {
     expect(userListRequestSchema.safeParse(VALID).success).toBe(true);
   });
 
-  it.each([0, 101, 1.5])('pageSize %s는 거부한다', (pageSize) => {
-    expect(userListRequestSchema.safeParse({ ...VALID, pageSize }).success).toBe(false);
-  });
-
-  it.each([0, -1, 1.5])('page %s는 거부한다', (page) => {
-    expect(userListRequestSchema.safeParse({ ...VALID, page }).success).toBe(false);
-  });
-
-  it('pageSize 100은 통과한다', () => {
-    expect(userListRequestSchema.safeParse({ ...VALID, pageSize: 100 }).success).toBe(true);
+  // 페이지 값은 거절하지 않고 보정한다(규칙과 사례는 listRequest.test.ts).
+  it('page·pageSize가 틀리면 기본값·상한으로 보정한다', () => {
+    expect(userListRequestSchema.parse({ ...VALID, page: 0, pageSize: 101 })).toMatchObject({ page: 1, pageSize: 100 });
   });
 
   it('알 수 없는 등급·날짜기준·검색기준은 거부한다', () => {

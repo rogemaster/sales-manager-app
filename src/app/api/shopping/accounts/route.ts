@@ -3,6 +3,7 @@ import { serverErrorResponse } from '@/shared/utils/serverError';
 import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { requirePermission } from '@/shared/utils/apiAuth';
+import { objectBodySchema, parseRequestBody } from '@/shared/utils/requestBody';
 import { generatorShoppingAccountCode } from '@/utils/codeGenerator';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
 import { findShoppingAccountWriteViolation } from '@/features/shoppingAccount/util/shoppingAccountWriteSchema';
@@ -12,8 +13,12 @@ export async function POST(req: NextRequest) {
   const session = await requirePermission(req, 'shoppingAccount.create');
   if (session instanceof NextResponse) return session;
 
+  const raw = await parseRequestBody(req, objectBodySchema());
+  if (raw instanceof NextResponse) return raw;
+
   try {
-    const body = (await req.json()) as CreateShoppingAccountBody;
+    // 필드 규칙은 아래 검증 함수가 본다. 타입은 그 검사를 통과한 뒤에야 참이 된다.
+    const body = raw as CreateShoppingAccountBody;
 
     const violation = findShoppingAccountWriteViolation(body);
     if (violation) {

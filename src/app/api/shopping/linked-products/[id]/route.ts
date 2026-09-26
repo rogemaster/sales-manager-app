@@ -4,17 +4,16 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { mallLinkedProducts } from '@/db/schema';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { parseRequestBody } from '@/shared/utils/requestBody';
 import { UpdateMallLinkedProductBody } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import { LINKED_PRODUCT_COLUMNS } from '@/features/mallLinkedProduct/server/linkedProductStore';
 import { toMallLinkedProduct } from '@/features/mallLinkedProduct/util/linkedProductRecord';
 import { buildSnapshotUpdate } from '@/features/mallLinkedProduct/util/linkedProductWrite';
+import { mallLinkedProductUpdateRequestSchema } from '@/features/mallLinkedProduct/util/mallLinkedProductRequestSchema';
 
 type Context = { params: Promise<{ id: string }> };
 
 const NOT_FOUND_MESSAGE = '존재하지 않는 연동 상품입니다.';
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export async function GET(req: NextRequest, { params }: Context) {
   const session = await requireSession(req);
@@ -41,11 +40,12 @@ export async function PATCH(req: NextRequest, { params }: Context) {
   if (session instanceof NextResponse) return session;
   const { id } = await params;
 
+  const parsed = await parseRequestBody(req, mallLinkedProductUpdateRequestSchema);
+  if (parsed instanceof NextResponse) return parsed;
+
   try {
-    const body = (await req.json()) as UpdateMallLinkedProductBody;
-    if (!isRecord(body.productSnapshot) || !isRecord(body.settingSnapshot)) {
-      return NextResponse.json({ error: '저장할 값이 올바르지 않습니다.' }, { status: 400 });
-    }
+    // 스키마는 두 스냅샷이 객체인지만 본다. 안의 값은 외부몰이 판정한다(domain-design.md).
+    const body = parsed as unknown as UpdateMallLinkedProductBody;
 
     // 불변 3컬럼·전송 필드가 SET에 없다 — 규칙은 buildSnapshotUpdate에 있다.
     const [updated] = await db

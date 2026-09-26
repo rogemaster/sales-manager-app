@@ -8,13 +8,17 @@ import {
   TAX_TYPE_OPTIONS,
 } from '@/features/products/constant/compliance.constants';
 import { CUSTOMER_CODE_MAX_LENGTH } from '@/features/products/util/customerCode';
+import { PRODUCT_BULK_MAX_ROWS } from '@/features/products/constant/bulk.constant';
 import { MAX_IMAGE_URL_LENGTH } from '@/shared/constant/upload.constant';
+import { objectBodySchema } from '@/shared/utils/requestBody';
 
 // integer 컬럼의 범위. 넘으면 Postgres가 던져 배치 전체가 500이 된다.
 const MAX_INT = 2147483647;
 
 // 메시지에 싣는 값의 길이. 10만 자 상품명이 그대로 응답에 실리는 것을 막는다.
 const MAX_VALUE_IN_MESSAGE = 50;
+
+const INVALID_PRODUCT_MESSAGE = '상품 데이터의 형식이 올바르지 않습니다';
 
 const codes = (options: FilterOption[]) => options.map(({ id }) => id) as [string, ...string[]];
 
@@ -138,7 +142,7 @@ const violationOf = ({ label, kind, limit }: Field, value: unknown): string => {
  * 'partial'은 PATCH용이다 — 보내지 않은 필드는 검사하지 않는다.
  */
 export const findProductWriteViolation = (product: unknown, mode: 'full' | 'partial' = 'full'): string | null => {
-  if (typeof product !== 'object' || product === null) return '상품 데이터의 형식이 올바르지 않습니다';
+  if (typeof product !== 'object' || product === null) return INVALID_PRODUCT_MESSAGE;
 
   const record = product as Record<string, unknown>;
 
@@ -157,3 +161,26 @@ export const findProductWriteViolation = (product: unknown, mode: 'full' | 'part
 
   return null;
 };
+
+/**
+ * 저장할 필드만 남긴다. productId·ownerId·createDate·updateDate는 서버가 정하므로 요청에 섞여 와도 버린다.
+ * FIELDS가 곧 쓰기 가능한 필드 목록이다 — 여기 없는 필드는 검증도 저장도 되지 않는다.
+ */
+export const pickProductWriteFields = (input: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(FIELDS.filter(({ key }) => key in input).map(({ key }) => [key, input[key]]));
+
+// 요청 본문의 겉모양만 본다. 필드 규칙은 한글 라벨 메시지를 만드는 findProductWriteViolation이 맡는다.
+const productObject = objectBodySchema(INVALID_PRODUCT_MESSAGE);
+
+/** POST /api/products/create, PATCH /api/products/[productId] 요청 본문. */
+export const productWriteBodySchema = productObject;
+
+/** POST /api/products/bulk 요청 본문. 엑셀 업로드가 앞에서 건수를 막지만 그 검사는 브라우저에서만 돈다. */
+export const productBulkRequestSchema = z.object(
+  {
+    products: z
+      .array(productObject, { required_error: INVALID_PRODUCT_MESSAGE, invalid_type_error: INVALID_PRODUCT_MESSAGE })
+      .max(PRODUCT_BULK_MAX_ROWS, `한 번에 최대 ${PRODUCT_BULK_MAX_ROWS}건까지 등록할 수 있습니다.`),
+  },
+  { invalid_type_error: INVALID_PRODUCT_MESSAGE },
+);
