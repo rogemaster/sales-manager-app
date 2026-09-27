@@ -71,9 +71,12 @@ export interface MallLinkedProductRequestItem {
 }
 
 export interface CreateMallLinkedProductsResult {
+  /** 요청 전체(성공 + 실패 + 건너뜀) */
   totalCount: number;
   successCount: number;
   failCount: number;
+  /** 상품·설정을 찾지 못해 보내지 않은 건 */
+  skippedCount: number;
 }
 
 export interface UpdateMallLinkedProductBody {
@@ -83,9 +86,12 @@ export interface UpdateMallLinkedProductBody {
 
 /** CreateMallLinkedProductsResult와 구조가 같지만 의미가 다르고 한쪽만 바뀔 수 있어 합치지 않는다. */
 export interface ResendMallLinkedProductsResult {
+  /** 요청 전체(성공 + 실패 + 건너뜀) */
   totalCount: number;
   successCount: number;
   failCount: number;
+  /** 연동 건을 찾지 못해 보내지 않은 건 */
+  skippedCount: number;
 }
 
 /**

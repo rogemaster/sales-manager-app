@@ -97,13 +97,16 @@ export const buildHistoryEntry = ({
   sentAt: now,
 });
 
-/** null은 대상이 없어 건너뛴 건이다(남의 것·없는 것). 집계에서 뺀다. 예외는 실패로 센다. */
+/**
+ * null은 대상이 없어 건너뛴 건이다(남의 것·없는 것 — 담아 둔 사이 설정이 삭제된 경우 등). 예외는 실패로 센다.
+ * 건너뜀을 따로 세는 이유: 집계에서 빼면 전부 건너뛴 전송이 "0건 전송" 성공 알림이 된다.
+ * totalCount는 요청 전체다(성공 + 실패 + 건너뜀).
+ */
 export const tallySendResults = (results: PromiseSettledResult<boolean | null>[]) => {
-  const result = { totalCount: 0, successCount: 0, failCount: 0 };
+  const result = { totalCount: results.length, successCount: 0, failCount: 0, skippedCount: 0 };
   results.forEach((settled) => {
-    if (settled.status === 'fulfilled' && settled.value === null) return;
-    result.totalCount += 1;
-    if (settled.status === 'fulfilled' && settled.value) result.successCount += 1;
+    if (settled.status === 'fulfilled' && settled.value === null) result.skippedCount += 1;
+    else if (settled.status === 'fulfilled' && settled.value) result.successCount += 1;
     else result.failCount += 1;
   });
   return result;
