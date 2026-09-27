@@ -111,7 +111,8 @@ export const ShoppingAccountForm = ({
                     <FormItem>
                       <FormLabel>쇼핑몰 선택 *</FormLabel>
                       <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
+                        {/* 생성 후 몰은 바꿀 수 없다 — 서버도 수정 요청의 mallCode를 받지 않는다. */}
+                        <Select value={field.value} onValueChange={field.onChange} disabled={mode === 'edit'}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="쇼핑몰을 선택하세요." />
                           </SelectTrigger>

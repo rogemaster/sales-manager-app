@@ -40,8 +40,12 @@ export type CreateShoppingAccountBody = Omit<ShoppingAccount, 'id' | 'ownerId' |
   apiKey: string;
 };
 
-/** password·apiKey가 빈 문자열이면 서버가 무시한다(기존 값 유지). */
-export type UpdateShoppingAccountBody = Partial<CreateShoppingAccountBody>;
+/**
+ * password·apiKey가 빈 문자열이면 서버가 무시한다(기존 값 유지).
+ * mallCode는 없다 — 생성 후 몰은 바꿀 수 없다. 설정·연동 건이 계정의 몰을 복사해 갖고 있어
+ * 계정 몰만 바뀌면 주소록(계정의 몰)과 전송(설정의 몰)이 갈라진다. 몰을 바꾸려면 새 계정을 등록한다.
+ */
+export type UpdateShoppingAccountBody = Partial<Omit<CreateShoppingAccountBody, 'mallCode'>>;
 
 export interface MallAccountOption {
   id: string;
