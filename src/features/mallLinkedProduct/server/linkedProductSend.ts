@@ -40,6 +40,7 @@ const loadApiKeys = async (ownerId: string, accountIds: string[]): Promise<Map<s
  * 상품 × 설정을 외부몰로 보내고 연동 건을 새로 만든다. 같은 조합이 있어도 항상 새 건이다(연동 1건 = 외부몰 상품 1개).
  * 클라이언트는 id만 보내고 서버가 원본을 읽어 스냅샷을 만든다 — 어긋날 여지가 없게 하는 생성 계약이다.
  * 쓰기 순서는 외부 전송 → 연동 행 → 이력. neon-http에 트랜잭션이 없어 건별 결과가 정상 계약이다.
+ * 연동 행 INSERT만 실패하면 외부몰에만 상품이 남는다 — pending 선기록을 검토하고 채택하지 않았다(domain-design.md "규모 판단으로 하지 않기로 한 것").
  */
 export const sendNewLinkedProducts = async (
   actor: SendActor,
@@ -106,7 +107,7 @@ export const resendLinkedProducts = async (
   ids: string[],
 ): Promise<ResendMallLinkedProductsResult> => {
   const uniqueIds = [...new Set(ids)];
-  if (uniqueIds.length === 0) return { totalCount: 0, successCount: 0, failCount: 0 };
+  if (uniqueIds.length === 0) return { totalCount: 0, successCount: 0, failCount: 0, skippedCount: 0 };
 
   const rows = await db
     .select(LINKED_PRODUCT_COLUMNS)

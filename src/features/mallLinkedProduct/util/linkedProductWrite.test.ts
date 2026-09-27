@@ -145,14 +145,22 @@ describe('buildHistoryEntry', () => {
 });
 
 describe('tallySendResults', () => {
-  it('건너뛴 건(null)은 빼고, 예외는 실패로 센다', () => {
+  it('건너뛴 건(null)은 skippedCount로, 예외는 실패로 센다. totalCount는 요청 전체다', () => {
     const results: PromiseSettledResult<boolean | null>[] = [
       { status: 'fulfilled', value: true },
       { status: 'fulfilled', value: false },
       { status: 'fulfilled', value: null },
       { status: 'rejected', reason: new Error('x') },
     ];
-    expect(tallySendResults(results)).toEqual({ totalCount: 3, successCount: 1, failCount: 2 });
+    expect(tallySendResults(results)).toEqual({ totalCount: 4, successCount: 1, failCount: 2, skippedCount: 1 });
+  });
+
+  it('전부 건너뛰면 성공 0건·건너뜀 N건이다', () => {
+    const results: PromiseSettledResult<boolean | null>[] = [
+      { status: 'fulfilled', value: null },
+      { status: 'fulfilled', value: null },
+    ];
+    expect(tallySendResults(results)).toEqual({ totalCount: 2, successCount: 0, failCount: 0, skippedCount: 2 });
   });
 });
 
