@@ -122,6 +122,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
   - `PHONE_REGEX` — 직접 regex가 필요한 경우
 - **시각 컬럼과 날짜 범위 필터:** 신규 테이블의 시각 컬럼은 `timestamp({ withTimezone: true })`를 쓴다. 날짜 범위 필터는 `src/shared/utils/date.ts`의 `toKstDateRange()`로 **KST 반개구간**(`>= start`, `< end + 1일`)을 만들어 비교한다. `lte(endDate)`로 비교하면 끝날짜 당일에 등록된 건이 통째로 누락되고, UTC 기준으로 자르면 KST 자정~오전 9시 등록 건이 하루 밀린다. `users` 테이블이 `text` `'YYYY-MM-DD'`인 것은 하위호환으로 유지하는 것이며 **선례로 삼지 않는다.** 서버에서 시각을 `'YYYY-MM-DD'`로 잘라 내려줄 때는 `toKstYmd()`를 쓴다 — Vercel은 UTC라 `dayjs(date).format()`은 KST 자정~오전 9시 건을 전날로 표시한다.
 - **스키마 반영은 `npx drizzle-kit push`다(마이그레이션 파일 없음).** push는 식 유니크 인덱스(`products_owner_customer_code_unique`·`naver_products_seller_name_unique`)를 매번 DROP/CREATE해 그 사이 중복 차단이 사라지므로, 사용 중인 DB에는 돌리지 않는다. 마이그레이션 파일(`generate`+`migrate`) 전환은 주문 DB화 결정 때 함께 정한다(2026-09-25 보류).
+- **공통화·정리 작업의 판단 기준:** 파일 크기가 아니라 사용처 수와 "여러 벌 중 한 벌만 바뀌면 무엇이 조용히 틀리는가"로 정한다 — 답이 없으면 중복을 둔다. Claude가 발견한 정리 항목은 착수 전 "안 하면 어떤 입력에서 무엇이 틀리는가"를 먼저 제시하고, 동작 변화 없는 파일 경로 이동은 요청 없이 하지 않는다(2026-09-27 PR#79~#92 과잉 작업 검토).
 
 ## Claude Code 서브에이전트 (Agent)
 
