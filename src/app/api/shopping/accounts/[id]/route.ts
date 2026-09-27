@@ -52,8 +52,8 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     // 테이블 컬럼에 없는 키가 .set()까지 가면 drizzle의 mapUpdateSet이 undefined 컬럼을 참조해 500이 된다.
     // 허용 키만, "보낸 필드만 바꾼다"를 지키기 위해 존재하는 키만(in 연산자) 담는다 —
     // 값을 못 채운 키를 undefined로 채워 넣지 않는다. id·ownerId·createdAt은 목록에 없어 버려진다.
+    // mallCode도 목록에 없다 — 생성 후 몰은 바꿀 수 없다(UpdateShoppingAccountBody 주석). 보내도 무시된다.
     const values: Partial<UpdateShoppingAccountBody> = {};
-    if ('mallCode' in rest) values.mallCode = rest.mallCode;
     if ('mallId' in rest) values.mallId = rest.mallId;
     if ('isActive' in rest) values.isActive = rest.isActive;
     if ('nickname' in rest) values.nickname = rest.nickname;
