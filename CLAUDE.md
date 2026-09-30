@@ -41,6 +41,8 @@ npm run build    # Production build
 npm run lint     # Run ESLint
 npm run test     # Run Vitest once
 npm run test:watch  # Run Vitest in watch mode
+npm run db:generate # schema.ts 변경 → drizzle/ 마이그레이션 파일 생성
+npm run db:migrate  # 마이그레이션 적용 (운영 Neon DB — 아래 "스키마 반영" 참고)
 ```
 
 Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/`, `src/utils/`, `src/features/*/util/`·`constant/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, `src/components/excel/`의 utils·strategies·message)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
@@ -121,7 +123,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
   - `formatPhone(value)` — 자동 하이픈 포맷터 (010-XXXX-XXXX)
   - `PHONE_REGEX` — 직접 regex가 필요한 경우
 - **시각 컬럼과 날짜 범위 필터:** 신규 테이블의 시각 컬럼은 `timestamp({ withTimezone: true })`를 쓴다. 날짜 범위 필터는 `src/shared/utils/date.ts`의 `toKstDateRange()`로 **KST 반개구간**(`>= start`, `< end + 1일`)을 만들어 비교한다. `lte(endDate)`로 비교하면 끝날짜 당일에 등록된 건이 통째로 누락되고, UTC 기준으로 자르면 KST 자정~오전 9시 등록 건이 하루 밀린다. `users` 테이블이 `text` `'YYYY-MM-DD'`인 것은 하위호환으로 유지하는 것이며 **선례로 삼지 않는다.** 서버에서 시각을 `'YYYY-MM-DD'`로 잘라 내려줄 때는 `toKstYmd()`를 쓴다 — Vercel은 UTC라 `dayjs(date).format()`은 KST 자정~오전 9시 건을 전날로 표시한다.
-- **스키마 반영은 `npx drizzle-kit push`다(마이그레이션 파일 없음).** push는 식 유니크 인덱스(`products_owner_customer_code_unique`·`naver_products_seller_name_unique`)를 매번 DROP/CREATE해 그 사이 중복 차단이 사라지므로, 사용 중인 DB에는 돌리지 않는다. 마이그레이션 파일(`generate`+`migrate`) 전환은 주문 DB화 결정 때 함께 정한다(2026-09-25 보류).
+- **스키마 반영은 마이그레이션 파일이다(2026-09-30 전환, 기준점 `drizzle/0000_baseline`).** `schema.ts` 수정 → `npm run db:generate` → 생성된 SQL 검토 → `npm run db:migrate`(로컬에서 수동 실행 — 로컬과 Vercel이 같은 Neon DB라 이것이 곧 운영 반영이다. build에 넣으면 프리뷰 배포마다 돈다). **`drizzle-kit push`는 쓰지 않는다** — DB 쪽 식 표기와 비교해 식 유니크 인덱스(`products_owner_customer_code_unique`·`naver_products_seller_name_unique`)를 매번 DROP/CREATE하고, 그 사이 중복 차단이 사라진다.
 - **공통화·정리 작업의 판단 기준:** 파일 크기가 아니라 사용처 수와 "여러 벌 중 한 벌만 바뀌면 무엇이 조용히 틀리는가"로 정한다 — 답이 없으면 중복을 둔다. Claude가 발견한 정리 항목은 착수 전 "안 하면 어떤 입력에서 무엇이 틀리는가"를 먼저 제시하고, 동작 변화 없는 파일 경로 이동은 요청 없이 하지 않는다(2026-09-27 PR#79~#92 과잉 작업 검토).
 
 ## Claude Code 서브에이전트 (Agent)
