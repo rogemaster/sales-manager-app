@@ -113,10 +113,10 @@ R2_BUCKET_NAME=your-bucket-name
 NEXT_PUBLIC_R2_PUBLIC_URL=your-r2-dev-url
 ```
 
-새 Neon 데이터베이스에 스키마를 반영합니다(마이그레이션 파일 없이 `push`로 직접 반영).
+새 Neon 데이터베이스에 스키마를 반영합니다(`drizzle/`의 마이그레이션 파일을 순서대로 실행).
 
 ```bash
-npx drizzle-kit push
+npm run db:migrate
 ```
 
 `/register`에서 가입한 뒤 사용합니다. **새 환경에는 샘플 데이터가 없어 목록이 비어 있습니다** — 상품·쇼핑몰 계정·정보설정은 직접 등록해 채울 수 있고(상품은 엑셀 대량등록도 가능), 주문 MSW mock 데이터는 데모 계정 소유라 새 계정에는 보이지 않습니다. 데이터가 채워진 화면은 라이브 데모에서 확인할 수 있습니다.
@@ -131,6 +131,8 @@ npm run build        # 프로덕션 빌드
 npm run lint         # ESLint
 npm test             # 단위 테스트
 npm run test:watch   # 테스트 감시 모드
+npm run db:generate  # 스키마 변경 → 마이그레이션 파일 생성
+npm run db:migrate   # 마이그레이션 적용
 ```
 
 <br />
