@@ -1,4 +1,4 @@
-# API 추가 규칙 — route handler와 MSW
+# API 추가 규칙 — route handler
 
 ## 기본은 route handler + Neon이다
 
@@ -14,38 +14,17 @@
   - 예외: 상품 확인 route 3개(자체 판독 함수로 이미 400), 외부몰 시뮬레이터(네이버 오류 형식을 흉내 내야 한다).
 - 인증이 없는 route는 로그인(`auth/[...nextauth]`)·가입(`register`, `check-email`)과 외부몰 시뮬레이터(`external/naver/*`, 계정 API Key를 Bearer로 받음)뿐이다.
 
-## MSW는 주문 수집·주문 엑셀 bulk 전용이다
+## MSW는 없다 (2026-10-01 제거)
 
-MSW에는 아직 DB로 옮기지 않은 **주문 수집**(작업 목록·수집 실행)과 **주문 엑셀 대량등록**(`POST /api/orders/bulk`, 쓰는 화면 없음)만 남아 있다. 데이터는 브라우저 메모리의 mock(`src/mocks/data/`)이다. 주문 목록·상세·클레임·코멘트·이력과 홈 주문 통계는 2026-09-30 route로 옮겼다.
+모든 API는 route다. 주문 수집 DB화(주문 DB화 라운드 3)와 함께 `src/mocks/`·`MSWProvider`·`msw` 패키지를 걷어냈다.
 
-- **브라우저 worker만 쓴다.** `MSWProvider`가 `(authenticated)` 레이아웃의 본문만 감싼다. 로그인·가입 화면에는 MSW가 없다.
-- **서버 MSW(`setupServer`)를 다시 켜지 않는다.** Node의 MSW는 서버의 모든 `fetch`를 가로챈다. `neon-http`는 쿼리를 `fetch`로 보내므로 `[MSW] Warning`이 쿼리마다 SQL과 파라미터를 로그에 남긴다(2026-09-24 제거, `auth-db-msw-boundary.md`의 "MSW를 켜는 범위" 절).
-- 새 MSW 핸들러는 주문 수집의 mock을 넓힐 때만 추가한다. 그 밖은 route로 만든다.
-- **MSW에 남은 핸들러가 DB로 옮긴 데이터를 필요로 하면, 실제 route를 불러오는 어댑터를 만들지 말고 그 핸들러 자체를 route로 옮긴다.** 어댑터는 목록 API를 "사실상 전체"로 불러 브라우저에서 세게 되어, 상한을 넘으면 결과가 조용히 틀린다(홈 통계가 1,000건 초과 시 그랬다).
-
-### MSW 파일 구조
-
-`src/mocks/handlers.ts`는 도메인 핸들러를 spread만 하는 인덱스다.
-
-```
-src/mocks/
-├── handlers.ts        # 인덱스
-├── browser.ts         # setupWorker
-├── config.ts          # baseUrl 공유 상수
-├── handlers/
-│   ├── orders.ts      # orders/bulk (엑셀 경로만)
-│   └── collection.ts  # order/collection jobs + trigger
-├── data/              # mock 원본 데이터 (운영 화면이 import하면 안 된다 — 카테고리 상수는 shared/constant/category.constant.ts)
-└── utils/             # 핸들러가 호출하는 로직
-```
-
-- 조건문·반복문·데이터 조작이 생기면 `utils/`로 분리한다. 핸들러는 위임만 하고 mock 배열을 직접 수정하지 않는다.
-- `baseUrl`은 `config.ts`에서 import한다.
-- 고정 경로(`/status`)와 동적 경로(`/:id`)가 같은 prefix를 공유하면 **고정 경로 핸들러를 먼저 등록한다.**
+- **서버 MSW(`setupServer`)를 다시 켜지 않는다.** Node의 MSW는 서버의 모든 `fetch`를 가로챈다. `neon-http`는 쿼리를 `fetch`로 보내므로 `[MSW] Warning`이 쿼리마다 SQL과 파라미터를 로그에 남긴다(2026-09-24, `auth-db-msw-boundary.md`의 "MSW를 켜는 범위" 절).
+- 외부몰이 필요한 흐름은 mock이 아니라 **시뮬레이터 route**(`src/simulators/`, `/api/external/<몰>/...`)로 만든다. 앱은 시뮬레이터를 import하지 않고 HTTP로만 부른다.
+- 주문 엑셀 대량등록(`bulkCreateOrders` → `POST /api/orders/bulk`)은 목적지 route가 없다 — 화면을 만들 때 route로 구현한다(`excel.md`).
 
 ## HTTP 메서드 선택 기준
 
-REST 의미론보다 기존 패턴을 먼저 따른다. route와 MSW 모두 같다.
+REST 의미론보다 기존 패턴을 먼저 따른다.
 
 | 메서드 | 용도 |
 |--------|------|

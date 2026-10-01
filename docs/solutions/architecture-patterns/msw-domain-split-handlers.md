@@ -28,6 +28,8 @@ tags:
 
 # MSW handlers를 도메인별 파일로 분리하는 패턴
 
+> **2026-10-01 — 역사 기록.** 주문 수집 DB화와 함께 MSW(`src/mocks/`·`MSWProvider`·`msw` 패키지)를 전부 제거했다. 이 문서가 설명하는 파일 구조는 더 이상 저장소에 없다. 지금 모든 API는 route handler이고, 외부몰이 필요한 흐름은 시뮬레이터 route(`src/simulators/`)로 만든다(`.claude/rules/msw-rules.md`). "고정 경로를 동적 경로보다 먼저" 같은 일반 교훈만 참고한다.
+
 ## Context
 
 MSW mock 레이어가 9개 도메인으로 확장되면서 단일 `src/mocks/handlers.ts` 파일이 320줄이 되었고, 인증·주문·상품·쇼핑 계정 등 서로 관련 없는 핸들러들이 한 파일에 섞였다. 새 API 핸들러를 추가할 때마다 도메인에 관계없이 이 파일 하나를 수정해야 했고, 특정 라우트의 핸들러를 찾으려면 전체를 스캔해야 했다.

@@ -1,32 +1,12 @@
 'use client';
 
-import { useAtomValue, useSetAtom } from 'jotai';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { CollectionDateFilter } from './components/CollectionDateFilter';
 import { CollectionMallFilter } from './components/CollectionMallFilter';
-import {
-  collectStartDateAtom,
-  collectEndDateAtom,
-  collectMallAtom,
-  collectMallIdAtom,
-  collectSearchParamsAtom,
-  selectedJobIdsAtom,
-} from '@/features/order/store/collect.store';
+import { CollectionSearchInput } from './components/CollectionSearchInput';
 
+/** 검색 버튼은 검색어 행(CollectionSearchInput)에 있다 — 검색 필터 섹션 공통 배치(ui-conventions). */
 export const CollectionFilterSection = () => {
-  const startDate = useAtomValue(collectStartDateAtom);
-  const endDate = useAtomValue(collectEndDateAtom);
-  const mallCode = useAtomValue(collectMallAtom);
-  const mallId = useAtomValue(collectMallIdAtom);
-  const setSearchParams = useSetAtom(collectSearchParamsAtom);
-  const setSelectedJobIds = useSetAtom(selectedJobIdsAtom);
-
-  const handleSearch = () => {
-    setSelectedJobIds([]);
-    setSearchParams({ startDate, endDate, mallCode, mallId });
-  };
-
   return (
     <Card className="overflow-hidden">
       <CardHeader className="border-b border-border/50 px-6 py-4">
@@ -37,10 +17,14 @@ export const CollectionFilterSection = () => {
       </CardHeader>
       <CardContent className="p-0">
         <div className="space-y-1">
-          <div className="px-6 py-1"><CollectionDateFilter /></div>
-          <div className="flex items-center justify-between px-6 py-1">
+          <div className="px-6 py-1">
+            <CollectionDateFilter />
+          </div>
+          <div className="px-6 py-1">
             <CollectionMallFilter />
-            <Button onClick={handleSearch}>검색</Button>
+          </div>
+          <div className="px-6 py-1">
+            <CollectionSearchInput />
           </div>
         </div>
       </CardContent>
