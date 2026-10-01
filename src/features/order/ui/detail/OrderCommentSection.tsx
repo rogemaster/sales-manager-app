@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { OrderComment } from '../../types/order.types';
 import { createOrderComment } from '../../api/createOrderComment';
+import { useAlert } from '@/hooks/useAlert';
 
 type Props = {
   orderId: string;
@@ -17,13 +18,16 @@ type Props = {
 export const OrderCommentSection = ({ orderId, comments, ownerId }: Props) => {
   const [content, setContent] = useState('');
   const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () => createOrderComment(orderId, content, ownerId),
+    mutationFn: () => createOrderComment(orderId, content),
     onSuccess: () => {
       setContent('');
       queryClient.invalidateQueries({ queryKey: ['order-comments', orderId, ownerId] });
     },
+    // 공백만 입력하면 서버가 400 사유를 돌려준다.
+    onError: (error) => showAlert({ type: 'error', message: error.message }),
   });
 
   return (

@@ -103,7 +103,10 @@ route가 같은 상수를 import하게 만든다 — 각자 정의하면 한쪽�
 
 > **2026-09-25 현황:** 9곳 중 MSW 8곳은 도메인을 DB로 옮기면서 사라졌다(쇼핑몰계정·정보설정의 삭제·상태변경은 C 모양 `{ successCount, failures }`으로 새로 만들어졌다). 전부-아니면-전무(403) 방식으로 남은 곳은 사용자 삭제 `DELETE /api/account/users` **1곳**이다.
 
+> **2026-10-01 보정:** neon-http에 없는 것은 **대화형** 트랜잭션(`db.transaction()`)이다. `db.batch`는 비대화형 트랜잭션이라 미리 정해진 문장 묶음은 원자적으로 실행된다(실측). 이 문서의 결론은 그대로다 — "세기 → 판정 → 지우기"는 앞 결과를 보고 다음 문장을 정해야 해서 batch로 묶을 수 없다. 쓰기 묶음의 원자성은 `neon-http-batch-and-cte-atomic-writes.md`.
+
 ## 관련
 
+- `neon-http-batch-and-cte-atomic-writes.md` — batch·CTE로 여러 쓰기를 원자적으로 묶는 법
 - `.claude/rules/excel.md` — `ExcelSaveResult` 부분 성공 모양(선례)
 - `docs/superpowers/specs/2026-09-20-shopping-account-db-migration-design.md` — 세 안의 기각 기록

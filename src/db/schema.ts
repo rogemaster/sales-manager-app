@@ -23,6 +23,9 @@ import type {
   MallLinkSendSource,
   MallLinkStatus,
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
+import type { ShoppingMalls } from '@/types/common.type';
+import type { DeliveryTypeId } from '@/shared/constant/delivery.constant';
+import type { OrderClaimType, OrderStatusTypes } from '@/features/order/types/order.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
 
@@ -225,5 +228,119 @@ export const mallLinkedProductHistories = pgTable(
       foreignColumns: [mallLinkedProducts.id],
     }).onDelete('cascade'),
     index('mall_linked_product_histories_linked_sent_idx').on(table.linkedProductId, table.sentAt.desc()),
+  ],
+);
+
+const tz = { withTimezone: true } as const;
+
+/**
+ * 주문. 입구는 API 수집과 엑셀 등록 둘이다(domain-design.md) — 엑셀 주문에는 수집 작업·쇼핑몰계정이 없을 수 있어
+ * 둘 다 FK를 걸지 않는다.
+ * ① 몰 원본(shop_order_number ~ collected_at)은 수정 route의 SET에 없다(orderWrite.ts buildOrderUpdate).
+ */
+export const orders = pgTable(
+  'orders',
+  {
+    orderNumber: text('order_number').primaryKey(),
+    ownerId: text('owner_id').notNull(),
+
+    shopOrderNumber: text('shop_order_number').notNull(),
+    mallCode: text('mall_code').$type<ShoppingMalls>().notNull(),
+    mallId: text('mall_id').notNull(),
+    shopProductId: text('shop_product_id').notNull(),
+    orderProductName: text('order_product_name').notNull(),
+    orderPrice: integer('order_price').notNull(),
+    orderTotalQuantity: integer('order_total_quantity').notNull(),
+    orderOption: text('order_option'),
+    orderSubOption: text('order_sub_option'),
+    orderSubTotalQuantity: text('order_sub_total_quantity'),
+    orderDeliveryType: text('order_delivery_type').$type<DeliveryTypeId>().notNull(),
+    orderDeliveryPrice: integer('order_delivery_price').notNull(),
+    paymentDate: timestamp('payment_date', tz).notNull(),
+    collectedAt: timestamp('collected_at', tz).notNull(),
+
+    orderName: text('order_name').notNull(),
+    orderPhoneNumber: text('order_phone_number').notNull(),
+    orderZipCode: text('order_zip_code').notNull(),
+    orderAddress: text('order_address').notNull(),
+    orderDetailAddress: text('order_detail_address'),
+    payeeName: text('payee_name').notNull(),
+    payeePhoneNumber: text('payee_phone_number').notNull(),
+    payeeZipCode: text('payee_zip_code').notNull(),
+    payeeAddress: text('payee_address').notNull(),
+    payeeDetailAddress: text('payee_detail_address'),
+    deliveryMessage: text('delivery_message'),
+
+    orderStatus: text('order_status').$type<OrderStatusTypes>().notNull(),
+    deliveryCompany: text('delivery_company'),
+    invoiceNumber: text('invoice_number'),
+    invoiceRegisteredAt: timestamp('invoice_registered_at', tz),
+    invoiceSentAt: timestamp('invoice_sent_at', tz),
+  },
+  (table) => [index('orders_owner_collected_idx').on(table.ownerId, table.collectedAt.desc())],
+);
+
+/** 주문당 최대 1건(2026-09-30 결정). 여러 건이 필요해지면 유니크를 푼다. 주문에 종속된 기록이라 FK + CASCADE. */
+export const orderClaims = pgTable(
+  'order_claims',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    orderNumber: text('order_number').notNull(),
+    ownerId: text('owner_id').notNull(),
+    claimType: text('claim_type').$type<OrderClaimType>().notNull(),
+    claimMessage: text('claim_message').notNull(),
+    handlerNote: text('handler_note').notNull().default(''),
+    createdAt: timestamp('created_at', tz).notNull(),
+  },
+  (table) => [
+    uniqueIndex('order_claims_order_number_unique').on(table.orderNumber),
+    foreignKey({
+      name: 'order_claims_order_fk',
+      columns: [table.orderNumber],
+      foreignColumns: [orders.orderNumber],
+    }).onDelete('cascade'),
+  ],
+);
+
+export const orderComments = pgTable(
+  'order_comments',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    orderNumber: text('order_number').notNull(),
+    ownerId: text('owner_id').notNull(),
+    content: text('content').notNull(),
+    authorName: text('author_name').notNull(),
+    authorEmail: text('author_email').notNull(),
+    createdAt: timestamp('created_at', tz).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: 'order_comments_order_fk',
+      columns: [table.orderNumber],
+      foreignColumns: [orders.orderNumber],
+    }).onDelete('cascade'),
+    index('order_comments_order_created_idx').on(table.orderNumber, table.createdAt),
+  ],
+);
+
+/** 주문 수정 1회당 1행. changed_fields는 필드 키 배열(클레임 메모는 'claim.handlerNote'). */
+export const orderEditHistories = pgTable(
+  'order_edit_histories',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    orderNumber: text('order_number').notNull(),
+    ownerId: text('owner_id').notNull(),
+    changedFields: jsonb('changed_fields').$type<string[]>().notNull(),
+    modifiedByName: text('modified_by_name').notNull(),
+    modifiedByEmail: text('modified_by_email').notNull(),
+    modifiedAt: timestamp('modified_at', tz).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: 'order_edit_histories_order_fk',
+      columns: [table.orderNumber],
+      foreignColumns: [orders.orderNumber],
+    }).onDelete('cascade'),
+    index('order_edit_histories_order_modified_idx').on(table.orderNumber, table.modifiedAt),
   ],
 );

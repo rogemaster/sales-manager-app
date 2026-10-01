@@ -1,17 +1,12 @@
 import { OrderComment } from '../types/order.types';
-import { throwIfUnauthorized } from '@/shared/utils/unauthorized';
+import { throwIfNotOk } from '@/shared/utils/apiResponse';
 
-export const createOrderComment = async (
-  orderId: string,
-  content: string,
-  ownerId: string,
-): Promise<OrderComment> => {
+export const createOrderComment = async (orderId: string, content: string): Promise<OrderComment> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}/comments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Owner-Id': ownerId },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content }),
   });
-  throwIfUnauthorized(response);
-  if (!response.ok) throw new Error('코멘트 저장 실패');
+  await throwIfNotOk(response, '코멘트 저장 실패');
   return response.json();
 };

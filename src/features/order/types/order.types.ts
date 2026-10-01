@@ -1,5 +1,6 @@
 import { ShoppingMalls } from '@/types/common.type';
 import { DeliveryTypeId } from '@/shared/constant/delivery.constant';
+import { BulkFailure } from '@/shared/utils/bulkResultAlert';
 
 export interface OrderSearchType {
   dateType: string;
@@ -32,6 +33,10 @@ export type OrderStatusTypes =
   | 'REQUEST_RETURN'
   | 'PROGRESS_RETURN'
   | 'COMPLETE_RETURN';
+
+export type OrderDateType = 'orderCollectionDate' | 'paymentDate' | 'invoiceRegisteredAt' | 'invoiceSentAt';
+
+export type OrderSearchKey = 'orderName' | 'payeeName' | 'orderProductName' | 'orderNumber' | 'shopOrderNumber';
 
 /*
 주문번호 - orderNumber
@@ -86,22 +91,26 @@ export interface Order {
   payeePhoneNumber: string;
   orderZipCode: string;
   orderAddress: string;
+  orderDetailAddress?: string;
   payeeZipCode: string;
   payeeAddress: string;
+  payeeDetailAddress?: string;
   deliveryMessage?: string;
   deliveryCompany?: string;   // 택배사
   invoiceNumber?: string;     // 송장번호
+  invoiceRegisteredAt?: string; // 송장등록일 — 상태가 송장등록으로 바뀐 순간(서버 기록)
+  invoiceSentAt?: string;       // 송장전송완료일 — 송장을 몰로 보내 완료된 순간(라운드 4)
   ownerId: string;
 }
 
 export interface OrderDetail extends Order {
-  orderDetailAddress?: string;
-  payeeDetailAddress?: string;
   claim?: OrderClaim;
 }
 
+export type OrderClaimType = 'CANCEL' | 'EXCHANGE' | 'RETURN';
+
 export interface OrderClaim {
-  claimType: 'CANCEL' | 'EXCHANGE' | 'RETURN';
+  claimType: OrderClaimType;
   claimMessage: string;
   handlerNote?: string;
 }
@@ -118,4 +127,10 @@ export interface OrderEditHistory {
   modifiedAt: string;
   modifiedBy: string;
   changedFields: string[];
+}
+
+/** POST /api/orders/status 응답. 부분 성공이 정상 결과다(bulkRequest.ts 선례). */
+export interface BulkOrderStatusResult {
+  successCount: number;
+  failures: BulkFailure[];
 }

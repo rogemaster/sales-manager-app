@@ -49,7 +49,7 @@ Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test
 
 ## Architecture Overview
 
-**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API는 `src/app/api/` route handler + Neon(Drizzle)이 처리하고, 아직 DB로 옮기지 않은 주문 영역(주문·수집·홈 주문 통계)만 MSW 브라우저 worker가 mock한다 (`MSWProvider`는 `(authenticated)` 레이아웃 안에만 있다).
+**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API는 `src/app/api/` route handler + Neon(Drizzle)이 처리하고, 아직 DB로 옮기지 않은 주문 수집과 주문 엑셀 대량등록 경로만 MSW 브라우저 worker가 mock한다 (`MSWProvider`는 `(authenticated)` 레이아웃 안에만 있다).
 
 ### Route Groups
 

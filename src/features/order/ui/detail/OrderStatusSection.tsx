@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { OrderDetail } from '../../types/order.types';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
-import { ORDER_STATUS } from '../../constant/status.constants';
+import { LOCKED_ORDER_STATUSES, USER_SELECTABLE_ORDER_STATUS } from '../../util/orderStatusRule';
 import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 
 type Props = {
@@ -18,9 +18,13 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
   const { control, register } = useFormContext<OrderDetail>();
   const watchedStatus = useWatch({ control, name: 'orderStatus' });
 
+  // 잠긴 상태(송장등록 이후·완료)는 상태를 바꿀 수 없다 — 서버도 같은 규칙으로 거절한다(orderStatusRule.ts).
+  const isStatusLocked = LOCKED_ORDER_STATUSES.includes(order.orderStatus);
   const showDeliveryFields = isEditMode
-    ? watchedStatus === 'INVOICE_REGISTER'
-    : order.orderStatus === 'INVOICE_REGISTER';
+    ? watchedStatus === 'INVOICE_REGISTER' || order.orderStatus === 'INVOICE_COMPLETE'
+    : order.orderStatus === 'INVOICE_REGISTER' || order.orderStatus === 'INVOICE_COMPLETE';
+  // 송장전송완료 뒤에는 몰에 이미 보낸 송장이라 고치지 않는다.
+  const canEditInvoice = isEditMode && watchedStatus === 'INVOICE_REGISTER';
 
   return (
     <Card className="overflow-hidden">
@@ -31,7 +35,7 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 pt-6">
-        {isEditMode ? (
+        {isEditMode && !isStatusLocked ? (
           <Controller
             control={control}
             name="orderStatus"
@@ -41,7 +45,7 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ORDER_STATUS.map((status) => (
+                  {USER_SELECTABLE_ORDER_STATUS.map((status) => (
                     <SelectItem key={status.id} value={status.id}>
                       {status.name}
                     </SelectItem>
@@ -58,7 +62,7 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
           <div className="grid grid-cols-2 gap-4 pt-2 border-t">
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">택배사</p>
-              {isEditMode ? (
+              {canEditInvoice ? (
                 <Controller
                   control={control}
                   name="deliveryCompany"
@@ -85,11 +89,19 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">송장번호</p>
-              {isEditMode ? (
+              {canEditInvoice ? (
                 <Input {...register('invoiceNumber')} placeholder="송장번호를 입력하세요" />
               ) : (
                 <p className="text-sm font-medium">{order.invoiceNumber || '-'}</p>
               )}
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">송장등록일</p>
+              <p className="text-sm font-medium">{order.invoiceRegisteredAt ?? '-'}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">송장전송완료일</p>
+              <p className="text-sm font-medium">{order.invoiceSentAt ?? '-'}</p>
             </div>
           </div>
         )}

@@ -13,7 +13,7 @@ export const useGetOrders = () => {
 
   return useQuery({
     queryKey: [ORDER_LIST_QUERY_KEY, workspaceOwnerId, filters, currentPage],
-    queryFn: () => getOrders(workspaceOwnerId, filters, currentPage),
+    queryFn: () => getOrders(filters, currentPage),
     enabled: !!workspaceOwnerId,
   });
 };

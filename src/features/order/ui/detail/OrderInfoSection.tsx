@@ -1,22 +1,17 @@
 'use client';
 
-import { Controller, useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OrderDetail } from '../../types/order.types';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 import { Field } from './Field';
 
+// ① 몰 원본은 수정하지 않는다(2026-09-30 결정). 서버도 이 필드를 SET에 넣지 않는다(orderWrite.ts).
 type Props = {
   order: OrderDetail;
-  isEditMode: boolean;
 };
 
-export const OrderInfoSection = ({ order, isEditMode }: Props) => {
-  const { register, control } = useFormContext<OrderDetail>();
-
+export const OrderInfoSection = ({ order }: Props) => {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="border-b border-border/50 px-6 py-4">
@@ -43,58 +38,21 @@ export const OrderInfoSection = ({ order, isEditMode }: Props) => {
             <p className="text-sm font-medium">{getShoppingMallName(order.mallCode)}</p>
           </Field>
           <Field label="주문상품명">
-            {isEditMode ? (
-              <Input {...register('orderProductName')} />
-            ) : (
-              <p className="text-sm font-medium">{order.orderProductName}</p>
-            )}
+            <p className="text-sm font-medium">{order.orderProductName}</p>
           </Field>
           <Field label="주문금액">
-            {isEditMode ? (
-              <Input type="number" {...register('orderPrice', { valueAsNumber: true })} />
-            ) : (
-              <p className="text-sm font-medium">{order.orderPrice.toLocaleString()}원</p>
-            )}
+            <p className="text-sm font-medium">{order.orderPrice.toLocaleString()}원</p>
           </Field>
           <Field label="주문수량">
-            {isEditMode ? (
-              <Input type="number" {...register('orderTotalQuantity', { valueAsNumber: true })} />
-            ) : (
-              <p className="text-sm font-medium">{order.orderTotalQuantity}</p>
-            )}
+            <p className="text-sm font-medium">{order.orderTotalQuantity}</p>
           </Field>
           <Field label="배송타입">
-            {isEditMode ? (
-              <Controller
-                control={control}
-                name="orderDeliveryType"
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="배송타입 선택" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DELIVERY_TYPE_OPTION.map((type) => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            ) : (
-              <p className="text-sm font-medium">
-                {DELIVERY_TYPE_OPTION.find((t) => t.id === order.orderDeliveryType)?.name ?? order.orderDeliveryType}
-              </p>
-            )}
+            <p className="text-sm font-medium">
+              {DELIVERY_TYPE_OPTION.find((t) => t.id === order.orderDeliveryType)?.name ?? order.orderDeliveryType}
+            </p>
           </Field>
           <Field label="배송비">
-            {isEditMode ? (
-              <Input type="number" {...register('orderDeliveryPrice', { valueAsNumber: true })} />
-            ) : (
-              <p className="text-sm font-medium">{order.orderDeliveryPrice.toLocaleString()}원</p>
-            )}
+            <p className="text-sm font-medium">{order.orderDeliveryPrice.toLocaleString()}원</p>
           </Field>
         </div>
       </CardContent>

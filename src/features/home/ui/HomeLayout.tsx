@@ -13,7 +13,6 @@ import { getRecentProducts } from '@/features/home/api/getRecentProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { calculatorRangeDate } from '@/shared/utils/date';
 import { ClaimStatCards } from './components/ClaimStatCards';
-import { InquiryStatCards } from './components/InquiryStatCards';
 import { LinkedProductStatCards } from './components/LinkedProductStatCards';
 import { OrderStatCards } from './components/OrderStatCards';
 import { QuickActions } from './components/QuickActions';
@@ -51,7 +50,7 @@ export const HomeLayout = () => {
 
   const { data: orderStats } = useQuery({
     queryKey: ['home', 'order-stats', workspaceOwnerId, startDate, endDate],
-    queryFn: () => getHomeOrderStats(workspaceOwnerId, startDate, endDate),
+    queryFn: () => getHomeOrderStats(startDate, endDate),
     enabled: !!workspaceOwnerId,
     placeholderData: keepPreviousData,
   });
@@ -87,7 +86,6 @@ export const HomeLayout = () => {
           {linkedProductStats && <LinkedProductStatCards stats={linkedProductStats} />}
           {orderStats && <OrderStatCards stats={orderStats} />}
           {orderStats && <ClaimStatCards stats={orderStats} />}
-          <InquiryStatCards />
         </div>
       </div>
       <QuickActions />
