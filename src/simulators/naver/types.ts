@@ -93,3 +93,112 @@ export type SimulatorFailureReason = 'UNAUTHORIZED' | 'NOT_FOUND' | 'INVALID' | 
 export type SimulatorResult<T> =
   | { ok: true; data: T }
   | { ok: false; reason: SimulatorFailureReason; invalidInputs: InvalidInput[] };
+
+export type NaverProductOrderStatus = 'PAYED' | 'DELIVERING';
+export type NaverPlaceOrderStatus = 'NOT_YET' | 'OK';
+
+export interface NaverOrderParty {
+  name: string;
+  tel: string;
+}
+
+export interface NaverShippingAddress {
+  name: string;
+  tel: string;
+  zipCode: string;
+  baseAddress: string;
+  detailAddress: string;
+}
+
+/** 주문 당시 값. 상품이 나중에 바뀌어도 주문은 그대로다. */
+export interface NaverProductOrderPayload {
+  productName: string;
+  optionValues: Record<string, string> | null;
+  quantity: number;
+  unitPrice: number;
+  totalPaymentAmount: number;
+  deliveryFeeType: NaverDeliveryFeeType;
+  deliveryFeeAmount: number;
+  orderer: NaverOrderParty;
+  shippingAddress: NaverShippingAddress;
+  shippingMemo: string | null;
+}
+
+/** 생성 함수의 결과. 번호·상태는 서비스가 붙인다. */
+export interface NaverProductOrderDraft {
+  productNo: number;
+  paymentDate: Date;
+  payload: NaverProductOrderPayload;
+}
+
+export interface NaverStoredProductOrder {
+  productOrderId: string;
+  orderId: string;
+  sellerId: string;
+  productNo: number;
+  productOrderStatus: NaverProductOrderStatus;
+  placeOrderStatus: NaverPlaceOrderStatus;
+  paymentDate: Date;
+  /** 시뮬레이터가 이 행을 만든 시각. 결제일은 무작위 과거이고 lastChangedAt은 상태 변경 때 덮어써져, 생성 시점은 여기만 남는다. */
+  createdAt: Date;
+  lastChangedAt: Date;
+  deliveryCompany: string | null;
+  trackingNumber: string | null;
+  dispatchedAt: Date | null;
+  payload: NaverProductOrderPayload;
+}
+
+export interface NaverDispatchItem {
+  productOrderId: string;
+  deliveryCompanyCode: string;
+  trackingNumber: string;
+}
+
+export type NaverOrderFailCode = 'NOT_FOUND' | 'INVALID_STATUS' | 'NOT_CONFIRMED' | 'INVALID_INPUT';
+
+export interface NaverOrderFailInfo {
+  productOrderId: string;
+  code: NaverOrderFailCode;
+  message: string;
+}
+
+/** 발주확인·발송처리 응답. 건별 부분 성공이 정상 결과다. */
+export interface NaverOrderBatchResult {
+  successProductOrderIds: string[];
+  failProductOrderInfos: NaverOrderFailInfo[];
+}
+
+export interface NaverProductOrderResponse {
+  productOrderId: string;
+  orderId: string;
+  productOrderStatus: NaverProductOrderStatus;
+  placeOrderStatus: NaverPlaceOrderStatus;
+  paymentDate: string;
+  lastChangedDate: string;
+  productNo: number;
+  productName: string;
+  optionValues: Record<string, string> | null;
+  quantity: number;
+  unitPrice: number;
+  totalPaymentAmount: number;
+  deliveryFeeType: NaverDeliveryFeeType;
+  deliveryFeeAmount: number;
+  orderer: NaverOrderParty;
+  shippingAddress: NaverShippingAddress;
+  shippingMemo: string | null;
+  delivery: { deliveryCompany: string; trackingNumber: string; dispatchedDate: string } | null;
+  /** 클레임은 이번 범위 밖(설계 결정 3). 자리만 둔다. */
+  claim: null;
+}
+
+/** 다음 페이지의 시작점 — 이 주문(변경 시각, 번호) "뒤부터" 읽는다. 응답에는 인코딩된 문자열로 나간다. */
+export interface NaverProductOrderCursor {
+  lastChangedAt: Date;
+  productOrderId: string;
+}
+
+export interface NaverProductOrderListResponse {
+  productOrders: NaverProductOrderResponse[];
+  /** 다음 페이지가 없으면 null. 그대로 cursor 쿼리에 넣는다. */
+  nextCursor: string | null;
+}

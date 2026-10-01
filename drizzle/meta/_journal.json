@@ -15,6 +15,20 @@
       "when": 1790778394056,
       "tag": "0001_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790839836279,
+      "tag": "0002_confused_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790843323961,
+      "tag": "0003_pretty_meteorite",
+      "breakpoints": true
     }
   ]
 }
