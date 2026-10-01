@@ -26,6 +26,7 @@ import type {
 import type { ShoppingMalls } from '@/types/common.type';
 import type { DeliveryTypeId } from '@/shared/constant/delivery.constant';
 import type { OrderClaimType, OrderStatusTypes } from '@/features/order/types/order.types';
+import type { CollectionResultStatus } from '@/features/order/types/collection.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
 
@@ -277,7 +278,13 @@ export const orders = pgTable(
     invoiceRegisteredAt: timestamp('invoice_registered_at', tz),
     invoiceSentAt: timestamp('invoice_sent_at', tz),
   },
-  (table) => [index('orders_owner_collected_idx').on(table.ownerId, table.collectedAt.desc())],
+  (table) => [
+    index('orders_owner_collected_idx').on(table.ownerId, table.collectedAt.desc()),
+    // 수집 중복 판정 키(스펙 §1). 빈 번호(API 없는 몰의 엑셀 주문)는 비교하지 않는다 — ON CONFLICT도 같은 WHERE를 붙인다.
+    uniqueIndex('orders_owner_mall_shop_order_unique')
+      .on(table.ownerId, table.mallCode, table.shopOrderNumber)
+      .where(sql`${table.shopOrderNumber} <> ''`),
+  ],
 );
 
 /** 주문당 최대 1건(2026-09-30 결정). 여러 건이 필요해지면 유니크를 푼다. 주문에 종속된 기록이라 FK + CASCADE. */
@@ -344,3 +351,26 @@ export const orderEditHistories = pgTable(
     index('order_edit_histories_order_modified_idx').on(table.orderNumber, table.modifiedAt),
   ],
 );
+
+/**
+ * 계정당 마지막 수집 결과 1행. 행이 없으면 수집한 적 없음(화면 WAITING).
+ * 계정이 지워지면 수집 기록도 의미가 없어 CASCADE.
+ */
+export const orderCollections = pgTable('order_collections', {
+  shoppingAccountId: text('shopping_account_id')
+    .primaryKey()
+    .references(() => shoppingAccounts.id, { onDelete: 'cascade' }),
+  ownerId: text('owner_id').notNull(),
+  status: text('status').$type<CollectionResultStatus>().notNull(),
+  periodStart: text('period_start').notNull(),
+  periodEnd: text('period_end').notNull(),
+  newCount: integer('new_count').notNull(),
+  duplicateCount: integer('duplicate_count').notNull(),
+  errorMessage: text('error_message'),
+  collectedAt: timestamp('collected_at', tz).notNull(),
+  // 값 복사(FK 아님) — 사용자가 삭제·개명돼도 그때의 실행자가 남는다(수정 이력과 같은 이유).
+  collectedByName: text('collected_by_name').notNull(),
+  collectedByEmail: text('collected_by_email').notNull(),
+  // 네이버 외 몰 무작위 생성 기준 시각. 네이버는 시뮬레이터가 자체 관리한다.
+  generatedAt: timestamp('generated_at', tz),
+});

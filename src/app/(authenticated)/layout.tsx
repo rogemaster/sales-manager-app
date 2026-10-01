@@ -8,7 +8,6 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createAppQueryClient } from '@/shared/utils/appQueryClient';
 import { setUserInfoAtom } from '@/features/auth/store/auth.store';
-import { MSWProvider } from '@/components/providers/MSWProvider';
 
 interface Props {
   children: React.ReactNode;
@@ -39,8 +38,7 @@ export default function Layout({ children }: Props) {
           <main className="flex-1 p-6 pl-[15rem]">
             <QueryClientProvider client={queryClient}>
               <div className="max-w-[80%] mx-auto space-y-6">
-                {/* 주문 영역(주문·수집·홈 주문 통계)만 MSW를 쓴다. 로그인·가입은 route라 여기 밖에 둔다 */}
-                <MSWProvider>{children}</MSWProvider>
+                {children}
               </div>
             </QueryClientProvider>
           </main>

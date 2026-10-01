@@ -24,10 +24,6 @@ const eslintConfig = [
               message: '시뮬레이터는 우리 도메인 타입을 알면 안 된다 — 네이버 이름으로 자체 정의할 것.',
             },
             {
-              group: ['@/mocks/*', '@/mocks/**', '**/mocks/**'],
-              message: '시뮬레이터는 MSW mock을 알면 안 된다.',
-            },
-            {
               group: ['@/db/schema', '**/db/schema'],
               message: '시뮬레이터는 우리 테이블을 읽지 않는다 — 네이버 테이블은 src/simulators/naver/schema.ts에 있다.',
             },

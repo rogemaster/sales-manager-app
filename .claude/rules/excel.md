@@ -34,7 +34,7 @@
 
 `ExcelProvider`(jotai `<Provider>`)로 Excel 화면 트리를 감싼다. 현재 적용: `products/bulk/page.tsx`.
 
-**이 패턴은 자기 완결적 기능 상태에만 쓴다.** `<Provider>`는 하위 트리에 새 store를 만들어 그 트리가 읽는 **모든 atom**을 초기값으로 되돌린다. auth 정보는 `(authenticated)/layout.tsx`가 전역 store에 주입하므로, 감싼 트리에서는 `workspaceOwnerIdAtom`이 `''`이 되어 `enabled: !!workspaceOwnerId` 쿼리가 에러도 요청도 없이 영구 비활성화된다. `products/bulk`가 괜찮은 것은 운이 섞여 있다 — 그 트리의 `ExcelDataPreview`도 `workspaceOwnerIdAtom`을 읽어 `''`을 받지만, 쿼리 게이팅에 쓰지 않고 상품 bulk route가 `ownerId`를 세션에서 꺼내 무시하기 때문이다. **주문(`ORDER`) 저장은 이 값을 MSW로 보내므로, 주문 엑셀 화면을 `ExcelProvider` 안에 만들면 빈 `ownerId`로 저장된다.** 화면 간 상태 격리 용도로는 쓸 수 없다 — [`scoped-jotai-provider-breaks-auth-atoms.md`](../../docs/solutions/architecture-patterns/scoped-jotai-provider-breaks-auth-atoms.md)
+**이 패턴은 자기 완결적 기능 상태에만 쓴다.** `<Provider>`는 하위 트리에 새 store를 만들어 그 트리가 읽는 **모든 atom**을 초기값으로 되돌린다. auth 정보는 `(authenticated)/layout.tsx`가 전역 store에 주입하므로, 감싼 트리에서는 `workspaceOwnerIdAtom`이 `''`이 되어 `enabled: !!workspaceOwnerId` 쿼리가 에러도 요청도 없이 영구 비활성화된다. `products/bulk`가 괜찮은 것은 운이 섞여 있다 — 그 트리의 `ExcelDataPreview`도 `workspaceOwnerIdAtom`을 읽어 `''`을 받지만, 쿼리 게이팅에 쓰지 않고 상품 bulk route가 `ownerId`를 세션에서 꺼내 무시하기 때문이다. **주문(`ORDER`) 전략은 이 값을 요청에 싣는다 — 주문 엑셀 route를 만들 때 `ownerId`를 세션에서 꺼내지 않으면, `ExcelProvider` 안의 화면은 빈 `ownerId`로 저장한다.** 화면 간 상태 격리 용도로는 쓸 수 없다 — [`scoped-jotai-provider-breaks-auth-atoms.md`](../../docs/solutions/architecture-patterns/scoped-jotai-provider-breaks-auth-atoms.md)
 
 ---
 
@@ -81,7 +81,7 @@
 - 알림은 `formatExcelFailureSummary`로 **첫 오류(시트 행이 가장 작은 것) + `(외 N건 오류)`**만 보여준다. 서버가 보낸 오류 메시지를 api 함수·`onError`에서 고정 문구로 덮지 않는다.
 - 저장 중에는 미리보기의 저장·초기화 버튼을 막고(중복 등록 방지), `ExcelSaveProgressDialog`(닫을 수 없는 모달)로 진행률을 보이며 `beforeunload` 경고를 켠다. `onProgress`는 이미지 단계에서만 알리므로 `done === total`을 상품 정보 저장 단계로 읽는다(`getExcelSaveProgressView`).
 
-**주문(`ORDER`)** — `orderExcelSaveStrategy` → `bulkCreateOrders`(MSW `POST /api/orders/bulk`). 전략·API는 있지만 **`saveType="ORDER"`를 쓰는 화면이 없다**(`order/create`는 빈 자리표시 화면이고 메뉴에도 없다).
+**주문(`ORDER`)** — `orderExcelSaveStrategy` → `bulkCreateOrders`(`POST /api/orders/bulk` — **목적지 route 없음**, 2026-10-01 MSW 제거). 전략·API는 있지만 **`saveType="ORDER"`를 쓰는 화면이 없다**(`order/create`는 빈 자리표시 화면이고 메뉴에도 없다).
 
 ### 표시명을 `as`로 통과시키지 않는다
 
@@ -94,7 +94,7 @@
 | 도메인 | 처리 층 |
 |--------|---------|
 | 상품 `POST /api/products/bulk` | route handler (Neon + R2) — `src/app/api/products/bulk/route.ts` |
-| 주문 `POST /api/orders/bulk` | MSW — `src/mocks/handlers/orders.ts` |
+| 주문 `POST /api/orders/bulk` | 없음 — 주문 엑셀 화면을 만들 때 route로 구현 |
 
 상품 bulk route가 엑셀 경로에 요구하는 것:
 
@@ -103,8 +103,6 @@
 - **한 번에 최대 50건**(`PRODUCT_BULK_MAX_ROWS`), 넘으면 400.
 - **오류 응답은 `{ error, rowIndex }`**. `customerCode`는 정규화 전에 문자열·숫자가 아닌 값을, 정규화 후 요청 안 중복·기존 데이터 중복을 첫 위반 행으로 400 거부한다. 검사 뒤 동시 저장으로 DB 인덱스에 걸리면 `rowIndex` 없이 400이다.
 
-주문 MSW 핸들러의 `delay(500)`은 네트워크 지연 흉내일 뿐이다. 예전 `AlertProvider` 닫힘 타이머 race는 `clearTimerRef`로 해결됐으므로 새 핸들러에 필수값처럼 복사하지 않는다.
-
 ---
 
 ## 구현 현황
@@ -112,5 +110,5 @@
 | 기능 | 상태 |
 |------|------|
 | 상품 대량 등록 (`products/bulk`) | ✅ 완료 |
-| 주문 대량 등록 전략·API (`orderExcelSaveStrategy`, MSW) | ✅ 있음 — 쓰는 화면 없음 |
+| 주문 대량 등록 전략·API 함수 (`orderExcelSaveStrategy`, `bulkCreateOrders`) | ⚠️ 있음 — 쓰는 화면·목적지 route 없음(MSW 제거) |
 | 주문 대량 등록 화면 (`order/create`) | ⬜ 미구현 (빈 자리표시) |

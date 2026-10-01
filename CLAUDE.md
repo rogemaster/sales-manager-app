@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |----------|----------|
 | 기능 개발 전체 과정 | `.claude/rules/workflow.md` |
 | UI 컴포넌트·화면 구현 | `.claude/rules/ui-conventions.md` |
-| API 추가(route handler·MSW 핸들러) | `.claude/rules/msw-rules.md` |
+| API 추가(route handler) | `.claude/rules/msw-rules.md` |
 | 도메인 설계·신규 엔티티·미구현 페이지 작업 | `.claude/rules/domain-design.md` |
 | Excel 기능 구현·수정·전략 추가 | `.claude/rules/excel.md` |
 | 커밋·PR, 새 문서의 저장 위치 결정 | `.claude/rules/git.md` |
@@ -45,11 +45,11 @@ npm run db:generate # schema.ts 변경 → drizzle/ 마이그레이션 파일 �
 npm run db:migrate  # 마이그레이션 적용 (운영 Neon DB — 아래 "스키마 반영" 참고)
 ```
 
-Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/`, `src/utils/`, `src/features/*/util/`·`constant/`, `src/lib/`, `src/simulators/`, `src/mocks/utils/`, `src/components/excel/`의 utils·strategies·message)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
+Vitest는 `vitest.config.ts`에 `include`를 두지 않아 전 경로의 `*.test.ts`를 실행한다. 테스트는 순수 로직(`src/shared/`, `src/utils/`, `src/features/*/util/`·`constant/`, `src/lib/`, `src/simulators/`, `src/components/excel/`의 utils·strategies·message)에 붙이고, **UI 컴포넌트와 API fetch 래퍼는 관례상 테스트 파일을 만들지 않는다.** 예외로 route의 **권한 거부 계약**(부족한 등급은 업무 데이터에 닿기 전에 403)은 `src/app/api/routePermissions.test.ts`가 표로 검사한다 — `requirePermission`을 단 route를 추가하면 이 표에도 넣는다.
 
 ## Architecture Overview
 
-**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API는 `src/app/api/` route handler + Neon(Drizzle)이 처리하고, 아직 DB로 옮기지 않은 주문 수집과 주문 엑셀 대량등록 경로만 MSW 브라우저 worker가 mock한다 (`MSWProvider`는 `(authenticated)` 레이아웃 안에만 있다).
+**Next.js 15 App Router** with feature-driven module organization. Authentication is handled by NextAuth.js (JWT strategy, Credentials provider). API는 `src/app/api/` route handler + Neon(Drizzle)이 처리한다. MSW는 2026-10-01 주문 수집 DB화와 함께 전부 제거했다.
 
 ### Route Groups
 
@@ -97,7 +97,7 @@ route의 catch는 `serverErrorResponse()`(src/shared/utils/serverError.ts)로 50
 - `src/components/ui/` — Radix UI primitives wrapped with Tailwind (shadcn/ui style)
 - `src/components/layout/` — `globalHeader`, `globalSidebar`
 - `src/components/common/` — Composite shared components (TablePagination, alert)
-- `src/components/providers/` — `SessionProvider`, `MSWProvider`, `ExcelProvider`
+- `src/components/providers/` — `SessionProvider`, `ExcelProvider`
 
 ### Styling
 

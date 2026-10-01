@@ -3,25 +3,29 @@
 import { useAtom } from 'jotai';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { selectedJobIdsAtom } from '@/features/order/store/collect.store';
-import { useGetCollectionJobs } from '@/features/order/api/useGetCollectionJobs';
+import { selectedAccountIdsAtom } from '@/features/order/store/collect.store';
+import { useCollectingAccountIds } from '@/features/order/api/useRunOrderCollection';
+import { useGetCollectionAccounts } from '@/features/order/api/useGetCollectionAccounts';
 import { CollectionStatusCell } from './components/CollectionStatusCell';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 
-export const CollectionTableSection = () => {
-  const { data: jobs = [] } = useGetCollectionJobs();
-  const [selectedJobIds, setSelectedJobIds] = useAtom(selectedJobIdsAtom);
+const HEADERS = ['쇼핑몰명', '아이디', '수집상태', '수집기간', '수집자', '최종수집일자'];
 
-  const allIds = jobs.map((j) => j.id);
-  const isAllChecked = allIds.length > 0 && allIds.every((id) => selectedJobIds.includes(id));
-  const isIndeterminate = selectedJobIds.some((id) => allIds.includes(id)) && !isAllChecked;
+export const CollectionTableSection = () => {
+  const { data: accounts = [] } = useGetCollectionAccounts();
+  const [selectedAccountIds, setSelectedAccountIds] = useAtom(selectedAccountIdsAtom);
+  const collectingAccountIds = useCollectingAccountIds();
+
+  const allIds = accounts.map((account) => account.accountId);
+  const isAllChecked = allIds.length > 0 && allIds.every((id) => selectedAccountIds.includes(id));
+  const isIndeterminate = selectedAccountIds.some((id) => allIds.includes(id)) && !isAllChecked;
 
   const handleToggleAll = (checked: boolean) => {
-    setSelectedJobIds(checked ? allIds : []);
+    setSelectedAccountIds(checked ? allIds : []);
   };
 
   const handleToggleRow = (id: string, checked: boolean) => {
-    setSelectedJobIds((prev) => (checked ? [...prev, id] : prev.filter((i) => i !== id)));
+    setSelectedAccountIds((prev) => (checked ? [...prev, id] : prev.filter((i) => i !== id)));
   };
 
   return (
@@ -35,44 +39,50 @@ export const CollectionTableSection = () => {
                 onCheckedChange={(checked) => handleToggleAll(!!checked)}
               />
             </TableHead>
-            <TableHead className="text-center font-bold uppercase tracking-widest">쇼핑몰명</TableHead>
-            <TableHead className="text-center font-bold uppercase tracking-widest">아이디</TableHead>
-            <TableHead className="text-center font-bold uppercase tracking-widest">수집상태</TableHead>
-            <TableHead className="text-center font-bold uppercase tracking-widest">작업ID</TableHead>
-            <TableHead className="text-center font-bold uppercase tracking-widest">최종수집일자</TableHead>
+            {HEADERS.map((header) => (
+              <TableHead key={header} className="text-center font-bold uppercase tracking-widest">
+                {header}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {jobs.length === 0 ? (
+          {accounts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                검색 조건을 선택한 후 검색 버튼을 눌러주세요.
+              <TableCell colSpan={HEADERS.length + 1} className="py-8 text-center text-muted-foreground">
+                수집할 쇼핑몰계정이 없습니다. 쇼핑몰계정을 등록하거나 검색 조건을 바꿔 주세요.
               </TableCell>
             </TableRow>
           ) : (
-            jobs.map((job) => (
+            accounts.map((account) => (
               <TableRow
-                key={job.id}
-                data-state={selectedJobIds.includes(job.id) ? 'selected' : undefined}
+                key={account.accountId}
+                data-state={selectedAccountIds.includes(account.accountId) ? 'selected' : undefined}
                 className="group border-b border-border/70 transition-colors last:border-0 hover:bg-muted/30"
               >
                 <TableCell>
                   <Checkbox
-                    checked={selectedJobIds.includes(job.id)}
-                    onCheckedChange={(checked) => handleToggleRow(job.id, !!checked)}
+                    checked={selectedAccountIds.includes(account.accountId)}
+                    onCheckedChange={(checked) => handleToggleRow(account.accountId, !!checked)}
                   />
                 </TableCell>
-                <TableCell className="text-center">{getShoppingMallName(job.mallCode)}</TableCell>
-                <TableCell className="text-center">{job.mallId}</TableCell>
+                <TableCell className="text-center">{getShoppingMallName(account.mallCode)}</TableCell>
+                <TableCell className="text-center">{account.mallId}</TableCell>
                 <TableCell className="text-center">
                   <CollectionStatusCell
-                    status={job.status}
-                    collectedCount={job.collectedCount}
-                    totalCount={job.totalCount}
+                    status={collectingAccountIds.includes(account.accountId) ? 'COLLECTING' : account.status}
+                    newCount={account.newCount}
+                    duplicateCount={account.duplicateCount}
+                    errorMessage={account.errorMessage}
                   />
                 </TableCell>
-                <TableCell className="text-center">{job.id}</TableCell>
-                <TableCell className="text-center">{job.lastCollectedAt ?? '-'}</TableCell>
+                <TableCell className="text-center">
+                  {account.periodStart && account.periodEnd ? `${account.periodStart} ~ ${account.periodEnd}` : '-'}
+                </TableCell>
+                <TableCell className="text-center" title={account.collectedByEmail ?? undefined}>
+                  {account.collectedByName ?? '-'}
+                </TableCell>
+                <TableCell className="text-center">{account.collectedAt ?? '-'}</TableCell>
               </TableRow>
             ))
           )}

@@ -45,7 +45,6 @@
 | 인증 | NextAuth.js | Credentials Provider + JWT 전략으로 커스텀 인증 구현 |
 | DB | Neon (PostgreSQL) + Drizzle ORM | 유저·상품·쇼핑몰 연동 영속성 보장, 서버리스 환경에 맞는 serverless driver |
 | 파일 저장소 | Cloudflare R2 | 상품 메인이미지 저장. S3 호환 API, egress 무료 |
-| API Mocking | MSW 2 | 아직 DB로 옮기지 않은 주문 영역(주문·수집·홈 주문 통계)만 서비스 워커에서 mock |
 | 엑셀 | ExcelJS + XLSX | 양식 생성(ExcelJS)과 업로드 파싱(XLSX) 역할 분리 |
 | 테스트 | Vitest | 순수 비즈니스 로직 단위 테스트 (UI·fetch 래퍼 제외) |
 
@@ -68,7 +67,7 @@
 **MSW와 실제 DB의 경계.** <br />
 개발 초기에는 모든 API를 MSW로 데이터는 mock data로 처리 했습니다. <br />
 서버에서 실행돼야 하는 인증부터 시작해, 서버 전용 시크릿(DB 접속·R2 자격증명)이 필요한 유저·상품·쇼핑몰 연동 API를 차례로 실제 route handler + Neon으로 옮겼습니다. <br />
-지금 MSW에 남은 것은 주문 영역뿐이며, MSW는 로그인한 화면 안에서 브라우저 서비스 워커로만 동작합니다. <br />
+마지막으로 주문 수집까지 실제 route와 외부몰 시뮬레이터로 옮기면서 MSW를 전부 걷어냈습니다. <br />
 → [`auth-db-msw-boundary.md`](docs/solutions/architecture-patterns/auth-db-msw-boundary.md)
 
 **몰별 설정은 discriminated union으로.** <br />
@@ -92,7 +91,7 @@
 
 ```bash
 npm install
-npm run dev   # 주문 영역 MSW는 로그인 후 화면에서 자동 활성화
+npm run dev
 ```
 
 프로젝트 루트에 `.env.local`을 만듭니다.
@@ -150,7 +149,6 @@ src/
 ├── utils/             # 코드 · 번호 생성기
 ├── lib/               # R2 저장소 · 원격 이미지 가져오기(서버 전용), cn() 등 헬퍼
 ├── db/                # Drizzle 클라이언트와 스키마
-├── mocks/             # MSW 핸들러 · mock 데이터 (주문 영역)
 ├── simulators/        # 외부몰(네이버) API 시뮬레이터 — api/external/naver route가 사용
 ├── types/             # 공통 타입
 └── middleware.ts      # 인증 라우트 보호
