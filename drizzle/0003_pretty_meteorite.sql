@@ -1,0 +1,1 @@
+ALTER TABLE "naver_product_orders" ADD COLUMN "created_at" timestamp with time zone NOT NULL;
