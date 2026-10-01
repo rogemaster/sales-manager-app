@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
     const claim = await findOrderClaim(orderId, session.ownerId);
     const now = new Date();
-    const update = buildOrderUpdate(values, current.orderStatus, now);
+    const update = buildOrderUpdate(values, current, now);
     // 클레임이 없는 주문의 메모는 저장할 곳이 없다 — 세지도 쓰지도 않는다.
     const nextNote = values.claim?.handlerNote;
     const changedFields = diffOrderFields(

@@ -53,7 +53,7 @@ export const orderWriteSchema = z
     invoiceNumber: optionalText(TEXT_LIMITS.shortText),
     // 클레임 유형·고객 사유는 몰 원본이라 받지 않는다.
     claim: z
-      .object({ handlerNote: z.string().max(TEXT_LIMITS.longText, maxLengthMessage(TEXT_LIMITS.longText)) })
+      .object({ handlerNote: z.string().trim().max(TEXT_LIMITS.longText, maxLengthMessage(TEXT_LIMITS.longText)) })
       .nullish(),
   })
   .superRefine((value, ctx) => {
@@ -112,12 +112,14 @@ export const resolveRequestedStatus = (
   requested: OrderStatusTypes,
 ): OrderStatusTypes => (base !== undefined && requested === base ? current : requested);
 
-/** 상세 저장의 SET. 송장등록일은 상태가 송장등록으로 "바뀔 때만" 기록한다 — 송장번호만 고쳐도 날짜는 그대로다. */
-export const buildOrderUpdate = (
-  values: OrderWriteValues,
-  currentStatus: OrderStatusTypes,
-  now: Date,
-): OrderUpdate => ({
+type OrderInvoiceState = Pick<OrderRow, 'orderStatus' | 'deliveryCompany' | 'invoiceNumber'>;
+
+/**
+ * 상세 저장의 SET. 송장등록일은 상태가 송장등록으로 "바뀔 때만" 기록한다 — 송장번호만 고쳐도 날짜는 그대로다.
+ * 택배사·송장번호는 저장 결과 상태가 송장등록일 때만 보낸 값을 쓴다 — 화면이 그때만 송장을 고칠 수 있게 보여준다.
+ * 그 밖에는 현재 값을 유지한다: 송장등록으로 바꿔 입력했다 되돌린 숨은 값, 송장전송완료 주문의 송장(몰에 이미 보낸 값).
+ */
+export const buildOrderUpdate = (values: OrderWriteValues, current: OrderInvoiceState, now: Date): OrderUpdate => ({
   orderName: values.orderName,
   orderPhoneNumber: values.orderPhoneNumber,
   orderZipCode: values.orderZipCode,
@@ -130,9 +132,10 @@ export const buildOrderUpdate = (
   payeeDetailAddress: toNullable(values.payeeDetailAddress),
   deliveryMessage: toNullable(values.deliveryMessage),
   orderStatus: values.orderStatus,
-  deliveryCompany: toNullable(values.deliveryCompany),
-  invoiceNumber: toNullable(values.invoiceNumber),
-  ...(values.orderStatus === 'INVOICE_REGISTER' && currentStatus !== 'INVOICE_REGISTER'
+  ...(values.orderStatus === 'INVOICE_REGISTER'
+    ? { deliveryCompany: toNullable(values.deliveryCompany), invoiceNumber: toNullable(values.invoiceNumber) }
+    : { deliveryCompany: current.deliveryCompany, invoiceNumber: current.invoiceNumber }),
+  ...(values.orderStatus === 'INVOICE_REGISTER' && current.orderStatus !== 'INVOICE_REGISTER'
     ? { invoiceRegisteredAt: now }
     : {}),
 });

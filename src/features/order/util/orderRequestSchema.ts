@@ -17,7 +17,7 @@ export const orderListRequestSchema = z.object({
     startDate: searchDateSchema,
     endDate: searchDateSchema,
     mallCode: filterCodeSchema([ALL_FILTER_OPTION.id, ...SHOPPING_MALL_CODES]),
-    // 'ALL' 또는 계정 id. 남의 id여도 owner_id 조건 때문에 0건일 뿐이다.
+    // 'ALL' 또는 몰 로그인 ID(orders.mall_id — 쇼핑몰계정 행 id가 아니다). 남의 것이어도 owner_id 조건 때문에 0건일 뿐이다.
     mallId: filterTextSchema(TEXT_LIMITS.shortText),
     deliveryCompany: filterCodeSchema(withAll(DELIVERY_COMPANY)),
     orderStatus: filterCodeSchema(withAll(ORDER_STATUS)),
