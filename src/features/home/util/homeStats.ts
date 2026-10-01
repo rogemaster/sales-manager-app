@@ -1,6 +1,7 @@
-import { HomeLinkedProductStats, HomeStats } from '@/features/home/types/home.types';
+import { HomeLinkedProductStats, HomeOrderStats, HomeStats } from '@/features/home/types/home.types';
 import { ProductStateType } from '@/features/products/types/product.types';
 import { MallLinkStatus } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
+import { OrderStatusTypes } from '@/features/order/types/order.types';
 
 export interface StateCountRow {
   state: string;
@@ -41,6 +42,38 @@ export const toLinkedProductStats = (rows: StatusCountRow[]): HomeLinkedProductS
   for (const { status, count } of rows) {
     stats.total += count;
     if (Object.hasOwn(STATUS_TO_KEY, status)) stats[STATUS_TO_KEY[status as MallLinkStatus]] += count;
+  }
+  return stats;
+};
+
+// 완료 상태(취소·교환·반품 완료)는 처리할 일이 아니라 카드에 담지 않는다 — 옛 MSW 집계와 같은 매핑이다.
+const ORDER_STATUS_TO_KEY: Partial<Record<OrderStatusTypes, keyof HomeOrderStats>> = {
+  NEW_ORDER: 'newOrder',
+  CONFIRMED_ORDER: 'confirmedOrder',
+  INVOICE_REGISTER: 'invoice',
+  INVOICE_COMPLETE: 'invoice',
+  REQUEST_CANCEL: 'cancelClaim',
+  PROGRESS_CANCEL: 'cancelClaim',
+  REQUEST_RETURN: 'returnClaim',
+  PROGRESS_RETURN: 'returnClaim',
+  REQUEST_EXCHANGE: 'exchangeClaim',
+  PROGRESS_EXCHANGE: 'exchangeClaim',
+};
+
+export const toHomeOrderStats = (rows: StatusCountRow[]): HomeOrderStats => {
+  const stats: HomeOrderStats = {
+    newOrder: 0,
+    confirmedOrder: 0,
+    invoice: 0,
+    cancelClaim: 0,
+    returnClaim: 0,
+    exchangeClaim: 0,
+  };
+  for (const { status, count } of rows) {
+    const key = Object.hasOwn(ORDER_STATUS_TO_KEY, status)
+      ? ORDER_STATUS_TO_KEY[status as OrderStatusTypes]
+      : undefined;
+    if (key) stats[key] += count;
   }
   return stats;
 };

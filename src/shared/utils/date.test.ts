@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isYmd, toKstDateRange, toKstYmd } from './date';
+import { isYmd, toKstDateRange, toKstDateTime, toKstYmd } from './date';
 
 describe('toKstDateRange', () => {
   it('start는 KST 자정 = UTC 전날 15:00 이다', () => {
@@ -74,5 +74,15 @@ describe('toKstYmd', () => {
 
   it('ISO 문자열도 받는다', () => {
     expect(toKstYmd('2026-09-01T08:00:00+09:00')).toBe('2026-09-01');
+  });
+});
+
+describe('toKstDateTime', () => {
+  it('UTC 전날 15:30은 KST 다음날 00:30이다', () => {
+    expect(toKstDateTime(new Date('2026-09-04T15:30:00.000Z'))).toBe('2026-09-05 00:30:00');
+  });
+
+  it('문자열 ISO 시각도 받는다', () => {
+    expect(toKstDateTime('2026-09-05T00:00:00.000Z')).toBe('2026-09-05 09:00:00');
   });
 });

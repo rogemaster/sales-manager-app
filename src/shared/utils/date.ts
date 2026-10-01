@@ -39,6 +39,9 @@ export const toKstDateRange = (startDate: string, endDate: string): { start: Dat
  */
 export const toKstYmd = (date: Date | string): string => dayjs(date).tz(KST).format('YYYY-MM-DD');
 
+/** 시각을 KST 기준 'YYYY-MM-DD HH:mm:ss'로. toKstYmd와 같은 이유다 — 서버(Vercel)는 UTC로 돈다. */
+export const toKstDateTime = (date: Date | string): string => dayjs(date).tz(KST).format('YYYY-MM-DD HH:mm:ss');
+
 /** 화면의 기간 버튼(최근 N일·N개월)용 [시작, 끝] Date. 브라우저 시각 기준이다 — 서버 필터 비교는 toKstDateRange가 한다. */
 export const calculatorRangeDate = (value: RangeTypeProps): [Date, Date] => {
   const startDate = dayjs().subtract(value.range, value.uniq).toDate();

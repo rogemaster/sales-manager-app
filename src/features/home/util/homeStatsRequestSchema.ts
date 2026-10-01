@@ -8,5 +8,5 @@ const date = z
   .string({ required_error: INVALID_PERIOD_MESSAGE, invalid_type_error: INVALID_PERIOD_MESSAGE })
   .refine(isYmd, INVALID_PERIOD_MESSAGE);
 
-/** POST /api/home/stats, /api/home/linked-product-stats 요청. 홈 업무현황 기간 버튼이 두 요청에 같은 기간을 보낸다. */
+/** POST /api/home/stats, /api/home/linked-product-stats, /api/home/order-stats 요청. 홈 업무현황 기간 버튼이 세 요청에 같은 기간을 보낸다. */
 export const homeStatsRequestSchema = z.object({ startDate: date, endDate: date });

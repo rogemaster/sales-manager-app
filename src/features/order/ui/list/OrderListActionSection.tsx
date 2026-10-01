@@ -8,18 +8,9 @@ import { selectedOrdersAtom } from '@/features/order/store/search.store';
 import { useGetOrders } from '@/features/order/api/useGetOrders';
 import { useBulkUpdateOrderStatus } from '@/features/order/api/useBulkUpdateOrderStatus';
 import { useAlert } from '@/hooks/useAlert';
-import { ORDER_STATUS } from '@/features/order/constant/status.constants';
+import { findOrderStatusChangeViolation, USER_SELECTABLE_ORDER_STATUS } from '@/features/order/util/orderStatusRule';
 import { OrderStatusTypes } from '@/features/order/types/order.types';
-
-const NON_CHANGEABLE_STATUSES: OrderStatusTypes[] = [
-  'INVOICE_REGISTER',
-  'INVOICE_COMPLETE',
-  'COMPLETE_CANCEL',
-  'COMPLETE_EXCHANGE',
-  'COMPLETE_RETURN',
-];
-
-const NON_CHANGEABLE_STATUS_NAMES = '송장등록, 송장전송완료, 취소완료, 교환완료, 반품완료';
+import { buildBulkResultAlert } from '@/shared/utils/bulkResultAlert';
 
 export const OrderListActionSection = () => {
   const [selectedOrders, setSelectedOrders] = useAtom(selectedOrdersAtom);
@@ -29,6 +20,27 @@ export const OrderListActionSection = () => {
   const { showAlert } = useAlert();
 
   const orders = data?.orders ?? [];
+
+  // 서버(POST /api/orders/status)와 같은 규칙으로 미리 막는다. 서버도 같은 함수로 한 번 더 거른다.
+  const findSelectionViolation = (next: OrderStatusTypes) =>
+    orders
+      .filter((o) => selectedOrders.includes(o.orderNumber))
+      .map((o) => findOrderStatusChangeViolation(o.orderStatus, next))
+      .find((message) => message !== null);
+
+  const runBulkUpdate = (orderStatus: OrderStatusTypes) => {
+    const snapshotIds = [...selectedOrders];
+    bulkUpdate(
+      { orderNumbers: snapshotIds, orderStatus },
+      {
+        onSuccess: ({ successCount, failures }) => {
+          setSelectedOrders([]);
+          showAlert(buildBulkResultAlert('변경', successCount, failures));
+        },
+        onError: (error) => showAlert({ type: 'error', message: error.message }),
+      },
+    );
+  };
 
   const handleBulkStatusChange = () => {
     if (selectedOrders.length === 0) {
@@ -40,36 +52,17 @@ export const OrderListActionSection = () => {
       return;
     }
 
-    const selectedOrderObjects = orders.filter((o) => selectedOrders.includes(o.orderNumber));
-    const nonChangeableOrders = selectedOrderObjects.filter((o) => NON_CHANGEABLE_STATUSES.includes(o.orderStatus));
-
-    if (nonChangeableOrders.length > 0) {
-      showAlert({
-        title: '상태 변경 불가',
-        message: `${NON_CHANGEABLE_STATUS_NAMES} 상태인 주문(${nonChangeableOrders.length}건)은 상태를 변경할 수 없습니다.`,
-        type: 'warning',
-      });
+    const violation = findSelectionViolation(targetStatus as OrderStatusTypes);
+    if (violation) {
+      showAlert({ title: '상태 변경 불가', message: violation, type: 'warning' });
       return;
     }
 
-    const snapshotIds = [...selectedOrders];
-    const count = snapshotIds.length;
-
     showAlert({
       title: '주문상태 일괄변경',
-      message: `선택한 ${count}건의 주문 상태를 변경하시겠습니까?`,
+      message: `선택한 ${selectedOrders.length}건의 주문 상태를 변경하시겠습니까?`,
       showCancel: true,
-      onConfirm: () => {
-        bulkUpdate(
-          { orderNumbers: snapshotIds, orderStatus: targetStatus as OrderStatusTypes },
-          {
-            onSuccess: () => {
-              setSelectedOrders([]);
-              showAlert({ message: `${count}건의 주문 상태가 변경되었습니다.`, type: 'success' });
-            },
-          },
-        );
-      },
+      onConfirm: () => runBulkUpdate(targetStatus as OrderStatusTypes),
     });
   };
 
@@ -79,36 +72,17 @@ export const OrderListActionSection = () => {
       return;
     }
 
-    const selectedOrderObjects = orders.filter((o) => selectedOrders.includes(o.orderNumber));
-    const nonNewOrders = selectedOrderObjects.filter((o) => o.orderStatus !== 'NEW_ORDER');
-
-    if (nonNewOrders.length > 0) {
-      showAlert({
-        title: '발주확인 변경 불가',
-        message: '신규주문 상태인 주문건만 발주확인으로 변경할 수 있습니다.',
-        type: 'warning',
-      });
+    const violation = findSelectionViolation('CONFIRMED_ORDER');
+    if (violation) {
+      showAlert({ title: '발주확인 변경 불가', message: violation, type: 'warning' });
       return;
     }
 
-    const snapshotIds = [...selectedOrders];
-    const count = snapshotIds.length;
-
     showAlert({
       title: '발주확인 일괄변경',
-      message: `선택한 ${count}건을 발주확인으로 변경하시겠습니까?`,
+      message: `선택한 ${selectedOrders.length}건을 발주확인으로 변경하시겠습니까?`,
       showCancel: true,
-      onConfirm: () => {
-        bulkUpdate(
-          { orderNumbers: snapshotIds, orderStatus: 'CONFIRMED_ORDER' },
-          {
-            onSuccess: () => {
-              setSelectedOrders([]);
-              showAlert({ message: `${count}건이 발주확인으로 변경되었습니다.`, type: 'success' });
-            },
-          },
-        );
-      },
+      onConfirm: () => runBulkUpdate('CONFIRMED_ORDER'),
     });
   };
 
@@ -123,7 +97,7 @@ export const OrderListActionSection = () => {
           <SelectValue placeholder="주문 상태 선택" />
         </SelectTrigger>
         <SelectContent>
-          {ORDER_STATUS.map((status) => (
+          {USER_SELECTABLE_ORDER_STATUS.map((status) => (
             <SelectItem key={status.id} value={status.id}>
               {status.name}
             </SelectItem>

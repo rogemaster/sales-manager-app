@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toHomeStats, toLinkedProductStats } from './homeStats';
+import { toHomeOrderStats, toHomeStats, toLinkedProductStats } from './homeStats';
 
 describe('toHomeStats', () => {
   it('상태별 건수를 각 칸에 담고 total은 합계다', () => {
@@ -74,5 +74,32 @@ describe('toLinkedProductStats', () => {
         { status: 'constructor', count: 1 },
       ]),
     ).toEqual({ total: 4, success: 1, failed: 0 });
+  });
+});
+
+describe('toHomeOrderStats', () => {
+  it('상태를 카드로 모은다 — 송장은 등록+전송완료, 클레임은 요청+처리중', () => {
+    expect(
+      toHomeOrderStats([
+        { status: 'NEW_ORDER', count: 3 },
+        { status: 'CONFIRMED_ORDER', count: 2 },
+        { status: 'INVOICE_REGISTER', count: 1 },
+        { status: 'INVOICE_COMPLETE', count: 4 },
+        { status: 'REQUEST_CANCEL', count: 1 },
+        { status: 'PROGRESS_CANCEL', count: 1 },
+        { status: 'COMPLETE_CANCEL', count: 9 },
+        { status: 'REQUEST_RETURN', count: 2 },
+        { status: 'PROGRESS_EXCHANGE', count: 5 },
+      ]),
+    ).toEqual({ newOrder: 3, confirmedOrder: 2, invoice: 5, cancelClaim: 2, returnClaim: 2, exchangeClaim: 5 });
+  });
+
+  it('완료 상태와 알 수 없는 상태는 어느 카드에도 담지 않는다', () => {
+    expect(
+      toHomeOrderStats([
+        { status: 'COMPLETE_RETURN', count: 1 },
+        { status: '???', count: 1 },
+      ]),
+    ).toEqual({ newOrder: 0, confirmedOrder: 0, invoice: 0, cancelClaim: 0, returnClaim: 0, exchangeClaim: 0 });
   });
 });
