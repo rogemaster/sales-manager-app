@@ -12,6 +12,11 @@ import {
   loadOrderActor,
   orderNotFoundResponse,
 } from '@/features/order/server/orderStore';
+import { syncOrdersToMall } from '@/features/order/server/orderMallSync';
+import { clearMallSyncColumns, recordMallSyncFailures } from '@/features/order/server/orderStatusBulk';
+import { MallSyncAction } from '@/features/order/types/order.types';
+import { toSyncTarget } from '@/features/order/util/orderBulkStatus';
+import { formatDetailConfirmRejection } from '@/features/order/util/orderMallSync';
 import { toOrder } from '@/features/order/util/orderRecord';
 import { findOrderStatusChangeViolation } from '@/features/order/util/orderStatusRule';
 import {
@@ -20,6 +25,9 @@ import {
   orderWriteSchema,
   resolveRequestedStatus,
 } from '@/features/order/util/orderWrite';
+
+// 발주확인 저장은 몰을 부른다(호출 10초 타임아웃) — 수집 route와 같은 상한.
+export const maxDuration = 60;
 
 type Context = { params: Promise<{ orderId: string }> };
 
@@ -73,8 +81,35 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     if (changedFields.length === 0) return NextResponse.json(toOrder(current));
 
     const actor = await loadOrderActor(session);
+
+    // 발주확인으로 바뀌는 저장은 DB에 쓰기 전에 몰부터 부른다(스펙 결정 4). 거절되면 이번 수정 전체를 저장하지 않는다.
+    const confirming = current.orderStatus !== 'CONFIRMED_ORDER' && values.orderStatus === 'CONFIRMED_ORDER';
+    let mallAction: MallSyncAction | null = null;
+    if (confirming) {
+      const [outcome] = await syncOrdersToMall({
+        action: 'CONFIRM',
+        targets: [toSyncTarget(current)],
+        ownerId: session.ownerId,
+      });
+      if (!outcome.ok) {
+        try {
+          await recordMallSyncFailures({
+            failures: [{ orderNumber: orderId, message: outcome.message }],
+            action: 'CONFIRM',
+            actor,
+            now,
+          });
+        } catch (error) {
+          console.error('몰 연동 실패 기록 실패:', error);
+        }
+        return NextResponse.json({ error: formatDetailConfirmRejection(outcome.message) }, { status: 400 });
+      }
+      if (outcome.viaMall) mallAction = 'CONFIRM';
+    }
+
     const owned = and(eq(orders.orderNumber, orderId), eq(orders.ownerId, session.ownerId));
-    const queries: BatchItem<'pg'>[] = [db.update(orders).set(update).where(owned)];
+    const setValues = confirming ? { ...update, ...clearMallSyncColumns('CONFIRM') } : update;
+    const queries: BatchItem<'pg'>[] = [db.update(orders).set(setValues).where(owned)];
     if (claim && nextNote !== undefined && changedFields.includes('claim.handlerNote')) {
       queries.push(db.update(orderClaims).set({ handlerNote: nextNote }).where(eq(orderClaims.id, claim.id)));
     }
@@ -86,6 +121,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
         modifiedByName: actor.name,
         modifiedByEmail: actor.email,
         modifiedAt: now,
+        mallAction,
       }),
     );
     // neon-http에 db.transaction()은 없지만 batch는 한 트랜잭션으로 실행된다 — "주문은 바뀌었는데 이력이 없음"이 생기지 않는다.
