@@ -44,6 +44,9 @@ export const toOrder = (row: OrderRow): Order => ({
   invoiceNumber: optional(row.invoiceNumber),
   invoiceRegisteredAt: optionalTime(row.invoiceRegisteredAt),
   invoiceSentAt: optionalTime(row.invoiceSentAt),
+  shoppingAccountId: optional(row.shoppingAccountId),
+  mallSyncAction: row.mallSyncAction ?? undefined,
+  mallSyncError: optional(row.mallSyncError),
   ownerId: row.ownerId,
 });
 
@@ -65,4 +68,6 @@ export const toOrderEditHistory = (row: OrderEditHistoryRow): OrderEditHistory =
   modifiedAt: toKstDateTime(row.modifiedAt),
   modifiedBy: row.modifiedByName,
   changedFields: row.changedFields,
+  mallAction: row.mallAction ?? undefined,
+  mallError: optional(row.mallError),
 });

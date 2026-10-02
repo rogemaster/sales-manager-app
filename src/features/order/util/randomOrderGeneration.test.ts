@@ -16,7 +16,7 @@ const fixed =
   (value: number): Random =>
   () =>
     value;
-const ACCOUNT = { ownerId: 'usr_1', mallCode: 'COUP' as const, mallId: 'coupang_seller1' };
+const ACCOUNT = { id: 'acc_coup', ownerId: 'usr_1', mallCode: 'COUP' as const, mallId: 'coupang_seller1' };
 const WIDE = { start: minutesAgo(7 * 24 * 60), endExclusive: new Date(NOW.getTime() + 24 * 60 * 60_000) };
 
 const source = (overrides: Partial<RandomOrderSource> = {}): RandomOrderSource => ({
@@ -103,6 +103,7 @@ describe('buildRandomOrders', () => {
       ownerId: 'usr_1',
       mallCode: 'COUP',
       mallId: 'coupang_seller1',
+      shoppingAccountId: 'acc_coup',
       shopProductId: 'EXT-1',
       orderProductName: '쿠팡 상품',
       orderTotalQuantity: 1,

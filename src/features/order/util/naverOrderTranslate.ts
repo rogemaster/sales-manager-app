@@ -103,7 +103,7 @@ const toNullable = (value: string | null): string | null => (value ? value : nul
  */
 export const toOrderFromNaver = (
   order: NaverProductOrder,
-  account: Pick<CollectingAccount, 'ownerId' | 'mallCode' | 'mallId'>,
+  account: Pick<CollectingAccount, 'id' | 'ownerId' | 'mallCode' | 'mallId'>,
   orderNumber: string,
   now: Date,
 ): TranslateResult => {
@@ -121,6 +121,8 @@ export const toOrderFromNaver = (
       shopOrderNumber: order.productOrderId,
       mallCode: account.mallCode,
       mallId: account.mallId,
+      // 라운드 4 — 발주확인·송장전송이 이 계정으로 몰을 부른다.
+      shoppingAccountId: account.id,
       shopProductId: String(order.productNo),
       orderProductName: order.productName,
       // 라벨 "총주문금액(실결제가)" — 배송비를 포함한 결제 금액이다.

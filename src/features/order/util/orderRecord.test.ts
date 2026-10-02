@@ -34,6 +34,9 @@ const baseRow: OrderRow = {
   invoiceNumber: null,
   invoiceRegisteredAt: null,
   invoiceSentAt: null,
+  shoppingAccountId: null,
+  mallSyncAction: null,
+  mallSyncError: null,
 };
 
 describe('toOrder', () => {
@@ -67,7 +70,41 @@ describe('toOrderEditHistory', () => {
         modifiedByName: '홍길동',
         modifiedByEmail: 'a@b.c',
         modifiedAt: new Date('2026-09-05T00:00:00.000Z'),
+        mallAction: null,
+        mallError: null,
       }),
     ).toEqual({ id: '7', modifiedAt: '2026-09-05 09:00:00', modifiedBy: '홍길동', changedFields: ['orderStatus'] });
+  });
+});
+
+describe('몰 연동 실패 필드', () => {
+  it('실패 사유가 있으면 응답에 싣고, 없으면 뺀다', () => {
+    expect(toOrder({ ...baseRow, mallSyncAction: 'INVOICE', mallSyncError: '사유' })).toMatchObject({
+      mallSyncAction: 'INVOICE',
+      mallSyncError: '사유',
+    });
+    const order = toOrder(baseRow);
+    expect(order.mallSyncAction).toBeUndefined();
+    expect(order.mallSyncError).toBeUndefined();
+  });
+
+  it('쇼핑몰계정 ID를 싣는다 — 목록 화면의 발주확인 사전 경고가 계정 유무로 판정한다', () => {
+    expect(toOrder({ ...baseRow, shoppingAccountId: 'acc_1' }).shoppingAccountId).toBe('acc_1');
+    expect(toOrder(baseRow).shoppingAccountId).toBeUndefined();
+  });
+
+  it('이력의 몰 연동 동작·사유를 싣는다', () => {
+    const history = toOrderEditHistory({
+      id: 1,
+      orderNumber: 'order_001',
+      ownerId: 'usr_1',
+      changedFields: [],
+      modifiedByName: '홍길동',
+      modifiedByEmail: 'a@b.c',
+      modifiedAt: new Date('2026-10-02T01:00:00.000Z'),
+      mallAction: 'CONFIRM',
+      mallError: '쇼핑몰에서 주문을 찾을 수 없습니다.',
+    });
+    expect(history).toMatchObject({ mallAction: 'CONFIRM', mallError: '쇼핑몰에서 주문을 찾을 수 없습니다.' });
   });
 });

@@ -72,7 +72,7 @@ export const createShopOrderNumber = (now: Date, random: Random): string =>
 
 export const buildRandomOrders = (input: {
   sources: RandomOrderSource[];
-  account: Pick<CollectingAccount, 'ownerId' | 'mallCode' | 'mallId'>;
+  account: Pick<CollectingAccount, 'id' | 'ownerId' | 'mallCode' | 'mallId'>;
   generatedAt: Date | null;
   period: { start: Date; endExclusive: Date };
   now: Date;
@@ -101,6 +101,7 @@ export const buildRandomOrders = (input: {
       shopOrderNumber: createShopOrderNumber(now, random),
       mallCode: account.mallCode,
       mallId: account.mallId,
+      shoppingAccountId: account.id,
       shopProductId: source.shopProductId,
       orderProductName: source.name,
       orderPrice: unitPrice * quantity + deliveryPrice,
