@@ -79,6 +79,9 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
     },
     onError: (error) => {
       showAlert({ type: 'error', message: error.message });
+      // 발주확인이 몰에서 거절되면 저장은 안 됐지만 실패 사유·이력은 기록됐다 — 바로 보이게 다시 읽는다.
+      queryClient.invalidateQueries({ queryKey: ['order-history', orderId, workspaceOwnerId] });
+      queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
     },
   });
 

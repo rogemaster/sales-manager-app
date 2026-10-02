@@ -34,6 +34,9 @@ export type OrderStatusTypes =
   | 'PROGRESS_RETURN'
   | 'COMPLETE_RETURN';
 
+/** 몰 연동 동작. 실패 사유 컬럼(orders.mall_sync_action)과 이력(order_edit_histories.mall_action)이 같은 값을 쓴다. */
+export type MallSyncAction = 'CONFIRM' | 'INVOICE';
+
 export type OrderDateType = 'orderCollectionDate' | 'paymentDate' | 'invoiceRegisteredAt' | 'invoiceSentAt';
 
 export type OrderSearchKey = 'orderName' | 'payeeName' | 'orderProductName' | 'orderNumber' | 'shopOrderNumber';
@@ -100,6 +103,9 @@ export interface Order {
   invoiceNumber?: string;     // 송장번호
   invoiceRegisteredAt?: string; // 송장등록일 — 상태가 송장등록으로 바뀐 순간(서버 기록)
   invoiceSentAt?: string;       // 송장전송완료일 — 송장을 몰로 보내 완료된 순간(라운드 4)
+  shoppingAccountId?: string;      // 수집에 쓴 쇼핑몰계정 — 없으면 몰 연동 없이 처리되는 주문(시드·엑셀)
+  mallSyncAction?: MallSyncAction; // 마지막으로 실패한 몰 연동 동작 — 같은 동작이 성공하면 비워진다
+  mallSyncError?: string;          // 그 실패 사유
   ownerId: string;
 }
 
@@ -127,6 +133,8 @@ export interface OrderEditHistory {
   modifiedAt: string;
   modifiedBy: string;
   changedFields: string[];
+  mallAction?: MallSyncAction; // 몰을 호출한 이력에만
+  mallError?: string;          // 몰 연동 실패 사유(실패 이력은 changedFields가 빈 배열)
 }
 
 /** POST /api/orders/status 응답. 부분 성공이 정상 결과다(bulkRequest.ts 선례). */

@@ -12,7 +12,8 @@ export interface MallSendOutcome {
 }
 
 // 시뮬레이터가 없는 몰(네이버 외)의 흉내낸 판정이다. 옛 mocks/utils/mallLinkSimulation.ts에서 옮겼다.
-const FAILURE_RATE = 0.1;
+// 주문 발주확인·송장전송의 무작위 판정(order/util/orderMallSync.ts)도 같은 비율을 쓴다.
+export const RANDOM_MALL_FAILURE_RATE = 0.1;
 const DUPLICATE_ERROR_MESSAGE = '동일 상품이 이미 등록되어 있습니다';
 const FALLBACK_ERROR_MESSAGE = '외부 쇼핑몰 전송 실패';
 const MALL_ERROR_MESSAGES: Partial<Record<ShoppingMalls, string>> = {
@@ -29,7 +30,7 @@ export const judgeRandomSend = (
 ): MallSendOutcome => {
   const { mallCode, externalProductId, hasPriorSuccess } = input;
 
-  if (random() >= FAILURE_RATE) {
+  if (random() >= RANDOM_MALL_FAILURE_RATE) {
     return {
       status: 'success',
       externalProductId: externalProductId ?? `ext_${mallCode}_${randomUUID().slice(0, 8)}`,

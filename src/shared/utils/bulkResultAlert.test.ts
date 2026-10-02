@@ -30,4 +30,8 @@ describe('buildBulkResultAlert', () => {
     ];
     expect(buildBulkResultAlert('삭제', 0, failures).message).toBe('존재하지 않는 설정입니다. (외 2건 오류)');
   });
+
+  it('전송 동사도 같은 형식이다', () => {
+    expect(buildBulkResultAlert('전송', 2, [])).toEqual({ type: 'success', message: '2건이 전송되었습니다.' });
+  });
 });

@@ -9,7 +9,7 @@ import {
 } from './naverOrderTranslate';
 
 const NOW = new Date('2026-10-01T03:00:00.000Z');
-const ACCOUNT = { ownerId: 'usr_1', mallCode: 'NSST' as const, mallId: 'naver_store1' };
+const ACCOUNT = { id: 'acc_naver', ownerId: 'usr_1', mallCode: 'NSST' as const, mallId: 'naver_store1' };
 
 const naverOrder = (overrides: Partial<NaverProductOrder> = {}): NaverProductOrder => ({
   productOrderId: '2026100112345678',
@@ -87,6 +87,7 @@ describe('toOrderFromNaver', () => {
         shopOrderNumber: '2026100112345678',
         mallCode: 'NSST',
         mallId: 'naver_store1',
+        shoppingAccountId: 'acc_naver',
         shopProductId: '7',
         orderProductName: '이어폰',
         orderPrice: 33000,

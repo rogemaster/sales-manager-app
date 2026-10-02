@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { OrderDetail } from '../../types/order.types';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
-import { LOCKED_ORDER_STATUSES, USER_SELECTABLE_ORDER_STATUS } from '../../util/orderStatusRule';
+import { LOCKED_ORDER_STATUSES, selectableOrderStatuses } from '../../util/orderStatusRule';
 import { DELIVERY_COMPANY } from '@/shared/constant/delivery.constant';
 
 type Props = {
@@ -45,7 +45,8 @@ export const OrderStatusSection = ({ order, isEditMode }: Props) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {USER_SELECTABLE_ORDER_STATUS.map((status) => (
+                  {/* 저장된 현재 상태 기준 — 폼에서 고른 값 기준이면 고를수록 선택지가 바뀐다. */}
+                  {selectableOrderStatuses(order.orderStatus).map((status) => (
                     <SelectItem key={status.id} value={status.id}>
                       {status.name}
                     </SelectItem>

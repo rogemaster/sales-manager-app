@@ -25,7 +25,7 @@ import type {
 } from '@/features/mallLinkedProduct/types/mallLinkedProduct.types';
 import type { ShoppingMalls } from '@/types/common.type';
 import type { DeliveryTypeId } from '@/shared/constant/delivery.constant';
-import type { OrderClaimType, OrderStatusTypes } from '@/features/order/types/order.types';
+import type { MallSyncAction, OrderClaimType, OrderStatusTypes } from '@/features/order/types/order.types';
 import type { CollectionResultStatus } from '@/features/order/types/collection.types';
 // drizzle-kit이 이 파일을 직접 실행하므로 값 import는 @ 별칭 없이 상대 경로로 둔다(타입 import는 지워져 무관하다).
 import { CUSTOMER_CODE_UNIQUE_INDEX } from '../lib/customerCodeUniqueViolation';
@@ -277,6 +277,12 @@ export const orders = pgTable(
     invoiceNumber: text('invoice_number'),
     invoiceRegisteredAt: timestamp('invoice_registered_at', tz),
     invoiceSentAt: timestamp('invoice_sent_at', tz),
+
+    // 수집에 쓴 쇼핑몰계정. FK가 아니다 — 계정을 삭제해도 주문은 남는다. null = 계정 없는 주문(시드·엑셀) → 몰 호출 없이 처리.
+    shoppingAccountId: text('shopping_account_id'),
+    // 마지막으로 실패한 몰 연동과 사유. 같은 동작이 성공하면 비운다(다른 동작의 사유는 남긴다).
+    mallSyncAction: text('mall_sync_action').$type<MallSyncAction>(),
+    mallSyncError: text('mall_sync_error'),
   },
   (table) => [
     index('orders_owner_collected_idx').on(table.ownerId, table.collectedAt.desc()),
@@ -341,6 +347,9 @@ export const orderEditHistories = pgTable(
     modifiedByName: text('modified_by_name').notNull(),
     modifiedByEmail: text('modified_by_email').notNull(),
     modifiedAt: timestamp('modified_at', tz).notNull(),
+    // 몰을 호출한 이력에만. 실패 이력은 changed_fields가 []이고 mall_error에 사유가 있다.
+    mallAction: text('mall_action').$type<MallSyncAction>(),
+    mallError: text('mall_error'),
   },
   (table) => [
     foreignKey({
