@@ -11,6 +11,7 @@ import { generatorDeliveryType } from '@/utils/deliveryGenerator';
 import { phoneNumberFormatter } from '@/utils/numberGenerator';
 import { getShoppingMallName } from '@/utils/shoppingMallGenerator';
 import { selectedOrdersAtom } from '@/features/order/store/search.store';
+import { MALL_SYNC_ACTION_LABEL } from '@/features/order/util/orderMallSync';
 
 interface OrderListTableProps {
   orders: Order[];
@@ -72,7 +73,15 @@ export const OrderListTable = ({ orders }: OrderListTableProps) => {
             <TableCell className="text-center">{order.shopOrderNumber}</TableCell>
             <TableCell className="text-center">{getShoppingMallName(order.mallCode)}</TableCell>
             <TableCell className="text-center">{order.mallId}</TableCell>
-            <TableCell className="text-center">{<OrderStatusBadge status={order.orderStatus} />}</TableCell>
+            <TableCell className="text-center">
+              <OrderStatusBadge status={order.orderStatus} />
+              {order.mallSyncAction && (
+                // 배지 아래 빨간 글자, 사유 전문은 title(라운드 4 사용자 결정 6).
+                <p className="mt-1 text-xs text-destructive" title={order.mallSyncError}>
+                  {MALL_SYNC_ACTION_LABEL[order.mallSyncAction]} 실패
+                </p>
+              )}
+            </TableCell>
             <TableCell className="text-center">{order.shopProductId}</TableCell>
             <TableCell>{order.orderProductName}</TableCell>
             <TableCell>{order.orderOption}</TableCell>

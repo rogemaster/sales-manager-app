@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { OrderEditHistory } from '../../types/order.types';
+import { formatMallSyncFailure, MALL_SYNC_ACTION_LABEL } from '../../util/orderMallSync';
 
 const FIELD_LABEL_MAP: Record<string, string> = {
   orderProductName: '주문상품명',
@@ -74,10 +75,17 @@ export const OrderEditHistorySection = ({ editHistory }: Props) => {
                   <span className="text-muted-foreground">{history.modifiedAt}</span>
                   <span className="font-medium">{history.modifiedBy}</span>
                 </div>
-                {history.changedFields.length > 0 && (
+                {history.mallAction && history.mallError ? (
                   <p className="text-xs text-muted-foreground mt-1">
-                    변경 항목: {history.changedFields.map(toFieldLabel).join(', ')}
+                    {formatMallSyncFailure(history.mallAction, history.mallError)}
                   </p>
+                ) : (
+                  history.changedFields.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      변경 항목: {history.changedFields.map(toFieldLabel).join(', ')}
+                      {history.mallAction && ` (${MALL_SYNC_ACTION_LABEL[history.mallAction]} 연동)`}
+                    </p>
+                  )
                 )}
               </div>
             ))}
