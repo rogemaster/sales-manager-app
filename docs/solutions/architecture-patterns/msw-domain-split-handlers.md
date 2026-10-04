@@ -1,7 +1,7 @@
 ---
 title: MSW handlers를 도메인별 파일로 분리하는 패턴
 date: 2026-06-22
-last_updated: 2026-09-25
+last_updated: 2026-10-04
 category: architecture-patterns
 module: mocks
 problem_type: architecture_pattern
@@ -9,7 +9,7 @@ component: development_workflow
 severity: medium
 applies_when:
   - MSW handler file grows beyond ~100 lines
-  - Adding a handler to the remaining mock API layer (order area only — new domains are route handlers)
+  - Reading as history only — MSW was removed on 2026-10-01; all APIs are route handlers
   - "A PATCH route uses both a static segment (e.g. /status) and a dynamic segment (e.g. /:id) under the same prefix"
 symptoms:
   - handlers.ts becomes hard to navigate and maintain as domains multiply

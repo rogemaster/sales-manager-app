@@ -1,13 +1,14 @@
 ---
 title: 단건 조회/수정 API의 ownerId 소유권 검증 — X-Owner-Id 헤더 패턴
 date: 2026-07-13
+last_updated: 2026-10-04
 category: architecture-patterns
 module: mocks
 problem_type: architecture_pattern
 component: development_workflow
 severity: high
 applies_when:
-  - MSW 핸들러로 처리하는 도메인일 때 (실제 route handler라면 requireSession 방식을 쓴다 — 2026-09-01 갱신 절 참고)
+  - 역사 기록으로만 읽는다 — MSW는 2026-10-01 제거됐고 모든 route는 requireSession/requirePermission으로 세션 ownerId를 쓴다
   - 목록 조회는 ownerId로 필터링되지만 단건 조회(:id)는 아무 검증 없이 리소스를 반환할 때
   - GET처럼 body가 없는 요청에 ownerId를 실어 보내야 할 때
   - PATCH의 업데이트 payload를 ownerId 같은 인증 정보로 오염시키고 싶지 않을 때
@@ -29,6 +30,8 @@ tags:
 ---
 
 # 단건 조회/수정 API의 ownerId 소유권 검증 — X-Owner-Id 헤더 패턴
+
+> **2026-10-01 — 역사 기록.** 이 패턴을 쓰던 마지막 도메인(주문)이 route로 옮겨갔고 MSW(`src/mocks/`)를 전부 제거했다. 아래 코드 경로는 더 이상 저장소에 없다. 지금 단건·하위 리소스·다건 액션의 소유권은 `requireSession`/`requirePermission`이 세션에서 꺼낸 `ownerId`를 `WHERE`에 넣어 판정한다(`[[api-route-session-auth-guard]]`). 유효한 교훈은 **하위 리소스는 부모 소유권 기준으로 404**, **다건 id는 fail-closed**, **업데이트 payload에 인증 정보를 섞지 않는다** 세 가지다.
 
 ## Context
 
@@ -170,11 +173,11 @@ route로 옮긴 도메인에서는 같은 역할을 `UPDATE`의 `SET`에 `ownerI
 1. 그 엔드포인트가 **실제 route handler**인가(DB·서버 전용 시크릿이 필요해서)? → `requireSession`(등급 무관) 또는 `requirePermission(req, '<permission>')`(정책표 `src/shared/utils/permission.ts`에 키가 있는 쓰기)을 쓴다. 클라이언트가 보낸 `ownerId`는 body에 있어도 무시한다. `[[api-route-session-auth-guard]]` 참고.
 2. **MSW 핸들러**인가? → 이 문서의 `X-Owner-Id` 헤더 패턴을 그대로 쓴다. 서비스 워커는 세션을 읽을 수 없으므로 이게 여전히 최선이다.
 
-두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다. **2026-09-24 기준 2번(헤더 패턴)을 쓰는 곳은 주문 영역(주문 상세·클레임·코멘트·히스토리·수정, 주문 수집 트리거)뿐이다.** 쇼핑몰계정·정보설정·연동상품도 2026-09-21~22에 1번으로 넘어갔다.
+두 방식이 공존하는 것은 과도기 상태이며, 남은 도메인이 route로 옮겨갈 때마다 1번으로 넘어간다. **2026-09-24 기준 2번(헤더 패턴)을 쓰는 곳은 주문 영역(주문 상세·클레임·코멘트·히스토리·수정, 주문 수집 트리거)뿐이었다.** 쇼핑몰계정·정보설정·연동상품은 2026-09-21~22에, 주문은 2026-10-01에 1번으로 넘어가 2번을 쓰는 곳은 없다.
 
 ## When to Apply
 
-- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → 새 API는 route가 기본이므로 **위 갱신 절의 1번**(`requireSession`/`requirePermission`)을 쓴다. 이 문서의 헤더 패턴은 주문 영역 MSW 핸들러를 넓힐 때만 해당한다
+- 새 도메인 엔티티(매입처·매출처 등)의 단건 조회/수정 API를 설계할 때 → 새 API는 route가 기본이므로 **위 갱신 절의 1번**(`requireSession`/`requirePermission`)을 쓴다. 이 문서의 헤더 패턴은 쓸 곳이 없다(MSW 제거)
 - 여러 id를 한 번에 받는 액션(일괄 실행/일괄 삭제 등)을 설계할 때 → **기본값은 fail-closed**(`allOwnedBy`로 전부 소유 확인 후 진행, 하나라도 불일치 시 전체 거부). 필터링-후-진행으로 갈 정당한 이유가 있다면 그 이유를 문서에 명시할 것
 - 기존 API 함수 시그니처에 인자를 추가할 때 → 커밋 전에 반드시 전체 호출부 grep
 
