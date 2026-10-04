@@ -41,6 +41,3 @@ export const orderCommentRequestSchema = z.object({
     .min(1, ORDER_COMMENT_EMPTY_MESSAGE)
     .max(TEXT_LIMITS.longText, maxLengthMessage(TEXT_LIMITS.longText)),
 });
-
-/** ilike 부분일치용. Postgres LIKE의 기본 이스케이프 문자는 \ 다 — 이스케이프하지 않으면 '50%'가 '50으로 시작'이 된다. */
-export const escapeLikePattern = (value: string): string => value.replace(/[\\%_]/g, (char) => `\\${char}`);

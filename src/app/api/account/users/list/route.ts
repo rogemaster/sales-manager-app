@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq, gte, lte, ilike, and, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { toPublicUser } from '@/features/account/util/publicUser';
 import { userListRequestSchema } from '@/features/account/util/userListRequestSchema';
@@ -36,9 +37,9 @@ export async function POST(req: NextRequest) {
 
     if (searchValue) {
       if (searchType === 'email') {
-        conditions.push(ilike(users.email, `%${searchValue}%`));
+        conditions.push(ilike(users.email, `%${escapeLikePattern(searchValue)}%`));
       } else {
-        conditions.push(ilike(users.name, `%${searchValue}%`));
+        conditions.push(ilike(users.name, `%${escapeLikePattern(searchValue)}%`));
       }
     }
 

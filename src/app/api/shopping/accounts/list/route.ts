@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { shoppingAccounts } from '@/db/schema';
 import { and, desc, eq, gte, ilike, lt, or, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 import { toKstDateRange } from '@/shared/utils/date';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { SHOPPING_ACCOUNT_PUBLIC_COLUMNS } from '@/features/shoppingAccount/util/accountColumns';
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (mallCode !== 'ALL') conditions.push(eq(shoppingAccounts.mallCode, mallCode));
     if (searchValue) {
       // 검색어는 mallId·nickname 중 하나에 걸리면 된다(OR). ilike라 대소문자를 구분하지 않는다.
-      const keyword = `%${searchValue}%`;
+      const keyword = `%${escapeLikePattern(searchValue)}%`;
       const matched = or(ilike(shoppingAccounts.mallId, keyword), ilike(shoppingAccounts.nickname, keyword));
       if (matched) conditions.push(matched);
     }

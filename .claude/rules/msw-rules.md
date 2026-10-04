@@ -12,6 +12,7 @@
   - 선택한 행을 일괄 처리하는 요청은 `src/shared/utils/bulkRequest.ts`를 쓴다. `ids` 누락을 0건으로 답하지 않는다 — 화면이 "대상 없음"이라는 거짓 안내를 띄운다.
   - 필드 규칙을 한글로 돌려주는 도메인 검증 함수(`findProductWriteViolation` 등)가 있으면 입구는 `objectBodySchema()`로 모양만 본다 — 규칙을 Zod로 두 벌 쓰지 않는다.
   - 예외: 상품 확인 route 3개(자체 판독 함수로 이미 400), 외부몰 시뮬레이터(네이버 오류 형식을 흉내 내야 한다).
+- **검색어 부분일치:** `ilike`에 넣는 검색어는 `escapeLikePattern`(`src/shared/utils/likePattern.ts`)을 거친다. 빠뜨리면 `%`·`_`가 와일드카드가 되어 `%` 하나로 전체가 나온다(2026-10-04, 주문 목록에만 있던 것을 전 목록 route로).
 - 인증이 없는 route는 로그인(`auth/[...nextauth]`)·가입(`register`, `check-email`)과 외부몰 시뮬레이터(`external/naver/*`, 계정 API Key를 Bearer로 받음)뿐이다.
 
 ## MSW는 없다 (2026-10-01 제거)
