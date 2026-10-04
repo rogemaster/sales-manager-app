@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  escapeLikePattern,
-  orderCommentRequestSchema,
-  orderListRequestSchema,
-  orderStatusBulkRequestSchema,
-} from './orderRequestSchema';
+import { orderCommentRequestSchema, orderListRequestSchema, orderStatusBulkRequestSchema } from './orderRequestSchema';
 
 const filters = {
   dateType: 'orderCollectionDate',
@@ -61,12 +56,5 @@ describe('orderCommentRequestSchema', () => {
   it('공백뿐인 코멘트는 거절한다', () => {
     expect(orderCommentRequestSchema.safeParse({ content: '   ' }).success).toBe(false);
     expect(orderCommentRequestSchema.parse({ content: ' 확인 ' }).content).toBe('확인');
-  });
-});
-
-describe('escapeLikePattern', () => {
-  it('%·_·\\를 글자로 찾도록 이스케이프한다', () => {
-    expect(escapeLikePattern('50%_할인\\')).toBe('50\\%\\_할인\\\\');
-    expect(escapeLikePattern('홍길동')).toBe('홍길동');
   });
 });

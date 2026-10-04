@@ -15,7 +15,7 @@ import {
   OrderInsert,
   toOrderFromNaver,
 } from '../util/naverOrderTranslate';
-import { escapeLikePattern } from '../util/orderRequestSchema';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 import { buildRandomOrders, RandomOrderSource, toRandomOrderSource } from '../util/randomOrderGeneration';
 import { OrderActor } from './orderStore';
 

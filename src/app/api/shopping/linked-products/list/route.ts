@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverErrorResponse } from '@/shared/utils/serverError';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 import { and, desc, eq, gte, ilike, lt, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { db } from '@/db';
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
     if (saleState !== 'ALL') conditions.push(eq(mallLinkedProducts.productState, saleState));
 
     const column = SEARCH_COLUMN[searchType];
-    if (searchValue && column) conditions.push(ilike(column, `%${searchValue}%`));
+    if (searchValue && column) conditions.push(ilike(column, `%${escapeLikePattern(searchValue)}%`));
 
     const where = and(...conditions);
 

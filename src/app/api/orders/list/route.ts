@@ -10,7 +10,8 @@ import { serverErrorResponse } from '@/shared/utils/serverError';
 import { ShoppingMalls } from '@/types/common.type';
 import { OrderDateType, OrderSearchKey, OrderStatusTypes } from '@/features/order/types/order.types';
 import { toOrder } from '@/features/order/util/orderRecord';
-import { escapeLikePattern, orderListRequestSchema } from '@/features/order/util/orderRequestSchema';
+import { orderListRequestSchema } from '@/features/order/util/orderRequestSchema';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 
 const DATE_COLUMN: Record<OrderDateType, AnyPgColumn> = {
   orderCollectionDate: orders.collectedAt,

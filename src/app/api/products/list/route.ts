@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { products } from '@/db/schema';
 import { and, desc, eq, gte, ilike, lt, sql } from 'drizzle-orm';
 import { requireSession } from '@/shared/utils/apiAuth';
+import { escapeLikePattern } from '@/shared/utils/likePattern';
 import { toKstDateRange } from '@/shared/utils/date';
 import { parseRequestBody } from '@/shared/utils/requestBody';
 import { productListRequestSchema } from '@/features/products/util/productListRequestSchema';
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (categoryId && categoryId !== 'ALL') conditions.push(eq(products.categoryId, categoryId));
     if (searchValue) {
       const col = searchType === 'productName' ? products.name : products.productId;
-      conditions.push(ilike(col, `%${searchValue}%`));
+      conditions.push(ilike(col, `%${escapeLikePattern(searchValue)}%`));
     }
 
     const where = and(...conditions);
