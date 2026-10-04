@@ -143,7 +143,7 @@ UPDATE users SET owner_id = id WHERE id = 'usr_2f20748f';
 
 ### mock 데이터를 실제 DB id와 맞추는 절차
 
-> **2026-09-22 이후 대상이 줄었다.** 쇼핑몰계정·정보설정은 Neon으로 옮겨 시드 스크립트(`scripts/seedShoppingAccounts.ts` 등, 로컬 전용)가 실제 계정 id로 행을 만든다. 이 절차가 아직 적용되는 곳은 MSW에 남은 주문 영역 mock(`src/mocks/data/MockOrdersData.ts`·`MockCollectionJobsData.ts`)뿐이다.
+> **2026-10-01 이후 적용 대상이 없다.** 쇼핑몰계정·정보설정(2026-09-22)에 이어 주문(2026-10-01)까지 Neon으로 옮겨, 시드 스크립트(`scripts/seedShoppingAccounts.ts`·`scripts/seedOrders.ts` 등, 로컬 전용)가 실제 계정 id로 행을 만든다. MSW mock은 전부 제거됐다. 아래 절차는 mock 계층을 다시 둘 때를 위한 기록이다.
 
 이 프로젝트처럼 **일부 도메인은 실 DB(Neon), 일부는 MSW mock**을 쓰는 구조에서는, mock 데이터의 `ownerId`가 실제 DB의 계정 id와 반드시 일치해야 로그인 후 데이터가 보인다. 새 mock 도메인을 추가하거나 인증 흐름이 바뀔 때마다:
 
@@ -226,5 +226,4 @@ interface PurchaseSource {
 - `src/app/api/register/route.ts` — 회원가입 시 `ownerId` 자기참조 저장
 - `src/app/api/account/users/list/route.ts`, `create/route.ts` — Neon DB 기반 사용자 목록/등록
 - `src/shared/utils/apiAuth.ts` — `requireSession`/`requirePermission`, 세션 `ownerId`의 출처
-- `src/mocks/data/MockOrdersData.ts` — 아직 실제 계정 id와 맞춰야 하는 mock 데이터(주문 영역)
 - `docs/solutions/architecture-patterns/typescript-type-design-patterns.md` — `Exclude<>` 기반 SubUserGrade 패턴 (Pattern 5)

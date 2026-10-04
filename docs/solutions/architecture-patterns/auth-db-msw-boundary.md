@@ -1,18 +1,18 @@
 ---
-title: MSW/DB 경계 설계 — route handler + Neon이 기본, MSW는 주문 영역만
+title: MSW/DB 경계 설계 — route handler + Neon으로 전부 옮기기까지 (MSW 2026-10-01 제거)
 date: 2026-06-24
-last_updated: 2026-09-25
+last_updated: 2026-10-04
 category: architecture-patterns
 module: auth, account
 problem_type: architecture_pattern
 component: authentication, user-management
 severity: medium
 applies_when:
-  - MSW에 남은 도메인(주문 영역)을 실제 DB로 전환할 때
-  - 새 기능을 MSW vs DB 중 어디서 처리할지 결정할 때 (기본은 route + Neon)
+  - mock 계층을 두고 개발하던 도메인을 실제 DB로 전환할 때
+  - 새 기능의 처리 위치를 정할 때 (MSW는 없다 — route + Neon, 외부몰은 시뮬레이터 route)
   - 서버 전용 시크릿(외부 스토리지 키·DB 접속 정보)이 필요한 기능을 설계할 때
-  - MSW에 남은 핸들러가 이미 DB로 옮긴 도메인의 데이터를 읽어야 할 때
-  - 도메인을 route로 옮긴 뒤 MSW를 켜는 범위(서버 listen, Provider 위치)를 점검할 때
+  - mock에 남은 핸들러가 이미 DB로 옮긴 도메인의 데이터를 읽어야 할 때
+  - 도메인을 route로 옮긴 뒤 mock 계층을 켜는 범위(서버 listen, Provider 위치)를 점검할 때
 tags:
   - msw
   - neon-db
@@ -22,15 +22,15 @@ tags:
   - boundary
 ---
 
-# MSW/DB 경계 설계 — route handler + Neon이 기본, MSW는 주문 영역만
+# MSW/DB 경계 설계 — route handler + Neon으로 전부 옮기기까지 (MSW 2026-10-01 제거)
 
-## 현재 경계 (2026-09-24 기준)
+## 현재 경계 (2026-10-01 기준) — MSW는 없다
 
-- **기본은 `src/app/api/.../route.ts` + Neon이다.** 인증·사용자·프로필·상품·쇼핑몰(계정·정보설정·연동상품)·홈 상품/연동 통계가 전부 route다.
-- **MSW에는 아직 DB로 옮기지 않은 주문 영역만 남았다** — 주문 목록·상세(클레임·코멘트·히스토리)·수집, 홈 주문·클레임·문의 통계. 브라우저 worker 하나만 쓰고, 서버 MSW는 없다.
-- 새 API는 route로 만든다. MSW 핸들러는 주문 영역 mock을 넓힐 때만 추가한다(`.claude/rules/msw-rules.md`).
+- **모든 API가 `src/app/api/.../route.ts` + Neon이다.** 인증·사용자·프로필·상품·쇼핑몰(계정·정보설정·연동상품)·주문(목록·상세·클레임·코멘트·이력·수집)·홈 통계 전부.
+- 마지막 남은 주문 영역을 주문 DB화 라운드 1~3(PR#95~#97)에서 옮기고, 라운드 3에서 `src/mocks/`·`MSWProvider`·`msw` 패키지를 걷어냈다. 문의는 DB화하지 않고 홈 카드를 숨겼다.
+- 외부몰이 필요한 흐름은 mock이 아니라 시뮬레이터 route(`src/simulators/`, `/api/external/<몰>/...`)로 만든다(`.claude/rules/msw-rules.md`).
 
-아래는 이 경계가 "인증만 DB" → "route가 기본"으로 옮겨 온 경위다. 중간의 판단 기준("MSW가 구조적으로 할 수 없는가")은 **그 시점의 기준**이며, 지금 새 기능의 위치를 정하는 기준이 아니다.
+아래는 이 경계가 "인증만 DB" → "route가 기본" → "전부 route"로 옮겨 온 경위다. 중간의 판단 기준("MSW가 구조적으로 할 수 없는가")은 **그 시점의 기준**이며, 지금 새 기능의 위치를 정하는 기준이 아니다.
 
 ## Context
 
@@ -133,7 +133,9 @@ DB로 전환한 경로의 MSW 핸들러 파일과 관련 utils를 함께 제거�
 
 ## MSW를 켜는 범위 — 필요한 화면만 (2026-09-24)
 
-MSW는 **주문 영역(주문 목록·상세·수집, 홈 주문 통계)이 쓰는 브라우저 worker 하나**만 남았다. `MSWProvider`는 `(authenticated)` 레이아웃의 본문만 감싼다.
+> 2026-10-01 MSW 전체 제거로 이 절의 장치(브라우저 worker, `MSWProvider`)도 함께 사라졌다. 교훈("켜 둔 이유가 사라지면 범위도 줄인다", 서버 MSW가 `fetch` 기반 DB 쿼리를 로그에 남긴다)은 유효하다.
+
+당시 MSW는 **주문 영역(주문 목록·상세·수집, 홈 주문 통계)이 쓰는 브라우저 worker 하나**만 남아 있었다. `MSWProvider`는 `(authenticated)` 레이아웃의 본문만 감쌌다.
 
 **서버 MSW(`instrumentation.ts`의 `setupServer().listen()`)는 삭제했다.** 2026-06-05에 가입·로그인을 MSW로 돌리던 시절 운영 오류를 고치려고 넣은 것인데, 가입·로그인이 route로 옮겨간 뒤에는 가로챌 서버 측 요청이 하나도 없었다. 그런데도 켜져 있던 비용이 컸다:
 
@@ -156,6 +158,6 @@ MSW는 **주문 영역(주문 목록·상세·수집, 홈 주문 통계)이 쓰�
 
 - `docs/solutions/integration-issues/msw-timing-issue-auth-db-fix.md` — 이 설계를 도출한 근본 원인
 - `docs/solutions/architecture-patterns/signup-vs-sub-user-create.md` — 두 사용자 등록 경로의 DB 저장 방식
-- `[[single-item-ownership-header-pattern]]` — `X-Owner-Id` 헤더 패턴은 **MSW 잔존 도메인 전용**이다. DB route로 옮긴 도메인은 `requireSession`으로 세션에서 직접 읽는다
+- `[[single-item-ownership-header-pattern]]` — `X-Owner-Id` 헤더 패턴은 MSW 시절 기록이다. 지금 route는 전부 `requireSession`으로 세션에서 직접 읽는다
 - `[[user-input-blocked-by-type-not-sanitizer]]` — R2 업로드 route의 키 조립·소유권 판정
 - `[[api-route-session-auth-guard]]` — **중요**: 여기 나열된 DB route handler들은 `middleware.ts`의 보호를 받지 않는다(matcher가 페이지 경로만 포함). 2026-07-16에야 발견된 인증 공백이었다 — 새 route.ts를 이 경계 기준으로 추가할 때 반드시 함께 참고할 것
