@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getProducts, GetProductsResponse } from '@/features/products/api/getProducts';
 import { commitProductSearch } from '@/features/products/util/productSearch';
-import { getMallRegistrationSearchFilterAtom } from '@/features/mallRegistration/store/search.store';
+import {
+  committedFiltersAtom,
+  currentPageAtom,
+  getMallRegistrationSearchFilterAtom,
+} from '@/features/mallRegistration/store/search.store';
 import { resetMallRegistrationStateAtom } from '@/features/mallRegistration/store/mallRegistration.store';
 import { MallRegistrationHeaderSection } from './MallRegistrationHeaderSection';
 import { MallRegistrationSearchFilterSection } from './MallRegistrationSearchFilterSection';
@@ -16,8 +20,9 @@ import { MallSelectModal } from './components/MallSelectModal';
 
 export const MallRegistrationLayout = () => {
   const currentFilter = useAtomValue(getMallRegistrationSearchFilterAtom);
-  const [appliedFilter, setAppliedFilter] = useState(currentFilter);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // 확정 필터·페이지는 store에 둔다 — 메뉴를 벗어나면 SearchFilterScopeReset이 초기화한다.
+  const [appliedFilter, setAppliedFilter] = useAtom(committedFiltersAtom);
+  const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
   const resetState = useSetAtom(resetMallRegistrationStateAtom);
 

@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useSetAtom } from 'jotai';
 import { GlobalHeader } from '@/components/layout';
 import { GlobalSidebar } from '@/components/layout/globalSidebar/GlobalSidebar';
+import { SearchFilterScopeReset } from '@/components/layout/SearchFilterScopeReset';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createAppQueryClient } from '@/shared/utils/appQueryClient';
@@ -27,6 +28,7 @@ export default function Layout({ children }: Props) {
 
   return (
     <SidebarProvider>
+      <SearchFilterScopeReset />
       <div className="flex min-h-screen w-full">
         {/* 사이드바 영역 */}
         <GlobalSidebar />

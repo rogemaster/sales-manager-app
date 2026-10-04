@@ -7,8 +7,8 @@ import {
   ProductSearchFilterSection,
   ProductTableSection,
 } from '@/features/products/ui/list';
-import { getSearchFilterAtom } from '../../store/search.store';
-import { useAtomValue } from 'jotai';
+import { committedFiltersAtom, currentPageAtom, getSearchFilterAtom } from '../../store/search.store';
+import { useAtom, useAtomValue } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts, GetProductsResponse } from '../../api/getProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
@@ -16,8 +16,9 @@ import { commitProductSearch } from '../../util/productSearch';
 
 export const ProductListLayout = () => {
   const currentFilter = useAtomValue(getSearchFilterAtom);
-  const [appliedFilter, setAppliedFilter] = useState(currentFilter);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // 확정 필터·페이지는 store에 둔다 — 상세에 다녀와도 유지되고, 메뉴를 벗어나면 SearchFilterScopeReset이 초기화한다.
+  const [appliedFilter, setAppliedFilter] = useAtom(committedFiltersAtom);
+  const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
   const [searchCount, setSearchCount] = useState(0);
   // 표시 여부는 화면을 떠나면 해제된다(요구사항). 지역 상태가 그것을 그대로 만족하므로
   // 새 Jotai atom을 만들지 않는다. 페이지 이동·재검색은 이 컴포넌트를 언마운트하지 않아 값이 유지된다.

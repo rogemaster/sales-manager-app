@@ -27,7 +27,9 @@ export const MallLinkedSearchInput = () => {
   const setCurrentPage = useSetAtom(currentPageAtom);
   const setSelectedLinkedIds = useSetAtom(selectedLinkedIdsAtom);
 
-  const [inputValue, setInputValue] = useState('');
+  // 상세에 다녀와 목록이 확정 검색어로 걸러져 있을 때 칸이 비어 보이지 않게 확정값으로 시작한다.
+  const committedSearchValue = useAtomValue(committedFiltersAtom).searchValue;
+  const [inputValue, setInputValue] = useState(committedSearchValue);
 
   const handleChangeInput: ChangeEventHandler<HTMLInputElement> = (e) => {
     setInputValue(e.target.value);
