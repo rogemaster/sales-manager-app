@@ -121,6 +121,7 @@ export const XxxDateFilter = () => {
 - **새 목록 화면은 둘 다 해야 한다.** 범위 등록을 빠뜨리면 그 화면만 탭을 닫을 때까지 필터가 남는다(2026-10-04 이전 전 화면의 증상). 범위 id를 추가하고 연결을 빠뜨리면 컴파일 오류가 난다.
 - 판정은 화면 unmount가 아니라 경로다 — 목록 → 상세 이동에서도 목록이 unmount된다.
 - 검색어를 입력칸 지역 state로 들고 있는 화면은 확정값(`committedFiltersAtom`의 `searchValue`)으로 시작한다. 유지된 목록이 검색어로 걸러져 있는데 칸이 비어 보이지 않게 하기 위해서다.
+- 근거: [`search-filter-menu-scope-reset-by-pathname.md`](../../docs/solutions/architecture-patterns/search-filter-menu-scope-reset-by-pathname.md)
 
 ## 검색 필터는 화면이 소유한다 (다른 도메인 것을 가져다 쓰지 않는다)
 
