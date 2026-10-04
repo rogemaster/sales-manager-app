@@ -25,7 +25,6 @@ export const shoppingSettingIdAtom = filters.atom<string>('ALL');
 export const linkStatusAtom = filters.atom<MallLinkStatus | 'ALL'>('ALL');
 export const saleStateAtom = filters.atom<ProductStateType | 'ALL'>('ALL');
 export const searchTypeAtom = filters.atom<MallLinkedProductSearchType>(DEFAULT_SEARCH_TYPE);
-export const searchValueAtom = filters.atom<string>('');
 
 // UI 조작 중인 draft 필터 (검색 버튼 클릭 전까지 API 호출에 사용되지 않음)
 export const getMallLinkedSearchFilterAtom = atom<MallLinkedProductSearch>((get) => ({
@@ -38,7 +37,7 @@ export const getMallLinkedSearchFilterAtom = atom<MallLinkedProductSearch>((get)
   linkStatus: get(linkStatusAtom),
   saleState: get(saleStateAtom),
   searchType: get(searchTypeAtom),
-  searchValue: get(searchValueAtom),
+  searchValue: '', // 검색어는 입력칸이 들고 있다가 검색 버튼에서 committed에 넣는다
 }));
 
 // 검색 버튼 클릭 시 확정된 필터 (API 쿼리에 실제로 사용)

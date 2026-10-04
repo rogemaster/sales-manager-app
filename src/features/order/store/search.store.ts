@@ -24,7 +24,6 @@ export const mallIdAtom = filters.atom<string>('ALL');
 export const deliveryCompanyAtom = filters.atom<string>('ALL');
 export const orderStatusAtom = filters.atom<string>(DEFAULT_ORDER_STATUS);
 export const searchTypeAtom = filters.atom<string>(DEFAULT_SEARCH_TYPE);
-export const searchValueAtom = filters.atom<string>('');
 
 export const selectedOrdersAtom = atom<string[]>([]);
 
@@ -38,7 +37,7 @@ export const getOrderSearchFilterAtom = atom<OrderSearchType>((get) => ({
   deliveryCompany: get(deliveryCompanyAtom),
   orderStatus: get(orderStatusAtom),
   searchType: get(searchTypeAtom),
-  searchValue: get(searchValueAtom),
+  searchValue: '', // 검색어는 입력칸이 들고 있다가 검색 버튼에서 committed에 넣는다
 }));
 
 // 검색 버튼 클릭 시 확정된 필터 (API 쿼리에 실제로 사용)
