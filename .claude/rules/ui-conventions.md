@@ -110,7 +110,17 @@ export const XxxDateFilter = () => {
 
 `draftFilterAtom` / `committedFilterAtom`(단수) 쪽이 대칭은 더 낫지만 기존 목록 화면 대부분(사용자·쇼핑몰계정·정보설정·연동상품·주문)이 위 형태라 이쪽으로 통일했다. 새 목록 화면은 위 표를 따른다.
 
-- **예외 2곳(선례로 삼지 않는다):** 상품목록과 쇼핑몰 상품등록(`mallRegistration`)은 확정값을 atom이 아니라 레이아웃의 `useState(appliedFilter)`에 둔다. 상품목록은 draft 이름도 도메인 접두어 없는 `getSearchFilterAtom`이다.
+- 확정값과 현재 페이지(`currentPageAtom`)도 store에 둔다 — 레이아웃 `useState`에 두면 상세에 다녀올 때 사라진다(상품목록·쇼핑몰상품등록이 그랬다, 2026-10-04 이전). 상품목록의 draft 이름은 도메인 접두어 없는 `getSearchFilterAtom`으로 남아 있다(선례로 삼지 않는다).
+
+### 메뉴 범위 — 같은 메뉴에서는 유지, 벗어나면 초기화
+
+검색 필터는 **같은 메뉴(목록 + 그 상세·등록) 안에서는 유지하고, 다른 메뉴로 가면 초기화한다**(2026-10-04 사용자 결정). 메뉴는 사이드바 항목이다.
+
+- store의 필터 atom(draft 구성 atom·확정값·현재 페이지)은 `createFilterGroup()`(`src/shared/utils/filterGroup.ts`)의 `filters.atom(...)`으로 만들고 `export const resetFilterAtom = filters.resetAtom`을 둔다. 체크박스 선택·모달 상태는 묶음에 넣지 않는다.
+- 범위는 `src/shared/constant/filterScope.constant.ts`에 경로로 정의하고(테스트 있음), `SearchFilterScopeReset`(`(authenticated)` 레이아웃)의 `RESET_ATOMS`에 store의 `resetFilterAtom`을 연결한다.
+- **새 목록 화면은 둘 다 해야 한다.** 범위 등록을 빠뜨리면 그 화면만 탭을 닫을 때까지 필터가 남는다(2026-10-04 이전 전 화면의 증상). 범위 id를 추가하고 연결을 빠뜨리면 컴파일 오류가 난다.
+- 판정은 화면 unmount가 아니라 경로다 — 목록 → 상세 이동에서도 목록이 unmount된다.
+- 검색어를 입력칸 지역 state로 들고 있는 화면은 확정값(`committedFiltersAtom`의 `searchValue`)으로 시작한다. 유지된 목록이 검색어로 걸러져 있는데 칸이 비어 보이지 않게 하기 위해서다.
 
 ## 검색 필터는 화면이 소유한다 (다른 도메인 것을 가져다 쓰지 않는다)
 
