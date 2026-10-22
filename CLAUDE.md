@@ -118,6 +118,7 @@ UI 스타일 작업 시 **폰트 크기와 폰트 색상은 절대 변경하지 
 - **Components:** PascalCase files; `'use client'` only where needed (forms, hooks, interactive UI)
 - **Prettier:** `printWidth: 120`, `singleQuote: true`, `trailingComma: all`, `semi: true`
 - **TypeScript:** strict mode; interface-based domain models; Zod write schemas in `features/*/util/*Schema.ts` (shared by form and route)
+- **queryKey:** 문자열 리터럴로 쓰지 않는다. `features/<도메인>/constant/queryKey.constant.ts`에 상수로 두고(키가 다루는 리소스의 도메인), 조회·무효화 양쪽이 import한다. 최상위 `shared/`로 모으지 않는다(2026-10-22 결정).
 - **연락처 필드:** 연락처(휴대폰) 필드를 추가할 때는 inline regex를 쓰지 않고 `src/shared/utils/phone.ts`에서 import한다.
   - `phoneSchemaRequired(emptyMsg?, formatMsg?)` — 필수 Zod 스키마
   - `formatPhone(value)` — 자동 하이픈 포맷터 (010-XXXX-XXXX)
