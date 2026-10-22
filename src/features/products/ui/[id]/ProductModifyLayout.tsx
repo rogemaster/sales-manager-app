@@ -14,6 +14,7 @@ import { getErrorMessage } from '@/shared/utils/errorMessage';
 import { useRouter } from 'next/navigation';
 import { resolveMainImageKey } from '@/shared/api/uploadImage';
 import { useCustomerCodeAvailability } from '../hooks/useCustomerCodeAvailability';
+import { PRODUCT_QUERY_KEY } from '@/features/products/constant/queryKey.constant';
 
 type Props = {
   productId: string;
@@ -29,7 +30,7 @@ export const ProductModifyLayout = ({ productId }: Props) => {
   const ensureCustomerCodeAvailable = useCustomerCodeAvailability(formData, productId);
 
   const { data: queryData, isSuccess } = useQuery({
-    queryKey: ['productId', productId, workspaceOwnerId],
+    queryKey: [PRODUCT_QUERY_KEY, productId, workspaceOwnerId],
     queryFn: () => getProduct(productId),
     enabled: !!workspaceOwnerId,
   });

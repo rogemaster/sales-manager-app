@@ -6,7 +6,8 @@ import { getErrorMessage } from '@/shared/utils/errorMessage';
 import { OrderStatusTypes } from '../types/order.types';
 import { selectedOrdersAtom } from '../store/search.store';
 import { bulkUpdateOrderStatus } from './bulkUpdateOrderStatus';
-import { ORDER_LIST_QUERY_KEY } from './useGetOrders';
+import { ORDER_LIST_QUERY_KEY } from '@/features/order/constant/queryKey.constant';
+import { HOME_ORDER_STATS_QUERY_KEY } from '@/features/home/constant/queryKey.constant';
 
 /** 목록 액션(상태 일괄변경·송장전송)의 mutation 키 접두어. 실행 중 버튼 비활성을 mutation 캐시로 판정한다. */
 export const ORDER_LIST_ACTION_MUTATION_KEY = 'orderListAction';
@@ -35,7 +36,7 @@ export const useBulkUpdateOrderStatus = () => {
     onError: (error) => showAlert({ type: 'error', message: getErrorMessage(error, '주문 상태 변경 실패') }),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['home', 'order-stats'] });
+      queryClient.invalidateQueries({ queryKey: [HOME_ORDER_STATS_QUERY_KEY] });
     },
   });
 };

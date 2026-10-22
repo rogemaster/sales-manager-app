@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MALL_LINKED_PRODUCTS_QUERY_KEY } from './useGetMallLinkedProducts';
-import { MALL_LINKED_PRODUCT_QUERY_KEY } from './useGetMallLinkedProduct';
-import { MALL_LINKED_PRODUCT_HISTORIES_QUERY_KEY } from './useGetMallLinkedProductHistories';
 import { resendMallLinkedProducts } from './resendMallLinkedProducts';
+import {
+  MALL_LINKED_PRODUCTS_QUERY_KEY,
+  MALL_LINKED_PRODUCT_QUERY_KEY,
+  MALL_LINKED_PRODUCT_HISTORIES_QUERY_KEY,
+} from '@/features/mallLinkedProduct/constant/queryKey.constant';
 
 export const useResendMallLinkedProducts = () => {
   const queryClient = useQueryClient();

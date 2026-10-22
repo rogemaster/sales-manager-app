@@ -17,6 +17,7 @@ import { MallRegistrationSearchFilterSection } from './MallRegistrationSearchFil
 import { MallRegistrationActionSection } from './MallRegistrationActionSection';
 import { MallRegistrationTableSection } from './MallRegistrationTableSection';
 import { MallSelectModal } from './components/MallSelectModal';
+import { MALL_REGISTRATION_PRODUCTS_QUERY_KEY } from '@/features/mallRegistration/constant/queryKey.constant';
 
 export const MallRegistrationLayout = () => {
   const currentFilter = useAtomValue(getMallRegistrationSearchFilterAtom);
@@ -27,7 +28,7 @@ export const MallRegistrationLayout = () => {
   const resetState = useSetAtom(resetMallRegistrationStateAtom);
 
   const { data, isLoading, isError } = useQuery<GetProductsResponse>({
-    queryKey: ['mallRegistrationProducts', workspaceOwnerId, appliedFilter, currentPage],
+    queryKey: [MALL_REGISTRATION_PRODUCTS_QUERY_KEY, workspaceOwnerId, appliedFilter, currentPage],
     queryFn: () => getProducts(workspaceOwnerId, appliedFilter, currentPage),
     enabled: !!workspaceOwnerId,
   });

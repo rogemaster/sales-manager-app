@@ -3,8 +3,7 @@ import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { collectFiltersAtom } from '../store/collect.store';
 import { getCollectionAccounts } from './getCollectionAccounts';
-
-export const COLLECTION_ACCOUNTS_QUERY_KEY = 'collectionAccounts';
+import { COLLECTION_ACCOUNTS_QUERY_KEY } from '@/features/order/constant/queryKey.constant';
 
 export const useGetCollectionAccounts = () => {
   const filters = useAtomValue(collectFiltersAtom);

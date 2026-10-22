@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getProducts, GetProductsResponse } from '../../api/getProducts';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { commitProductSearch } from '../../util/productSearch';
+import { PRODUCT_LIST_QUERY_KEY } from '@/features/products/constant/queryKey.constant';
 
 export const ProductListLayout = () => {
   const currentFilter = useAtomValue(getSearchFilterAtom);
@@ -26,7 +27,7 @@ export const ProductListLayout = () => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data, isLoading, isError } = useQuery<GetProductsResponse>({
-    queryKey: ['products', workspaceOwnerId, appliedFilter, currentPage],
+    queryKey: [PRODUCT_LIST_QUERY_KEY, workspaceOwnerId, appliedFilter, currentPage],
     queryFn: () => getProducts(workspaceOwnerId, appliedFilter, currentPage),
     enabled: !!workspaceOwnerId,
   });

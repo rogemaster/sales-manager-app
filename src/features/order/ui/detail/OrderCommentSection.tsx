@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { OrderComment } from '../../types/order.types';
 import { createOrderComment } from '../../api/createOrderComment';
 import { useAlert } from '@/hooks/useAlert';
+import { ORDER_COMMENTS_QUERY_KEY } from '@/features/order/constant/queryKey.constant';
 
 type Props = {
   orderId: string;
@@ -24,7 +25,7 @@ export const OrderCommentSection = ({ orderId, comments, ownerId }: Props) => {
     mutationFn: () => createOrderComment(orderId, content),
     onSuccess: () => {
       setContent('');
-      queryClient.invalidateQueries({ queryKey: ['order-comments', orderId, ownerId] });
+      queryClient.invalidateQueries({ queryKey: [ORDER_COMMENTS_QUERY_KEY, orderId, ownerId] });
     },
     // 공백만 입력하면 서버가 400 사유를 돌려준다.
     onError: (error) => showAlert({ type: 'error', message: error.message }),

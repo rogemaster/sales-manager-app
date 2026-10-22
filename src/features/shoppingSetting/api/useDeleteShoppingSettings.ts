@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteShoppingSettings } from './deleteShoppingSettings';
-import { SHOPPING_SETTING_LIST_QUERY_KEY } from './useGetShoppingSettings';
+import { SHOPPING_SETTING_LIST_QUERY_KEY } from '@/features/shoppingSetting/constant/queryKey.constant';
 
 export const useDeleteShoppingSettings = () => {
   const queryClient = useQueryClient();

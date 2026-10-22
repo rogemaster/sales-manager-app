@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateShoppingAccountsStatus } from './updateShoppingAccountsStatus';
-import { SHOPPING_ACCOUNT_LIST_QUERY_KEY } from './useGetShoppingAccounts';
+import { SHOPPING_ACCOUNT_LIST_QUERY_KEY } from '@/features/shoppingAccount/constant/queryKey.constant';
 
 export const useUpdateShoppingAccountsStatus = () => {
   const queryClient = useQueryClient();

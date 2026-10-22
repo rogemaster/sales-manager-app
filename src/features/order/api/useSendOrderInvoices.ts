@@ -6,7 +6,8 @@ import { getErrorMessage } from '@/shared/utils/errorMessage';
 import { selectedOrdersAtom } from '../store/search.store';
 import { sendOrderInvoices } from './sendOrderInvoices';
 import { ORDER_LIST_ACTION_MUTATION_KEY } from './useBulkUpdateOrderStatus';
-import { ORDER_LIST_QUERY_KEY } from './useGetOrders';
+import { ORDER_LIST_QUERY_KEY } from '@/features/order/constant/queryKey.constant';
+import { HOME_ORDER_STATS_QUERY_KEY } from '@/features/home/constant/queryKey.constant';
 
 /** 송장전송. 콜백을 훅 단위에 두는 이유는 useBulkUpdateOrderStatus와 같다. */
 export const useSendOrderInvoices = () => {
@@ -24,7 +25,7 @@ export const useSendOrderInvoices = () => {
     onError: (error) => showAlert({ type: 'error', message: getErrorMessage(error, '송장전송 실패') }),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['home', 'order-stats'] });
+      queryClient.invalidateQueries({ queryKey: [HOME_ORDER_STATS_QUERY_KEY] });
     },
   });
 };

@@ -18,6 +18,12 @@ import { OrderStatCards } from './components/OrderStatCards';
 import { QuickActions } from './components/QuickActions';
 import { RecentProducts } from './components/RecentProducts';
 import { StatCards } from './components/StatCards';
+import {
+  HOME_STATS_QUERY_KEY,
+  HOME_LINKED_PRODUCT_STATS_QUERY_KEY,
+  HOME_ORDER_STATS_QUERY_KEY,
+  HOME_RECENT_PRODUCTS_QUERY_KEY,
+} from '@/features/home/constant/queryKey.constant';
 
 const PERIOD_OPTIONS = [7, 15, 30] as const;
 type Period = (typeof PERIOD_OPTIONS)[number];
@@ -34,7 +40,7 @@ export const HomeLayout = () => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: stats } = useQuery({
-    queryKey: ['home', 'stats', workspaceOwnerId, startDate, endDate],
+    queryKey: [HOME_STATS_QUERY_KEY, workspaceOwnerId, startDate, endDate],
     queryFn: () => getHomeStats(startDate, endDate),
     enabled: !!workspaceOwnerId,
     // 기간을 바꾸는 동안 이전 숫자를 유지한다 — 없으면 줄이 사라졌다 다시 나타난다.
@@ -42,21 +48,21 @@ export const HomeLayout = () => {
   });
 
   const { data: linkedProductStats } = useQuery({
-    queryKey: ['home', 'linked-product-stats', workspaceOwnerId, startDate, endDate],
+    queryKey: [HOME_LINKED_PRODUCT_STATS_QUERY_KEY, workspaceOwnerId, startDate, endDate],
     queryFn: () => getHomeLinkedProductStats(startDate, endDate),
     enabled: !!workspaceOwnerId,
     placeholderData: keepPreviousData,
   });
 
   const { data: orderStats } = useQuery({
-    queryKey: ['home', 'order-stats', workspaceOwnerId, startDate, endDate],
+    queryKey: [HOME_ORDER_STATS_QUERY_KEY, workspaceOwnerId, startDate, endDate],
     queryFn: () => getHomeOrderStats(startDate, endDate),
     enabled: !!workspaceOwnerId,
     placeholderData: keepPreviousData,
   });
 
   const { data: recentProducts } = useQuery({
-    queryKey: ['home', 'recent-products', workspaceOwnerId],
+    queryKey: [HOME_RECENT_PRODUCTS_QUERY_KEY, workspaceOwnerId],
     queryFn: () => getRecentProducts(),
     enabled: !!workspaceOwnerId,
   });
