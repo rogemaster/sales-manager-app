@@ -3,8 +3,7 @@ import { useAtomValue } from 'jotai';
 import { committedFiltersAtom, currentPageAtom } from '../store/search.store';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getShoppingSettings } from './getShoppingSettings';
-
-export const SHOPPING_SETTING_LIST_QUERY_KEY = 'shoppingSettingList';
+import { SHOPPING_SETTING_LIST_QUERY_KEY } from '@/features/shoppingSetting/constant/queryKey.constant';
 
 export const useGetShoppingSettings = () => {
   const filters = useAtomValue(committedFiltersAtom);

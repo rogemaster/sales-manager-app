@@ -7,8 +7,8 @@ import { selectedAccountIdsAtom } from '../store/collect.store';
 import { buildCollectionResultAlert } from '../util/collectionResultAlert';
 import { pendingCollectionAccountIds } from '../util/collectionPending';
 import { runOrderCollection } from './runOrderCollection';
-import { COLLECTION_ACCOUNTS_QUERY_KEY } from './useGetCollectionAccounts';
-import { ORDER_LIST_QUERY_KEY } from './useGetOrders';
+import { COLLECTION_ACCOUNTS_QUERY_KEY, ORDER_LIST_QUERY_KEY } from '@/features/order/constant/queryKey.constant';
+import { HOME_ORDER_STATS_QUERY_KEY } from '@/features/home/constant/queryKey.constant';
 
 const RUN_ORDER_COLLECTION_MUTATION_KEY = ['runOrderCollection'];
 
@@ -35,7 +35,7 @@ export const useRunOrderCollection = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [COLLECTION_ACCOUNTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['home', 'order-stats'] });
+      queryClient.invalidateQueries({ queryKey: [HOME_ORDER_STATS_QUERY_KEY] });
     },
   });
 };

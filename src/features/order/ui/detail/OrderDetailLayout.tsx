@@ -15,13 +15,19 @@ import { getOrderHistory } from '../../api/getOrderHistory';
 import { updateOrder } from '../../api/updateOrder';
 import { Order, OrderDetail } from '../../types/order.types';
 import { orderWriteSchema, OrderWriteValues } from '../../util/orderWrite';
-import { ORDER_LIST_QUERY_KEY } from '../../api/useGetOrders';
 import { OrderInfoSection } from './OrderInfoSection';
 import { OrdererRecipientSection } from './OrdererRecipientSection';
 import { OrderStatusSection } from './OrderStatusSection';
 import { OrderClaimSection } from './OrderClaimSection';
 import { OrderCommentSection } from './OrderCommentSection';
 import { OrderEditHistorySection } from './OrderEditHistorySection';
+import {
+  ORDER_QUERY_KEY,
+  ORDER_CLAIM_QUERY_KEY,
+  ORDER_COMMENTS_QUERY_KEY,
+  ORDER_HISTORY_QUERY_KEY,
+  ORDER_LIST_QUERY_KEY,
+} from '@/features/order/constant/queryKey.constant';
 
 type Props = {
   orderId: string;
@@ -35,25 +41,25 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);
 
   const { data: order, isSuccess: orderSuccess } = useQuery({
-    queryKey: ['order', orderId, workspaceOwnerId],
+    queryKey: [ORDER_QUERY_KEY, orderId, workspaceOwnerId],
     queryFn: () => getOrder(orderId),
     enabled: !!workspaceOwnerId,
   });
 
   const { data: claim, isSuccess: claimSuccess } = useQuery({
-    queryKey: ['order-claim', orderId, workspaceOwnerId],
+    queryKey: [ORDER_CLAIM_QUERY_KEY, orderId, workspaceOwnerId],
     queryFn: () => getOrderClaim(orderId),
     enabled: !!workspaceOwnerId,
   });
 
   const { data: comments = [] } = useQuery({
-    queryKey: ['order-comments', orderId, workspaceOwnerId],
+    queryKey: [ORDER_COMMENTS_QUERY_KEY, orderId, workspaceOwnerId],
     queryFn: () => getOrderComments(orderId),
     enabled: !!workspaceOwnerId,
   });
 
   const { data: history = [] } = useQuery({
-    queryKey: ['order-history', orderId, workspaceOwnerId],
+    queryKey: [ORDER_HISTORY_QUERY_KEY, orderId, workspaceOwnerId],
     queryFn: () => getOrderHistory(orderId),
     enabled: !!workspaceOwnerId,
   });
@@ -70,9 +76,9 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
       // 클레임 메모는 같은 요청으로 저장됐다 — 다시 조회하지 않고 보낸 값으로 맞춘다.
       const updatedClaim = claim ? { ...claim, handlerNote: values.claim?.handlerNote ?? claim.handlerNote } : claim;
       form.reset({ ...updatedOrder, claim: updatedClaim ?? undefined });
-      queryClient.setQueryData(['order', orderId, workspaceOwnerId], updatedOrder);
-      queryClient.setQueryData(['order-claim', orderId, workspaceOwnerId], updatedClaim);
-      queryClient.invalidateQueries({ queryKey: ['order-history', orderId, workspaceOwnerId] });
+      queryClient.setQueryData([ORDER_QUERY_KEY, orderId, workspaceOwnerId], updatedOrder);
+      queryClient.setQueryData([ORDER_CLAIM_QUERY_KEY, orderId, workspaceOwnerId], updatedClaim);
+      queryClient.invalidateQueries({ queryKey: [ORDER_HISTORY_QUERY_KEY, orderId, workspaceOwnerId] });
       queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
       setIsEditMode(false);
       showAlert({ type: 'success', message: '주문 수정 완료' });
@@ -80,7 +86,7 @@ export const OrderDetailLayout = ({ orderId }: Props) => {
     onError: (error) => {
       showAlert({ type: 'error', message: error.message });
       // 발주확인이 몰에서 거절되면 저장은 안 됐지만 실패 사유·이력은 기록됐다 — 바로 보이게 다시 읽는다.
-      queryClient.invalidateQueries({ queryKey: ['order-history', orderId, workspaceOwnerId] });
+      queryClient.invalidateQueries({ queryKey: [ORDER_HISTORY_QUERY_KEY, orderId, workspaceOwnerId] });
       queryClient.invalidateQueries({ queryKey: [ORDER_LIST_QUERY_KEY] });
     },
   });

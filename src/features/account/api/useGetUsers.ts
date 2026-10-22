@@ -3,8 +3,7 @@ import { useAtomValue } from 'jotai';
 import { committedFiltersAtom, currentPageAtom } from '../store/userSearch.store';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getUsers } from './getUsers';
-
-export const USER_LIST_QUERY_KEY = 'userList';
+import { USER_LIST_QUERY_KEY } from '@/features/account/constant/queryKey.constant';
 
 export const useGetUsers = () => {
   const filters = useAtomValue(committedFiltersAtom);

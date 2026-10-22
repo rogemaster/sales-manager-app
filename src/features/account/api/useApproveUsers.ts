@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { approveUsers } from './approveUsers';
-import { USER_LIST_QUERY_KEY } from './useGetUsers';
+import { USER_LIST_QUERY_KEY } from '@/features/account/constant/queryKey.constant';
 
 export const useApproveUsers = () => {
   const queryClient = useQueryClient();

@@ -2,8 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getMallLinkedProduct } from './getMallLinkedProduct';
-
-export const MALL_LINKED_PRODUCT_QUERY_KEY = 'mallLinkedProduct';
+import { MALL_LINKED_PRODUCT_QUERY_KEY } from '@/features/mallLinkedProduct/constant/queryKey.constant';
 
 export const useGetMallLinkedProduct = (id: string) => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);

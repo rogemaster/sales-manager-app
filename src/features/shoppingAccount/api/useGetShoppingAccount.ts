@@ -2,8 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { getShoppingAccount } from './getShoppingAccount';
-
-export const SHOPPING_ACCOUNT_QUERY_KEY = 'shoppingAccount';
+import { SHOPPING_ACCOUNT_QUERY_KEY } from '@/features/shoppingAccount/constant/queryKey.constant';
 
 export const useGetShoppingAccount = (id: string) => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);

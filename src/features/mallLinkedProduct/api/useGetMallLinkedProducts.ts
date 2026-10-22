@@ -3,8 +3,7 @@ import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { committedFiltersAtom, currentPageAtom } from '../store/search.store';
 import { getMallLinkedProducts } from './getMallLinkedProducts';
-
-export const MALL_LINKED_PRODUCTS_QUERY_KEY = 'mallLinkedProducts';
+import { MALL_LINKED_PRODUCTS_QUERY_KEY } from '@/features/mallLinkedProduct/constant/queryKey.constant';
 
 export const useGetMallLinkedProducts = () => {
   const workspaceOwnerId = useAtomValue(workspaceOwnerIdAtom);

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createShoppingSetting } from './createShoppingSetting';
-import { SHOPPING_SETTING_LIST_QUERY_KEY } from './useGetShoppingSettings';
 import { CreateShoppingSettingBody } from '../types/shoppingSetting.types';
+import { SHOPPING_SETTING_LIST_QUERY_KEY } from '@/features/shoppingSetting/constant/queryKey.constant';
 
 export const useCreateShoppingSetting = () => {
   const queryClient = useQueryClient();

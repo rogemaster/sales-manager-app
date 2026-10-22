@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { workspaceOwnerIdAtom } from '@/features/auth/store/auth.store';
 import { updateShoppingAccount } from './updateShoppingAccount';
-import { SHOPPING_ACCOUNT_LIST_QUERY_KEY } from './useGetShoppingAccounts';
-import { SHOPPING_ACCOUNT_QUERY_KEY } from './useGetShoppingAccount';
 import { UpdateShoppingAccountBody } from '../types/shoppingAccount.types';
+import {
+  SHOPPING_ACCOUNT_LIST_QUERY_KEY,
+  SHOPPING_ACCOUNT_QUERY_KEY,
+} from '@/features/shoppingAccount/constant/queryKey.constant';
 
 export const useUpdateShoppingAccount = (id: string) => {
   const queryClient = useQueryClient();
