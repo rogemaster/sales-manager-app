@@ -24,6 +24,9 @@ const valid = {
   brand: '브랜드',
   manufacturer: '제조사',
   informationDisclosure: { key: '', id: '', name: '', fields: {} },
+  originCountryCode: 'KR',
+  taxType: 'TAXABLE',
+  adultProductType: 'GENERAL',
 };
 
 describe('prepareProductWrite - 등록(full)', () => {

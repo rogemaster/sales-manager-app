@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES } from '@/shared/constant/category.constant';
+import {
+  ADULT_PRODUCT_OPTIONS,
+  ORIGIN_COUNTRIES,
+  TAX_TYPE_OPTIONS,
+} from '@/features/products/constant/compliance.constants';
 import { PRODUCT_BULK_EXCEL_TEMPLATE, PRODUCT_EXCEL_COL } from './bulkTemplate.constant';
 
 describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
-  it('컬럼 24개를 정의된 순서대로 갖는다', () => {
+  it('컬럼 28개를 정의된 순서대로 갖는다', () => {
     expect(PRODUCT_BULK_EXCEL_TEMPLATE.template.map((item) => item.name)).toEqual([
       '고객상품코드',
       '상품명',
@@ -19,6 +24,10 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
       '배송비',
       '메인이미지',
       '상세설명',
+      '원산지',
+      '원산지(기타)',
+      '부가세유형',
+      '성인상품여부',
       '옵션명1',
       '옵션값1',
       '옵션명2',
@@ -43,7 +52,7 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
   it('숫자 서식이 아닌 컬럼은 전부 텍스트 서식이다', () => {
     const textColumns = PRODUCT_BULK_EXCEL_TEMPLATE.template.filter((item) => !item.numeric).map((item) => item.name);
 
-    expect(textColumns).toHaveLength(20);
+    expect(textColumns).toHaveLength(24);
     expect(textColumns).toContain('모델번호');
     expect(textColumns).toContain('고객상품코드');
     expect(textColumns).toContain('옵션값1');
@@ -64,6 +73,9 @@ describe('PRODUCT_BULK_EXCEL_TEMPLATE', () => {
       '배송비',
       '메인이미지',
       '상세설명',
+      '원산지',
+      '부가세유형',
+      '성인상품여부',
       '총수량',
     ]);
   });
@@ -90,5 +102,23 @@ describe('PRODUCT_EXCEL_COL', () => {
   it('이름표에 양식에 없는 컬럼이 없다', () => {
     const templateKeys = PRODUCT_BULK_EXCEL_TEMPLATE.template.map(({ key }) => key);
     expect(Object.keys(PRODUCT_EXCEL_COL).sort()).toEqual([...templateKeys].sort());
+  });
+});
+
+describe('규정 정보 컬럼', () => {
+  // 상품 폼이 필수로 받는 값이다. 화면 Select·라디오와 같은 표시명만 받는다.
+  const column = (name: string) => PRODUCT_BULK_EXCEL_TEMPLATE.template.find((item) => item.name === name);
+
+  it.each([
+    ['원산지', ORIGIN_COUNTRIES],
+    ['부가세유형', TAX_TYPE_OPTIONS],
+    ['성인상품여부', ADULT_PRODUCT_OPTIONS],
+  ])('%s는 필수이고 화면과 같은 표시명만 적을 수 있다', (name, options) => {
+    expect(column(name)?.req).toBe(true);
+    expect(column(name)?.allowed).toEqual(options.map(({ name: label }) => label));
+  });
+
+  it("원산지(기타)는 원산지가 '기타'일 때만 필수다", () => {
+    expect(column('원산지(기타)')).toMatchObject({ req: false, requiredWhen: { header: '원산지', value: '기타' } });
   });
 });

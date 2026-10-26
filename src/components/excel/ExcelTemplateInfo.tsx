@@ -8,7 +8,12 @@ export const ExcelTemplateInfo = ({ templateTitle: title, template }: ExcelTempl
         {template.length > 0 &&
           template.map((item) => (
             <li key={item.name}>
-              {item.name} {item.req ? '(필수)' : '(선택)'}
+              {item.name}{' '}
+              {item.req
+                ? '(필수)'
+                : item.requiredWhen
+                  ? `(${item.requiredWhen.header} '${item.requiredWhen.value}' 선택 시 필수)`
+                  : '(선택)'}
             </li>
           ))}
       </ul>

@@ -54,3 +54,18 @@ describe('excelValidErrorsCodeToMessages', () => {
     expect(error.message).toBe('[고객상품코드] 중복 여부를 확인하지 못했습니다.');
   });
 });
+
+describe('excelValidErrorsCodeToMessages - 조건부 필수', () => {
+  it('EMPTY_REQUIRED_WHEN은 어떤 조건에서 필수인지 함께 알린다', () => {
+    const [error] = excelValidErrorsCodeToMessages([
+      {
+        row: 4,
+        header: '원산지(기타)',
+        code: 'EMPTY_REQUIRED_WHEN',
+        requiredWhen: { header: '원산지', value: '기타' },
+      },
+    ]);
+
+    expect(error.message).toBe("[원산지(기타)] [원산지] 값이 '기타'이면 비워 둘 수 없습니다.");
+  });
+});
