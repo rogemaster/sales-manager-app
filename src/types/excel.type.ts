@@ -23,6 +23,15 @@ export interface ExcelTemplateInfo {
   // 워크스페이스 안에서 겹치면 안 되는 코드 컬럼(고객사 상품코드). 붙이면 업로드 시 파일 안 중복과
   // 이미 등록된 코드와의 중복을 오류 행으로 잡는다. 비교는 공백·대소문자를 무시한다.
   uniqueCode?: boolean;
+  // 다른 컬럼이 특정 값일 때만 필수인 컬럼(원산지가 '기타'일 때의 원산지 직접 입력). req는 false로 둔다 —
+  // 컬럼이 없거나 비어도 조건에 걸리지 않은 행은 통과하고, 걸린 행만 EMPTY_REQUIRED_WHEN으로 잡는다.
+  requiredWhen?: ExcelRequiredWhen;
+}
+
+// header 컬럼의 값이(앞뒤 공백 무시) value와 같을 때 필수. value는 시트에 적는 표시명이다.
+export interface ExcelRequiredWhen {
+  header: string;
+  value: string;
 }
 
 // 엑셀 section header
@@ -73,6 +82,7 @@ export type UploadErrorCode =
 export type ValidationErrorCode =
   | 'MISSING_FIELD'
   | 'EMPTY_VALUE'
+  | 'EMPTY_REQUIRED_WHEN'
   | 'INVALID_VALUE'
   | 'INVALID_NUMBER'
   | 'INVALID_IMAGE'
@@ -99,6 +109,8 @@ export type ValidationError = {
   rows?: number[];
   // DUPLICATE_EXISTING에서 채워진다. 이미 등록된 쪽의 실제 표기 — 사용자가 목록에서 찾을 수 있게 한다.
   existingCode?: string;
+  // EMPTY_REQUIRED_WHEN에서 채워진다. 어떤 조건 때문에 필수였는지 메시지가 알려주기 위한 값이다.
+  requiredWhen?: ExcelRequiredWhen;
 };
 
 export type UploadResult = {

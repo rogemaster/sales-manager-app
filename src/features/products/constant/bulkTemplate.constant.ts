@@ -2,6 +2,15 @@ import { ExcelTemplate } from '@/types/excel.type';
 import { PRODUCT_STATUS } from '@/features/products/constant/status.constants';
 import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 import { CATEGORIES } from '@/shared/constant/category.constant';
+import {
+  ADULT_PRODUCT_OPTIONS,
+  ORIGIN_COUNTRIES,
+  ORIGIN_ETC,
+  TAX_TYPE_OPTIONS,
+} from '@/features/products/constant/compliance.constants';
+
+// 원산지 '기타'의 표시명. 시트에는 코드(ETC)가 아니라 표시명을 적는다.
+const ORIGIN_ETC_NAME = ORIGIN_COUNTRIES.find(({ id }) => id === ORIGIN_ETC)?.name ?? '';
 
 /**
  * 시트 컬럼 이름(헤더 글자). 파싱된 행의 키가 이 글자라서, 양식·저장 전략·미리보기가 모두 여기서 읽는다.
@@ -22,6 +31,10 @@ export const PRODUCT_EXCEL_COL = {
   deliveryPrice: '배송비',
   mainImage: '메인이미지',
   detailPage: '상세설명',
+  originCountry: '원산지',
+  originCountryEtc: '원산지(기타)',
+  taxType: '부가세유형',
+  adultProductType: '성인상품여부',
   option1Name: '옵션명1',
   option1Value: '옵션값1',
   option2Name: '옵션명2',
@@ -119,6 +132,32 @@ export const PRODUCT_BULK_EXCEL_TEMPLATE: ExcelTemplate = {
       key: 'detailPage',
       name: PRODUCT_EXCEL_COL.detailPage,
       req: true,
+    },
+    // 규정 정보. 상품 폼이 필수로 받는 값이라 엑셀도 필수다. 폼의 기본값(과세·일반상품)은 채우지 않는다.
+    {
+      key: 'originCountry',
+      name: PRODUCT_EXCEL_COL.originCountry,
+      req: true,
+      allowed: ORIGIN_COUNTRIES.map(({ name }) => name),
+    },
+    {
+      key: 'originCountryEtc',
+      name: PRODUCT_EXCEL_COL.originCountryEtc,
+      req: false,
+      // 폼에서 '기타'를 고르면 나타나는 직접 입력칸과 같다.
+      requiredWhen: { header: PRODUCT_EXCEL_COL.originCountry, value: ORIGIN_ETC_NAME },
+    },
+    {
+      key: 'taxType',
+      name: PRODUCT_EXCEL_COL.taxType,
+      req: true,
+      allowed: TAX_TYPE_OPTIONS.map(({ name }) => name),
+    },
+    {
+      key: 'adultProductType',
+      name: PRODUCT_EXCEL_COL.adultProductType,
+      req: true,
+      allowed: ADULT_PRODUCT_OPTIONS.map(({ name }) => name),
     },
     {
       key: 'option1Name',

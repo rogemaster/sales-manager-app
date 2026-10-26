@@ -155,3 +155,64 @@ describe('validateExcelData - 숫자 검사', () => {
     expect(errors[0].code).toBe('EMPTY_VALUE');
   });
 });
+
+describe('validateExcelData - 조건부 필수 검사', () => {
+  // 원산지가 '기타'일 때만 직접 입력칸이 필수다. 컬럼 자체는 선택이라 양식에서 빼도 다른 행은 막히지 않는다.
+  const conditionalTemplate: ExcelTemplateInfo[] = [
+    { key: 'origin', name: '원산지', req: true, allowed: ['대한민국', '기타'] },
+    { key: 'originEtc', name: '원산지(기타)', req: false, requiredWhen: { header: '원산지', value: '기타' } },
+  ];
+
+  const originRow = (over: Record<string, string | number> = {}) => ({
+    원산지: '기타',
+    '원산지(기타)': '베트남 외',
+    [EXCEL_SHEET_ROW_KEY]: 3,
+    ...over,
+  });
+
+  it('조건 컬럼이 그 값이고 이 컬럼이 비어 있으면 EMPTY_REQUIRED_WHEN 오류를 만든다', () => {
+    const { result, errors } = validateExcelData([originRow({ '원산지(기타)': ' ' })], conditionalTemplate);
+
+    expect(result).toBe('success');
+    expect(errors).toEqual([
+      {
+        row: 3,
+        header: '원산지(기타)',
+        code: 'EMPTY_REQUIRED_WHEN',
+        requiredWhen: { header: '원산지', value: '기타' },
+      },
+    ]);
+  });
+
+  it('컬럼 자체가 없어도 조건에 걸린 행만 오류로 잡는다', () => {
+    const { result, errors } = validateExcelData(
+      [
+        { 원산지: '기타', [EXCEL_SHEET_ROW_KEY]: 2 },
+        { 원산지: '대한민국', [EXCEL_SHEET_ROW_KEY]: 3 },
+      ],
+      conditionalTemplate,
+    );
+
+    expect(result).toBe('success');
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ row: 2, code: 'EMPTY_REQUIRED_WHEN' });
+  });
+
+  it('조건 컬럼 값은 앞뒤 공백을 무시하고 비교한다', () => {
+    const { errors } = validateExcelData([originRow({ 원산지: ' 기타 ', '원산지(기타)': '' })], conditionalTemplate);
+
+    expect(errors[0]?.code).toBe('EMPTY_REQUIRED_WHEN');
+  });
+
+  it('조건에 맞지 않으면 비어 있어도 통과한다', () => {
+    const { errors } = validateExcelData([originRow({ 원산지: '대한민국', '원산지(기타)': '' })], conditionalTemplate);
+
+    expect(errors).toHaveLength(0);
+  });
+
+  it('조건에 맞고 값이 있으면 통과한다', () => {
+    const { errors } = validateExcelData([originRow()], conditionalTemplate);
+
+    expect(errors).toHaveLength(0);
+  });
+});

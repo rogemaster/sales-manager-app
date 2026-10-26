@@ -20,6 +20,9 @@ const valid = {
   brand: '브랜드',
   manufacturer: '제조사',
   informationDisclosure: { key: '', id: '', name: '', fields: {} },
+  originCountryCode: 'KR',
+  taxType: 'TAXABLE',
+  adultProductType: 'GENERAL',
 };
 
 const combo = { values: { 색상: '빨강' }, quantity: 1, skuCode: '', optionPrice: 0 };
@@ -165,6 +168,40 @@ describe('findProductWriteViolation - 열거', () => {
     expect(findProductWriteViolation({ ...valid, originCountryCode: '한국' })).toBe(
       "원산지에 사용할 수 없는 값입니다: '한국'",
     );
+  });
+});
+
+describe('findProductWriteViolation - 원산지·부가세유형·성인상품여부', () => {
+  // 상품 폼이 필수로 받는 값이다. 엑셀이 이 값을 못 채우던 동안만 선택으로 두었다.
+  it.each([
+    ['originCountryCode', '원산지가 없습니다'],
+    ['taxType', '부가세유형이 없습니다'],
+    ['adultProductType', '성인상품여부가 없습니다'],
+  ])('전체 모드는 %s가 없으면 잡는다', (key, message) => {
+    expect(findProductWriteViolation({ ...valid, [key]: undefined })).toBe(message);
+  });
+
+  it('전체 모드는 null을 거부한다', () => {
+    expect(findProductWriteViolation({ ...valid, taxType: null })).toBe("부가세유형에 사용할 수 없는 값입니다: 'null'");
+  });
+
+  it('부분 모드는 보내지 않았으면 요구하지 않는다', () => {
+    expect(findProductWriteViolation({ price: 1000 }, 'partial')).toBeNull();
+  });
+
+  it('원산지가 기타인데 직접 입력값이 없으면 잡는다', () => {
+    expect(findProductWriteViolation({ ...valid, originCountryCode: 'ETC' })).toBe('원산지(기타)가 없습니다');
+    expect(findProductWriteViolation({ ...valid, originCountryCode: 'ETC', originCountryEtc: '  ' })).toBe(
+      '원산지(기타)가 없습니다',
+    );
+  });
+
+  it('원산지가 기타면 직접 입력값과 함께 통과한다', () => {
+    expect(findProductWriteViolation({ ...valid, originCountryCode: 'ETC', originCountryEtc: '베트남 외' })).toBeNull();
+  });
+
+  it('부분 모드에서도 원산지를 기타로 바꾸면 직접 입력값을 요구한다', () => {
+    expect(findProductWriteViolation({ originCountryCode: 'ETC' }, 'partial')).toBe('원산지(기타)가 없습니다');
   });
 });
 

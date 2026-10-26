@@ -46,6 +46,7 @@
 | `allowed` | 적을 수 있는 **표시명** 목록. 목록 밖이면 `INVALID_VALUE`. 목록은 화면 Select가 쓰는 상수에서 파생한다(예: `PRODUCT_STATUS.map(({ name }) => name)`) |
 | `numeric` | 다운로드 양식의 숫자 서식이자, 업로드 시 0 이상 정수 검증(`INVALID_NUMBER`). 현재 숫자 컬럼(공급가·판매가·배송비·총수량)이 전부 같은 규칙이라 표시 하나로 충분하다 — 다른 규칙이 필요한 숫자 컬럼이 생기면 그때 표현을 늘린다 |
 | `remoteImage` | 외부 이미지 주소 컬럼. 업로드 시 `/api/products/image/check`로 확인만 하고 실패 행을 `INVALID_IMAGE`로 잡는다. **R2에 저장하지 않는다** — 사용자가 저장하지 않고 초기화하면 파일만 남는다. 실제 가져오기는 저장 전략이 한다. 빈 값은 확인하지 않고, 필드 오류가 있는 행도 확인한다 |
+| `requiredWhen` | 다른 컬럼이 특정 표시명일 때만 필수(`{ header, value }`, 현재 `원산지(기타)` — 원산지가 '기타'일 때). `req: false`로 두고, 조건에 걸린 행이 비어 있으면 `EMPTY_REQUIRED_WHEN`이다. 컬럼이 없어도 `MISSING_FIELD`로 보지 않는다 — 조건에 안 걸린 행까지 미리보기가 막힌다 |
 | `uniqueCode` | 워크스페이스 안에서 겹치면 안 되는 코드(현재 `고객상품코드`뿐). 파일 안 중복은 묶음의 **모든 행**을 `DUPLICATE_IN_FILE`로, 기존 코드와의 중복은 `/api/products/customer-code/check` 1회 호출로 `DUPLICATE_EXISTING`, 확인 실패는 `CODE_CHECK_FAILED`. 비교는 공백·대소문자 무시 |
 
 - **`uniqueCode`는 100자 초과 코드를 먼저 `INVALID_CODE`로 잡고 확인 대상에서 뺀다.** 확인 API에 보내면 요청 전체가 400이 되어 모든 행이 `CODE_CHECK_FAILED`가 된다.

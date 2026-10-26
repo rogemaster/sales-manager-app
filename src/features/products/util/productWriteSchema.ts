@@ -6,6 +6,7 @@ import { CATEGORIES } from '@/shared/constant/category.constant';
 import {
   ADULT_PRODUCT_OPTIONS,
   ORIGIN_COUNTRIES,
+  ORIGIN_ETC,
   TAX_TYPE_OPTIONS,
 } from '@/features/products/constant/compliance.constants';
 import { CUSTOMER_CODE_MAX_LENGTH } from '@/features/products/util/customerCode';
@@ -81,9 +82,10 @@ const FIELDS: {
 
   { key: 'state', label: '판매상태', required: true, ...code(PRODUCT_STATUS) },
   { key: 'deliveryType', label: '배송정책', required: true, ...code(DELIVERY_TYPE_OPTION) },
-  { key: 'taxType', label: '부가세유형', required: false, ...code(TAX_TYPE_OPTIONS) },
-  { key: 'adultProductType', label: '성인상품여부', required: false, ...code(ADULT_PRODUCT_OPTIONS) },
-  { key: 'originCountryCode', label: '원산지', required: false, ...code(ORIGIN_COUNTRIES) },
+  // 규정 정보 셋은 엑셀 대량등록이 채우지 못하던 동안 선택이었다. 상품 폼이 필수로 받는 값이다.
+  { key: 'taxType', label: '부가세유형', required: true, ...code(TAX_TYPE_OPTIONS) },
+  { key: 'adultProductType', label: '성인상품여부', required: true, ...code(ADULT_PRODUCT_OPTIONS) },
+  { key: 'originCountryCode', label: '원산지', required: true, ...code(ORIGIN_COUNTRIES) },
 
   { key: 'keyWords', label: '키워드', required: false, ...list(z.string().max(50), 20) },
   { key: 'option', label: '옵션', required: false, ...list(optionCombination, 1000) },
@@ -159,6 +161,13 @@ export const findProductWriteViolation = (product: unknown, mode: 'full' | 'part
     }
 
     if (!field.schema.safeParse(value).success) return violationOf(field, value);
+  }
+
+  // 원산지가 '기타'면 직접 입력값이 원산지 자체다. 비어 있으면 네이버에 원산지 없이 전송된다.
+  // 부분 모드에서 직접 입력값만 보낸 경우는 저장된 원산지를 모르므로 보지 않는다.
+  if (record.originCountryCode === ORIGIN_ETC) {
+    const etc = record.originCountryEtc;
+    if (typeof etc !== 'string' || !etc.trim()) return `${subject('원산지(기타)')} 없습니다`;
   }
 
   return null;

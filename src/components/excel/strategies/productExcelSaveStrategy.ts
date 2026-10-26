@@ -7,6 +7,12 @@ import { DELIVERY_TYPE_OPTION } from '@/shared/constant/delivery.constant';
 import { CATEGORIES } from '@/shared/constant/category.constant';
 import { PRODUCT_EXCEL_COL } from '@/features/products/constant/bulkTemplate.constant';
 import {
+  ADULT_PRODUCT_OPTIONS,
+  ORIGIN_COUNTRIES,
+  ORIGIN_ETC,
+  TAX_TYPE_OPTIONS,
+} from '@/features/products/constant/compliance.constants';
+import {
   buildCombinationsFromExcel,
   resolveTotalQuantity,
   toExcelOptionPairs,
@@ -31,6 +37,9 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
     const option = buildCombinationsFromExcel(pairs, quantity, toText(r[PRODUCT_EXCEL_COL.skuPrefix]));
     const subOption = buildCombinationsFromExcel(subPairs, quantity, toText(r[PRODUCT_EXCEL_COL.subSkuPrefix]));
 
+    // 규정 정보는 기본값으로 떨어뜨리지 않는다 — 목록 밖이면 비워 두고 서버가 "없음"으로 거부한다.
+    const originCountryCode = toCode(ORIGIN_COUNTRIES, r[PRODUCT_EXCEL_COL.originCountry]);
+
     return {
       // 이 값은 서버에서 버려진다 — /api/products/bulk가 교차 테넌트 PK 충돌을 막으려고 항상 재채번한다.
       productId: generatorProductCode(),
@@ -49,6 +58,15 @@ export const productExcelSaveStrategy = (rows: ExcelRowWithErrors[]): Omit<Produ
       deliveryPrice: Number(r[PRODUCT_EXCEL_COL.deliveryPrice]),
       mainImage: (r[PRODUCT_EXCEL_COL.mainImage] as string) || '',
       detailPage: (r[PRODUCT_EXCEL_COL.detailPage] as string) || '',
+      originCountryCode,
+      // 폼도 '기타'가 아닌 국가로 바꾸면 직접 입력값을 지운다.
+      originCountryEtc:
+        originCountryCode === ORIGIN_ETC ? toText(r[PRODUCT_EXCEL_COL.originCountryEtc]) || undefined : undefined,
+      taxType: toCode(TAX_TYPE_OPTIONS, r[PRODUCT_EXCEL_COL.taxType]) as Product['taxType'],
+      adultProductType: toCode(
+        ADULT_PRODUCT_OPTIONS,
+        r[PRODUCT_EXCEL_COL.adultProductType],
+      ) as Product['adultProductType'],
       option,
       subOption,
       totalQuantity: resolveTotalQuantity(option, quantity),

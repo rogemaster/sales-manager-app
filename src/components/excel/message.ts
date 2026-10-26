@@ -22,6 +22,12 @@ export function excelValidErrorsCodeToMessages(errors: ValidationError[]): Valid
     if (item.code === 'EMPTY_VALUE') {
       return { ...item, message: `[${item.header}] 값이 비어 있습니다.` };
     }
+    if (item.code === 'EMPTY_REQUIRED_WHEN') {
+      return {
+        ...item,
+        message: `[${item.header}] [${item.requiredWhen?.header}] 값이 '${item.requiredWhen?.value}'이면 비워 둘 수 없습니다.`,
+      };
+    }
     if (item.code === 'INVALID_VALUE') {
       return {
         ...item,

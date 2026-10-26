@@ -12,6 +12,9 @@ const baseRow: ExcelRowWithErrors = {
   메인이미지: 'https://example.com/main.png',
   상세설명: '<p>상세</p>',
   총수량: 10,
+  원산지: '대한민국',
+  부가세유형: '과세',
+  성인상품여부: '일반상품',
 };
 
 describe('productExcelSaveStrategy - 브랜드 및 모델 정보', () => {
@@ -168,5 +171,39 @@ describe('productExcelSaveStrategy - 표시명을 코드로 치환', () => {
 
     expect(product.state).toBe('WAIT_SALE');
     expect(product.deliveryType).toBe('');
+  });
+});
+
+describe('productExcelSaveStrategy - 규정 정보', () => {
+  it('원산지·부가세유형·성인상품여부 표시명을 코드로 바꾼다', () => {
+    const [product] = productExcelSaveStrategy([
+      { ...baseRow, 원산지: '중국', 부가세유형: '면세', 성인상품여부: '성인상품' },
+    ]);
+
+    expect(product.originCountryCode).toBe('CN');
+    expect(product.taxType).toBe('TAX_FREE');
+    expect(product.adultProductType).toBe('ADULT');
+    expect(product.originCountryEtc).toBeUndefined();
+  });
+
+  it("원산지가 '기타'면 직접 입력값을 함께 저장한다", () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 원산지: '기타', '원산지(기타)': ' 베트남 외 ' }]);
+
+    expect(product.originCountryCode).toBe('ETC');
+    expect(product.originCountryEtc).toBe('베트남 외');
+  });
+
+  // 폼도 '기타'가 아닌 국가로 바꾸면 직접 입력값을 지운다.
+  it("원산지가 '기타'가 아니면 직접 입력값을 버린다", () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 원산지: '대한민국', '원산지(기타)': '베트남 외' }]);
+
+    expect(product.originCountryEtc).toBeUndefined();
+  });
+
+  // 업로드 검증이 앞에서 막지만, 목록 밖 값을 그대로 통과시키지 않는다 — 서버가 "없음"으로 거부한다.
+  it('목록 밖 표시명은 코드 없이 둔다', () => {
+    const [product] = productExcelSaveStrategy([{ ...baseRow, 부가세유형: '과세상품' }]);
+
+    expect(product.taxType).toBeUndefined();
   });
 });

@@ -29,7 +29,7 @@ export function validateExcelData(rowsData: ExcelRowType[], templateInfo: ExcelT
   const errors: ValidationError[] = [];
 
   rowsData.forEach((row) => {
-    templateInfo.forEach(({ name: header, req, allowed, numeric }) => {
+    templateInfo.forEach(({ name: header, req, allowed, numeric, requiredWhen }) => {
       if (req && missingField(row, header)) {
         errors.push({ row: getSheetRow(row), header, code: 'MISSING_FIELD' });
         return;
@@ -37,6 +37,16 @@ export function validateExcelData(rowsData: ExcelRowType[], templateInfo: ExcelT
 
       if (req && emptyValue(row, header)) {
         errors.push({ row: getSheetRow(row), header, code: 'EMPTY_VALUE' });
+        return;
+      }
+
+      // 컬럼 자체가 없어도 missingField로 보지 않는다 — 조건에 걸리지 않은 행까지 미리보기 불가가 된다.
+      if (
+        requiredWhen &&
+        String(row[requiredWhen.header] ?? '').trim() === requiredWhen.value &&
+        emptyValue(row, header)
+      ) {
+        errors.push({ row: getSheetRow(row), header, code: 'EMPTY_REQUIRED_WHEN', requiredWhen });
         return;
       }
 
