@@ -27,6 +27,16 @@ export const CollectionStatusCell = ({ status, newCount, duplicateCount, errorMe
       >
         {config.label}
       </span>
+      {/* 수집은 요청 1번에 끝나 서버가 중간 진행률을 주지 않는다 — 숫자 없이 진행 중임만 보인다 */}
+      {status === 'COLLECTING' && (
+        <div
+          role="progressbar"
+          aria-label="수집 진행 중"
+          className="h-1.5 w-24 overflow-hidden rounded-full bg-gray-200"
+        >
+          <div className="h-full w-1/3 animate-indeterminate rounded-full bg-blue-500" />
+        </div>
+      )}
       {showCounts && (
         <span className="text-xs text-muted-foreground">
           신규 {newCount} · 중복 {duplicateCount}
